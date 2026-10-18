@@ -21,6 +21,8 @@ import { enregistrerTentative } from "@/lib/supabase/projets";
 import { MonacoEditorPane } from "@/components/workspace/MonacoEditorPane";
 import { WorkspaceFileTree } from "@/components/workspace/WorkspaceFileTree";
 import { PreviewSandbox } from "@/components/workspace/PreviewSandbox";
+import { DatabasePanel } from "@/components/sql/DatabasePanel";
+import { PhpRunnerPanel } from "@/components/php/PhpRunnerPanel";
 import type { WorkspaceFile } from "@/components/workspace/types";
 import {
   BookOpen,
@@ -81,13 +83,17 @@ function Workspace() {
     starterFiles: ex.starter,
   });
 
-  const [activeFileName, setActiveFileName] = useState<string>("index.html");
+  const [activeFileName, setActiveFileName] = useState<string>(() => Object.keys(ex.starter)[0] ?? "index.html");
   const [sidebarTab, setSidebarTab] = useState<"enonce" | "fichiers" | "resultats">("enonce");
   const [evaluationSummary, setEvaluationSummary] = useState<EvaluationSummary | null>(null);
   const [unlockedHints, setUnlockedHints] = useState<UnlockedHint[]>([]);
   const [unlockingHint, setUnlockingHint] = useState(false);
   const [verifying, setVerifying] = useState(false);
   const [cursorPos, setCursorPos] = useState({ line: 1, col: 1 });
+
+  const hasPhp = useMemo(() => Object.keys(files).some((k) => k.endsWith(".php")), [files]);
+  const hasSql = useMemo(() => Object.keys(files).some((k) => k.endsWith(".sql") || k === "db/init.sql"), [files]);
+  const [rightPanelTab, setRightPanelTab] = useState<"preview" | "sql" | "php">("preview");
 
   const handleVerify = () => {
     setVerifying(true);
@@ -100,9 +106,19 @@ function Workspace() {
     document.body.appendChild(frame);
 
     // Extraction du contenu HTML pour les tests
-    const html = files["index.html"]?.content ?? "";
-    const css = files["style.css"]?.content ?? "";
-    const js = files["script.js"]?.content ?? "";
+    const htmlKey =
+      files["index.html"] !== undefined
+        ? "index.html"
+        : Object.keys(files).find((k) => k.endsWith(".html")) ?? "index.html";
+    const html = files[htmlKey]?.content ?? "";
+    const css = Object.entries(files)
+      .filter(([k]) => k.endsWith(".css"))
+      .map(([, f]) => f.content)
+      .join("\n");
+    const js = Object.entries(files)
+      .filter(([k]) => k.endsWith(".js"))
+      .map(([, f]) => f.content)
+      .join("\n");
 
     const combinedDoc = `<!DOCTYPE html><html><head><style>${css}</style></head><body>${html.replace(/<!DOCTYPE.*?>/i, "")}<script>${js}</script></body></html>`;
 
@@ -444,9 +460,59 @@ function Workspace() {
           </div>
         </section>
 
-        {/* Panneau Droit : Aperçu Bac à Sable Sécurisé */}
-        <section className="flex min-h-0 flex-col">
-          <PreviewSandbox files={files} />
+        {/* Panneau Droit : Aperçu Bac à Sable Sécurisé + Base SQL + Console PHP */}
+        <section className="flex min-h-0 flex-col bg-background">
+          {(hasSql || hasPhp) && (
+            <div className="flex border-b bg-panel text-xs font-mono shrink-0 select-none">
+              <button
+                onClick={() => setRightPanelTab("preview")}
+                className={`flex-1 py-2 text-center transition-colors border-b-2 ${
+                  rightPanelTab === "preview"
+                    ? "border-b-primary font-semibold text-foreground bg-background/50"
+                    : "border-b-transparent text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                Aperçu Web
+              </button>
+              {hasSql && (
+                <button
+                  onClick={() => setRightPanelTab("sql")}
+                  className={`flex-1 py-2 text-center transition-colors border-b-2 ${
+                    rightPanelTab === "sql"
+                      ? "border-b-primary font-semibold text-foreground bg-background/50"
+                      : "border-b-transparent text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  Base SQL (SQLite)
+                </button>
+              )}
+              {hasPhp && (
+                <button
+                  onClick={() => setRightPanelTab("php")}
+                  className={`flex-1 py-2 text-center transition-colors border-b-2 ${
+                    rightPanelTab === "php"
+                      ? "border-b-primary font-semibold text-foreground bg-background/50"
+                      : "border-b-transparent text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  Console PHP 8.2
+                </button>
+              )}
+            </div>
+          )}
+
+          <div className="flex-1 min-h-0 overflow-hidden">
+            {rightPanelTab === "preview" && <PreviewSandbox files={files} />}
+            {rightPanelTab === "sql" && (
+              <DatabasePanel
+                initialSql={files["db/init.sql"]?.content || files["schema.sql"]?.content || ""}
+                projectFiles={Object.fromEntries(Object.entries(files).map(([k, v]) => [k, v.content]))}
+              />
+            )}
+            {rightPanelTab === "php" && (
+              <PhpRunnerPanel files={files} activeFileName={activeFileName} />
+            )}
+          </div>
         </section>
       </div>
 

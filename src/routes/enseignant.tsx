@@ -39,9 +39,125 @@ export const Route = createFileRoute("/enseignant")({
   component: TeacherDashboardPage,
 });
 
+const DEMO_CLASSES: TeacherClass[] = [
+  {
+    id: "demo-cls-1",
+    nom: "Terminale STI2D - Groupe 1",
+    annee: "2026-2027",
+    archivee: false,
+    created_at: new Date().toISOString(),
+    members_count: 24,
+    assigned_subjects_count: 3,
+  },
+  {
+    id: "demo-cls-2",
+    nom: "Terminale STI2D - Groupe 2",
+    annee: "2026-2027",
+    archivee: false,
+    created_at: new Date().toISOString(),
+    members_count: 22,
+    assigned_subjects_count: 2,
+  },
+];
+
+const DEMO_STUDENTS: TeacherClassMember[] = [
+  {
+    eleve_id: "demo-s1",
+    nom: "Bernard",
+    prenom: "Lucas",
+    score_formatif: 90,
+    projet_statut: "rendu",
+    criteres_reussis: 6,
+    total_criteres: 6,
+    joined_at: new Date(Date.now() - 86400000 * 5).toISOString(),
+    derniere_activite: new Date().toISOString(),
+    points_faibles: [],
+  },
+  {
+    eleve_id: "demo-s2",
+    nom: "Khelifi",
+    prenom: "Inès",
+    score_formatif: 70,
+    projet_statut: "en_cours",
+    criteres_reussis: 4,
+    total_criteres: 6,
+    joined_at: new Date(Date.now() - 86400000 * 4).toISOString(),
+    derniere_activite: new Date().toISOString(),
+    points_faibles: ["Contrôle de saisie CIN (8 chiffres)"],
+  },
+  {
+    eleve_id: "demo-s3",
+    nom: "Zitouni",
+    prenom: "Mehdi",
+    score_formatif: 85,
+    projet_statut: "rendu",
+    criteres_reussis: 5,
+    total_criteres: 6,
+    joined_at: new Date(Date.now() - 86400000 * 3).toISOString(),
+    derniere_activite: new Date().toISOString(),
+    points_faibles: [],
+  },
+  {
+    eleve_id: "demo-s4",
+    nom: "Moreau",
+    prenom: "Camille",
+    score_formatif: 40,
+    projet_statut: "en_cours",
+    criteres_reussis: 2,
+    total_criteres: 6,
+    joined_at: new Date(Date.now() - 86400000 * 2).toISOString(),
+    derniere_activite: new Date().toISOString(),
+    points_faibles: ["Syntaxe requête SQL JOIN", "Sélection d'élément DOM"],
+  },
+];
+
+const DEMO_INVITATIONS: ClassInvitationRecord[] = [
+  {
+    id: "demo-inv-1",
+    class_id: "demo-cls-1",
+    code: "STI-7842",
+    expire_le: new Date(Date.now() + 86400000 * 30).toISOString(),
+    utilisations_max: 30,
+    nb_utilisations: 4,
+    revoque: false,
+    created_at: new Date().toISOString(),
+  },
+];
+
+const DEMO_FILES: StudentFile[] = [
+  {
+    id: "demo-f1",
+    chemin: "index.html",
+    contenu: `<!DOCTYPE html>\n<html lang="fr">\n<head>\n  <meta charset="UTF-8">\n  <title>Laboratoire STI - Copie Élève</title>\n  <link rel="stylesheet" href="style.css">\n</head>\n<body>\n  <article class="carte">\n    <h1>TP Synthèse Don Lycée</h1>\n    <p>Travail réalisé par l'élève en salle de TP.</p>\n  </article>\n  <script src="script.js"></script>\n</body>\n</html>`,
+    rev: 1,
+    updated_at: new Date().toISOString(),
+  },
+  {
+    id: "demo-f2",
+    chemin: "style.css",
+    contenu: `body {\n  font-family: sans-serif;\n  background-color: #f8fafc;\n}\n.carte {\n  border: 2px solid #0066cc;\n  border-radius: 8px;\n  padding: 16px;\n}`,
+    rev: 1,
+    updated_at: new Date().toISOString(),
+  },
+  {
+    id: "demo-f3",
+    chemin: "script.js",
+    contenu: `console.log("Contrôle de validation chargé pour vérification enseignant.");`,
+    rev: 1,
+    updated_at: new Date().toISOString(),
+  },
+];
+
 function TeacherDashboardPage() {
   const { user, profile, role, loading: authLoading } = useAuth();
   const navigate = useNavigate();
+
+  const [isDemo, setIsDemo] = useState(() => {
+    if (typeof window !== "undefined") {
+      return new URLSearchParams(window.location.search).get("demo") === "true";
+    }
+    return false;
+  });
 
   const [classes, setClasses] = useState<TeacherClass[]>([]);
   const [selectedClassId, setSelectedClassId] = useState<string | null>(null);
@@ -60,6 +176,14 @@ function TeacherDashboardPage() {
 
   // Charger les classes de l'enseignant
   const loadClasses = async () => {
+    if (isDemo) {
+      setClasses(DEMO_CLASSES);
+      if (!selectedClassId) setSelectedClassId("demo-cls-1");
+      setStudents(DEMO_STUDENTS);
+      setInvitations(DEMO_INVITATIONS);
+      return;
+    }
+
     if (!user) return;
     setLoadingData(true);
     const cls = await getTeacherClasses(user.id);
@@ -73,6 +197,12 @@ function TeacherDashboardPage() {
 
   // Charger les données de la classe sélectionnée
   const loadClassDetails = async (classId: string) => {
+    if (isDemo) {
+      setStudents(DEMO_STUDENTS);
+      setInvitations(DEMO_INVITATIONS);
+      return;
+    }
+
     setLoadingData(true);
     const [progress, invs] = await Promise.all([
       getClassStudentsProgress(classId),
@@ -84,21 +214,38 @@ function TeacherDashboardPage() {
   };
 
   useEffect(() => {
-    if (user && (role === "enseignant" || role === "admin")) {
+    if (isDemo || (user && (role === "enseignant" || role === "admin"))) {
       loadClasses();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user, role]);
+  }, [user, role, isDemo]);
 
   useEffect(() => {
     if (selectedClassId) {
       loadClassDetails(selectedClassId);
     }
-  }, [selectedClassId]);
+  }, [selectedClassId, isDemo]);
 
   // Création d'une nouvelle classe
   const handleCreateClass = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isDemo) {
+      const newCls: TeacherClass = {
+        id: `demo-cls-${Date.now()}`,
+        nom: newClassName || "Nouvelle Classe STI",
+        annee: "2026-2027",
+        archivee: false,
+        created_at: new Date().toISOString(),
+        members_count: 0,
+        assigned_subjects_count: 0,
+      };
+      setClasses([...classes, newCls]);
+      setSelectedClassId(newCls.id);
+      setNewClassName("");
+      setIsCreatingClass(false);
+      return;
+    }
+
     if (!user) return;
     setNewClassError(null);
 
@@ -117,6 +264,11 @@ function TeacherDashboardPage() {
   const handleInspectCopy = async (student: TeacherClassMember) => {
     setInspectingStudent(student);
     setLoadingCopy(true);
+    if (isDemo) {
+      setInspectingFiles(DEMO_FILES);
+      setLoadingCopy(false);
+      return;
+    }
     const files = await getStudentCopyFiles(student.eleve_id);
     setInspectingFiles(files);
     setLoadingCopy(false);
@@ -139,7 +291,7 @@ function TeacherDashboardPage() {
   };
 
   // 1. Écran de chargement initial d'authentification
-  if (authLoading) {
+  if (authLoading && !isDemo) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background text-muted-foreground text-sm">
         Vérification des droits d'accès enseignant...
@@ -147,8 +299,8 @@ function TeacherDashboardPage() {
     );
   }
 
-  // 2. Contrôle d'accès strict (T-02, PRD F-01)
-  if (!user || (role !== "enseignant" && role !== "admin")) {
+  // 2. Contrôle d'accès strict (T-02, PRD F-01) avec proposition de Mode Démo
+  if (!isDemo && (!user || (role !== "enseignant" && role !== "admin"))) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background px-4">
         <div className="max-w-md w-full border rounded-xl p-8 bg-card text-center space-y-4 shadow-lg">
@@ -156,14 +308,23 @@ function TeacherDashboardPage() {
             <ShieldAlert className="w-6 h-6" />
           </div>
           <h1 className="text-xl font-bold text-foreground">Accès Réservé aux Enseignants</h1>
-          <p className="text-xs text-muted-foreground">
-            L'espace de supervision de classe est strictement restreint aux comptes enseignants
-            validés par l'administration (T-02, T-03).
+          <p className="text-xs text-muted-foreground leading-relaxed">
+            L'espace de supervision de classe est restreint aux comptes enseignants validés par
+            l'administration (T-02, T-03).
           </p>
-          <div className="pt-4">
+          <div className="pt-2 flex flex-col gap-2">
+            <Button
+              onClick={() => {
+                setIsDemo(true);
+                loadClasses();
+              }}
+              className="w-full bg-primary text-primary-foreground text-xs font-medium h-9"
+            >
+              Explorer en Mode Démo Enseignant
+            </Button>
             <Link
               to="/"
-              className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-xs font-medium text-primary-foreground hover:bg-primary/90 transition-colors gap-2"
+              className="inline-flex items-center justify-center rounded-md border px-4 py-2 text-xs font-medium hover:bg-muted transition-colors gap-2 text-muted-foreground hover:text-foreground"
             >
               <ArrowLeft className="w-4 h-4" />
               Retourner à l'espace élève
@@ -208,9 +369,13 @@ function TeacherDashboardPage() {
           </div>
           <Badge
             variant="outline"
-            className="text-[10px] bg-primary/10 text-primary border-primary/20"
+            className={`text-[10px] ${isDemo ? "bg-amber-500/10 text-amber-500 border-amber-500/20" : "bg-primary/10 text-primary border-primary/20"}`}
           >
-            {role === "admin" ? "Administrateur" : "Enseignant certifié"}
+            {isDemo
+              ? "Mode Démonstration"
+              : role === "admin"
+                ? "Administrateur"
+                : "Enseignant certifié"}
           </Badge>
         </div>
 
@@ -218,7 +383,11 @@ function TeacherDashboardPage() {
           <span className="text-muted-foreground">
             Connecté :{" "}
             <strong className="text-foreground">
-              {profile?.prenom} {profile?.nom}
+              {isDemo
+                ? "Professeur (Démo)"
+                : `${profile?.prenom || ""} ${profile?.nom || ""}`.trim() ||
+                  user?.email ||
+                  "Enseignant"}
             </strong>
           </span>
           <Button

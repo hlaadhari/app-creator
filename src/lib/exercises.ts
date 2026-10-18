@@ -1,5 +1,7 @@
-export type FileName = "index.html" | "style.css" | "script.js";
-export type Files = Record<FileName, string>;
+import { contentSubjects } from "./content/all-subjects";
+
+export type FileName = string;
+export type Files = Record<string, string>;
 
 export type Criterion = {
   id: string;
@@ -15,7 +17,13 @@ export type Exercise = {
   title: string;
   level: "Facile" | "Moyen" | "Difficile";
   competence: string;
+  module?: string;
+  dureeMinutes?: number;
+  tags?: string[];
+  examMode?: boolean;
+  bareme?: number;
   statement: string[];
+  enonceMarkdown?: string;
   starter: Files;
   criteria: Criterion[];
   hints: string[];
@@ -24,7 +32,7 @@ export type Exercise = {
 const css = (win: Window, el: Element | null, prop: string) =>
   el ? win.getComputedStyle(el).getPropertyValue(prop).trim() : "";
 
-export const exercises: Exercise[] = [
+export const initialExercises: Exercise[] = [
   {
     id: "carte-profil",
     title: "Carte de profil",
@@ -119,19 +127,57 @@ export const exercises: Exercise[] = [
   },
 ];
 
+export const exercises: Exercise[] = [
+  ...initialExercises.map((e) => ({
+    ...e,
+    module: "Initiation",
+    dureeMinutes: 15,
+    tags: [e.competence.split(" – ")[0] || "Web"],
+  })),
+  ...contentSubjects,
+];
+
 export const getExercise = (id: string) => exercises.find((e) => e.id === id);
 
 /** Assemble les fichiers en un document unique pour l'aperçu. */
 export function buildDocument(files: Files): string {
-  let html = files["index.html"];
-  const style = `<style>\n${files["style.css"]}\n</style>`;
-  const script = `<script>\n${files["script.js"].replace(/<\/script>/gi, "<" + "/script>")}\n</script>`;
-  html = /<link[^>]*href=["']style\.css["'][^>]*>/i.test(html)
-    ? html.replace(/<link[^>]*href=["']style\.css["'][^>]*>/i, style)
-    : html.replace(/<\/head>/i, `${style}</head>`);
-  html = /<script[^>]*src=["']script\.js["'][^>]*>\s*<\/script>/i.test(html)
-    ? html.replace(/<script[^>]*src=["']script\.js["'][^>]*>\s*<\/script>/i, script)
-    : html.replace(/<\/body>/i, `${script}</body>`);
+  // Déterminer le fichier HTML principal (ex: index.html, location.html, Don.html, evaluation.html)
+  const htmlKey =
+    files["index.html"] !== undefined
+      ? "index.html"
+      : Object.keys(files).find((k) => k.endsWith(".html")) ?? "index.html";
+  let html = files[htmlKey] ?? "<!DOCTYPE html><html><body></body></html>";
+
+  // Récupérer et concaténer toutes les feuilles CSS
+  const cssParts = Object.entries(files)
+    .filter(([k]) => k.endsWith(".css"))
+    .map(([, v]) => v)
+    .join("\n");
+  const style = cssParts ? `<style>\n${cssParts}\n</style>` : "";
+
+  // Récupérer et concaténer tous les scripts JS
+  const jsParts = Object.entries(files)
+    .filter(([k]) => k.endsWith(".js"))
+    .map(([, v]) => v)
+    .join("\n");
+  const script = jsParts ? `<script>\n${jsParts.replace(/<\/script>/gi, "<" + "/script>")}\n</script>` : "";
+
+  if (style) {
+    if (html.includes("</head>")) {
+      html = html.replace(/<\/head>/i, `${style}\n</head>`);
+    } else {
+      html = `${style}\n${html}`;
+    }
+  }
+
+  if (script) {
+    if (html.includes("</body>")) {
+      html = html.replace(/<\/body>/i, `${script}\n</body>`);
+    } else {
+      html = `${html}\n${script}`;
+    }
+  }
+
   return html;
 }
 

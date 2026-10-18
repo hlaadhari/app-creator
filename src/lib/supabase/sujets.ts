@@ -7,13 +7,29 @@ export interface RemoteSujet {
   niveau: "Facile" | "Moyen" | "Difficile";
   competence: string;
   ordre: number;
+  module?: string;
+  dureeMinutes?: number;
+  tags?: string[];
+  examMode?: boolean;
 }
 
 /**
- * Récupère le catalogue des sujets depuis Supabase avec repli (fallback)
- * transparent sur la liste statique locale si hors-ligne ou erreur réseau.
+ * Récupère le catalogue des sujets depuis Supabase avec fusion transparente
+ * et repli sur la liste statique locale complète (10 sujets des Modules A, B, C).
  */
 export async function getSujetsCatalog(): Promise<RemoteSujet[]> {
+  const localList: RemoteSujet[] = exercises.map((e, idx) => ({
+    id: e.id,
+    titre: e.title,
+    niveau: e.level,
+    competence: e.competence,
+    ordre: idx + 1,
+    module: e.module || "Initiation",
+    dureeMinutes: e.dureeMinutes || 20,
+    tags: e.tags || [],
+    examMode: e.examMode || false,
+  }));
+
   try {
     const { data, error } = await supabase
       .from("sujets")
@@ -21,32 +37,38 @@ export async function getSujetsCatalog(): Promise<RemoteSujet[]> {
       .order("ordre", { ascending: true });
 
     if (error || !data || data.length === 0) {
-      console.warn("[Supabase] Catalogue distant non disponible, utilisation du catalogue local :", error?.message);
-      return exercises.map((e, idx) => ({
-        id: e.id,
-        titre: e.title,
-        niveau: e.level,
-        competence: e.competence,
-        ordre: idx + 1,
-      }));
+      return localList;
     }
 
-    return data.map((d) => ({
-      id: d.id,
-      titre: d.titre,
-      niveau: d.niveau as "Facile" | "Moyen" | "Difficile",
-      competence: d.competence,
-      ordre: d.ordre,
-    }));
+    const remoteIds = new Set(data.map((d) => d.id));
+    const merged: RemoteSujet[] = data.map((d) => {
+      const local = exercises.find((e) => e.id === d.id);
+      return {
+        id: d.id,
+        titre: d.titre,
+        niveau: d.niveau as "Facile" | "Moyen" | "Difficile",
+        competence: d.competence,
+        ordre: d.ordre,
+        module: local?.module || "Initiation",
+        dureeMinutes: local?.dureeMinutes || 20,
+        tags: local?.tags || [],
+        examMode: local?.examMode || false,
+      };
+    });
+
+    for (const item of localList) {
+      if (!remoteIds.has(item.id)) {
+        merged.push({
+          ...item,
+          ordre: merged.length + 1,
+        });
+      }
+    }
+
+    return merged;
   } catch (err) {
     console.warn("[Supabase] Exception réseau lors du chargement des sujets, repli local :", err);
-    return exercises.map((e, idx) => ({
-      id: e.id,
-      titre: e.title,
-      niveau: e.level,
-      competence: e.competence,
-      ordre: idx + 1,
-    }));
+    return localList;
   }
 }
 
@@ -95,9 +117,8 @@ export async function getStarterFiles(sujetId: string): Promise<Files> {
     }
 
     return {
-      "index.html": remoteFiles["index.html"] ?? fallback["index.html"],
-      "style.css": remoteFiles["style.css"] ?? fallback["style.css"],
-      "script.js": remoteFiles["script.js"] ?? fallback["script.js"],
+      ...fallback,
+      ...remoteFiles,
     };
   } catch {
     return fallback;
