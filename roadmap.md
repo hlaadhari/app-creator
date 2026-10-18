@@ -9,7 +9,7 @@
 
 | Jalon | Étape & Périmètre | Livrable Clé | Condition de Sortie / Seuil | Statut |
 |---|---|---|---|---|
-| **M0** | **Phase 0 : Validation Technique** | Rapport de faisabilité + banc de test | Décision Go / Go conditionnel / No-Go (§7.5) | **En cours / Spécifié** |
+| **M0** | **Phase 0 : Validation Technique** | Rapport de faisabilité + banc de test | Décision Go / Go conditionnel / No-Go (§7.5) | **Validé (Go conditionnel)** |
 | **M1** | **Phase 1 : Fondations & Base** | Schéma Supabase, Auth, RLS, CI | Démarrage en environnement vierge, RLS testées | **Partiellement réalisé** |
 | **M2** | **Phase 1 : MVP Parcours Élève** | Parcours complet HTML/CSS/JS | Critères d'acceptation Phase 1 validés | **En cours** |
 | **M3** | **Pilote Court HTML/CSS/JS** | Retour terrain sur 1 classe (4-6 sem.) | 0 perte de données, satisfaction ≥ 4/5 | Planifié |
@@ -26,10 +26,10 @@
 ### Jalon M0 — Phase 0 : Validation Technique (Jalon de Décision)
 - [x] Spécification du protocole de test sur poste de référence (4 Go RAM, CPU double cœur).
 - [x] Définition des 3 sujets représentatifs (S1 : Formulaire PHP POST, S2 : SQL avancé, S3 : Multi-pages & sessions).
-- [ ] [Issue #12](https://github.com/hlaadhari/app-creator/issues/12) : Conception du harnais de comparaison (sortie HTML, état base, codes retours entre MariaDB/PHP natif et WASM).
-- [ ] Mesure des métriques de performance (temps de chargement, consommation mémoire).
-- [ ] Chiffrage précis du Plan B (coût par élève/heure sur conteneurs isolés).
-- [ ] Décision formelle : **Go / Go conditionnel / No-Go**.
+- [x] [Issue #12](https://github.com/hlaadhari/app-creator/issues/12) : Conception du harnais de comparaison (sortie HTML, état base, codes retours entre MariaDB/PHP natif et WASM).
+- [x] Mesure des métriques de performance (temps de chargement, consommation mémoire).
+- [x] Chiffrage précis du Plan B (coût par élève/heure sur conteneurs isolés).
+- [x] Décision formelle : **Go / Go conditionnel / No-Go** ([docs/PHASE_0_REPORT.md](docs/PHASE_0_REPORT.md) validé avec **GO CONDITIONNEL**).
 
 ---
 
@@ -37,7 +37,7 @@
 - [x] **Étape 1.1 - Rôles & Profils** : Migration `0000_etape1_profiles_roles.sql` (enum `app_role`, table `profiles`, trigger `handle_new_user`, fonction `has_role`).
 - [x] **Étape 1.2 - Sujets & Immuabilité** : Migration `0001_etape2_sujets.sql` (tables `sujets`, `sujet_versions`, `sujet_version_fichiers`, `criteres`, `solutions`, `indices`, triggers `protect_published_version` et `protect_published_children`, seed 3 sujets initiaux).
 - [x] **Étape 1.3 - Classes, Invitations & Projets** : Migration `0002_etape3_classes_projets.sql` (tables `classes`, `class_invitations`, `class_members`, `class_sujets`, `projets`, `projet_fichiers`, `tentatives`, RPC `rejoindre_classe` et `initialiser_projet`, RLS complètes).
-- [ ] **Étape 1.4 - Suite de tests négatifs MVP** : [Issue #9](https://github.com/hlaadhari/app-creator/issues/9) : Automatisation des tests T-01 à T-14 en CI.
+- [x] **Étape 1.4 - Suite de tests négatifs MVP** : [Issue #9](https://github.com/hlaadhari/app-creator/issues/9) : Automatisation des tests T-01 à T-14 en CI.
 
 ---
 
