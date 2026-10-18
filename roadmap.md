@@ -36,7 +36,7 @@
 ### Jalon M1 — Phase 1 (Lot A) : Fondations & Données
 - [x] **Étape 1.1 - Rôles & Profils** : Migration `0000_etape1_profiles_roles.sql` (enum `app_role`, table `profiles`, trigger `handle_new_user`, fonction `has_role`).
 - [x] **Étape 1.2 - Sujets & Immuabilité** : Migration `0001_etape2_sujets.sql` (tables `sujets`, `sujet_versions`, `sujet_version_fichiers`, `criteres`, `solutions`, `indices`, triggers `protect_published_version` et `protect_published_children`, seed 3 sujets initiaux).
-- [ ] **Étape 1.3 - Classes & Invitations** : Création des tables `classes`, `class_invitations`, `class_members` avec validation admin du rôle enseignant.
+- [x] **Étape 1.3 - Classes, Invitations & Projets** : Migration `0002_etape3_classes_projets.sql` (tables `classes`, `class_invitations`, `class_members`, `class_sujets`, `projets`, `projet_fichiers`, `tentatives`, RPC `rejoindre_classe` et `initialiser_projet`, RLS complètes).
 - [ ] **Étape 1.4 - Suite de tests négatifs MVP** : Automatisation des tests T-01, T-02, T-03, T-05, T-09, T-12 en CI.
 
 ---
