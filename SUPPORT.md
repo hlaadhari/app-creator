@@ -31,4 +31,4 @@ Bienvenue sur le centre d'assistance de **Sprout Workshop / Labo STI**.
 ## 3. Canaux de Communication
 
 - **Discussions GitHub** : [https://github.com/hlaadhari/app-creator/discussions](https://github.com/hlaadhari/app-creator/discussions)
-- **E-mail de contact** : `hatem.zitouni.ptd@gmail.com`
+- **E-mail de contact** : `hatem.laadhari@gmail.com`
