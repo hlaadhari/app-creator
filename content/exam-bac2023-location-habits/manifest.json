@@ -1,0 +1,13 @@
+{
+  "id": "exam-bac2023-location-habits",
+  "titre": "Bac 2023 - Location d'Habits Traditionnels",
+  "module": "Module C",
+  "duree_minutes": 90,
+  "niveau": 3,
+  "exam_mode": true,
+  "bareme": 20,
+  "tags": ["Bac STI", "HTML5", "CSS3", "JavaScript", "PHP", "MySQLi", "Examen Blanc"],
+  "description": "Sujet officiel du Bac Pratique STI 2023 : gestion de la location d'habits avec validation client, vérification de disponibilité, enregistrement SQL et mise à jour de stock.",
+  "fichiers_attendus": ["location.html", "mesStyles.css", "controls.js", "location.php"],
+  "base_de_donnees": "db/init.sql"
+}

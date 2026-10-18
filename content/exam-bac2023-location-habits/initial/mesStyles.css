@@ -1,0 +1,27 @@
+/* Feuille de style initiale à enrichir par l'élève */
+body {
+  font-family: Arial, sans-serif;
+  margin: 20px;
+  background-color: #f7f9fa;
+  color: #333;
+}
+
+h1 {
+  color: #0b3954;
+  text-align: center;
+}
+
+fieldset {
+  width: 600px;
+  margin: 0 auto;
+  padding: 15px;
+  border: 2px solid #0b3954;
+  border-radius: 8px;
+  background-color: #ffffff;
+}
+
+legend {
+  font-weight: bold;
+  color: #0b3954;
+  padding: 0 10px;
+}

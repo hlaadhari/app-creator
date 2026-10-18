@@ -1,0 +1,96 @@
+[
+  {
+    "id": "EX23-01",
+    "code": "HTML-01",
+    "titre": "Structure du formulaire de location (HTML5)",
+    "description": "Le formulaire location.html doit comporter les champs cin, id_habit, date_loc, duree et la méthode POST vers location.php.",
+    "points": 2,
+    "ordre": 1,
+    "sonde": {
+      "type": "dom_selector",
+      "selector": "form[method=\"POST\" i][action=\"location.php\"] input#cin, form select#id_habit, form input#date_loc, form input#duree",
+      "minCount": 4
+    },
+    "fail_message": "Le formulaire location.html ne contient pas tous les champs requis (cin, id_habit, date_loc, duree) ou n'envoie pas en POST vers location.php."
+  },
+  {
+    "id": "EX23-02",
+    "code": "CSS-01",
+    "titre": "Liaison et mise en forme CSS3",
+    "description": "La feuille mesStyles.css doit styliser le conteneur fieldset avec bordure, padding et coins arrondis.",
+    "points": 2,
+    "ordre": 2,
+    "sonde": {
+      "type": "css_property",
+      "selector": "fieldset",
+      "property": "border-width",
+      "isGreaterThanZero": true
+    },
+    "fail_message": "La feuille mesStyles.css n'applique pas les styles attendus sur le fieldset."
+  },
+  {
+    "id": "EX23-03",
+    "code": "JS-01",
+    "titre": "Contrôle JS du CIN dans verif2()",
+    "description": "La fonction verif2() doit valider que le champ CIN contient exactement 8 chiffres.",
+    "points": 2.5,
+    "ordre": 3,
+    "sonde": {
+      "type": "js_eval",
+      "checkSelector": "#cin"
+    },
+    "fail_message": "La fonction verif2() ne valide pas correctement la longueur et le format à 8 chiffres du CIN."
+  },
+  {
+    "id": "EX23-04",
+    "code": "JS-02",
+    "titre": "Contrôle JS sélection habit, date et durée",
+    "description": "La fonction verif2() doit refuser la soumission si aucun habit n'est choisi, si la date est vide ou si la durée est inférieure ou égale à zéro.",
+    "points": 2.5,
+    "ordre": 4,
+    "sonde": {
+      "type": "js_eval",
+      "checkSelector": "#duree"
+    },
+    "fail_message": "La fonction verif2() ne valide pas la sélection de l'habit, la date ou la durée strictement positive."
+  },
+  {
+    "id": "EX23-05",
+    "code": "PHP-01",
+    "titre": "Connexion MySQLi et réception des paramètres POST",
+    "description": "Le script location.php doit établir la connexion à bd2023 et extraire les variables cin, id_habit, date_loc et duree.",
+    "points": 4,
+    "ordre": 5,
+    "sonde": {
+      "type": "dom_selector",
+      "selector": "body"
+    },
+    "fail_message": "Connexion MySQLi ou extraction des paramètres POST incorrecte dans location.php."
+  },
+  {
+    "id": "EX23-06",
+    "code": "SQL-01",
+    "titre": "Vérification client et insertion dans location",
+    "description": "Le script doit vérifier l'existence du client et insérer un nouvel enregistrement dans la table location.",
+    "points": 4,
+    "ordre": 6,
+    "sonde": {
+      "type": "dom_selector",
+      "selector": "body"
+    },
+    "fail_message": "La vérification du client ou la requête INSERT INTO location est manquante ou incorrecte."
+  },
+  {
+    "id": "EX23-07",
+    "code": "SQL-02",
+    "titre": "Mise à jour de disponibilité et affichage récapitulatif",
+    "description": "Le script doit exécuter UPDATE habit SET disponible = 'N' et afficher le montant total calculé.",
+    "points": 3,
+    "ordre": 7,
+    "sonde": {
+      "type": "dom_selector",
+      "selector": "body"
+    },
+    "fail_message": "La mise à jour de la disponibilité dans habit ou le récapitulatif de location est manquant."
+  }
+]

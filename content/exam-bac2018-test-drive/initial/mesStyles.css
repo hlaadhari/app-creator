@@ -1,0 +1,27 @@
+/* Styles initiaux Test Drive */
+body {
+  font-family: Arial, sans-serif;
+  margin: 20px;
+  background-color: #f8f9fa;
+  color: #212529;
+}
+
+h1 {
+  text-align: center;
+  color: #c0392b;
+}
+
+fieldset {
+  width: 620px;
+  margin: 0 auto;
+  padding: 15px;
+  border: 2px solid #c0392b;
+  border-radius: 8px;
+  background-color: #ffffff;
+}
+
+legend {
+  font-weight: bold;
+  color: #c0392b;
+  padding: 0 10px;
+}
