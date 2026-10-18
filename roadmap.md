@@ -13,7 +13,7 @@
 | **M1** | **Phase 1 : Fondations & Base** | Schéma Supabase, Auth, RLS, CI | Démarrage en environnement vierge, RLS testées | **Partiellement réalisé** |
 | **M2** | **Phase 1 : MVP Parcours Élève** | Parcours complet HTML/CSS/JS | Critères d'acceptation Phase 1 validés | **En cours** |
 | **M3** | **Pilote Court HTML/CSS/JS** | Retour terrain sur 1 classe (4-6 sem.) | 0 perte de données, satisfaction ≥ 4/5 | Planifié |
-| **M4** | **Phase 2 : PHP & SQL Local** | Exécution WASM, panneau SQL, dialecte | Scénarios essentiels du Bac conformes | Planifié |
+| **M4** | **Phase 2 : PHP & SQL Local** | Exécution WASM, panneau SQL, dialecte | Scénarios essentiels du Bac conformes | **Validé** |
 | **M5** | **Phase 3 : Correction Étendue & Aides** | Indices 3 niveaux, corrigés, contestations | Faux négatifs < 3%, faux positifs < 1% | Planifié |
 | **M6** | **Phase 4 : Mode Examen & Snapshots** | Sessions synchronisées, grille notation | Écritures refusées après temps serveur, snapshots scellés | Planifié |
 | **M7** | **Phase 5 : Pilotage & Compétences** | Référentiel, points faibles, tuteur IA | Formule de maîtrise testée, tuteur coupé en examen | Planifié |
@@ -67,11 +67,11 @@
 
 ### Jalon M4 — Phase 2 : PHP + SQL Local
 - [x] [Issue #13](https://github.com/hlaadhari/app-creator/issues/13) : Intégration de PHP WASM dans un Web Worker avec limites de ressources (watchdog 3s, max 64 Mo).
-- [ ] [Issue #14](https://github.com/hlaadhari/app-creator/issues/14) : Intégration du moteur SQLite WASM et chargement des scripts `.sql` du sujet.
-- [ ] Panneau « Base de données » (visualiseur de tables, exécution de requêtes interactives).
-- [ ] Implémentation du **Contrôleur de dialecte SQL** (alerte sur les syntaxes SQLite incompatibles MySQL).
-- [ ] Bouton de réinitialisation de la base à l'état initial du sujet.
-- [ ] Export et import de l'archive `SW_xxxxx.zip`.
+- [x] [Issue #14](https://github.com/hlaadhari/app-creator/issues/14) : Intégration du moteur SQLite WASM et chargement des scripts `.sql` du sujet.
+- [x] Panneau « Base de données » (visualiseur de tables, exécution de requêtes interactives).
+- [x] Implémentation du **Contrôleur de dialecte SQL** (alerte sur les syntaxes SQLite incompatibles MySQL).
+- [x] Bouton de réinitialisation de la base à l'état initial du sujet.
+- [x] Export et import de l'archive `SW_xxxxx.zip`.
 
 ---
 
