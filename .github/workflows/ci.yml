@@ -33,16 +33,20 @@ jobs:
       - name: Run unit & regression tests
         run: bun run test
 
-      - name: Build application
-        run: bun run build
+      - name: Build application (Standard & Vercel verification)
+        run: |
+          echo "Building standard target..."
+          bun run build
+          echo "Verifying Vercel Nitro build..."
+          NITRO_PRESET=vercel bun run build
         env:
-          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL || 'https://example.supabase.co' }}
-          VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.VITE_SUPABASE_PUBLISHABLE_KEY || 'fake-key' }}
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL || 'https://dxanlvsonydghkmycexq.supabase.co' }}
+          VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.VITE_SUPABASE_PUBLISHABLE_KEY || 'sb_publishable_6oy2IYNYBkyKr0umKULwVw_vy7bVVIZ' }}
 
       - name: Security Check T-12 (No Secrets in Client Bundle)
         run: |
           echo "Scanning build artifacts for forbidden secrets..."
-          if grep -rn "SUPABASE_SERVICE_ROLE_KEY" dist/ .output/ 2>/dev/null; then
+          if grep -rn "SUPABASE_SERVICE_ROLE_KEY" dist/ .output/ .vercel/ 2>/dev/null; then
             echo "SECURITY VIOLATION (T-12): service_role secret detected in client build!"
             exit 1
           fi
