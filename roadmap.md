@@ -15,7 +15,7 @@
 | **M3** | **Pilote Court HTML/CSS/JS** | Retour terrain sur 1 classe (4-6 sem.) | 0 perte de données, satisfaction ≥ 4/5 | Planifié |
 | **M4** | **Phase 2 : PHP & SQL Local** | Exécution WASM, panneau SQL, dialecte | Scénarios essentiels du Bac conformes | **Validé** |
 | **M5** | **Phase 3 : Correction Étendue & Aides** | Indices 3 niveaux, corrigés, contestations | Faux négatifs < 3%, faux positifs < 1% | Planifié |
-| **M6** | **Phase 4 : Mode Examen & Snapshots** | Sessions synchronisées, grille notation | Écritures refusées après temps serveur, snapshots scellés | Planifié |
+| **M6** | **Phase 4 : Mode Examen & Snapshots** | Sessions synchronisées, grille notation | Écritures refusées après temps serveur, snapshots scellés | **Validé** |
 | **M7** | **Phase 5 : Pilotage & Compétences** | Référentiel, points faibles, tuteur IA | Formule de maîtrise testée, tuteur coupé en examen | Planifié |
 | **M8** | **Version 1.0 & Déploiement** | Déploiement étendu lycée | KPIs globaux au vert (§3) | Planifié |
 
@@ -85,12 +85,14 @@
 ---
 
 ### Jalon M6 — Phase 4 : Mode Examen Blanc & Snapshots
-- [ ] [Issue #15](https://github.com/hlaadhari/app-creator/issues/15) : Sessions d'examen synchronisées avec gestion de la salle d'attente.
-- [ ] Minuteur et calcul du temps sous contrôle strict de l'horloge serveur.
-- [ ] Verrouillage automatique des écritures à l'échéance serveur.
-- [ ] [Issue #16](https://github.com/hlaadhari/app-creator/issues/16) : Génération du **Snapshot immuable** du rendu (hash SHA-256, fichiers, base, versions).
-- [ ] Rejouage reproductible de la correction de référence.
-- [ ] Grille de notation assistée pour l'enseignant avec journalisation des justifications.
+- [x] [Issue #15](https://github.com/hlaadhari/app-creator/issues/15) : Sessions d'examen synchronisées avec gestion de la salle d'attente.
+- [x] Minuteur et calcul du temps sous contrôle strict de l'horloge serveur.
+- [x] Verrouillage automatique des écritures à l'échéance serveur.
+- [x] [Issue #16](https://github.com/hlaadhari/app-creator/issues/16) : Génération du **Snapshot immuable** du rendu (hash SHA-256, fichiers, base, versions).
+- [x] Rejouage reproductible de la correction de référence.
+- [x] Grille de notation assistée pour l'enseignant avec journalisation des justifications.
+- [x] [Issue #27](https://github.com/hlaadhari/app-creator/issues/27) : Catalogue étendu des sujets (Modules A, B, C) et accès Espace Enseignant / Mode Démo.
+- [x] [Issue #30](https://github.com/hlaadhari/app-creator/issues/30) : Espace d'administration centrale, validation des enseignants (`valide_par`) et conformité RGPD.
 
 ---
 
