@@ -1,10 +1,31 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { useEffect, useRef, useState } from "react";
-import { buildDocument, getExercise, runCriteria, score, type FileName, type Files, type Result } from "@/lib/exercises";
+import { useEffect, useRef, useState, useMemo } from "react";
+import {
+  getExercise,
+  runCriteria,
+  score,
+  type FileName,
+  type Result,
+} from "@/lib/exercises";
 import { clear, load, save } from "@/lib/progress";
 import { SproutLogo } from "@/components/SproutLogo";
 import { AuthModal } from "@/components/AuthModal";
 import { enregistrerTentative } from "@/lib/supabase/projets";
+import { MonacoEditorPane } from "@/components/workspace/MonacoEditorPane";
+import { WorkspaceFileTree } from "@/components/workspace/WorkspaceFileTree";
+import { PreviewSandbox } from "@/components/workspace/PreviewSandbox";
+import type { WorkspaceFile } from "@/components/workspace/types";
+import {
+  BookOpen,
+  FolderTree,
+  CheckCircle2,
+  Play,
+  RotateCcw,
+  Sparkles,
+  HelpCircle,
+  Clock,
+  Save,
+} from "lucide-react";
 
 export const Route = createFileRoute("/sujet/$id")({
   loader: ({ params }) => {
@@ -25,185 +46,514 @@ export const Route = createFileRoute("/sujet/$id")({
   component: Workspace,
 });
 
-const FILES: FileName[] = ["index.html", "style.css", "script.js"];
-const icon: Record<FileName, string> = { "index.html": "text-destructive", "style.css": "text-accent-foreground", "script.js": "text-primary" };
-
 function Workspace() {
   const { id } = Route.useParams();
   const ex = getExercise(id)!;
-  const [files, setFiles] = useState<Files>(ex.starter);
-  const [active, setActive] = useState<FileName>("index.html");
-  const [preview, setPreview] = useState(() => buildDocument(ex.starter));
+
+  // Normalisation du dossier : Travail_Eleve/SW_<id> (F-16)
+  const folderName = `Travail_Eleve/SW_${id.replace(/[^a-zA-Z0-9_-]/g, "")}`;
+
+  // État multi-fichiers typé
+  const [files, setFiles] = useState<Record<string, WorkspaceFile>>(() => ({
+    "index.html": {
+      name: "index.html",
+      type: "text",
+      content: ex.starter["index.html"],
+      language: "html",
+    },
+    "style.css": {
+      name: "style.css",
+      type: "text",
+      content: ex.starter["style.css"],
+      language: "css",
+    },
+    "script.js": {
+      name: "script.js",
+      type: "text",
+      content: ex.starter["script.js"],
+      language: "javascript",
+    },
+  }));
+
+  const [activeFileName, setActiveFileName] = useState<string>("index.html");
+  const [sidebarTab, setSidebarTab] = useState<"enonce" | "fichiers" | "resultats">("enonce");
   const [results, setResults] = useState<Result[] | null>(null);
   const [hints, setHints] = useState(0);
-  const [tab, setTab] = useState<"sujet" | "resultats">("sujet");
   const [savedAt, setSavedAt] = useState<number | null>(null);
+  const [isDirty, setIsDirty] = useState(false);
+  const [cursorPos, setCursorPos] = useState({ line: 1, col: 1 });
+
   const best = useRef<number | undefined>(undefined);
   const loaded = useRef(false);
 
+  // Chargement depuis le cache local persistant
   useEffect(() => {
     const s = load(id);
-    if (s) { setFiles(s.files); setPreview(buildDocument(s.files)); best.current = s.best; setSavedAt(s.savedAt); }
+    if (s && s.files) {
+      setFiles((prev) => {
+        const next = { ...prev };
+        for (const [k, content] of Object.entries(s.files)) {
+          if (next[k]) {
+            next[k] = { ...next[k], content };
+          } else {
+            next[k] = { name: k, type: "text", content };
+          }
+        }
+        return next;
+      });
+      best.current = s.best;
+      setSavedAt(s.savedAt ?? null);
+    }
     loaded.current = true;
   }, [id]);
 
+  // Sauvegarde automatique avec debounce
   useEffect(() => {
     if (!loaded.current) return;
-    const t = setTimeout(() => {
-      setPreview(buildDocument(files));
-      const now = Date.now();
-      save(id, { files, best: best.current, savedAt: now });
-      setSavedAt(now);
-    }, 500);
-    return () => clearTimeout(t);
+    const timer = setTimeout(() => {
+      handleSave();
+    }, 800);
+    return () => clearTimeout(timer);
   }, [files, id]);
 
-  const verify = () => {
+  const handleSave = () => {
+    const now = Date.now();
+    const plainFiles: Record<string, string> = {};
+    for (const [k, v] of Object.entries(files)) {
+      if (v.type === "text") {
+        plainFiles[k] = v.content;
+      }
+    }
+    save(id, {
+      files: plainFiles as Record<FileName, string>,
+      best: best.current,
+      savedAt: now,
+    });
+    setSavedAt(now);
+    setIsDirty(false);
+  };
+
+  const handleContentChange = (newContent: string) => {
+    setFiles((prev) => {
+      const existing = prev[activeFileName];
+      if (!existing) return prev;
+      return {
+        ...prev,
+        [activeFileName]: {
+          ...existing,
+          content: newContent,
+        },
+      };
+    });
+    setIsDirty(true);
+  };
+
+  const handleAddFile = (newFile: WorkspaceFile) => {
+    setFiles((prev) => ({
+      ...prev,
+      [newFile.name]: newFile,
+    }));
+    setActiveFileName(newFile.name);
+    setIsDirty(true);
+  };
+
+  const handleDeleteFile = (fileName: string) => {
+    if (["index.html", "style.css", "script.js"].includes(fileName)) return;
+    setFiles((prev) => {
+      const next = { ...prev };
+      delete next[fileName];
+      return next;
+    });
+    if (activeFileName === fileName) {
+      setActiveFileName("index.html");
+    }
+    setIsDirty(true);
+  };
+
+  const handleVerify = () => {
+    // Évaluation sécurisée dans une frame masquée
     const frame = document.createElement("iframe");
     frame.setAttribute("sandbox", "allow-scripts allow-same-origin");
     frame.style.cssText = "position:absolute;width:800px;height:600px;left:-9999px;";
     document.body.appendChild(frame);
+
+    // Extraction du contenu HTML pour les tests
+    const html = files["index.html"]?.content ?? "";
+    const css = files["style.css"]?.content ?? "";
+    const js = files["script.js"]?.content ?? "";
+
+    const combinedDoc = `<!DOCTYPE html><html><head><style>${css}</style></head><body>${html.replace(/<!DOCTYPE.*?>/i, "")}<script>${js}</script></body></html>`;
+
     frame.onload = () => {
-      const doc = frame.contentDocument!, win = frame.contentWindow!;
-      const r = runCriteria(ex.criteria, doc, win);
-      frame.remove();
-      setResults(r);
-      setTab("resultats");
-      const sc = score(r);
-      const n = sc.note20;
-      if (best.current === undefined || n > best.current) {
-        best.current = n;
-        save(id, { files, best: n, savedAt: Date.now() });
+      try {
+        const doc = frame.contentDocument!;
+        const win = frame.contentWindow!;
+        const r = runCriteria(ex.criteria, doc, win);
+        frame.remove();
+        setResults(r);
+        setSidebarTab("resultats");
+
+        const sc = score(r);
+        const n = sc.note20;
+        if (best.current === undefined || n > best.current) {
+          best.current = n;
+          handleSave();
+        }
+
+        enregistrerTentative({
+          sujetId: id,
+          pointsObtenus: sc.got,
+          pointsTotal: sc.total,
+          note20: sc.note20,
+          details: Object.fromEntries(r.map((c) => [c.id, { ok: c.ok, label: c.label }])),
+        });
+      } catch (err) {
+        console.error("Erreur lors de l'évaluation formative :", err);
+        frame.remove();
       }
-      enregistrerTentative({
-        sujetId: id,
-        pointsObtenus: sc.got,
-        pointsTotal: sc.total,
-        note20: sc.note20,
-        details: Object.fromEntries(r.map((c) => [c.id, { ok: c.ok, label: c.label }])),
-      });
     };
-    frame.srcdoc = buildDocument(files);
+    frame.srcdoc = combinedDoc;
   };
 
-  const reset = () => {
-    if (!confirm("Réinitialiser le sujet ? Votre code sera effacé.")) return;
-    clear(id); best.current = undefined; setFiles(ex.starter); setResults(null); setHints(0);
+  const handleReset = () => {
+    if (!confirm("Réinitialiser le sujet aux fichiers de départ ? Votre code local sera effacé.")) return;
+    clear(id);
+    best.current = undefined;
+    setFiles({
+      "index.html": { name: "index.html", type: "text", content: ex.starter["index.html"], language: "html" },
+      "style.css": { name: "style.css", type: "text", content: ex.starter["style.css"], language: "css" },
+      "script.js": { name: "script.js", type: "text", content: ex.starter["script.js"], language: "javascript" },
+    });
+    setActiveFileName("index.html");
+    setResults(null);
+    setHints(0);
+    setIsDirty(false);
   };
 
-  const s = results ? score(results) : null;
-  const lines = files[active].split("\n").length;
+  const currentFile: WorkspaceFile = files[activeFileName] ?? files["index.html"] ?? {
+    name: "index.html",
+    type: "text",
+    content: "",
+    language: "html",
+  };
+  const sc = results ? score(results) : null;
+  const lineCount = currentFile.type === "text" ? currentFile.content.split("\n").length : 0;
+
+  // Détection du langage pour Monaco
+  const editorLanguage = useMemo(() => {
+    if (activeFileName.endsWith(".html")) return "html";
+    if (activeFileName.endsWith(".css")) return "css";
+    if (activeFileName.endsWith(".js")) return "javascript";
+    if (activeFileName.endsWith(".php")) return "php";
+    if (activeFileName.endsWith(".sql")) return "sql";
+    return "html";
+  }, [activeFileName]);
 
   return (
-    <div className="flex h-screen flex-col">
-      <header className="flex items-center gap-3 border-b bg-panel px-4 py-2 text-sm">
-        <Link to="/" className="hover:opacity-85 transition-opacity flex items-center gap-2">
-          <SproutLogo size="sm" showText={false} />
-          <span className="font-semibold text-xs tracking-tight">Sprout Workshop</span>
-        </Link>
-        <span className="text-muted-foreground">/</span>
-        <span className="font-medium text-xs font-mono">{ex.title}</span>
-        <div className="ml-auto flex items-center gap-2">
+    <div className="flex h-screen flex-col bg-background text-foreground font-sans overflow-hidden">
+      {/* Header Principal */}
+      <header className="flex h-11 items-center justify-between border-b bg-panel px-4 text-xs font-mono select-none shrink-0">
+        <div className="flex items-center gap-2">
+          <Link to="/" className="flex items-center gap-2 hover:opacity-85 transition-opacity">
+            <SproutLogo size="sm" showText={false} />
+            <span className="font-semibold text-xs tracking-tight">Sprout Workshop</span>
+          </Link>
+          <span className="text-muted-foreground/60">/</span>
+          <span className="text-muted-foreground">Sujets</span>
+          <span className="text-muted-foreground/60">/</span>
+          <span className="font-medium text-foreground truncate max-w-[200px] sm:max-w-none">{ex.title}</span>
+          <span className="rounded bg-primary/10 border border-primary/20 px-1.5 py-0.5 text-[10px] text-primary hidden md:inline">
+            SW_{id}
+          </span>
+        </div>
+
+        <div className="flex items-center gap-2">
           <AuthModal />
-          <button onClick={reset} className="rounded border px-3 py-1 text-muted-foreground hover:text-foreground">Réinitialiser</button>
-          <button onClick={verify} className="rounded bg-primary px-4 py-1 font-medium text-primary-foreground hover:opacity-90">▶ Vérifier</button>
+          <button
+            onClick={handleReset}
+            className="flex items-center gap-1.5 rounded border bg-background/50 px-2.5 py-1 text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+            title="Réinitialiser le projet à son état de départ"
+          >
+            <RotateCcw className="h-3 w-3" />
+            <span className="hidden sm:inline">Réinitialiser</span>
+          </button>
+          <button
+            onClick={handleVerify}
+            className="flex items-center gap-1.5 rounded bg-primary px-3.5 py-1 font-medium text-primary-foreground hover:opacity-90 shadow-xs transition-opacity cursor-pointer"
+          >
+            <Play className="h-3 w-3 fill-current" />
+            <span>Vérifier</span>
+          </button>
         </div>
       </header>
 
-      <div className="grid flex-1 min-h-0 grid-cols-1 lg:grid-cols-[300px_1fr_1fr]">
-        <aside className="flex min-h-0 flex-col border-r bg-panel">
-          <div className="flex border-b text-xs font-mono">
-            {(["sujet", "resultats"] as const).map((t) => (
-              <button key={t} onClick={() => setTab(t)} className={`flex-1 py-2 uppercase tracking-wider ${tab === t ? "border-b-2 border-primary text-foreground" : "text-muted-foreground"}`}>
-                {t === "sujet" ? "Sujet" : "Résultats"}
-              </button>
-            ))}
+      {/* Corps du Workspace en 3 Panneaux */}
+      <div className="grid flex-1 min-h-0 grid-cols-1 lg:grid-cols-[320px_1fr_1fr] divide-x">
+        {/* Panneau Latéral Gauche : Énoncé / Fichiers / Résultats */}
+        <aside className="flex min-h-0 flex-col bg-panel">
+          <div className="flex border-b text-xs font-mono bg-panel/80 shrink-0">
+            <button
+              onClick={() => setSidebarTab("enonce")}
+              className={`flex-1 py-2 flex items-center justify-center gap-1.5 uppercase tracking-wider text-[11px] transition-colors ${
+                sidebarTab === "enonce"
+                  ? "border-b-2 border-primary text-foreground font-semibold bg-background/40"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              <BookOpen className="h-3.5 w-3.5" />
+              <span>Sujet</span>
+            </button>
+            <button
+              onClick={() => setSidebarTab("fichiers")}
+              className={`flex-1 py-2 flex items-center justify-center gap-1.5 uppercase tracking-wider text-[11px] transition-colors ${
+                sidebarTab === "fichiers"
+                  ? "border-b-2 border-primary text-foreground font-semibold bg-background/40"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              <FolderTree className="h-3.5 w-3.5" />
+              <span>Fichiers</span>
+            </button>
+            <button
+              onClick={() => setSidebarTab("resultats")}
+              className={`flex-1 py-2 flex items-center justify-center gap-1.5 uppercase tracking-wider text-[11px] transition-colors ${
+                sidebarTab === "resultats"
+                  ? "border-b-2 border-primary text-foreground font-semibold bg-background/40"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              <CheckCircle2 className="h-3.5 w-3.5" />
+              <span>Résultats</span>
+              {results && (
+                <span className="ml-1 px-1 rounded-full bg-primary/20 text-[10px] text-primary">
+                  {sc?.note20}/20
+                </span>
+              )}
+            </button>
           </div>
-          <div className="flex-1 overflow-auto p-4 text-sm">
-            {tab === "sujet" ? (
-              <>
-                <div className="text-xs font-mono text-primary">{ex.competence}</div>
-                <ol className="mt-3 list-decimal space-y-2 pl-4">
-                  {ex.statement.map((l, i) => <li key={i}>{l}</li>)}
-                </ol>
-                <h3 className="mt-6 text-xs font-mono uppercase tracking-wider text-muted-foreground">Indices</h3>
-                <div className="mt-2 space-y-2">
-                  {ex.hints.slice(0, hints).map((h, i) => (
-                    <div key={i} className="rounded border-l-2 border-primary bg-muted p-2 text-xs">{h}</div>
-                  ))}
-                  {hints < ex.hints.length && (
-                    <button onClick={() => setHints(hints + 1)} className="text-xs text-primary hover:underline">
-                      Afficher l'indice {hints + 1}/{ex.hints.length}
-                    </button>
-                  )}
+
+          <div className="flex-1 overflow-auto min-h-0">
+            {sidebarTab === "enonce" && (
+              <div className="p-4 text-sm space-y-4">
+                <div>
+                  <div className="text-[11px] font-mono uppercase text-primary tracking-wider">{ex.competence}</div>
+                  <h2 className="text-base font-semibold mt-1">{ex.title}</h2>
+                  <div className="flex items-center gap-2 mt-1">
+                    <span className="rounded border px-1.5 py-0.2 text-[10px] font-mono text-muted-foreground">
+                      Niveau : {ex.level}
+                    </span>
+                    {best.current !== undefined && (
+                      <span className="rounded bg-success/10 border border-success/30 px-1.5 py-0.2 text-[10px] font-mono text-success">
+                        Meilleur score : {best.current}/20
+                      </span>
+                    )}
+                  </div>
                 </div>
-              </>
-            ) : results && s ? (
-              <>
-                <div className="flex items-baseline gap-2">
-                  <span className={`text-4xl font-semibold font-mono ${s.note20 === 20 ? "text-success" : "text-primary"}`}>{s.note20}</span>
-                  <span className="text-muted-foreground">/20 · {s.got}/{s.total} pts</span>
+
+                <div className="border-t pt-3">
+                  <h3 className="text-xs font-mono uppercase tracking-wider text-muted-foreground mb-2">Instructions</h3>
+                  <ol className="list-decimal space-y-2 pl-4 text-xs leading-relaxed text-foreground/90">
+                    {ex.statement.map((item, i) => (
+                      <li key={i}>{item}</li>
+                    ))}
+                  </ol>
                 </div>
-                <ul className="mt-4 space-y-2">
-                  {results.map((r) => (
-                    <li key={r.id} className="rounded border bg-card p-2">
-                      <div className="flex gap-2">
-                        <span className={r.ok ? "text-success" : "text-destructive"}>{r.ok ? "✓" : "✗"}</span>
-                        <span className="flex-1">{r.label}</span>
-                        <span className="font-mono text-xs text-muted-foreground">{r.points} pt</span>
+
+                <div className="border-t pt-3">
+                  <div className="flex items-center justify-between mb-2">
+                    <h3 className="text-xs font-mono uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+                      <Sparkles className="h-3.5 w-3.5 text-amber-500" />
+                      <span>Indices progressifs</span>
+                    </h3>
+                    <span className="text-[10px] font-mono text-muted-foreground">
+                      {hints}/{ex.hints.length} débloqué(s)
+                    </span>
+                  </div>
+
+                  <div className="space-y-2">
+                    {ex.hints.slice(0, hints).map((hintText, i) => (
+                      <div key={i} className="rounded-md border-l-2 border-primary bg-muted/60 p-2.5 text-xs text-foreground/90">
+                        <span className="font-mono font-semibold text-[10px] text-primary uppercase block mb-1">
+                          Indice {i + 1}
+                        </span>
+                        {hintText}
                       </div>
-                      {!r.ok && <p className="mt-1 pl-5 text-xs text-muted-foreground">{r.message}</p>}
-                    </li>
-                  ))}
-                </ul>
-              </>
-            ) : (
-              <p className="text-muted-foreground">Cliquez sur « Vérifier » pour corriger votre travail.</p>
+                    ))}
+
+                    {hints < ex.hints.length && (
+                      <button
+                        onClick={() => setHints((h) => h + 1)}
+                        className="w-full text-left rounded border border-dashed p-2 text-xs text-primary hover:bg-accent/40 transition-colors flex items-center justify-between"
+                      >
+                        <span>Afficher l'indice {hints + 1}</span>
+                        <HelpCircle className="h-3.5 w-3.5 text-primary shrink-0" />
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {sidebarTab === "fichiers" && (
+              <WorkspaceFileTree
+                folderName={folderName}
+                files={files}
+                activeFile={activeFileName}
+                onSelectFile={setActiveFileName}
+                onAddFile={handleAddFile}
+                onDeleteFile={handleDeleteFile}
+              />
+            )}
+
+            {sidebarTab === "resultats" && (
+              <div className="p-4 space-y-4">
+                {results && sc ? (
+                  <>
+                    <div className="rounded-lg border bg-card p-4 text-center">
+                      <div className="text-[11px] font-mono uppercase tracking-wider text-muted-foreground">Note provisoire</div>
+                      <div className="mt-1 flex items-baseline justify-center gap-1">
+                        <span className={`text-4xl font-mono font-bold ${sc.note20 >= 16 ? "text-success" : sc.note20 >= 10 ? "text-primary" : "text-destructive"}`}>
+                          {sc.note20}
+                        </span>
+                        <span className="text-sm font-mono text-muted-foreground">/20</span>
+                      </div>
+                      <div className="mt-1 text-xs text-muted-foreground font-mono">
+                        {sc.got} / {sc.total} critères validés
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <h3 className="text-xs font-mono uppercase tracking-wider text-muted-foreground">Détail des critères</h3>
+                      <ul className="space-y-2">
+                        {results.map((r) => (
+                          <li key={r.id} className="rounded-md border bg-card p-2.5 text-xs transition-colors">
+                            <div className="flex items-start gap-2">
+                              <span className={`font-mono text-sm shrink-0 ${r.ok ? "text-success" : "text-destructive"}`}>
+                                {r.ok ? "✓" : "✗"}
+                              </span>
+                              <div className="flex-1">
+                                <div className="font-medium text-foreground">{r.label}</div>
+                                {!r.ok && <p className="mt-1 text-[11px] text-muted-foreground leading-normal">{r.message}</p>}
+                              </div>
+                              <span className="font-mono text-[10px] text-muted-foreground shrink-0">{r.points} pt</span>
+                            </div>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </>
+                ) : (
+                  <div className="flex flex-col items-center justify-center p-8 text-center text-muted-foreground">
+                    <CheckCircle2 className="h-8 w-8 mb-2 stroke-1 text-muted-foreground/60" />
+                    <p className="text-xs font-mono">Aucune vérification effectuée.</p>
+                    <p className="text-[11px] text-muted-foreground/80 mt-1">
+                      Cliquez sur le bouton « ▶ Vérifier » pour exécuter les critères sur votre code.
+                    </p>
+                  </div>
+                )}
+              </div>
             )}
           </div>
         </aside>
 
-        <section className="flex min-h-0 flex-col border-r bg-editor">
-          <div className="flex border-b bg-panel text-xs font-mono">
-            {FILES.map((f) => (
-              <button key={f} onClick={() => setActive(f)} className={`border-r px-4 py-2 ${active === f ? "bg-editor text-foreground border-t-2 border-t-primary" : "text-muted-foreground"}`}>
-                <span className={icon[f]}>●</span> {f}
-              </button>
-            ))}
+        {/* Panneau Central : Éditeur Monaco + Onglets VS Code */}
+        <section className="flex min-h-0 flex-col bg-editor">
+          {/* Barre d'onglets de fichiers */}
+          <div className="flex items-center border-b bg-panel text-xs font-mono overflow-x-auto shrink-0 select-none">
+            {Object.keys(files).map((fileName) => {
+              const isActive = activeFileName === fileName;
+              return (
+                <button
+                  key={fileName}
+                  onClick={() => setActiveFileName(fileName)}
+                  className={`flex items-center gap-2 border-r px-4 py-2 transition-colors border-t-2 ${
+                    isActive
+                      ? "bg-editor text-foreground border-t-primary font-medium"
+                      : "text-muted-foreground hover:bg-accent/40 border-t-transparent"
+                  }`}
+                >
+                  <span
+                    className={
+                      fileName.endsWith(".html")
+                        ? "text-orange-500 font-bold"
+                        : fileName.endsWith(".css")
+                          ? "text-sky-400 font-bold"
+                          : fileName.endsWith(".js")
+                            ? "text-amber-400 font-bold"
+                            : "text-purple-400"
+                    }
+                  >
+                    ●
+                  </span>
+                  <span>{fileName}</span>
+                  {isDirty && isActive && <span className="h-1.5 w-1.5 rounded-full bg-primary" title="Modifications non sauvegardées" />}
+                </button>
+              );
+            })}
           </div>
-          <div className="flex flex-1 min-h-0 overflow-auto font-mono text-sm leading-6">
-            <div className="select-none px-3 py-3 text-right text-muted-foreground/60">
-              {Array.from({ length: lines }, (_, i) => <div key={i}>{i + 1}</div>)}
-            </div>
-            <textarea
-              value={files[active]}
-              onChange={(e) => setFiles({ ...files, [active]: e.target.value })}
-              onKeyDown={(e) => {
-                if (e.key === "Tab") {
-                  e.preventDefault();
-                  const t = e.currentTarget, st = t.selectionStart, en = t.selectionEnd;
-                  const v = t.value.slice(0, st) + "  " + t.value.slice(en);
-                  setFiles({ ...files, [active]: v });
-                  requestAnimationFrame(() => { t.selectionStart = t.selectionEnd = st + 2; });
-                }
-              }}
-              spellCheck={false}
-              className="flex-1 resize-none whitespace-pre bg-transparent py-3 pr-4 outline-none"
-              style={{ height: `${lines * 1.5 + 1.5}rem`, minHeight: "100%" }}
-            />
+
+          {/* Éditeur de code Monaco ou Visualiseur d'asset */}
+          <div className="flex-1 min-h-0 relative">
+            {currentFile.type === "asset" ? (
+              <div className="flex flex-col items-center justify-center h-full p-8 text-muted-foreground">
+                <img
+                  src={currentFile.content}
+                  alt={currentFile.name}
+                  className="max-h-64 max-w-full rounded border bg-card shadow-sm object-contain"
+                />
+                <span className="mt-3 font-mono text-xs text-foreground font-medium">{currentFile.name}</span>
+                <span className="text-[11px] text-muted-foreground font-mono">
+                  {currentFile.size ? `${Math.round(currentFile.size / 1024)} Ko` : "Ressource locale"}
+                </span>
+              </div>
+            ) : (
+              <MonacoEditorPane
+                value={currentFile.content}
+                onChange={handleContentChange}
+                language={editorLanguage}
+                theme="vs-dark"
+                onSave={handleSave}
+                onCursorChange={(line, col) => setCursorPos({ line, col })}
+              />
+            )}
           </div>
         </section>
 
+        {/* Panneau Droit : Aperçu Bac à Sable Sécurisé */}
         <section className="flex min-h-0 flex-col">
-          <div className="border-b bg-panel px-4 py-2 text-xs font-mono text-muted-foreground">Aperçu</div>
-          <iframe title="Aperçu" sandbox="allow-scripts" srcDoc={preview} className="flex-1 bg-foreground" />
+          <PreviewSandbox files={files} />
         </section>
       </div>
 
-      <footer className="flex gap-4 bg-statusbar px-3 py-0.5 text-xs font-mono text-primary-foreground">
-        <span>{active}</span>
-        <span>{lines} lignes</span>
-        <span className="ml-auto">{savedAt ? `Sauvegardé à ${new Date(savedAt).toLocaleTimeString("fr-FR")}` : "Non sauvegardé"}</span>
+      {/* Barre de Statut VS Code */}
+      <footer className="flex h-5 items-center gap-4 bg-statusbar px-3 text-[11px] font-mono text-primary-foreground select-none shrink-0">
+        <span className="flex items-center gap-1">
+          <span>{activeFileName}</span>
+        </span>
+        <span className="text-primary-foreground/40">|</span>
+        <span>{lineCount} lignes</span>
+        <span className="text-primary-foreground/40">|</span>
+        <span>Ln {cursorPos.line}, Col {cursorPos.col}</span>
+        <span className="text-primary-foreground/40">|</span>
+        <span>UTF-8</span>
+        <span className="text-primary-foreground/40">|</span>
+        <span>Spaces: 2</span>
+
+        <span className="ml-auto flex items-center gap-1.5">
+          {isDirty ? (
+            <span className="flex items-center gap-1 text-amber-300">
+              <Clock className="h-3 w-3" />
+              <span>Sauvegarde en cours...</span>
+            </span>
+          ) : savedAt ? (
+            <span className="flex items-center gap-1 text-primary-foreground/90">
+              <Save className="h-3 w-3 text-emerald-400" />
+              <span>Sauvegardé à {new Date(savedAt).toLocaleTimeString("fr-FR")}</span>
+            </span>
+          ) : (
+            <span>Non sauvegardé</span>
+          )}
+        </span>
       </footer>
     </div>
   );
