@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Location d'Habits - Bac 2023</title>
+    <link rel="stylesheet" href="mesStyles.css" />
+    <script src="controls.js"></script>
+  </head>
+  <body>
+    <header>
+      <h1>Location d'Habits Traditionnels</h1>
+    </header>
+
+    <main>
+      <!-- Formulaire à compléter par l'élève -->
+      <form method="POST" action="location.php" onsubmit="return verif2();">
+        <fieldset>
+          <legend>Formulaire de Location</legend>
+          <table>
+            <tr>
+              <td><label for="cin">Numéro CIN (8 chiffres) :</label></td>
+              <td><input type="text" id="cin" name="cin" maxlength="8" /></td>
+            </tr>
+            <tr>
+              <td><label for="id_habit">Habit à louer :</label></td>
+              <td>
+                <select id="id_habit" name="id_habit">
+                  <option value="">-- Sélectionner un habit --</option>
+                  <option value="1">Jebba Soie Blanche (Taille L - 45 DT/j)</option>
+                  <option value="2">Caftan Royal Doré (Taille M - 75 DT/j)</option>
+                  <option value="3">Costume Traditionnel Brodé (Taille XL - 60 DT/j)</option>
+                </select>
+              </td>
+            </tr>
+            <tr>
+              <td><label for="date_loc">Date de location :</label></td>
+              <td><input type="date" id="date_loc" name="date_loc" /></td>
+            </tr>
+            <tr>
+              <td><label for="duree">Durée (jours) :</label></td>
+              <td><input type="number" id="duree" name="duree" min="1" /></td>
+            </tr>
+            <tr>
+              <td colspan="2" style="text-align: center">
+                <input type="submit" value="Enregistrer la location" />
+                <input type="reset" value="Annuler" />
+              </td>
+            </tr>
+          </table>
+        </fieldset>
+      </form>
+    </main>
+  </body>
+</html>

@@ -1,0 +1,22 @@
+{
+  "id": "exam-bac2018-test-drive",
+  "titre": "Bac 2018 - Évaluation & Essai Test Drive",
+  "module": "Module C",
+  "duree_minutes": 90,
+  "niveau": 3,
+  "exam_mode": true,
+  "bareme": 20,
+  "tags": [
+    "Bac STI",
+    "HTML5",
+    "CSS3",
+    "JavaScript",
+    "PHP",
+    "MySQLi",
+    "Examen Blanc",
+    "SQL-Multicritères"
+  ],
+  "description": "Sujet officiel du Bac Pratique STI 2018 : évaluation de véhicules d'essai avec formulaire de notation multi-critères, validation JS, et enregistrement/calcul de moyenne en PHP/MySQLi.",
+  "fichiers_attendus": ["evaluation.html", "mesStyles.css", "controle.js", "evaluer.php"],
+  "base_de_donnees": "db/init.sql"
+}

@@ -8,11 +8,28 @@ export interface UnlockedHint {
   unlockedAt: number;
 }
 
+export interface HintOptions {
+  isExamMode?: boolean;
+}
+
+export function isExamSubject(sujetId: string): boolean {
+  return (
+    sujetId.startsWith("exam-") ||
+    sujetId.includes("bac20") ||
+    sujetId.toLowerCase().includes("examen")
+  );
+}
+
 /**
  * Récupère le nombre total d'indices disponibles pour une version de sujet
  * Respecte T-04 : ne renvoie QUE le compteur, aucun texte d'indice masqué.
+ * En mode examen, le système d'indices est totalement désactivé (renvoie 0).
  */
-export async function getNombreIndices(sujetId: string): Promise<number> {
+export async function getNombreIndices(sujetId: string, options?: HintOptions): Promise<number> {
+  if (options?.isExamMode || isExamSubject(sujetId)) {
+    return 0;
+  }
+
   try {
     const { data: v } = await supabase
       .from("sujet_versions")
@@ -39,11 +56,19 @@ export async function getNombreIndices(sujetId: string): Promise<number> {
 
 /**
  * Débloque le niveau suivant d'indice de manière progressive et contrôlée (PRD F-46 à F-48, T-04)
+ * En mode examen, le déblocage est strictement interdit et renvoie une erreur explicite.
  */
 export async function debloquerNiveauIndice(
   sujetId: string,
-  targetLevel: number
+  targetLevel: number,
+  options?: HintOptions,
 ): Promise<{ success: boolean; hint?: UnlockedHint; error?: string }> {
+  if (options?.isExamMode || isExamSubject(sujetId)) {
+    return {
+      success: false,
+      error: "Le système d'indices est désactivé en mode examen.",
+    };
+  }
   const levelNames: Record<number, "Conceptuel" | "Syntaxique" | "Extrait de code"> = {
     1: "Conceptuel",
     2: "Syntaxique",

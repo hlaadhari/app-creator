@@ -1,0 +1,96 @@
+[
+  {
+    "id": "EX18-01",
+    "code": "HTML-01",
+    "titre": "Formulaire d'évaluation d'essai (HTML5)",
+    "description": "Le formulaire evaluation.html doit comporter les champs cin, immatriculation, date_test, note_confort, note_conduite, note_securite et envoyer en POST vers evaluer.php.",
+    "points": 2,
+    "ordre": 1,
+    "sonde": {
+      "type": "dom_selector",
+      "selector": "form[method=\"POST\" i][action=\"evaluer.php\"] input#cin, form select#immatriculation, form input#date_test, form input#note_confort, form input#note_conduite, form input#note_securite",
+      "minCount": 6
+    },
+    "fail_message": "Le formulaire evaluation.html ne comporte pas l'ensemble des champs requis pour l'évaluation ou n'envoie pas en POST vers evaluer.php."
+  },
+  {
+    "id": "EX18-02",
+    "code": "CSS-01",
+    "titre": "Styles et mise en page Test Drive",
+    "description": "La feuille mesStyles.css doit appliquer des règles de présentation sur le fieldset et les boutons.",
+    "points": 2,
+    "ordre": 2,
+    "sonde": {
+      "type": "css_property",
+      "selector": "fieldset",
+      "property": "border-width",
+      "isGreaterThanZero": true
+    },
+    "fail_message": "La feuille mesStyles.css n'applique pas les styles attendus sur le formulaire d'évaluation."
+  },
+  {
+    "id": "EX18-03",
+    "code": "JS-01",
+    "titre": "Validation JS du CIN et de la voiture dans test()",
+    "description": "La fonction test() doit vérifier que le champ CIN comporte exactement 8 chiffres et qu'un véhicule est sélectionné.",
+    "points": 2.5,
+    "ordre": 3,
+    "sonde": {
+      "type": "js_eval",
+      "checkSelector": "#cin"
+    },
+    "fail_message": "La fonction test() ne valide pas le format 8 chiffres du CIN ou la sélection obligatoire du véhicule."
+  },
+  {
+    "id": "EX18-04",
+    "code": "JS-02",
+    "titre": "Contrôle des notes multi-critères et de la date",
+    "description": "La fonction test() doit vérifier que la date est renseignée et que chaque note (confort, conduite, sécurité) est comprise entre 1 et 5 inclus.",
+    "points": 2.5,
+    "ordre": 4,
+    "sonde": {
+      "type": "js_eval",
+      "checkSelector": "#note_confort"
+    },
+    "fail_message": "La fonction test() ne valide pas les bornes [1..5] des notes ou la présence de la date."
+  },
+  {
+    "id": "EX18-05",
+    "code": "PHP-01",
+    "titre": "Connexion MySQLi et extraction des paramètres POST",
+    "description": "Le script evaluer.php doit se connecter à MySQLi et récupérer les variables postées avec validation.",
+    "points": 4,
+    "ordre": 5,
+    "sonde": {
+      "type": "dom_selector",
+      "selector": "body"
+    },
+    "fail_message": "Connexion MySQLi ou extraction des paramètres POST invalide dans evaluer.php."
+  },
+  {
+    "id": "EX18-06",
+    "code": "SQL-01",
+    "titre": "Insertion de l'évaluation dans la table evaluation",
+    "description": "Le script doit vérifier l'existence du client et de la voiture puis exécuter la requête INSERT INTO evaluation.",
+    "points": 4,
+    "ordre": 6,
+    "sonde": {
+      "type": "dom_selector",
+      "selector": "body"
+    },
+    "fail_message": "L'insertion dans la table evaluation ou la vérification client/voiture est absente ou erronée."
+  },
+  {
+    "id": "EX18-07",
+    "code": "SQL-02",
+    "titre": "Calcul de moyennes et requête d'agrégation multi-critères",
+    "description": "Le script doit calculer la moyenne du test et exécuter une requête SQL d'agrégation AVG() pour restituer les moyennes globales.",
+    "points": 3,
+    "ordre": 7,
+    "sonde": {
+      "type": "dom_selector",
+      "selector": "body"
+    },
+    "fail_message": "La requête d'agrégation AVG() ou le calcul de moyenne est manquant dans evaluer.php."
+  }
+]
