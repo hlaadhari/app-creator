@@ -2,7 +2,7 @@ import type { Files } from "./exercises";
 
 const key = (id: string) => `bacsti:${id}`;
 
-export type Saved = { files: Files; best?: number; savedAt: number };
+export type Saved = { files: Files; best?: number | undefined; savedAt: number };
 
 export function load(id: string): Saved | null {
   if (typeof window === "undefined") return null;
