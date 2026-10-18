@@ -115,7 +115,7 @@ export const getExercise = (id: string) => exercises.find((e) => e.id === id);
 export function buildDocument(files: Files): string {
   let html = files["index.html"];
   const style = `<style>\n${files["style.css"]}\n</style>`;
-  const script = `<script>\n${files["script.js"].replace(/<\/script>/gi, "<\\/script>")}\n<\/script>`;
+  const script = `<script>\n${files["script.js"].replace(/<\/script>/gi, "<" + "/script>")}\n</script>`;
   html = /<link[^>]*href=["']style\.css["'][^>]*>/i.test(html)
     ? html.replace(/<link[^>]*href=["']style\.css["'][^>]*>/i, style)
     : html.replace(/<\/head>/i, `${style}</head>`);
