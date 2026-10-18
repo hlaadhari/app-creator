@@ -1,0 +1,10 @@
+{
+  "id": "ex-html-css-01",
+  "titre": "Mise en forme & Transitions CSS3",
+  "module": "Module A",
+  "duree_minutes": 20,
+  "niveau": 1,
+  "tags": ["CSS3", "Box-Model", "Hover"],
+  "description": "Alignement de conteneurs, modélisation de boîtes et transitions dynamiques CSS3.",
+  "fichiers_attendus": ["index.html", "style.css"]
+}

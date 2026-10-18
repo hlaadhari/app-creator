@@ -1,0 +1,10 @@
+{
+  "id": "ex-js-01",
+  "titre": "Validation JS - Contrôle CIN & Chaînes",
+  "module": "Module A",
+  "duree_minutes": 25,
+  "niveau": 1,
+  "tags": ["JavaScript", "DOM", "RegExp"],
+  "description": "Validation côté client d'un formulaire d'inscription : vérification de la présence, de la longueur exacte (8 chiffres) et du format numérique d'un numéro de Carte d'Identité Nationale (CIN).",
+  "fichiers_attendus": ["formulaire.html", "controle.js"]
+}

@@ -1,0 +1,10 @@
+{
+  "id": "ex-sql-01",
+  "titre": "Commandes LDD & Contraintes d'Intégrité",
+  "module": "Module A",
+  "duree_minutes": 20,
+  "niveau": 1,
+  "tags": ["SQL", "LDD", "CREATE TABLE"],
+  "description": "Création d'une table relationnelle avec clé primaire, clé étrangère et contrainte CHECK de domaine de validité conforme au référentiel Bac STI.",
+  "fichiers_attendus": ["schema.sql"]
+}
