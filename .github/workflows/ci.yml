@@ -1,0 +1,49 @@
+name: CI - Labo STI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  validate:
+    name: Lint, Typecheck, Test & Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Typecheck
+        run: npx tsc --noEmit
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Run unit & regression tests
+        run: npm test
+
+      - name: Build application
+        run: npm run build
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL || 'https://example.supabase.co' }}
+          VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.VITE_SUPABASE_PUBLISHABLE_KEY || 'fake-key' }}
+
+      - name: Security Check T-12 (No Secrets in Client Bundle)
+        run: |
+          echo "Scanning build artifacts for forbidden secrets..."
+          if grep -rn "SUPABASE_SERVICE_ROLE_KEY" dist/ 2>/dev/null; then
+            echo "SECURITY VIOLATION (T-12): service_role secret detected in client build!"
+            exit 1
+          fi
+          echo "Security Check T-12 passed: No leaks detected."
