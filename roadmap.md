@@ -59,9 +59,9 @@
   - [ ] Exécution dynamique des sondes JSON stockées en base dans la table `criteres`.
   - [ ] Bouton « Vérifier » renvoyant le détail critère par critère en moins de 3 secondes.
   - [ ] Validation de chaque sujet avec au moins 2 solutions valides différentes et 1 solution invalide.
-- [ ] **Étape 2.5 - Espace Enseignant de base** ([Issue #10](https://github.com/hlaadhari/app-creator/issues/10) & [Issue #11](https://github.com/hlaadhari/app-creator/issues/11)) :
-  - [ ] Consultation en lecture seule du travail des élèves de sa classe.
-  - [ ] Publication de nouvelles versions de sujets (garantie d'immuabilité des projets en cours).
+- [x] **Étape 2.5 - Espace Enseignant de base** ([Issue #10](https://github.com/hlaadhari/app-creator/issues/10) & [Issue #11](https://github.com/hlaadhari/app-creator/issues/11)) :
+  - [x] Consultation en lecture seule du travail des élèves de sa classe.
+  - [x] Publication de nouvelles versions de sujets (garantie d'immuabilité des projets en cours).
 
 ---
 
@@ -80,7 +80,7 @@
 - [ ] Système d'indices progressifs (3 niveaux) avec déblocage sécurisé par RPC serveur (`debloquer_indice`).
 - [ ] Déblocage tracé des corrigés de référence selon les règles de l'enseignant.
 - [ ] Bouton « Contester ce critère » côté élève avec file de traitement enseignant.
-- [ ] Possibilité pour l'enseignant de désactiver un critère contesté et de recalculer les notes automatiquement ([Issue #11](https://github.com/hlaadhari/app-creator/issues/11)).
+- [x] Possibilité pour l'enseignant de désactiver un critère contesté et de recalculer les notes automatiquement ([Issue #11](https://github.com/hlaadhari/app-creator/issues/11)).
 
 ---
 
