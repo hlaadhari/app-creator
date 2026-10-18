@@ -9,7 +9,7 @@ import { getMesClasses, type ClassInfo } from "@/lib/supabase/classes";
 import { getAllBuffers } from "@/lib/storage/indexeddb";
 import { useAuth } from "@/lib/supabase/auth";
 import { Button } from "@/components/ui/button";
-import { HelpCircle, GraduationCap, Users, Clock, Award, ShieldAlert } from "lucide-react";
+import { HelpCircle, GraduationCap, Users, Clock, Award, ShieldAlert, Shield } from "lucide-react";
 
 export const Route = createFileRoute("/")({
   loader: async () => {
@@ -121,6 +121,31 @@ function Index() {
               >
                 <GraduationCap className="h-4 w-4 text-primary" />
                 <span className="hidden sm:inline">Espace Enseignant (Aperçu)</span>
+              </Button>
+            </Link>
+          )}
+
+          {role === "admin" ? (
+            <Link to="/admin">
+              <Button
+                variant="outline"
+                size="sm"
+                className="gap-1.5 text-xs text-rose-500 border-rose-500/30 hover:bg-rose-500/10"
+              >
+                <Shield className="h-4 w-4" />
+                <span className="hidden sm:inline">Administration</span>
+              </Button>
+            </Link>
+          ) : (
+            <Link to="/admin" search={{ demo: "true" }}>
+              <Button
+                variant="outline"
+                size="sm"
+                className="gap-1.5 text-xs text-rose-500/80 hover:text-rose-600 border-dashed hover:border-rose-500/40"
+                title="Accéder au panneau d'administration centrale (Mode Démo)"
+              >
+                <Shield className="h-4 w-4 text-rose-500" />
+                <span className="hidden sm:inline">Admin (Aperçu)</span>
               </Button>
             </Link>
           )}

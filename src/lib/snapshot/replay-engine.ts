@@ -16,13 +16,13 @@ import {
   type ReplayExecutionResult,
 } from "./types";
 import { verifierIntegriteSnapshot } from "./snapshot-engine";
-import { SQLiteEngine } from "@/lib/sql/sqlite-engine";
+import { SqliteEngine } from "@/lib/sql/sqlite-engine";
 
 export interface RejouerCorrectionOptions {
   snapshot: SnapshotManifeste;
   fichiers: Record<string, string | Uint8Array>;
   criteres: CriterionDefinition[];
-  sqlDump?: string | null;
+  sqlDump?: string | null | undefined;
   baremeTotal?: number; // Par défaut 20 points
 }
 
@@ -90,20 +90,15 @@ async function executerPasseEvaluation(
   const summary = evaluateCriteria(criteres, doc, win);
 
   // 2. Gestion éventuelle d'une validation SQL
-  let sqliteEngine: SQLiteEngine | null = null;
+  let sqliteEngine: SqliteEngine | null = null;
   if (sqlDump && sqlDump.trim().length > 0) {
     try {
-      sqliteEngine = new SQLiteEngine();
-      await sqliteEngine.init();
-      await sqliteEngine.chargerScript(sqlDump);
-      const tables = await sqliteEngine.listerTables();
+      sqliteEngine = new SqliteEngine();
+      await sqliteEngine.init(sqlDump);
+      const tables = await sqliteEngine.getTables();
       journal.push(`Base SQLite initialisée avec succès pour le rejouage (${tables.length} table(s)).`);
     } catch (err) {
       journal.push(`Avertissement base SQL lors du rejouage : ${String(err)}`);
-    } finally {
-      if (sqliteEngine) {
-        sqliteEngine.close();
-      }
     }
   }
 

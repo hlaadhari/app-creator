@@ -126,7 +126,7 @@ export const TeacherSnapshotReplay: React.FC<TeacherSnapshotReplayProps> = ({
   // Téléchargement de l'archive officielle SW_<NCIN>.zip
   const handleDownloadArchive = () => {
     const zipBytes = creerArchiveSnapshotZip(numeroCin, snapshot, fichiers, sqlDump ?? undefined);
-    const blob = new Blob([zipBytes], { type: "application/zip" });
+    const blob = new Blob([zipBytes as unknown as BlobPart], { type: "application/zip" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;

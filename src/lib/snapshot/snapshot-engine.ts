@@ -19,7 +19,7 @@ import { creerArchiveZip, type ArchiveFileEntry } from "@/lib/export/archive-exp
 export async function computeSha256(data: string | Uint8Array): Promise<string> {
   const encoder = new TextEncoder();
   const buffer = typeof data === "string" ? encoder.encode(data) : data;
-  const hashBuffer = await globalThis.crypto.subtle.digest("SHA-256", buffer);
+  const hashBuffer = await globalThis.crypto.subtle.digest("SHA-256", buffer as unknown as BufferSource);
   const hashArray = Array.from(new Uint8Array(hashBuffer));
   return hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
 }
