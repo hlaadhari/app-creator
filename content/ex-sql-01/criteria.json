@@ -1,0 +1,37 @@
+[
+  {
+    "id": "c1_create_table",
+    "titre": "Création de la table mesure",
+    "points": 4,
+    "fail_message": "L'instruction CREATE TABLE mesure est requise.",
+    "sql_pattern": "CREATE\\s+TABLE\\s+`?mesure`?"
+  },
+  {
+    "id": "c2_primary_key",
+    "titre": "Clé primaire id_mesure",
+    "points": 4,
+    "fail_message": "La table mesure doit définir id_mesure comme clé primaire (PRIMARY KEY).",
+    "sql_pattern": "PRIMARY\\s+KEY"
+  },
+  {
+    "id": "c3_foreign_key",
+    "titre": "Clé étrangère vers capteur(id_capteur)",
+    "points": 4,
+    "fail_message": "Une contrainte FOREIGN KEY (id_capteur) REFERENCES capteur(id_capteur) doit être spécifiée.",
+    "sql_pattern": "FOREIGN\\s+KEY\\s*\\([`\"]?id_capteur[`\"]?\\)\\s*REFERENCES\\s+[`\"]?capteur[`\"]?\\s*\\([`\"]?id_capteur[`\"]?\\)"
+  },
+  {
+    "id": "c4_check_constraint",
+    "titre": "Contrainte CHECK de plage de température (-50 à 150)",
+    "points": 4,
+    "fail_message": "Une contrainte CHECK doit restreindre la valeur entre -50 et 150 degrés.",
+    "sql_pattern": "CHECK\\s*\\([\\s\\S]*?valeur[\\s\\S]*?-50[\\s\\S]*?150[\\s\\S]*?\\)"
+  },
+  {
+    "id": "c5_not_null",
+    "titre": "Contraintes d'intégrité NOT NULL",
+    "points": 4,
+    "fail_message": "Les champs obligatoires id_capteur et valeur doivent être déclarés NOT NULL.",
+    "sql_pattern": "NOT\\s+NULL"
+  }
+]

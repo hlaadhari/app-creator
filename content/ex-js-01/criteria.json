@@ -1,0 +1,45 @@
+[
+  {
+    "id": "c1_verif_exists",
+    "titre": "Déclaration de la fonction verif()",
+    "points": 4,
+    "fail_message": "La fonction verif() doit être déclarée dans controle.js.",
+    "type": "js_function_exists",
+    "function_name": "verif"
+  },
+  {
+    "id": "c2_length_control",
+    "titre": "Contrôle de la longueur (.length === 8)",
+    "points": 4,
+    "fail_message": "Le code doit utiliser la propriété .length pour contrôler que le CIN comporte 8 caractères.",
+    "type": "code_contains",
+    "patterns": [".length", "8"]
+  },
+  {
+    "id": "c3_reject_short",
+    "titre": "Rejet des saisies trop courtes",
+    "points": 4,
+    "fail_message": "La fonction verif() doit retourner false si le CIN comporte moins de 8 caractères (ex: '12345').",
+    "type": "js_test_execution",
+    "input_cin": "12345",
+    "expected_return": false
+  },
+  {
+    "id": "c4_reject_alpha",
+    "titre": "Rejet des caractères non numériques",
+    "points": 4,
+    "fail_message": "La fonction verif() doit retourner false si le CIN contient des lettres ou symboles (ex: '1234567A').",
+    "type": "js_test_execution",
+    "input_cin": "1234567A",
+    "expected_return": false
+  },
+  {
+    "id": "c5_accept_valid",
+    "titre": "Validation positive pour 8 chiffres",
+    "points": 4,
+    "fail_message": "La fonction verif() doit retourner true pour un numéro CIN valide (ex: '09876543').",
+    "type": "js_test_execution",
+    "input_cin": "09876543",
+    "expected_return": true
+  }
+]

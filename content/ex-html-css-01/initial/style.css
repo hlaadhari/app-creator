@@ -1,0 +1,28 @@
+/* ==========================================================================
+   Exercice : Mise en forme & Transitions CSS3
+   Complétez les règles ci-dessous conformément aux consignes.
+   ========================================================================== */
+
+body {
+  font-family: sans-serif;
+  margin: 20px;
+}
+
+/* 1. Titre h1 et transition */
+h1 {
+  /* Vos règles ici */
+}
+
+h1:hover {
+  /* Vos règles au survol ici */
+}
+
+/* 2. Blocs .L1 */
+.L1 {
+  /* Vos règles d'alignement ici */
+}
+
+/* 3. Style .b1 */
+.b1 {
+  /* Vos bordures et styles ici */
+}

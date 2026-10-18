@@ -1,0 +1,54 @@
+[
+  {
+    "id": "c1_display_inline_block",
+    "titre": "Alignement .L1 en ligne (inline-block)",
+    "points": 4,
+    "fail_message": "Les éléments de classe .L1 doivent avoir la propriété display: inline-block.",
+    "selector": ".L1",
+    "css_property": "display",
+    "expected_value": "inline-block"
+  },
+  {
+    "id": "c2_width",
+    "titre": "Largeur définie sur .L1 (250px)",
+    "points": 3,
+    "fail_message": "Les éléments .L1 doivent avoir une largeur fixée à 250px.",
+    "selector": ".L1",
+    "css_property": "width",
+    "expected_value": "250px"
+  },
+  {
+    "id": "c3_border",
+    "titre": "Bordure sur .b1 (2px solid #0066cc)",
+    "points": 4,
+    "fail_message": "La classe .b1 doit avoir une bordure solide de 2px en #0066cc.",
+    "selector": ".b1",
+    "css_property": "border-style",
+    "expected_value": "solid"
+  },
+  {
+    "id": "c4_border_radius",
+    "titre": "Coins arrondis sur .b1 (border-radius)",
+    "points": 3,
+    "fail_message": "La classe .b1 doit posséder un border-radius de 8px.",
+    "selector": ".b1",
+    "css_property": "border-radius",
+    "expected_value": "8px"
+  },
+  {
+    "id": "c5_transition",
+    "titre": "Transition fluide sur h1",
+    "points": 3,
+    "fail_message": "Le titre h1 doit définir une transition CSS.",
+    "selector": "h1",
+    "css_property": "transition-duration",
+    "expected_value": "0.3s"
+  },
+  {
+    "id": "c6_hover_rule",
+    "titre": "Règle de survol h1:hover",
+    "points": 3,
+    "fail_message": "La feuille de style doit comporter la pseudo-classe h1:hover avec une transformation ou couleur.",
+    "css_rule_contains": "h1:hover"
+  }
+]
