@@ -14,6 +14,105 @@ export type Database = {
   }
   public: {
     Tables: {
+      criteres: {
+        Row: {
+          attendu: Json
+          code: string
+          id: string
+          label: string
+          message_echec: string
+          ordre: number
+          points: number
+          sonde: Json
+          version_id: string
+        }
+        Insert: {
+          attendu: Json
+          code: string
+          id?: string
+          label: string
+          message_echec: string
+          ordre: number
+          points: number
+          sonde: Json
+          version_id: string
+        }
+        Update: {
+          attendu?: Json
+          code?: string
+          id?: string
+          label?: string
+          message_echec?: string
+          ordre?: number
+          points?: number
+          sonde?: Json
+          version_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "criteres_version_id_fkey"
+            columns: ["version_id"]
+            isOneToOne: false
+            referencedRelation: "sujet_versions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      indices: {
+        Row: {
+          id: string
+          ordre: number
+          texte: string
+          version_id: string
+        }
+        Insert: {
+          id?: string
+          ordre: number
+          texte: string
+          version_id: string
+        }
+        Update: {
+          id?: string
+          ordre?: number
+          texte?: string
+          version_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "indices_version_id_fkey"
+            columns: ["version_id"]
+            isOneToOne: false
+            referencedRelation: "sujet_versions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      indices_debloques: {
+        Row: {
+          indice_id: string
+          unlocked_at: string
+          user_id: string
+        }
+        Insert: {
+          indice_id: string
+          unlocked_at?: string
+          user_id: string
+        }
+        Update: {
+          indice_id?: string
+          unlocked_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "indices_debloques_indice_id_fkey"
+            columns: ["indice_id"]
+            isOneToOne: false
+            referencedRelation: "indices"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           created_at: string
@@ -32,6 +131,126 @@ export type Database = {
           id?: string
           nom?: string
           prenom?: string
+        }
+        Relationships: []
+      }
+      solutions: {
+        Row: {
+          chemin: string
+          contenu: string
+          id: string
+          version_id: string
+        }
+        Insert: {
+          chemin: string
+          contenu: string
+          id?: string
+          version_id: string
+        }
+        Update: {
+          chemin?: string
+          contenu?: string
+          id?: string
+          version_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "solutions_version_id_fkey"
+            columns: ["version_id"]
+            isOneToOne: false
+            referencedRelation: "sujet_versions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sujet_version_fichiers: {
+        Row: {
+          chemin: string
+          contenu: string
+          id: string
+          version_id: string
+        }
+        Insert: {
+          chemin: string
+          contenu?: string
+          id?: string
+          version_id: string
+        }
+        Update: {
+          chemin?: string
+          contenu?: string
+          id?: string
+          version_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sujet_version_fichiers_version_id_fkey"
+            columns: ["version_id"]
+            isOneToOne: false
+            referencedRelation: "sujet_versions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sujet_versions: {
+        Row: {
+          enonce: string[]
+          id: string
+          numero: number
+          publiee: boolean
+          published_at: string | null
+          sujet_id: string
+        }
+        Insert: {
+          enonce?: string[]
+          id?: string
+          numero: number
+          publiee?: boolean
+          published_at?: string | null
+          sujet_id: string
+        }
+        Update: {
+          enonce?: string[]
+          id?: string
+          numero?: number
+          publiee?: boolean
+          published_at?: string | null
+          sujet_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sujet_versions_sujet_id_fkey"
+            columns: ["sujet_id"]
+            isOneToOne: false
+            referencedRelation: "sujets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sujets: {
+        Row: {
+          competence: string
+          created_at: string
+          id: string
+          niveau: string
+          ordre: number
+          titre: string
+        }
+        Insert: {
+          competence: string
+          created_at?: string
+          id: string
+          niveau: string
+          ordre?: number
+          titre: string
+        }
+        Update: {
+          competence?: string
+          created_at?: string
+          id?: string
+          niveau?: string
+          ordre?: number
+          titre?: string
         }
         Relationships: []
       }
@@ -58,6 +277,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      debloquer_indice: { Args: { _version_id: string }; Returns: string }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -65,6 +285,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      nb_indices: { Args: { _version_id: string }; Returns: number }
     }
     Enums: {
       app_role: "eleve" | "enseignant" | "admin"
