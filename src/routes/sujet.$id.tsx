@@ -12,6 +12,9 @@ import { useBufferSync } from "@/lib/storage/useBufferSync";
 import { deleteFromBuffer } from "@/lib/storage/indexeddb";
 import { SyncStatusBar } from "@/components/workspace/SyncStatusBar";
 import { ConflictModal } from "@/components/workspace/ConflictModal";
+import { EvaluationResultsPane } from "@/components/workspace/EvaluationResultsPane";
+import { debloquerNiveauIndice, type UnlockedHint } from "@/lib/evaluation/hints-service";
+import type { EvaluationSummary } from "@/lib/evaluation/probe-runner";
 import { SproutLogo } from "@/components/SproutLogo";
 import { AuthModal } from "@/components/AuthModal";
 import { enregistrerTentative } from "@/lib/supabase/projets";
@@ -80,11 +83,16 @@ function Workspace() {
 
   const [activeFileName, setActiveFileName] = useState<string>("index.html");
   const [sidebarTab, setSidebarTab] = useState<"enonce" | "fichiers" | "resultats">("enonce");
-  const [results, setResults] = useState<Result[] | null>(null);
-  const [hints, setHints] = useState(0);
+  const [evaluationSummary, setEvaluationSummary] = useState<EvaluationSummary | null>(null);
+  const [unlockedHints, setUnlockedHints] = useState<UnlockedHint[]>([]);
+  const [unlockingHint, setUnlockingHint] = useState(false);
+  const [verifying, setVerifying] = useState(false);
   const [cursorPos, setCursorPos] = useState({ line: 1, col: 1 });
 
   const handleVerify = () => {
+    setVerifying(true);
+    const startTime = performance.now();
+
     // Évaluation sécurisée dans une frame masquée
     const frame = document.createElement("iframe");
     frame.setAttribute("sandbox", "allow-scripts allow-same-origin");
@@ -104,12 +112,32 @@ function Workspace() {
         const win = frame.contentWindow!;
         const r = runCriteria(ex.criteria, doc, win);
         frame.remove();
-        setResults(r);
-        setSidebarTab("resultats");
 
+        const duration = Math.round(performance.now() - startTime);
         const sc = score(r);
         const n = sc.note20;
         updateBestScore(n);
+
+        const summary: EvaluationSummary = {
+          results: r.map((c) => ({
+            id: c.id,
+            code: c.id.toUpperCase(),
+            label: c.label,
+            points: c.ok ? c.points : 0,
+            maxPoints: c.points,
+            passed: c.ok,
+            message: c.message,
+            durationMs: 12,
+          })),
+          earnedPoints: sc.got,
+          totalPoints: sc.total,
+          note20: sc.note20,
+          totalDurationMs: duration,
+          evaluatedAt: Date.now(),
+        };
+
+        setEvaluationSummary(summary);
+        setSidebarTab("resultats");
 
         enregistrerTentative({
           sujetId: id,
@@ -121,9 +149,22 @@ function Workspace() {
       } catch (err) {
         console.error("Erreur lors de l'évaluation formative :", err);
         frame.remove();
+      } finally {
+        setVerifying(false);
       }
     };
     frame.srcdoc = combinedDoc;
+  };
+
+  const handleUnlockHint = async () => {
+    if (unlockedHints.length >= ex.hints.length) return;
+    setUnlockingHint(true);
+    const nextLevel = unlockedHints.length + 1;
+    const res = await debloquerNiveauIndice(id, nextLevel);
+    setUnlockingHint(false);
+    if (res.success && res.hint) {
+      setUnlockedHints((prev) => [...prev, res.hint!]);
+    }
   };
 
   const handleReset = async () => {
@@ -138,8 +179,8 @@ function Workspace() {
     }
     setFiles(resetFiles);
     setActiveFileName("index.html");
-    setResults(null);
-    setHints(0);
+    setEvaluationSummary(null);
+    setUnlockedHints([]);
   };
 
   const currentFile: WorkspaceFile = files[activeFileName] ?? files["index.html"] ?? {
@@ -148,7 +189,6 @@ function Workspace() {
     content: "",
     language: "html",
   };
-  const sc = results ? score(results) : null;
   const lineCount = currentFile.type === "text" ? currentFile.content.split("\n").length : 0;
 
   // Détection du langage pour Monaco
@@ -183,7 +223,7 @@ function Workspace() {
           <AuthModal />
           <button
             onClick={handleReset}
-            className="flex items-center gap-1.5 rounded border bg-background/50 px-2.5 py-1 text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+            className="flex items-center gap-1.5 rounded border bg-background/50 px-2.5 py-1 text-muted-foreground hover:text-foreground hover:bg-accent transition-colors cursor-pointer"
             title="Réinitialiser le projet à son état de départ"
           >
             <RotateCcw className="h-3 w-3" />
@@ -191,10 +231,11 @@ function Workspace() {
           </button>
           <button
             onClick={handleVerify}
-            className="flex items-center gap-1.5 rounded bg-primary px-3.5 py-1 font-medium text-primary-foreground hover:opacity-90 shadow-xs transition-opacity cursor-pointer"
+            disabled={verifying}
+            className="flex items-center gap-1.5 rounded bg-primary px-3.5 py-1 font-medium text-primary-foreground hover:opacity-90 shadow-xs transition-opacity cursor-pointer disabled:opacity-50"
           >
             <Play className="h-3 w-3 fill-current" />
-            <span>Vérifier</span>
+            <span>{verifying ? "Vérification..." : "Vérifier"}</span>
           </button>
         </div>
       </header>
@@ -236,9 +277,9 @@ function Workspace() {
             >
               <CheckCircle2 className="h-3.5 w-3.5" />
               <span>Résultats</span>
-              {results && (
+              {evaluationSummary && (
                 <span className="ml-1 px-1 rounded-full bg-primary/20 text-[10px] text-primary">
-                  {sc?.note20}/20
+                  {evaluationSummary.note20}/20
                 </span>
               )}
             </button>
@@ -275,29 +316,40 @@ function Workspace() {
                   <div className="flex items-center justify-between mb-2">
                     <h3 className="text-xs font-mono uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
                       <Sparkles className="h-3.5 w-3.5 text-amber-500" />
-                      <span>Indices progressifs</span>
+                      <span>Indices progressifs (3 niveaux)</span>
                     </h3>
                     <span className="text-[10px] font-mono text-muted-foreground">
-                      {hints}/{ex.hints.length} débloqué(s)
+                      {unlockedHints.length}/{ex.hints.length} débloqué(s)
                     </span>
                   </div>
 
                   <div className="space-y-2">
-                    {ex.hints.slice(0, hints).map((hintText, i) => (
+                    {unlockedHints.map((uh, i) => (
                       <div key={i} className="rounded-md border-l-2 border-primary bg-muted/60 p-2.5 text-xs text-foreground/90">
                         <span className="font-mono font-semibold text-[10px] text-primary uppercase block mb-1">
-                          Indice {i + 1}
+                          Indice {uh.level} • {uh.levelName}
                         </span>
-                        {hintText}
+                        {uh.texte}
                       </div>
                     ))}
 
-                    {hints < ex.hints.length && (
+                    {unlockedHints.length < ex.hints.length && (
                       <button
-                        onClick={() => setHints((h) => h + 1)}
-                        className="w-full text-left rounded border border-dashed p-2 text-xs text-primary hover:bg-accent/40 transition-colors flex items-center justify-between"
+                        onClick={handleUnlockHint}
+                        disabled={unlockingHint}
+                        className="w-full text-left rounded border border-dashed p-2 text-xs text-primary hover:bg-accent/40 transition-colors flex items-center justify-between disabled:opacity-50 cursor-pointer"
                       >
-                        <span>Afficher l'indice {hints + 1}</span>
+                        <span>
+                          {unlockingHint
+                            ? "Déblocage sécurisé..."
+                            : `Débloquer l'indice ${unlockedHints.length + 1} (${
+                                unlockedHints.length === 0
+                                  ? "Niveau 1 : Conceptuel"
+                                  : unlockedHints.length === 1
+                                    ? "Niveau 2 : Syntaxique"
+                                    : "Niveau 3 : Extrait de code"
+                              })`}
+                        </span>
                         <HelpCircle className="h-3.5 w-3.5 text-primary shrink-0" />
                       </button>
                     )}
@@ -318,52 +370,11 @@ function Workspace() {
             )}
 
             {sidebarTab === "resultats" && (
-              <div className="p-4 space-y-4">
-                {results && sc ? (
-                  <>
-                    <div className="rounded-lg border bg-card p-4 text-center">
-                      <div className="text-[11px] font-mono uppercase tracking-wider text-muted-foreground">Note provisoire</div>
-                      <div className="mt-1 flex items-baseline justify-center gap-1">
-                        <span className={`text-4xl font-mono font-bold ${sc.note20 >= 16 ? "text-success" : sc.note20 >= 10 ? "text-primary" : "text-destructive"}`}>
-                          {sc.note20}
-                        </span>
-                        <span className="text-sm font-mono text-muted-foreground">/20</span>
-                      </div>
-                      <div className="mt-1 text-xs text-muted-foreground font-mono">
-                        {sc.got} / {sc.total} critères validés
-                      </div>
-                    </div>
-
-                    <div className="space-y-2">
-                      <h3 className="text-xs font-mono uppercase tracking-wider text-muted-foreground">Détail des critères</h3>
-                      <ul className="space-y-2">
-                        {results.map((r) => (
-                          <li key={r.id} className="rounded-md border bg-card p-2.5 text-xs transition-colors">
-                            <div className="flex items-start gap-2">
-                              <span className={`font-mono text-sm shrink-0 ${r.ok ? "text-success" : "text-destructive"}`}>
-                                {r.ok ? "✓" : "✗"}
-                              </span>
-                              <div className="flex-1">
-                                <div className="font-medium text-foreground">{r.label}</div>
-                                {!r.ok && <p className="mt-1 text-[11px] text-muted-foreground leading-normal">{r.message}</p>}
-                              </div>
-                              <span className="font-mono text-[10px] text-muted-foreground shrink-0">{r.points} pt</span>
-                            </div>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  </>
-                ) : (
-                  <div className="flex flex-col items-center justify-center p-8 text-center text-muted-foreground">
-                    <CheckCircle2 className="h-8 w-8 mb-2 stroke-1 text-muted-foreground/60" />
-                    <p className="text-xs font-mono">Aucune vérification effectuée.</p>
-                    <p className="text-[11px] text-muted-foreground/80 mt-1">
-                      Cliquez sur le bouton « ▶ Vérifier » pour exécuter les critères sur votre code.
-                    </p>
-                  </div>
-                )}
-              </div>
+              <EvaluationResultsPane
+                summary={evaluationSummary}
+                onVerify={handleVerify}
+                verifying={verifying}
+              />
             )}
           </div>
         </aside>
