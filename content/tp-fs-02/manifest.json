@@ -1,0 +1,11 @@
+{
+  "id": "tp-fs-02",
+  "titre": "Consultation Météo & Agrégations (Bac 2021)",
+  "module": "Module B",
+  "duree_minutes": 60,
+  "niveau": 2,
+  "tags": ["HTML5", "JavaScript", "PHP", "MySQLi", "SQL-Aggregation"],
+  "description": "TP d'intégration Full-Stack issu du sujet national Bac STI : formulaire de sélection géographique, contrôle de saisie en JavaScript test2(), requête SQL d'agrégation (AVG, MAX, MIN, GROUP BY) et génération dynamique du rapport météo en PHP 8.2.",
+  "fichiers_attendus": ["consultation.html", "controle.js", "meteo.php"],
+  "base_de_donnees": "db/init.sql"
+}

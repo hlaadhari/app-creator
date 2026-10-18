@@ -1,0 +1,11 @@
+{
+  "id": "tp-fs-01",
+  "titre": "Formulaire de Don pour les Lycées",
+  "module": "Module B",
+  "duree_minutes": 45,
+  "niveau": 2,
+  "tags": ["HTML5", "CSS3", "JavaScript", "PHP", "MySQLi"],
+  "description": "TP de synthèse Full-Stack : conception d'une interface de don matériel pour les lycées techniques, validation et calcul dynamique en JavaScript, traitement et insertion sécurisée dans une base de données MySQL via PHP 8.2.",
+  "fichiers_attendus": ["Don.html", "mesStyles.css", "controles.js", "enregistrer.php"],
+  "base_de_donnees": "db/init.sql"
+}

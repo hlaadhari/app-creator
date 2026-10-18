@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Consultation Météo Régionale</title>
+  </head>
+  <body>
+    <h1>Consultation Météo Régionale – Synthèse Statistique</h1>
+
+    <!-- Formulaire de sélection -->
+    <form id="fMeteo" name="fMeteo" action="meteo.php" method="post" onsubmit="return test2();">
+      <div>
+        <label for="station">Station Météo :</label>
+        <select id="station" name="station">
+          <option value="">-- Choisir une station --</option>
+          <option value="1">Station Nord (Tunis)</option>
+          <option value="2">Station Sahel (Sousse)</option>
+          <option value="3">Station Sud (Sfax)</option>
+        </select>
+      </div>
+
+      <div>
+        <label for="annee">Année d'observation :</label>
+        <input type="number" id="annee" name="annee" min="2020" max="2026" placeholder="2026" />
+      </div>
+
+      <div>
+        <button type="submit" id="btnConsulter">Afficher les statistiques</button>
+      </div>
+    </form>
+
+    <script src="controle.js"></script>
+  </body>
+</html>

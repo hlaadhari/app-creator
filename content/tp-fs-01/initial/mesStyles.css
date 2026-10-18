@@ -1,0 +1,28 @@
+/* ==========================================================================
+   TP Full-Stack : Formulaire de Don
+   Feuille de style à compléter conformément aux consignes.
+   ========================================================================== */
+
+body {
+  font-family: sans-serif;
+  background-color: #f8fafc;
+}
+
+/* 1. Titre */
+h1 {
+  /* Vos règles ici */
+}
+
+/* 2. Formulaire et Fieldset */
+#fDon {
+  /* Vos règles de centrage ici */
+}
+
+fieldset {
+  /* Vos règles de bordure et padding ici */
+}
+
+/* 3. Bouton */
+#btnValider {
+  /* Vos règles pour le bouton ici */
+}

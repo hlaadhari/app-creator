@@ -1,0 +1,48 @@
+[
+  {
+    "id": "c1_form_structure",
+    "titre": "Structure du formulaire HTML5 et fieldset",
+    "points": 3,
+    "fail_message": "Le formulaire doit avoir id='fDon', action='enregistrer.php', method='post' et comporter un <fieldset>.",
+    "selector": "form#fDon fieldset",
+    "expected_attributes": {
+      "action": "enregistrer.php",
+      "method": "post"
+    }
+  },
+  {
+    "id": "c2_css_layout",
+    "titre": "Mise en page CSS3 et centrage du formulaire",
+    "points": 3,
+    "fail_message": "La feuille mesStyles.css doit définir une largeur maximale de 600px et des marges automatiques pour #fDon.",
+    "css_rule_contains": "#fDon"
+  },
+  {
+    "id": "c3_js_calculation",
+    "titre": "Calcul dynamique du montant estimé",
+    "points": 4,
+    "fail_message": "La fonction calculerMontant() doit multiplier le prix unitaire de l'article par la quantité.",
+    "js_function": "calculerMontant"
+  },
+  {
+    "id": "c4_js_validation",
+    "titre": "Validation de saisie test1() avant envoi",
+    "points": 4,
+    "fail_message": "La fonction test1() doit contrôler la longueur du nom (≥ 3 caractères), le type donateur et la quantité > 0.",
+    "js_function": "test1"
+  },
+  {
+    "id": "c5_db_table",
+    "titre": "Table MySQL 'don' avec contraintes CHECK",
+    "points": 3,
+    "fail_message": "La table don doit comporter une clé primaire id, qte INT et montant DECIMAL avec contraintes CHECK positives.",
+    "sql_pattern": "CREATE\\s+TABLE[\\s\\S]*?don[\\s\\S]*?montant"
+  },
+  {
+    "id": "c6_php_insert",
+    "titre": "Insertion sécurisée des données en PHP/MySQLi",
+    "points": 3,
+    "fail_message": "Le script enregistrer.php doit exécuter la requête INSERT INTO don avec les valeurs du formulaire.",
+    "php_pattern": "INSERT\\s+INTO\\s+don"
+  }
+]

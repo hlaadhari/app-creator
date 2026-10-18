@@ -1,0 +1,37 @@
+[
+  {
+    "id": "c1_form_selection",
+    "titre": "Formulaire de sélection de station météo",
+    "points": 4,
+    "fail_message": "Le formulaire doit contenir la liste déroulante #station et le champ numérique #annee.",
+    "selector": "form#fMeteo select#station, form#fMeteo input#annee"
+  },
+  {
+    "id": "c2_js_test2",
+    "titre": "Fonction de contrôle test2()",
+    "points": 4,
+    "fail_message": "La fonction test2() doit valider la sélection d'une station et une année comprise entre 2020 et 2026.",
+    "js_function": "test2"
+  },
+  {
+    "id": "c3_db_schema",
+    "titre": "Schéma relationnel station et mesure",
+    "points": 4,
+    "fail_message": "Le script init.sql doit créer les tables station et mesure avec clé étrangère et contraintes.",
+    "sql_pattern": "CREATE\\s+TABLE[\\s\\S]*?station[\\s\\S]*?CREATE\\s+TABLE[\\s\\S]*?mesure"
+  },
+  {
+    "id": "c4_sql_aggregation",
+    "titre": "Requête SQL d'agrégation statistique (AVG, MAX, MIN, GROUP BY)",
+    "points": 4,
+    "fail_message": "La requête PHP doit utiliser AVG(temperature), MAX(temperature), MIN(temperature) et GROUP BY.",
+    "php_pattern": "SELECT[\\s\\S]*?AVG\\([\\s\\S]*?GROUP\\s+BY"
+  },
+  {
+    "id": "c5_html_table_render",
+    "titre": "Restitution des résultats dans un tableau HTML",
+    "points": 4,
+    "fail_message": "Le résultat doit être affiché sous forme d'un tableau HTML <table> avec mise en forme des valeurs.",
+    "php_pattern": "<table>[\\s\\S]*?<th>[\\s\\S]*?<td>"
+  }
+]
