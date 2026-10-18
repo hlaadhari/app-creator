@@ -3,6 +3,8 @@ import { useEffect, useRef, useState } from "react";
 import { buildDocument, getExercise, runCriteria, score, type FileName, type Files, type Result } from "@/lib/exercises";
 import { clear, load, save } from "@/lib/progress";
 import { SproutLogo } from "@/components/SproutLogo";
+import { AuthModal } from "@/components/AuthModal";
+import { enregistrerTentative } from "@/lib/supabase/projets";
 
 export const Route = createFileRoute("/sujet/$id")({
   loader: ({ params }) => {
@@ -67,11 +69,19 @@ function Workspace() {
       frame.remove();
       setResults(r);
       setTab("resultats");
-      const n = score(r).note20;
+      const sc = score(r);
+      const n = sc.note20;
       if (best.current === undefined || n > best.current) {
         best.current = n;
         save(id, { files, best: n, savedAt: Date.now() });
       }
+      enregistrerTentative({
+        sujetId: id,
+        pointsObtenus: sc.got,
+        pointsTotal: sc.total,
+        note20: sc.note20,
+        details: Object.fromEntries(r.map((c) => [c.id, { ok: c.ok, label: c.label }])),
+      });
     };
     frame.srcdoc = buildDocument(files);
   };
@@ -93,7 +103,8 @@ function Workspace() {
         </Link>
         <span className="text-muted-foreground">/</span>
         <span className="font-medium text-xs font-mono">{ex.title}</span>
-        <div className="ml-auto flex gap-2">
+        <div className="ml-auto flex items-center gap-2">
+          <AuthModal />
           <button onClick={reset} className="rounded border px-3 py-1 text-muted-foreground hover:text-foreground">Réinitialiser</button>
           <button onClick={verify} className="rounded bg-primary px-4 py-1 font-medium text-primary-foreground hover:opacity-90">▶ Vérifier</button>
         </div>

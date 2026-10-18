@@ -272,6 +272,295 @@ export type Database = {
         }
         Relationships: []
       }
+      classes: {
+        Row: {
+          annee: string
+          archivee: boolean
+          created_at: string
+          enseignant_id: string
+          id: string
+          nom: string
+        }
+        Insert: {
+          annee?: string
+          archivee?: boolean
+          created_at?: string
+          enseignant_id: string
+          id?: string
+          nom: string
+        }
+        Update: {
+          annee?: string
+          archivee?: boolean
+          created_at?: string
+          enseignant_id?: string
+          id?: string
+          nom?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "classes_enseignant_id_fkey"
+            columns: ["enseignant_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      class_invitations: {
+        Row: {
+          class_id: string
+          code: string
+          created_at: string
+          expire_le: string
+          id: string
+          nb_utilisations: number
+          revoque: boolean
+          utilisations_max: number
+        }
+        Insert: {
+          class_id: string
+          code: string
+          created_at?: string
+          expire_le: string
+          id?: string
+          nb_utilisations?: number
+          revoque?: boolean
+          utilisations_max?: number
+        }
+        Update: {
+          class_id?: string
+          code?: string
+          created_at?: string
+          expire_le?: string
+          id?: string
+          nb_utilisations?: number
+          revoque?: boolean
+          utilisations_max?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "class_invitations_class_id_fkey"
+            columns: ["class_id"]
+            isOneToOne: false
+            referencedRelation: "classes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      class_members: {
+        Row: {
+          class_id: string
+          eleve_id: string
+          joined_at: string
+          left_at: string | null
+        }
+        Insert: {
+          class_id: string
+          eleve_id: string
+          joined_at?: string
+          left_at?: string | null
+        }
+        Update: {
+          class_id?: string
+          eleve_id?: string
+          joined_at?: string
+          left_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "class_members_class_id_fkey"
+            columns: ["class_id"]
+            isOneToOne: false
+            referencedRelation: "classes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "class_members_eleve_id_fkey"
+            columns: ["eleve_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      class_sujets: {
+        Row: {
+          actif: boolean
+          attribue_le: string
+          class_id: string
+          echeance: string | null
+          sujet_id: string
+        }
+        Insert: {
+          actif?: boolean
+          attribue_le?: string
+          class_id: string
+          echeance?: string | null
+          sujet_id: string
+        }
+        Update: {
+          actif?: boolean
+          attribue_le?: string
+          class_id?: string
+          echeance?: string | null
+          sujet_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "class_sujets_class_id_fkey"
+            columns: ["class_id"]
+            isOneToOne: false
+            referencedRelation: "classes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "class_sujets_sujet_id_fkey"
+            columns: ["sujet_id"]
+            isOneToOne: false
+            referencedRelation: "sujets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      projets: {
+        Row: {
+          created_at: string
+          eleve_id: string
+          id: string
+          statut: string
+          titre: string
+          updated_at: string
+          version_id: string
+        }
+        Insert: {
+          created_at?: string
+          eleve_id: string
+          id?: string
+          statut?: string
+          titre: string
+          updated_at?: string
+          version_id: string
+        }
+        Update: {
+          created_at?: string
+          eleve_id?: string
+          id?: string
+          statut?: string
+          titre?: string
+          updated_at?: string
+          version_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "projets_eleve_id_fkey"
+            columns: ["eleve_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "projets_version_id_fkey"
+            columns: ["version_id"]
+            isOneToOne: false
+            referencedRelation: "sujet_versions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      projet_fichiers: {
+        Row: {
+          chemin: string
+          contenu: string
+          id: string
+          projet_id: string
+          rev: number
+          updated_at: string
+        }
+        Insert: {
+          chemin: string
+          contenu?: string
+          id?: string
+          projet_id: string
+          rev?: number
+          updated_at?: string
+        }
+        Update: {
+          chemin?: string
+          contenu?: string
+          id?: string
+          projet_id?: string
+          rev?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "projet_fichiers_projet_id_fkey"
+            columns: ["projet_id"]
+            isOneToOne: false
+            referencedRelation: "projets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tentatives: {
+        Row: {
+          created_at: string
+          details: Json
+          eleve_id: string
+          id: string
+          note20: number
+          points_obtenus: number
+          points_total: number
+          projet_id: string | null
+          sujet_version_id: string
+        }
+        Insert: {
+          created_at?: string
+          details?: Json
+          eleve_id: string
+          id?: string
+          note20: number
+          points_obtenus: number
+          points_total: number
+          projet_id?: string | null
+          sujet_version_id: string
+        }
+        Update: {
+          created_at?: string
+          details?: Json
+          eleve_id?: string
+          id?: string
+          note20?: number
+          points_obtenus?: number
+          points_total?: number
+          projet_id?: string | null
+          sujet_version_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tentatives_eleve_id_fkey"
+            columns: ["eleve_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tentatives_projet_id_fkey"
+            columns: ["projet_id"]
+            isOneToOne: false
+            referencedRelation: "projets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tentatives_sujet_version_id_fkey"
+            columns: ["sujet_version_id"]
+            isOneToOne: false
+            referencedRelation: "sujet_versions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -285,7 +574,29 @@ export type Database = {
         }
         Returns: boolean
       }
+      initialiser_projet: {
+        Args: {
+          _version_id: string
+          _titre?: string
+        }
+        Returns: string
+      }
       nb_indices: { Args: { _version_id: string }; Returns: number }
+      rejoindre_classe: {
+        Args: {
+          _code: string
+        }
+        Returns: string
+      }
+      sauvegarder_fichier: {
+        Args: {
+          _projet_id: string
+          _chemin: string
+          _contenu: string
+          _expected_rev: number
+        }
+        Returns: number
+      }
     }
     Enums: {
       app_role: "eleve" | "enseignant" | "admin"

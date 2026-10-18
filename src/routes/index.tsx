@@ -1,8 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { exercises } from "@/lib/exercises";
 import { load } from "@/lib/progress";
 import { SproutLogo } from "@/components/SproutLogo";
+import { AuthModal } from "@/components/AuthModal";
+import { getSujetsCatalog, type RemoteSujet } from "@/lib/supabase/sujets";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -19,16 +20,24 @@ export const Route = createFileRoute("/")({
 });
 
 function Index() {
+  const [sujets, setSujets] = useState<RemoteSujet[]>([]);
   const [best, setBest] = useState<Record<string, number | undefined>>({});
+
   useEffect(() => {
-    setBest(Object.fromEntries(exercises.map((e) => [e.id, load(e.id)?.best])));
+    getSujetsCatalog().then((list) => {
+      setSujets(list);
+      setBest(Object.fromEntries(list.map((e) => [e.id, load(e.id)?.best])));
+    });
   }, []);
 
   return (
     <div className="min-h-screen">
       <header className="border-b px-6 py-3.5 flex items-center justify-between">
         <SproutLogo size="sm" subtitle="Labo STI" />
-        <span className="text-xs text-muted-foreground font-mono">parcours HTML · CSS · JS</span>
+        <div className="flex items-center gap-4">
+          <span className="text-xs text-muted-foreground font-mono hidden sm:inline">parcours HTML · CSS · JS</span>
+          <AuthModal />
+        </div>
       </header>
       <main className="mx-auto max-w-4xl px-6 py-14">
         <p className="font-mono text-sm text-primary">// entraînement Bac STI</p>
@@ -40,7 +49,7 @@ function Index() {
         </p>
 
         <div className="mt-12 grid gap-3">
-          {exercises.map((e, i) => (
+          {sujets.map((e, i) => (
             <Link
               key={e.id}
               to="/sujet/$id"
@@ -51,10 +60,10 @@ function Index() {
                 {String(i + 1).padStart(2, "0")}
               </span>
               <div className="flex-1">
-                <div className="font-medium">{e.title}</div>
+                <div className="font-medium">{e.titre}</div>
                 <div className="text-sm text-muted-foreground">{e.competence}</div>
               </div>
-              <span className="rounded border px-2 py-0.5 text-xs font-mono text-muted-foreground">{e.level}</span>
+              <span className="rounded border px-2 py-0.5 text-xs font-mono text-muted-foreground">{e.niveau}</span>
               <span className={`w-16 text-right font-mono text-sm ${best[e.id] === 20 ? "text-success" : "text-muted-foreground"}`}>
                 {best[e.id] !== undefined ? `${best[e.id]}/20` : "—"}
               </span>

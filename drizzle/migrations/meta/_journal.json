@@ -15,6 +15,13 @@
       "when": 1792319192294,
       "tag": "0001_etape2_sujets",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1792322500000,
+      "tag": "0002_etape3_classes_projets",
+      "breakpoints": true
     }
   ]
 }
