@@ -2,13 +2,14 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { exercises } from "@/lib/exercises";
 import { load } from "@/lib/progress";
+import { SproutLogo } from "@/components/SproutLogo";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Labo STI – Entraînement Bac STI" },
-      { name: "description", content: "Entraînez-vous au Bac STI : HTML, CSS et JavaScript avec correction automatique et indices." },
-      { property: "og:title", content: "Labo STI – Entraînement Bac STI" },
+      { title: "Sprout Workshop – Labo STI" },
+      { name: "description", content: "Entraînez-vous au Bac STI avec Sprout Workshop : HTML, CSS et JavaScript avec correction automatique et indices." },
+      { property: "og:title", content: "Sprout Workshop – Labo STI" },
       { property: "og:description", content: "Éditeur dans le navigateur, aperçu en direct et correction automatique." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -25,10 +26,9 @@ function Index() {
 
   return (
     <div className="min-h-screen">
-      <header className="border-b px-6 py-4 flex items-center gap-3">
-        <span className="font-mono text-primary text-lg">&lt;/&gt;</span>
-        <span className="font-semibold tracking-tight">Labo STI</span>
-        <span className="ml-auto text-xs text-muted-foreground font-mono">parcours HTML · CSS · JS</span>
+      <header className="border-b px-6 py-3.5 flex items-center justify-between">
+        <SproutLogo size="sm" subtitle="Labo STI" />
+        <span className="text-xs text-muted-foreground font-mono">parcours HTML · CSS · JS</span>
       </header>
       <main className="mx-auto max-w-4xl px-6 py-14">
         <p className="font-mono text-sm text-primary">// entraînement Bac STI</p>

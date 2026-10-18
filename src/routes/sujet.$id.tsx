@@ -2,6 +2,7 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { buildDocument, getExercise, runCriteria, score, type FileName, type Files, type Result } from "@/lib/exercises";
 import { clear, load, save } from "@/lib/progress";
+import { SproutLogo } from "@/components/SproutLogo";
 
 export const Route = createFileRoute("/sujet/$id")({
   loader: ({ params }) => {
@@ -86,9 +87,12 @@ function Workspace() {
   return (
     <div className="flex h-screen flex-col">
       <header className="flex items-center gap-3 border-b bg-panel px-4 py-2 text-sm">
-        <Link to="/" className="font-mono text-primary">&lt;/&gt; Labo STI</Link>
+        <Link to="/" className="hover:opacity-85 transition-opacity flex items-center gap-2">
+          <SproutLogo size="sm" showText={false} />
+          <span className="font-semibold text-xs tracking-tight">Sprout Workshop</span>
+        </Link>
         <span className="text-muted-foreground">/</span>
-        <span className="font-medium">{ex.title}</span>
+        <span className="font-medium text-xs font-mono">{ex.title}</span>
         <div className="ml-auto flex gap-2">
           <button onClick={reset} className="rounded border px-3 py-1 text-muted-foreground hover:text-foreground">Réinitialiser</button>
           <button onClick={verify} className="rounded bg-primary px-4 py-1 font-medium text-primary-foreground hover:opacity-90">▶ Vérifier</button>
