@@ -111,6 +111,7 @@ describe("Règle Pédagogique PRD §10.4 : Validation des Sujets Pré-Publicatio
             background-color: rgb(0, 102, 204);
             color: rgb(255, 255, 255);
             border-radius: 6px;
+            border-top-left-radius: 6px;
             padding: 8px 16px;
           }
         `,

@@ -71,7 +71,17 @@ export const exercises: Exercise[] = [
     criteria: [
       { id: "bg", label: "Fond du bouton rgb(0, 102, 204)", points: 3, fail: "La couleur de fond de #valider n'est pas rgb(0, 102, 204) (#0066cc).", check: (d, w) => css(w, d.getElementById("valider"), "background-color") === "rgb(0, 102, 204)" },
       { id: "color", label: "Texte du bouton en blanc", points: 2, fail: "La couleur du texte de #valider doit être blanche.", check: (d, w) => css(w, d.getElementById("valider"), "color") === "rgb(255, 255, 255)" },
-      { id: "radius", label: "Coins arrondis", points: 2, fail: "Ajoutez un border-radius supérieur à 0.", check: (d, w) => parseFloat(css(w, d.getElementById("valider"), "border-top-left-radius")) > 0 },
+      {
+        id: "radius",
+        label: "Coins arrondis",
+        points: 2,
+        fail: "Ajoutez un border-radius supérieur à 0.",
+        check: (d, w) =>
+          parseFloat(
+            css(w, d.getElementById("valider"), "border-top-left-radius") ||
+            css(w, d.getElementById("valider"), "border-radius")
+          ) > 0,
+      },
       { id: "padding", label: "Padding non nul", points: 1, fail: "Ajoutez un padding au bouton.", check: (d, w) => parseFloat(css(w, d.getElementById("valider"), "padding-top")) > 0 },
       { id: "center", label: "Titre centré", points: 2, fail: "Le <h1> doit avoir text-align: center.", check: (d, w) => css(w, d.querySelector("h1"), "text-align") === "center" },
     ],
