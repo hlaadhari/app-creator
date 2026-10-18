@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Soutien aux Laboratoires de Lycée – Formulaire de Don</title>
+    <link rel="stylesheet" href="mesStyles.css" />
+  </head>
+  <body>
+    <h1>Soutien aux Laboratoires de Lycée – Formulaire de Don</h1>
+
+    <!-- Formulaire à compléter -->
+    <form id="fDon" name="fDon" action="enregistrer.php" method="post" onsubmit="return test1();">
+      <fieldset>
+        <legend>Informations sur le Donateur et le Matériel</legend>
+
+        <div>
+          <label for="nom">Nom du donateur :</label>
+          <input type="text" id="nom" name="nom" />
+        </div>
+
+        <!-- Type de donateur (radio) -->
+        <div>
+          <span>Type de donateur :</span>
+          <label><input type="radio" name="type_user" value="Élève" /> Élève</label>
+          <label><input type="radio" name="type_user" value="Enseignant" /> Enseignant</label>
+          <label><input type="radio" name="type_user" value="Parent" /> Parent</label>
+          <label><input type="radio" name="type_user" value="Entreprise" /> Entreprise</label>
+        </div>
+
+        <!-- Lycée -->
+        <div>
+          <label for="lycee">Lycée bénéficiaire :</label>
+          <select id="lycee" name="lycee">
+            <option value="">-- Sélectionnez un établissement --</option>
+            <option value="Lycée Pilote">Lycée Pilote</option>
+            <option value="Lycée Technique">Lycée Technique</option>
+            <option value="Lycée Ibn Khaldoun">Lycée Ibn Khaldoun</option>
+          </select>
+        </div>
+
+        <!-- Article -->
+        <div>
+          <label for="article">Article matériel :</label>
+          <select id="article" name="article" onchange="calculerMontant()">
+            <option value="">-- Sélectionnez un équipement --</option>
+            <option value="Ordinateur" data-prix="800">Ordinateur (800 DT)</option>
+            <option value="Imprimante 3D" data-prix="1200">Imprimante 3D (1200 DT)</option>
+            <option value="Casque VR" data-prix="500">Casque VR (500 DT)</option>
+            <option value="Carte Microcontrôleur" data-prix="60">
+              Carte Microcontrôleur (60 DT)
+            </option>
+          </select>
+        </div>
+
+        <!-- Quantité -->
+        <div>
+          <label for="qte">Quantité :</label>
+          <input type="number" id="qte" name="qte" min="1" value="1" oninput="calculerMontant()" />
+        </div>
+
+        <!-- Montant total estimé -->
+        <div>
+          <label for="montant">Montant estimé (DT) :</label>
+          <input type="text" id="montant" name="montant" readonly placeholder="0.00" />
+        </div>
+
+        <div class="actions">
+          <button type="submit" id="btnValider">Valider mon don</button>
+        </div>
+      </fieldset>
+    </form>
+
+    <script src="controles.js"></script>
+  </body>
+</html>
