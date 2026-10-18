@@ -22,7 +22,7 @@ const CODE_KEYWORDS = [
   /let\s+[a-zA-Z0-9_]+\s*=/g,
   /var\s+[a-zA-Z0-9_]+\s*=/g,
   /<\?php/gi,
-  /<script[\s\S]*?>[\s\S]*?<\/script>/gi,
+  /<script\b[\s\S]*?<\/script\s*>/gi,
 ];
 
 export interface SanitizedTelemetryPayload {
