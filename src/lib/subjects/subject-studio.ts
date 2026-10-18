@@ -58,7 +58,7 @@ export interface SubjectVersionRecord {
 function createDomEnvironment(
   html: string,
   css: string = "",
-  js: string = ""
+  js: string = "",
 ): { doc: Document; win: Window } {
   if (typeof window !== "undefined" && typeof DOMParser !== "undefined") {
     const parser = new DOMParser();
@@ -77,12 +77,11 @@ function createDomEnvironment(
     return { doc, win };
   }
 
-  // Environnement Node.js (Vitest) via require dynamique indirect
+  // Environnement Node.js (Vitest) via require dynamique
   try {
-    const indirectEval = (0, eval);
-    const req = typeof indirectEval !== "undefined" ? indirectEval("require") : null;
-    if (req) {
-      const { JSDOM } = req("jsdom");
+    const getRequire = new Function("return typeof require !== 'undefined' ? require : null")();
+    if (getRequire) {
+      const { JSDOM } = getRequire("jsdom");
       const dom = new JSDOM(html, { runScripts: "dangerously" });
       const win = dom.window as unknown as Window;
       const doc = win.document;
@@ -118,7 +117,7 @@ export function testerSolution(
   const { doc, win } = createDomEnvironment(
     html,
     files["style.css"] || "",
-    files["script.js"] || ""
+    files["script.js"] || "",
   );
 
   const evalSummary: EvaluationSummary = evaluateCriteria(criteria, doc, win);
