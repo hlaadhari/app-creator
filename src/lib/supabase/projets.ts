@@ -1,4 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
+import type { Json } from "@/integrations/supabase/types";
 import type { Files } from "@/lib/exercises";
 
 export interface SyncResult {
@@ -39,7 +40,7 @@ export async function enregistrerTentative(params: {
       points_obtenus: params.pointsObtenus,
       points_total: params.pointsTotal,
       note20: params.note20,
-      details: params.details,
+      details: params.details as unknown as Json,
     });
   } catch (err) {
     console.warn("[Tentatives] Erreur lors de l'enregistrement distant :", err);

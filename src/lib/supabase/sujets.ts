@@ -68,11 +68,12 @@ export async function getStarterFiles(sujetId: string): Promise<Files> {
       .order("numero", { ascending: false })
       .limit(1);
 
-    if (vErr || !versions || versions.length === 0) {
+    const firstVersion = versions[0];
+    if (vErr || !firstVersion) {
       return fallback;
     }
 
-    const versionId = versions[0].id;
+    const versionId = firstVersion.id;
 
     // 2. Récupérer les fichiers associés à cette version
     const { data: filesData, error: fErr } = await supabase
