@@ -28,8 +28,15 @@ export function SproutLogo({
   return (
     <div className={`flex items-center gap-2.5 ${className}`}>
       {/* Sprout Icon */}
-      <div className={`relative flex shrink-0 items-center justify-center rounded-lg bg-emerald-950/40 p-1 border border-emerald-500/20 ${iconSizes[size]}`}>
-        <svg viewBox="0 0 64 64" className="h-full w-full" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <div
+        className={`relative flex shrink-0 items-center justify-center rounded-lg bg-emerald-950/40 p-1 border border-emerald-500/20 ${iconSizes[size]}`}
+      >
+        <svg
+          viewBox="0 0 64 64"
+          className="h-full w-full"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
           {/* Soil */}
           <path d="M 18 52 Q 32 48 46 52" stroke="#22c55e" strokeWidth="3" strokeLinecap="round" />
           {/* Stems */}
