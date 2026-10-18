@@ -16,6 +16,8 @@ import {
 import { StudentProgressTable } from "@/components/teacher/StudentProgressTable";
 import { StudentCopyModal } from "@/components/teacher/StudentCopyModal";
 import { InvitationsManager } from "@/components/teacher/InvitationsManager";
+import { SubjectStudioTab } from "@/components/teacher/SubjectStudioTab";
+import { ContestationsManager } from "@/components/teacher/ContestationsManager";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
@@ -373,6 +375,12 @@ function TeacherDashboardPage() {
                 <TabsTrigger value="invitations" className="text-xs">
                   Codes d'invitation ({invitations.length})
                 </TabsTrigger>
+                <TabsTrigger value="contestations" className="text-xs">
+                  Contestations d'élèves (F-44)
+                </TabsTrigger>
+                <TabsTrigger value="studio" className="text-xs">
+                  Studio de Sujets & Immuabilité
+                </TabsTrigger>
               </TabsList>
 
               <TabsContent value="progression">
@@ -391,6 +399,14 @@ function TeacherDashboardPage() {
                   invitations={invitations}
                   onRefresh={() => loadClassDetails(activeClass.id)}
                 />
+              </TabsContent>
+
+              <TabsContent value="contestations">
+                <ContestationsManager classId={activeClass.id} className={activeClass.nom} />
+              </TabsContent>
+
+              <TabsContent value="studio">
+                <SubjectStudioTab />
               </TabsContent>
             </Tabs>
           </div>
