@@ -19,7 +19,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: 'npm'
 
       - name: Install dependencies
         run: npm install
@@ -42,7 +41,7 @@ jobs:
       - name: Security Check T-12 (No Secrets in Client Bundle)
         run: |
           echo "Scanning build artifacts for forbidden secrets..."
-          if grep -rn "SUPABASE_SERVICE_ROLE_KEY" dist/ 2>/dev/null; then
+          if grep -rn "SUPABASE_SERVICE_ROLE_KEY" dist/ .output/ 2>/dev/null; then
             echo "SECURITY VIOLATION (T-12): service_role secret detected in client build!"
             exit 1
           fi
