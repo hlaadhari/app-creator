@@ -59,7 +59,10 @@ L'ensemble du cadrage et des spécifications est organisé dans le dossier `docs
 - [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) : Détail de l'architecture logicielle, sandboxing, isolation et Plan B.
 - [`docs/DATA_MODEL.md`](docs/DATA_MODEL.md) : Modèle relationnel complet des 26 tables, triggers d'immuabilité et RLS.
 - [`docs/SECURITY.md`](docs/SECURITY.md) : Modèle de menace, politique CSP et spécifications des 14 tests négatifs.
+- [`docs/CRITERIA_GUIDE.md`](docs/CRITERIA_GUIDE.md) : **Guide de rédaction des critères pédagogiques** (modèles de tests, règles de tolérance, 3 niveaux d'indices).
 - [`roadmap.md`](roadmap.md) : Feuille de route détaillée jalonnée de M0 à M8.
+- [`CONTRIBUTING.md`](CONTRIBUTING.md) : Guide de contribution, conventions de commit et workflow.
+- [`SECURITY.md`](SECURITY.md) : Politique de signalement de vulnérabilités.
 - [`AGENTS.md`](AGENTS.md) : Consignes de pair programming et règles d'or pour agents IA.
 
 ---
