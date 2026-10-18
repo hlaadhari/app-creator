@@ -7,7 +7,11 @@ import {
   type FileName,
   type Result,
 } from "@/lib/exercises";
-import { clear, load, save } from "@/lib/progress";
+import { clear } from "@/lib/progress";
+import { useBufferSync } from "@/lib/storage/useBufferSync";
+import { deleteFromBuffer } from "@/lib/storage/indexeddb";
+import { SyncStatusBar } from "@/components/workspace/SyncStatusBar";
+import { ConflictModal } from "@/components/workspace/ConflictModal";
 import { SproutLogo } from "@/components/SproutLogo";
 import { AuthModal } from "@/components/AuthModal";
 import { enregistrerTentative } from "@/lib/supabase/projets";
@@ -53,122 +57,32 @@ function Workspace() {
   // Normalisation du dossier : Travail_Eleve/SW_<id> (F-16)
   const folderName = `Travail_Eleve/SW_${id.replace(/[^a-zA-Z0-9_-]/g, "")}`;
 
-  // État multi-fichiers typé
-  const [files, setFiles] = useState<Record<string, WorkspaceFile>>(() => ({
-    "index.html": {
-      name: "index.html",
-      type: "text",
-      content: ex.starter["index.html"],
-      language: "html",
-    },
-    "style.css": {
-      name: "style.css",
-      type: "text",
-      content: ex.starter["style.css"],
-      language: "css",
-    },
-    "script.js": {
-      name: "script.js",
-      type: "text",
-      content: ex.starter["script.js"],
-      language: "javascript",
-    },
-  }));
+  // Hook de persistance prioritaire dans IndexedDB (labo_sti_buffer) et sync asynchrone
+  const {
+    files,
+    setFiles,
+    updateFileContent,
+    addNewFile,
+    removeFile,
+    syncStatus,
+    rev,
+    lastSavedAt,
+    bestScore,
+    updateBestScore,
+    conflict,
+    resolveConflict,
+    isLateSync,
+    triggerManualSync,
+  } = useBufferSync({
+    exerciseId: id,
+    starterFiles: ex.starter,
+  });
 
   const [activeFileName, setActiveFileName] = useState<string>("index.html");
   const [sidebarTab, setSidebarTab] = useState<"enonce" | "fichiers" | "resultats">("enonce");
   const [results, setResults] = useState<Result[] | null>(null);
   const [hints, setHints] = useState(0);
-  const [savedAt, setSavedAt] = useState<number | null>(null);
-  const [isDirty, setIsDirty] = useState(false);
   const [cursorPos, setCursorPos] = useState({ line: 1, col: 1 });
-
-  const best = useRef<number | undefined>(undefined);
-  const loaded = useRef(false);
-
-  // Chargement depuis le cache local persistant
-  useEffect(() => {
-    const s = load(id);
-    if (s && s.files) {
-      setFiles((prev) => {
-        const next = { ...prev };
-        for (const [k, content] of Object.entries(s.files)) {
-          if (next[k]) {
-            next[k] = { ...next[k], content };
-          } else {
-            next[k] = { name: k, type: "text", content };
-          }
-        }
-        return next;
-      });
-      best.current = s.best;
-      setSavedAt(s.savedAt ?? null);
-    }
-    loaded.current = true;
-  }, [id]);
-
-  // Sauvegarde automatique avec debounce
-  useEffect(() => {
-    if (!loaded.current) return;
-    const timer = setTimeout(() => {
-      handleSave();
-    }, 800);
-    return () => clearTimeout(timer);
-  }, [files, id]);
-
-  const handleSave = () => {
-    const now = Date.now();
-    const plainFiles: Record<string, string> = {};
-    for (const [k, v] of Object.entries(files)) {
-      if (v.type === "text") {
-        plainFiles[k] = v.content;
-      }
-    }
-    save(id, {
-      files: plainFiles as Record<FileName, string>,
-      best: best.current,
-      savedAt: now,
-    });
-    setSavedAt(now);
-    setIsDirty(false);
-  };
-
-  const handleContentChange = (newContent: string) => {
-    setFiles((prev) => {
-      const existing = prev[activeFileName];
-      if (!existing) return prev;
-      return {
-        ...prev,
-        [activeFileName]: {
-          ...existing,
-          content: newContent,
-        },
-      };
-    });
-    setIsDirty(true);
-  };
-
-  const handleAddFile = (newFile: WorkspaceFile) => {
-    setFiles((prev) => ({
-      ...prev,
-      [newFile.name]: newFile,
-    }));
-    setActiveFileName(newFile.name);
-    setIsDirty(true);
-  };
-
-  const handleDeleteFile = (fileName: string) => {
-    if (["index.html", "style.css", "script.js"].includes(fileName)) return;
-    setFiles((prev) => {
-      const next = { ...prev };
-      delete next[fileName];
-      return next;
-    });
-    if (activeFileName === fileName) {
-      setActiveFileName("index.html");
-    }
-    setIsDirty(true);
-  };
 
   const handleVerify = () => {
     // Évaluation sécurisée dans une frame masquée
@@ -195,10 +109,7 @@ function Workspace() {
 
         const sc = score(r);
         const n = sc.note20;
-        if (best.current === undefined || n > best.current) {
-          best.current = n;
-          handleSave();
-        }
+        updateBestScore(n);
 
         enregistrerTentative({
           sujetId: id,
@@ -215,19 +126,20 @@ function Workspace() {
     frame.srcdoc = combinedDoc;
   };
 
-  const handleReset = () => {
+  const handleReset = async () => {
     if (!confirm("Réinitialiser le sujet aux fichiers de départ ? Votre code local sera effacé.")) return;
+    await deleteFromBuffer(id);
     clear(id);
-    best.current = undefined;
-    setFiles({
-      "index.html": { name: "index.html", type: "text", content: ex.starter["index.html"], language: "html" },
-      "style.css": { name: "style.css", type: "text", content: ex.starter["style.css"], language: "css" },
-      "script.js": { name: "script.js", type: "text", content: ex.starter["script.js"], language: "javascript" },
-    });
+    const resetFiles: Record<string, WorkspaceFile> = {};
+    for (const [name, content] of Object.entries(ex.starter)) {
+      const ext = name.split(".").pop() || "";
+      const lang = ext === "html" ? "html" : ext === "css" ? "css" : "javascript";
+      resetFiles[name] = { name, content, type: "text", language: lang };
+    }
+    setFiles(resetFiles);
     setActiveFileName("index.html");
     setResults(null);
     setHints(0);
-    setIsDirty(false);
   };
 
   const currentFile: WorkspaceFile = files[activeFileName] ?? files["index.html"] ?? {
@@ -342,9 +254,9 @@ function Workspace() {
                     <span className="rounded border px-1.5 py-0.2 text-[10px] font-mono text-muted-foreground">
                       Niveau : {ex.level}
                     </span>
-                    {best.current !== undefined && (
+                    {bestScore !== undefined && (
                       <span className="rounded bg-success/10 border border-success/30 px-1.5 py-0.2 text-[10px] font-mono text-success">
-                        Meilleur score : {best.current}/20
+                        Meilleur score : {bestScore}/20
                       </span>
                     )}
                   </div>
@@ -400,8 +312,8 @@ function Workspace() {
                 files={files}
                 activeFile={activeFileName}
                 onSelectFile={setActiveFileName}
-                onAddFile={handleAddFile}
-                onDeleteFile={handleDeleteFile}
+                onAddFile={addNewFile}
+                onDeleteFile={removeFile}
               />
             )}
 
@@ -486,7 +398,9 @@ function Workspace() {
                     ●
                   </span>
                   <span>{fileName}</span>
-                  {isDirty && isActive && <span className="h-1.5 w-1.5 rounded-full bg-primary" title="Modifications non sauvegardées" />}
+                  {syncStatus === "pending" && isActive && (
+                    <span className="h-1.5 w-1.5 rounded-full bg-primary" title="Modifications locales enregistrées dans le tampon IndexedDB" />
+                  )}
                 </button>
               );
             })}
@@ -509,10 +423,10 @@ function Workspace() {
             ) : (
               <MonacoEditorPane
                 value={currentFile.content}
-                onChange={handleContentChange}
+                onChange={(newContent) => updateFileContent(activeFileName, newContent)}
                 language={editorLanguage}
                 theme="vs-dark"
-                onSave={handleSave}
+                onSave={triggerManualSync}
                 onCursorChange={(line, col) => setCursorPos({ line, col })}
               />
             )}
@@ -525,36 +439,23 @@ function Workspace() {
         </section>
       </div>
 
-      {/* Barre de Statut VS Code */}
-      <footer className="flex h-5 items-center gap-4 bg-statusbar px-3 text-[11px] font-mono text-primary-foreground select-none shrink-0">
-        <span className="flex items-center gap-1">
-          <span>{activeFileName}</span>
-        </span>
-        <span className="text-primary-foreground/40">|</span>
-        <span>{lineCount} lignes</span>
-        <span className="text-primary-foreground/40">|</span>
-        <span>Ln {cursorPos.line}, Col {cursorPos.col}</span>
-        <span className="text-primary-foreground/40">|</span>
-        <span>UTF-8</span>
-        <span className="text-primary-foreground/40">|</span>
-        <span>Spaces: 2</span>
+      {/* Barre de Statut Résiliente */}
+      <SyncStatusBar
+        status={syncStatus}
+        rev={rev}
+        lastSavedAt={lastSavedAt}
+        cursorPos={cursorPos}
+        activeFileName={activeFileName}
+        isLateSync={isLateSync}
+        onManualSync={triggerManualSync}
+      />
 
-        <span className="ml-auto flex items-center gap-1.5">
-          {isDirty ? (
-            <span className="flex items-center gap-1 text-amber-300">
-              <Clock className="h-3 w-3" />
-              <span>Sauvegarde en cours...</span>
-            </span>
-          ) : savedAt ? (
-            <span className="flex items-center gap-1 text-primary-foreground/90">
-              <Save className="h-3 w-3 text-emerald-400" />
-              <span>Sauvegardé à {new Date(savedAt).toLocaleTimeString("fr-FR")}</span>
-            </span>
-          ) : (
-            <span>Non sauvegardé</span>
-          )}
-        </span>
-      </footer>
+      {/* Modale d'arbitrage de conflit explicite (Inviolable #4) */}
+      <ConflictModal
+        open={Boolean(conflict)}
+        conflict={conflict}
+        onResolve={resolveConflict}
+      />
     </div>
   );
 }

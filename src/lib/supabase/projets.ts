@@ -6,7 +6,16 @@ export interface SyncResult {
   ok: boolean;
   conflict?: boolean;
   newRev?: number;
+  remoteContent?: string;
+  remoteRev?: number;
   error?: string;
+}
+
+export interface RemoteFileInfo {
+  chemin: string;
+  contenu: string;
+  rev: number;
+  updated_at: string;
 }
 
 /**
@@ -78,10 +87,25 @@ export async function getOrCreateProjet(sujetId: string): Promise<string | null>
     // Initialiser le projet via RPC sécurisée
     const { data: newId, error } = await supabase.rpc("initialiser_projet", {
       _version_id: v.id,
-      _titre: `Travail ${sujetId}`,
     });
 
     if (error) {
+      // Si la table projets existe en direct, tentative d'insertion de secours
+      const { data: directInsert, error: directErr } = await supabase
+        .from("projets")
+        .insert({
+          titre: `Travail ${sujetId}`,
+          eleve_id: user.id,
+          version_id: v.id,
+          statut: "en_cours",
+        })
+        .select("id")
+        .maybeSingle();
+
+      if (!directErr && directInsert) {
+        return directInsert.id;
+      }
+
       console.warn("[Projets] Erreur lors de l'initialisation du projet :", error.message);
       return null;
     }
@@ -89,6 +113,23 @@ export async function getOrCreateProjet(sujetId: string): Promise<string | null>
     return newId;
   } catch (e) {
     console.warn("[Projets] Exception lors de getOrCreateProjet :", e);
+    return null;
+  }
+}
+
+/**
+ * Récupère tous les fichiers distants enregistrés pour un projet.
+ */
+export async function chargerFichiersDistants(projetId: string): Promise<RemoteFileInfo[] | null> {
+  try {
+    const { data, error } = await supabase
+      .from("projet_fichiers")
+      .select("chemin, contenu, rev, updated_at")
+      .eq("projet_id", projetId);
+
+    if (error || !data) return null;
+    return data as RemoteFileInfo[];
+  } catch {
     return null;
   }
 }
@@ -104,6 +145,7 @@ export async function sauvegarderFichierDistant(
   expectedRev: number
 ): Promise<SyncResult> {
   try {
+    // 1. Tenter via la RPC sécurisée
     const { data, error } = await supabase.rpc("sauvegarder_fichier", {
       _projet_id: projetId,
       _chemin: chemin,
@@ -111,14 +153,75 @@ export async function sauvegarderFichierDistant(
       _expected_rev: expectedRev,
     });
 
-    if (error) {
-      if (error.message.includes("CONFLIT_REVISION")) {
-        return { ok: false, conflict: true, error: "Conflit de révision : une version plus récente existe sur le serveur." };
-      }
-      return { ok: false, error: error.message };
+    if (!error && typeof data === "number") {
+      return { ok: true, newRev: data };
     }
 
-    return { ok: true, newRev: data };
+    // Détection de conflit de révision
+    if (error?.message?.includes("CONFLIT_REVISION")) {
+      // Lire la révision serveur concurrente
+      const { data: remote } = await supabase
+        .from("projet_fichiers")
+        .select("rev, contenu")
+        .eq("projet_id", projetId)
+        .eq("chemin", chemin)
+        .maybeSingle();
+
+      return {
+        ok: false,
+        conflict: true,
+        remoteRev: remote?.rev ?? expectedRev + 1,
+        remoteContent: remote?.contenu ?? "",
+        error: "Conflit de révision : une version plus récente existe sur le serveur.",
+      };
+    }
+
+    // 2. Repli direct avec vérification manuelle optimiste si RPC absente
+    const { data: existing } = await supabase
+      .from("projet_fichiers")
+      .select("rev, contenu")
+      .eq("projet_id", projetId)
+      .eq("chemin", chemin)
+      .maybeSingle();
+
+    if (existing) {
+      if (existing.rev > expectedRev) {
+        return {
+          ok: false,
+          conflict: true,
+          remoteRev: existing.rev,
+          remoteContent: existing.contenu,
+          error: "Conflit de révision détecté.",
+        };
+      }
+
+      const nextRev = existing.rev + 1;
+      const { error: updErr } = await supabase
+        .from("projet_fichiers")
+        .update({
+          contenu,
+          rev: nextRev,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("projet_id", projetId)
+        .eq("chemin", chemin);
+
+      if (updErr) return { ok: false, error: updErr.message };
+      return { ok: true, newRev: nextRev };
+    } else {
+      const { error: insErr } = await supabase
+        .from("projet_fichiers")
+        .insert({
+          projet_id: projetId,
+          chemin,
+          contenu,
+          rev: 1,
+          updated_at: new Date().toISOString(),
+        });
+
+      if (insErr) return { ok: false, error: insErr.message };
+      return { ok: true, newRev: 1 };
+    }
   } catch (err) {
     return { ok: false, error: String(err) };
   }
