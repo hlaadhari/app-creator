@@ -66,7 +66,7 @@
 ---
 
 ### Jalon M4 — Phase 2 : PHP + SQL Local
-- [ ] [Issue #13](https://github.com/hlaadhari/app-creator/issues/13) : Intégration de PHP WASM dans un Web Worker avec limites de ressources (watchdog 3s, max 64 Mo).
+- [x] [Issue #13](https://github.com/hlaadhari/app-creator/issues/13) : Intégration de PHP WASM dans un Web Worker avec limites de ressources (watchdog 3s, max 64 Mo).
 - [ ] [Issue #14](https://github.com/hlaadhari/app-creator/issues/14) : Intégration du moteur SQLite WASM et chargement des scripts `.sql` du sujet.
 - [ ] Panneau « Base de données » (visualiseur de tables, exécution de requêtes interactives).
 - [ ] Implémentation du **Contrôleur de dialecte SQL** (alerte sur les syntaxes SQLite incompatibles MySQL).
