@@ -12,7 +12,7 @@ const PII_PATTERNS = [
   // Supabase service_role keys or JWTs
   /eyJ[a-zA-Z0-9_-]{10,}\.[a-zA-Z0-9_-]{10,}\.[a-zA-Z0-9_-]{10,}/g,
   // Common token prefixes
-  /(?:Bearer\s+)[a-zA-Z0-9_\-\.]{20,}/gi,
+  /(?:Bearer\s+)[a-zA-Z0-9_.-]{20,}/gi,
   /(?:sbp_[a-zA-Z0-9]{20,})/gi,
 ];
 
