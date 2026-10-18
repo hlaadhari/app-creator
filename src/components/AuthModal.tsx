@@ -56,7 +56,11 @@ export function AuthModal() {
       <div className="flex items-center gap-3">
         <span className="text-xs font-mono text-muted-foreground">
           {profile?.prenom ? `${profile.prenom} ${profile.nom}` : user.email}
-          {role && <span className="ml-1.5 rounded bg-primary/10 text-primary px-1.5 py-0.5 text-[10px] uppercase font-semibold">{role}</span>}
+          {role && (
+            <span className="ml-1.5 rounded bg-primary/10 text-primary px-1.5 py-0.5 text-[10px] uppercase font-semibold">
+              {role}
+            </span>
+          )}
         </span>
         <Button variant="outline" size="sm" onClick={() => signOut()}>
           Déconnexion

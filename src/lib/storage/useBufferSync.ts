@@ -153,7 +153,9 @@ export function useBufferSync({ exerciseId, starterFiles }: UseBufferSyncOptions
   // 3. Vérification distante lors de la connexion
   const checkRemoteSync = async (exId: string) => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (!user) return; // Mode invité
 
       const pId = await getOrCreateProjet(exId);
@@ -205,7 +207,9 @@ export function useBufferSync({ exerciseId, starterFiles }: UseBufferSyncOptions
       return;
     }
 
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
     if (!user) {
       setSyncStatus("local");
       return;
@@ -305,7 +309,7 @@ export function useBufferSync({ exerciseId, starterFiles }: UseBufferSyncOptions
       await saveToBuffer(updatedBuffer);
       setLastSavedAt(now);
     },
-    [exerciseId, files, bestScore, rev, syncStatus, isLateSync, conflict]
+    [exerciseId, files, bestScore, rev, syncStatus, isLateSync, conflict],
   );
 
   // 6. Modification du contenu d'un fichier (frappe clavier)
@@ -326,7 +330,7 @@ export function useBufferSync({ exerciseId, starterFiles }: UseBufferSyncOptions
       // Programmation sync distante debounce
       scheduleRemoteSync();
     },
-    [persistToLocalBuffer, scheduleRemoteSync]
+    [persistToLocalBuffer, scheduleRemoteSync],
   );
 
   // 7. Ajout d'un nouveau fichier ou ressource
@@ -340,7 +344,7 @@ export function useBufferSync({ exerciseId, starterFiles }: UseBufferSyncOptions
       persistToLocalBuffer({ syncStatus: "pending" });
       scheduleRemoteSync();
     },
-    [persistToLocalBuffer, scheduleRemoteSync]
+    [persistToLocalBuffer, scheduleRemoteSync],
   );
 
   // 8. Suppression d'un fichier
@@ -356,7 +360,7 @@ export function useBufferSync({ exerciseId, starterFiles }: UseBufferSyncOptions
       persistToLocalBuffer({ syncStatus: "pending" });
       scheduleRemoteSync();
     },
-    [persistToLocalBuffer, scheduleRemoteSync]
+    [persistToLocalBuffer, scheduleRemoteSync],
   );
 
   // 9. Mise à jour de la meilleure note
@@ -370,7 +374,7 @@ export function useBufferSync({ exerciseId, starterFiles }: UseBufferSyncOptions
         return prev;
       });
     },
-    [persistToLocalBuffer]
+    [persistToLocalBuffer],
   );
 
   // 10. Résolution explicite de conflit (aucun écrasement silencieux)
@@ -409,7 +413,7 @@ export function useBufferSync({ exerciseId, starterFiles }: UseBufferSyncOptions
           projetIdRef.current,
           conflict.fileName,
           conflict.localContent,
-          forcedRev
+          forcedRev,
         );
       }
 

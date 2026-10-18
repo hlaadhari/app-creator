@@ -12,7 +12,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Users, KeyRound, CheckCircle2, AlertTriangle, Clock, GraduationCap } from "lucide-react";
 import { useAuth } from "@/lib/supabase/auth";
-import { rejoindreClasse, getMesClasses, type ClassInfo, checkRateLimit } from "@/lib/supabase/classes";
+import {
+  rejoindreClasse,
+  getMesClasses,
+  type ClassInfo,
+  checkRateLimit,
+} from "@/lib/supabase/classes";
 
 interface JoinClassModalProps {
   onClassJoined?: () => void;
@@ -90,14 +95,18 @@ export function JoinClassModal({ onClassJoined, triggerButton }: JoinClassModalP
             <DialogTitle>Rejoindre une classe STI</DialogTitle>
           </div>
           <DialogDescription className="text-xs">
-            Saisissez le code d'invitation fourni par votre enseignant pour accéder aux sujets de votre classe.
+            Saisissez le code d'invitation fourni par votre enseignant pour accéder aux sujets de
+            votre classe.
           </DialogDescription>
         </DialogHeader>
 
         {!user ? (
           <div className="rounded-lg border border-amber-500/30 bg-amber-500/10 p-4 text-xs text-amber-700 dark:text-amber-300">
             <p className="font-semibold mb-1">Authentification requise</p>
-            <p>Veuillez vous connecter avec votre compte élève pour associer vos travaux à votre classe.</p>
+            <p>
+              Veuillez vous connecter avec votre compte élève pour associer vos travaux à votre
+              classe.
+            </p>
           </div>
         ) : (
           <div className="space-y-4">
@@ -118,13 +127,17 @@ export function JoinClassModal({ onClassJoined, triggerButton }: JoinClassModalP
             {cooldown > 0 && (
               <div className="rounded-lg border border-amber-500/30 bg-amber-500/10 p-3 text-xs text-amber-700 dark:text-amber-300 flex items-center gap-2">
                 <Clock className="h-4 w-4 animate-spin text-amber-500 shrink-0" />
-                <span>Protection anti brute-force active : réessayez dans <strong>{cooldown}s</strong>.</span>
+                <span>
+                  Protection anti brute-force active : réessayez dans <strong>{cooldown}s</strong>.
+                </span>
               </div>
             )}
 
             <form onSubmit={handleSubmit} className="space-y-3">
               <div className="space-y-1.5">
-                <Label htmlFor="class-code" className="text-xs font-medium">Code d'invitation (ex: STI-7842)</Label>
+                <Label htmlFor="class-code" className="text-xs font-medium">
+                  Code d'invitation (ex: STI-7842)
+                </Label>
                 <div className="relative">
                   <KeyRound className="h-4 w-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
                   <Input

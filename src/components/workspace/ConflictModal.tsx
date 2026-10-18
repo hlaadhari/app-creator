@@ -17,7 +17,9 @@ interface ConflictModalProps {
 }
 
 export function ConflictModal({ open, conflict, onResolve }: ConflictModalProps) {
-  const [activeTab, setActiveTab] = React.useState<"side_by_side" | "local" | "remote">("side_by_side");
+  const [activeTab, setActiveTab] = React.useState<"side_by_side" | "local" | "remote">(
+    "side_by_side",
+  );
 
   if (!conflict) return null;
 
@@ -30,8 +32,9 @@ export function ConflictModal({ open, conflict, onResolve }: ConflictModalProps)
             <DialogTitle>Conflit de révision détecté ({conflict.fileName})</DialogTitle>
           </div>
           <DialogDescription className="text-xs text-muted-foreground mt-1">
-            Une version concurrente plus récente existe sur le serveur (révision distante v{conflict.remoteRev} vs locale v{conflict.localRev}).
-            Conformément à la règle d'intégrité pédagogique, <strong>aucun écrasement automatique n'est effectué</strong>.
+            Une version concurrente plus récente existe sur le serveur (révision distante v
+            {conflict.remoteRev} vs locale v{conflict.localRev}). Conformément à la règle
+            d'intégrité pédagogique, <strong>aucun écrasement automatique n'est effectué</strong>.
             Veuillez choisir quelle version conserver.
           </DialogDescription>
         </DialogHeader>
@@ -74,7 +77,10 @@ export function ConflictModal({ open, conflict, onResolve }: ConflictModalProps)
             </button>
           </div>
           <span className="text-muted-foreground">
-            Fichier : <code className="text-foreground font-mono bg-muted px-1.5 py-0.5 rounded">{conflict.fileName}</code>
+            Fichier :{" "}
+            <code className="text-foreground font-mono bg-muted px-1.5 py-0.5 rounded">
+              {conflict.fileName}
+            </code>
           </span>
         </div>
 
@@ -110,12 +116,16 @@ export function ConflictModal({ open, conflict, onResolve }: ConflictModalProps)
             </div>
           ) : activeTab === "local" ? (
             <div className="p-3">
-              <div className="text-xs font-semibold text-amber-600 mb-2">Tampon local (rev {conflict.localRev}) :</div>
+              <div className="text-xs font-semibold text-amber-600 mb-2">
+                Tampon local (rev {conflict.localRev}) :
+              </div>
               <pre className="whitespace-pre-wrap">{conflict.localContent}</pre>
             </div>
           ) : (
             <div className="p-3">
-              <div className="text-xs font-semibold text-blue-600 mb-2">Version distante (rev {conflict.remoteRev}) :</div>
+              <div className="text-xs font-semibold text-blue-600 mb-2">
+                Version distante (rev {conflict.remoteRev}) :
+              </div>
               <pre className="whitespace-pre-wrap">{conflict.remoteContent}</pre>
             </div>
           )}

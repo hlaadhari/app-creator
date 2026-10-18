@@ -29,7 +29,9 @@ export async function enregistrerTentative(params: {
   details: Record<string, unknown>;
 }): Promise<void> {
   try {
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
     if (!user) return; // Mode invité : persistance locale uniquement
 
     // Récupérer la version active du sujet
@@ -61,7 +63,9 @@ export async function enregistrerTentative(params: {
  */
 export async function getOrCreateProjet(sujetId: string): Promise<string | null> {
   try {
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
     if (!user) return null;
 
     const { data: v } = await supabase
@@ -142,7 +146,7 @@ export async function sauvegarderFichierDistant(
   projetId: string,
   chemin: string,
   contenu: string,
-  expectedRev: number
+  expectedRev: number,
 ): Promise<SyncResult> {
   try {
     // 1. Tenter via la RPC sécurisée
@@ -209,15 +213,13 @@ export async function sauvegarderFichierDistant(
       if (updErr) return { ok: false, error: updErr.message };
       return { ok: true, newRev: nextRev };
     } else {
-      const { error: insErr } = await supabase
-        .from("projet_fichiers")
-        .insert({
-          projet_id: projetId,
-          chemin,
-          contenu,
-          rev: 1,
-          updated_at: new Date().toISOString(),
-        });
+      const { error: insErr } = await supabase.from("projet_fichiers").insert({
+        projet_id: projetId,
+        chemin,
+        contenu,
+        rev: 1,
+        updated_at: new Date().toISOString(),
+      });
 
       if (insErr) return { ok: false, error: insErr.message };
       return { ok: true, newRev: 1 };

@@ -96,7 +96,7 @@ INSERT INTO don (nom, montant) VALUES ('Lycée Pilote', 150.00);
     it("normalise uniformément les chemins de fichiers", () => {
       expect(normaliserCheminFichier(".\\css\\style.css")).toBe("css/style.css");
       expect(normaliserCheminFichier("/Travail_Eleve/SW_12345/index.html")).toBe(
-        "Travail_Eleve/SW_12345/index.html"
+        "Travail_Eleve/SW_12345/index.html",
       );
     });
 
@@ -306,12 +306,7 @@ INSERT INTO don (nom, montant) VALUES ('Lycée Pilote', 150.00);
         horodatageServeur: "2026-10-19T10:00:00.000Z",
       });
 
-      const zipBytes = creerArchiveSnapshotZip(
-        "12345678",
-        snapshot,
-        dummyFiles,
-        dummySqlDump
-      );
+      const zipBytes = creerArchiveSnapshotZip("12345678", snapshot, dummyFiles, dummySqlDump);
 
       expect(zipBytes).toBeInstanceOf(Uint8Array);
       expect(zipBytes.length).toBeGreaterThan(500);
@@ -348,7 +343,7 @@ INSERT INTO don (nom, montant) VALUES ('Lycée Pilote', 150.00);
         snapshot.projetId,
         snapshot.passageId ?? null,
         replay,
-        "prof-007"
+        "prof-007",
       );
 
       expect(note.note_auto).toBe(20);

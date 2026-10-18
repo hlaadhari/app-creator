@@ -34,7 +34,7 @@ export function initialiserNoteOfficielle(
   snapshotId: string,
   passageId: string | null,
   replayResult: ReplayExecutionResult,
-  enseignantId: string
+  enseignantId: string,
 ): NoteOfficielleRecord {
   const now = new Date().toISOString();
 
@@ -70,7 +70,7 @@ export function ajusterPointsCritere(input: AjusterCritereInput): NoteOfficielle
 
   if (!justification || justification.trim().length === 0) {
     throw new Error(
-      "Motivation pédagogique obligatoire : Toute modification de note doit être justifiée."
+      "Motivation pédagogique obligatoire : Toute modification de note doit être justifiée.",
     );
   }
 
@@ -81,7 +81,7 @@ export function ajusterPointsCritere(input: AjusterCritereInput): NoteOfficielle
 
   if (pointsAjustes < 0 || pointsAjustes > critere.pointsMax) {
     throw new Error(
-      `Points invalides : Les points doivent être compris entre 0 et ${critere.pointsMax}.`
+      `Points invalides : Les points doivent être compris entre 0 et ${critere.pointsMax}.`,
     );
   }
 
@@ -124,7 +124,7 @@ export function ajusterNoteFinaleGlobale(input: AjusterNoteGlobaleInput): NoteOf
 
   if (!justification || justification.trim().length < 5) {
     throw new Error(
-      "Motivation pédagogique obligatoire : Une justification détaillée d'au moins 5 caractères est requise."
+      "Motivation pédagogique obligatoire : Une justification détaillée d'au moins 5 caractères est requise.",
     );
   }
 

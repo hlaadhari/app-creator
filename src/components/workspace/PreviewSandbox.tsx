@@ -15,7 +15,7 @@ export function PreviewSandbox({ files, className = "" }: PreviewSandboxProps) {
     const htmlKey =
       files["index.html"] !== undefined
         ? "index.html"
-        : Object.keys(files).find((k) => k.endsWith(".html")) ?? "index.html";
+        : (Object.keys(files).find((k) => k.endsWith(".html")) ?? "index.html");
     let html = files[htmlKey]?.content ?? "<!DOCTYPE html><html><body></body></html>";
     const css = Object.entries(files)
       .filter(([k]) => k.endsWith(".css"))
@@ -30,7 +30,10 @@ export function PreviewSandbox({ files, className = "" }: PreviewSandboxProps) {
     for (const [name, file] of Object.entries(files)) {
       if (file.type === "asset" && file.content) {
         // Remplacement des occurrences relatives (ex: "photo.jpg", "./photo.jpg")
-        const regex = new RegExp(`(["'])(?:\\.\\/)?${name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}(["'])`, "g");
+        const regex = new RegExp(
+          `(["'])(?:\\.\\/)?${name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}(["'])`,
+          "g",
+        );
         html = html.replace(regex, `$1${file.content}$2`);
       }
     }
@@ -92,14 +95,18 @@ export function PreviewSandbox({ files, className = "" }: PreviewSandboxProps) {
       <div className="flex items-center justify-between border-b bg-panel px-3 py-1.5 text-xs font-mono">
         <div className="flex items-center gap-2 text-muted-foreground">
           <span className="font-semibold text-foreground">Aperçu en direct</span>
-          <span className="text-[10px] text-muted-foreground/80 hidden sm:inline">(Isolation sandbox sécurisée)</span>
+          <span className="text-[10px] text-muted-foreground/80 hidden sm:inline">
+            (Isolation sandbox sécurisée)
+          </span>
         </div>
 
         <div className="flex items-center gap-1 bg-background/60 p-0.5 rounded border">
           <button
             onClick={() => setViewport("desktop")}
             className={`p-1 rounded transition-colors ${
-              viewport === "desktop" ? "bg-accent text-foreground shadow-xs" : "text-muted-foreground hover:text-foreground"
+              viewport === "desktop"
+                ? "bg-accent text-foreground shadow-xs"
+                : "text-muted-foreground hover:text-foreground"
             }`}
             title="Vue Bureau (100%)"
           >
@@ -108,7 +115,9 @@ export function PreviewSandbox({ files, className = "" }: PreviewSandboxProps) {
           <button
             onClick={() => setViewport("tablet")}
             className={`p-1 rounded transition-colors ${
-              viewport === "tablet" ? "bg-accent text-foreground shadow-xs" : "text-muted-foreground hover:text-foreground"
+              viewport === "tablet"
+                ? "bg-accent text-foreground shadow-xs"
+                : "text-muted-foreground hover:text-foreground"
             }`}
             title="Vue Tablette (768px)"
           >
@@ -117,7 +126,9 @@ export function PreviewSandbox({ files, className = "" }: PreviewSandboxProps) {
           <button
             onClick={() => setViewport("mobile")}
             className={`p-1 rounded transition-colors ${
-              viewport === "mobile" ? "bg-accent text-foreground shadow-xs" : "text-muted-foreground hover:text-foreground"
+              viewport === "mobile"
+                ? "bg-accent text-foreground shadow-xs"
+                : "text-muted-foreground hover:text-foreground"
             }`}
             title="Vue Mobile (375px)"
           >

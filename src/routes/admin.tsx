@@ -95,7 +95,12 @@ function AdminDashboardPage() {
       setUsers(
         users.map((u) =>
           u.id === userId
-            ? { ...u, statutValidation: "valide", valide_par: "demo-admin", valide_at: new Date().toISOString() }
+            ? {
+                ...u,
+                statutValidation: "valide",
+                valide_par: "demo-admin",
+                valide_at: new Date().toISOString(),
+              }
             : u,
         ),
       );
@@ -146,7 +151,11 @@ function AdminDashboardPage() {
 
   // Anonymisation RGPD d'un élève
   const handleAnonymize = async (userId: string) => {
-    if (!window.confirm("Êtes-vous sûr de vouloir anonymiser définitivement ce profil élève (RGPD §17) ?")) {
+    if (
+      !window.confirm(
+        "Êtes-vous sûr de vouloir anonymiser définitivement ce profil élève (RGPD §17) ?",
+      )
+    ) {
       return;
     }
 
@@ -209,8 +218,8 @@ function AdminDashboardPage() {
           </div>
           <h1 className="text-xl font-bold text-foreground">Accès Réservé à l'Administration</h1>
           <p className="text-xs text-muted-foreground leading-relaxed">
-            L'espace d'administration centrale est réservé aux comptes dotés du rôle
-            administrateur (T-03, PRD §4.1).
+            L'espace d'administration centrale est réservé aux comptes dotés du rôle administrateur
+            (T-03, PRD §4.1).
           </p>
           <div className="pt-2 flex flex-col gap-2">
             <Button
@@ -260,7 +269,9 @@ function AdminDashboardPage() {
           <span className="text-muted-foreground">/</span>
           <div className="flex items-center gap-2">
             <Shield className="w-5 h-5 text-rose-500" />
-            <h1 className="text-sm font-semibold tracking-tight">Panneau d'Administration Centrale</h1>
+            <h1 className="text-sm font-semibold tracking-tight">
+              Panneau d'Administration Centrale
+            </h1>
           </div>
           <Badge
             variant="outline"
@@ -278,7 +289,9 @@ function AdminDashboardPage() {
           <span className="text-muted-foreground">
             Connecté :{" "}
             <strong className="text-foreground">
-              {isDemo ? "Administrateur Système (Démo)" : `${profile?.prenom || ""} ${profile?.nom || ""}`.trim() || user?.email || "Admin"}
+              {isDemo
+                ? "Administrateur Système (Démo)"
+                : `${profile?.prenom || ""} ${profile?.nom || ""}`.trim() || user?.email || "Admin"}
             </strong>
           </span>
           <Button
@@ -325,7 +338,10 @@ function AdminDashboardPage() {
               </div>
               <div>
                 <div className="text-2xl font-bold font-mono">
-                  {users.filter((u) => u.role === "enseignant" && u.statutValidation === "valide").length}
+                  {
+                    users.filter((u) => u.role === "enseignant" && u.statutValidation === "valide")
+                      .length
+                  }
                 </div>
                 <div className="text-xs text-muted-foreground">Enseignants certifiés</div>
               </div>
@@ -399,7 +415,9 @@ function AdminDashboardPage() {
                         <div className="font-semibold text-sm">
                           {teacher.prenom} {teacher.nom}
                         </div>
-                        <div className="text-xs text-muted-foreground font-mono">{teacher.email}</div>
+                        <div className="text-xs text-muted-foreground font-mono">
+                          {teacher.email}
+                        </div>
                         <div className="text-[11px] text-muted-foreground">
                           Inscrit le {new Date(teacher.created_at).toLocaleDateString()}
                         </div>
@@ -433,7 +451,9 @@ function AdminDashboardPage() {
             {/* Liste complète des utilisateurs */}
             <Card>
               <CardHeader className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3">
-                <CardTitle className="text-sm font-semibold">Répertoire de tous les comptes</CardTitle>
+                <CardTitle className="text-sm font-semibold">
+                  Répertoire de tous les comptes
+                </CardTitle>
                 <div className="flex items-center gap-2 flex-wrap">
                   <div className="relative">
                     <Search className="w-3.5 h-3.5 absolute left-2.5 top-2.5 text-muted-foreground" />
@@ -549,7 +569,9 @@ function AdminDashboardPage() {
                   <div>
                     <CardTitle className="text-sm font-semibold flex items-center gap-2">
                       <ShieldCheck className="w-4 h-4 text-emerald-500" />
-                      <span>Matrice Officielle des 14 Tests Négatifs de Sécurité (T-01 à T-14)</span>
+                      <span>
+                        Matrice Officielle des 14 Tests Négatifs de Sécurité (T-01 à T-14)
+                      </span>
                     </CardTitle>
                     <p className="text-xs text-muted-foreground mt-0.5">
                       Conformité stricte avec le modèle de menace défini dans docs/SECURITY.md

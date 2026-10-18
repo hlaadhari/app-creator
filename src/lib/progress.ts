@@ -6,7 +6,11 @@ export type Saved = { files: Files; best?: number | undefined; savedAt: number }
 
 export function load(id: string): Saved | null {
   if (typeof window === "undefined") return null;
-  try { return JSON.parse(localStorage.getItem(key(id)) || "null"); } catch { return null; }
+  try {
+    return JSON.parse(localStorage.getItem(key(id)) || "null");
+  } catch {
+    return null;
+  }
 }
 
 export function save(id: string, data: Saved) {

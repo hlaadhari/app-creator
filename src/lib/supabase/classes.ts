@@ -98,7 +98,9 @@ export async function rejoindreClasse(code: string): Promise<JoinClassResult> {
   }
 
   try {
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
     if (!user) {
       return {
         success: false,
@@ -118,7 +120,8 @@ export async function rejoindreClasse(code: string): Promise<JoinClassResult> {
       if (msg.includes("invalide") || msg.includes("expire") || msg.includes("complet")) {
         return {
           success: false,
-          error: "Ce code d'invitation est invalide, expiré ou la classe a atteint son quota maximal.",
+          error:
+            "Ce code d'invitation est invalide, expiré ou la classe a atteint son quota maximal.",
         };
       }
       return {
@@ -204,12 +207,15 @@ async function initialiserSujetsClasse(classId: string): Promise<void> {
  */
 export async function getMesClasses(): Promise<ClassInfo[]> {
   try {
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
     if (!user) return [];
 
     const { data: memberships, error } = await supabase
       .from("class_members")
-      .select(`
+      .select(
+        `
         class_id,
         joined_at,
         classes (
@@ -218,7 +224,8 @@ export async function getMesClasses(): Promise<ClassInfo[]> {
           annee,
           enseignant_id
         )
-      `)
+      `,
+      )
       .eq("eleve_id", user.id)
       .is("left_at", null);
 
@@ -227,7 +234,12 @@ export async function getMesClasses(): Promise<ClassInfo[]> {
     return memberships
       .filter((m) => m.classes !== null)
       .map((m) => {
-        const c = m.classes as unknown as { id: string; nom: string; annee: string; enseignant_id: string };
+        const c = m.classes as unknown as {
+          id: string;
+          nom: string;
+          annee: string;
+          enseignant_id: string;
+        };
         return {
           id: c.id,
           nom: c.nom,

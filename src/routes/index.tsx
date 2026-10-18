@@ -344,7 +344,9 @@ function Index() {
                       </span>
                     )}
                   </div>
-                  <div className="text-xs text-muted-foreground truncate mt-0.5">{e.competence}</div>
+                  <div className="text-xs text-muted-foreground truncate mt-0.5">
+                    {e.competence}
+                  </div>
                 </div>
 
                 <div className="flex items-center justify-between sm:justify-end gap-3 shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0">

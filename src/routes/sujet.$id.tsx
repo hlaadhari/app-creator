@@ -1,12 +1,6 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useEffect, useRef, useState, useMemo } from "react";
-import {
-  getExercise,
-  runCriteria,
-  score,
-  type FileName,
-  type Result,
-} from "@/lib/exercises";
+import { getExercise, runCriteria, score, type FileName, type Result } from "@/lib/exercises";
 import { clear } from "@/lib/progress";
 import { useBufferSync } from "@/lib/storage/useBufferSync";
 import { deleteFromBuffer } from "@/lib/storage/indexeddb";
@@ -47,7 +41,10 @@ export const Route = createFileRoute("/sujet/$id")({
       { title: `${loaderData?.title ?? "Sujet"} – Labo STI` },
       { name: "description", content: `Sujet d'entraînement : ${loaderData?.competence ?? ""}` },
       { property: "og:title", content: `${loaderData?.title ?? "Sujet"} – Labo STI` },
-      { property: "og:description", content: `Sujet d'entraînement Bac STI : ${loaderData?.competence ?? ""}` },
+      {
+        property: "og:description",
+        content: `Sujet d'entraînement Bac STI : ${loaderData?.competence ?? ""}`,
+      },
       { property: "og:type", content: "article" },
       { name: "twitter:card", content: "summary" },
     ],
@@ -83,7 +80,9 @@ function Workspace() {
     starterFiles: ex.starter,
   });
 
-  const [activeFileName, setActiveFileName] = useState<string>(() => Object.keys(ex.starter)[0] ?? "index.html");
+  const [activeFileName, setActiveFileName] = useState<string>(
+    () => Object.keys(ex.starter)[0] ?? "index.html",
+  );
   const [sidebarTab, setSidebarTab] = useState<"enonce" | "fichiers" | "resultats">("enonce");
   const [evaluationSummary, setEvaluationSummary] = useState<EvaluationSummary | null>(null);
   const [unlockedHints, setUnlockedHints] = useState<UnlockedHint[]>([]);
@@ -92,7 +91,10 @@ function Workspace() {
   const [cursorPos, setCursorPos] = useState({ line: 1, col: 1 });
 
   const hasPhp = useMemo(() => Object.keys(files).some((k) => k.endsWith(".php")), [files]);
-  const hasSql = useMemo(() => Object.keys(files).some((k) => k.endsWith(".sql") || k === "db/init.sql"), [files]);
+  const hasSql = useMemo(
+    () => Object.keys(files).some((k) => k.endsWith(".sql") || k === "db/init.sql"),
+    [files],
+  );
   const [rightPanelTab, setRightPanelTab] = useState<"preview" | "sql" | "php">("preview");
 
   const handleVerify = () => {
@@ -109,7 +111,7 @@ function Workspace() {
     const htmlKey =
       files["index.html"] !== undefined
         ? "index.html"
-        : Object.keys(files).find((k) => k.endsWith(".html")) ?? "index.html";
+        : (Object.keys(files).find((k) => k.endsWith(".html")) ?? "index.html");
     const html = files[htmlKey]?.content ?? "";
     const css = Object.entries(files)
       .filter(([k]) => k.endsWith(".css"))
@@ -184,7 +186,8 @@ function Workspace() {
   };
 
   const handleReset = async () => {
-    if (!confirm("Réinitialiser le sujet aux fichiers de départ ? Votre code local sera effacé.")) return;
+    if (!confirm("Réinitialiser le sujet aux fichiers de départ ? Votre code local sera effacé."))
+      return;
     await deleteFromBuffer(id);
     clear(id);
     const resetFiles: Record<string, WorkspaceFile> = {};
@@ -199,12 +202,13 @@ function Workspace() {
     setUnlockedHints([]);
   };
 
-  const currentFile: WorkspaceFile = files[activeFileName] ?? files["index.html"] ?? {
-    name: "index.html",
-    type: "text",
-    content: "",
-    language: "html",
-  };
+  const currentFile: WorkspaceFile = files[activeFileName] ??
+    files["index.html"] ?? {
+      name: "index.html",
+      type: "text",
+      content: "",
+      language: "html",
+    };
   const lineCount = currentFile.type === "text" ? currentFile.content.split("\n").length : 0;
 
   // Détection du langage pour Monaco
@@ -229,7 +233,9 @@ function Workspace() {
           <span className="text-muted-foreground/60">/</span>
           <span className="text-muted-foreground">Sujets</span>
           <span className="text-muted-foreground/60">/</span>
-          <span className="font-medium text-foreground truncate max-w-[200px] sm:max-w-none">{ex.title}</span>
+          <span className="font-medium text-foreground truncate max-w-[200px] sm:max-w-none">
+            {ex.title}
+          </span>
           <span className="rounded bg-primary/10 border border-primary/20 px-1.5 py-0.5 text-[10px] text-primary hidden md:inline">
             SW_{id}
           </span>
@@ -305,7 +311,9 @@ function Workspace() {
             {sidebarTab === "enonce" && (
               <div className="p-4 text-sm space-y-4">
                 <div>
-                  <div className="text-[11px] font-mono uppercase text-primary tracking-wider">{ex.competence}</div>
+                  <div className="text-[11px] font-mono uppercase text-primary tracking-wider">
+                    {ex.competence}
+                  </div>
                   <h2 className="text-base font-semibold mt-1">{ex.title}</h2>
                   <div className="flex items-center gap-2 mt-1">
                     <span className="rounded border px-1.5 py-0.2 text-[10px] font-mono text-muted-foreground">
@@ -320,7 +328,9 @@ function Workspace() {
                 </div>
 
                 <div className="border-t pt-3">
-                  <h3 className="text-xs font-mono uppercase tracking-wider text-muted-foreground mb-2">Instructions</h3>
+                  <h3 className="text-xs font-mono uppercase tracking-wider text-muted-foreground mb-2">
+                    Instructions
+                  </h3>
                   <ol className="list-decimal space-y-2 pl-4 text-xs leading-relaxed text-foreground/90">
                     {ex.statement.map((item, i) => (
                       <li key={i}>{item}</li>
@@ -341,7 +351,10 @@ function Workspace() {
 
                   <div className="space-y-2">
                     {unlockedHints.map((uh, i) => (
-                      <div key={i} className="rounded-md border-l-2 border-primary bg-muted/60 p-2.5 text-xs text-foreground/90">
+                      <div
+                        key={i}
+                        className="rounded-md border-l-2 border-primary bg-muted/60 p-2.5 text-xs text-foreground/90"
+                      >
                         <span className="font-mono font-semibold text-[10px] text-primary uppercase block mb-1">
                           Indice {uh.level} • {uh.levelName}
                         </span>
@@ -426,7 +439,10 @@ function Workspace() {
                   </span>
                   <span>{fileName}</span>
                   {syncStatus === "pending" && isActive && (
-                    <span className="h-1.5 w-1.5 rounded-full bg-primary" title="Modifications locales enregistrées dans le tampon IndexedDB" />
+                    <span
+                      className="h-1.5 w-1.5 rounded-full bg-primary"
+                      title="Modifications locales enregistrées dans le tampon IndexedDB"
+                    />
                   )}
                 </button>
               );
@@ -442,9 +458,13 @@ function Workspace() {
                   alt={currentFile.name}
                   className="max-h-64 max-w-full rounded border bg-card shadow-sm object-contain"
                 />
-                <span className="mt-3 font-mono text-xs text-foreground font-medium">{currentFile.name}</span>
+                <span className="mt-3 font-mono text-xs text-foreground font-medium">
+                  {currentFile.name}
+                </span>
                 <span className="text-[11px] text-muted-foreground font-mono">
-                  {currentFile.size ? `${Math.round(currentFile.size / 1024)} Ko` : "Ressource locale"}
+                  {currentFile.size
+                    ? `${Math.round(currentFile.size / 1024)} Ko`
+                    : "Ressource locale"}
                 </span>
               </div>
             ) : (
@@ -506,7 +526,9 @@ function Workspace() {
             {rightPanelTab === "sql" && (
               <DatabasePanel
                 initialSql={files["db/init.sql"]?.content || files["schema.sql"]?.content || ""}
-                projectFiles={Object.fromEntries(Object.entries(files).map(([k, v]) => [k, v.content]))}
+                projectFiles={Object.fromEntries(
+                  Object.entries(files).map(([k, v]) => [k, v.content]),
+                )}
               />
             )}
             {rightPanelTab === "php" && (
@@ -528,11 +550,7 @@ function Workspace() {
       />
 
       {/* Modale d'arbitrage de conflit explicite (Inviolable #4) */}
-      <ConflictModal
-        open={Boolean(conflict)}
-        conflict={conflict}
-        onResolve={resolveConflict}
-      />
+      <ConflictModal open={Boolean(conflict)} conflict={conflict} onResolve={resolveConflict} />
     </div>
   );
 }

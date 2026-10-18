@@ -49,16 +49,46 @@ export const initialExercises: Exercise[] = [
       "script.js": `// Pas de JavaScript nécessaire pour ce sujet\n`,
     },
     criteria: [
-      { id: "article", label: "Un <article class=\"carte\"> existe", points: 2, fail: "Aucun élément <article> avec la classe « carte » trouvé.", check: (d) => !!d.querySelector("article.carte") },
-      { id: "h1", label: "Un <h1> non vide dans la carte", points: 2, fail: "Le titre <h1> est absent ou vide dans la carte.", check: (d) => !!d.querySelector("article.carte h1")?.textContent?.trim() },
-      { id: "p", label: "Un paragraphe de présentation", points: 1, fail: "Ajoutez un <p> contenant du texte dans la carte.", check: (d) => !!d.querySelector("article.carte p")?.textContent?.trim() },
-      { id: "ul", label: "Une liste d'au moins 3 loisirs", points: 3, fail: "La liste <ul> doit contenir au moins 3 <li>.", check: (d) => (d.querySelectorAll("article.carte ul > li").length >= 3) },
-      { id: "mail", label: "Un lien mailto:", points: 2, fail: "Aucun lien dont le href commence par « mailto: ».", check: (d) => !!d.querySelector('article.carte a[href^="mailto:"]') },
+      {
+        id: "article",
+        label: 'Un <article class="carte"> existe',
+        points: 2,
+        fail: "Aucun élément <article> avec la classe « carte » trouvé.",
+        check: (d) => !!d.querySelector("article.carte"),
+      },
+      {
+        id: "h1",
+        label: "Un <h1> non vide dans la carte",
+        points: 2,
+        fail: "Le titre <h1> est absent ou vide dans la carte.",
+        check: (d) => !!d.querySelector("article.carte h1")?.textContent?.trim(),
+      },
+      {
+        id: "p",
+        label: "Un paragraphe de présentation",
+        points: 1,
+        fail: "Ajoutez un <p> contenant du texte dans la carte.",
+        check: (d) => !!d.querySelector("article.carte p")?.textContent?.trim(),
+      },
+      {
+        id: "ul",
+        label: "Une liste d'au moins 3 loisirs",
+        points: 3,
+        fail: "La liste <ul> doit contenir au moins 3 <li>.",
+        check: (d) => d.querySelectorAll("article.carte ul > li").length >= 3,
+      },
+      {
+        id: "mail",
+        label: "Un lien mailto:",
+        points: 2,
+        fail: "Aucun lien dont le href commence par « mailto: ».",
+        check: (d) => !!d.querySelector('article.carte a[href^="mailto:"]'),
+      },
     ],
     hints: [
-      "Commencez par écrire <article class=\"carte\"> … </article> dans le <body>.",
+      'Commencez par écrire <article class="carte"> … </article> dans le <body>.',
       "Une liste s'écrit <ul><li>…</li><li>…</li></ul>.",
-      "Un lien e-mail : <a href=\"mailto:moi@exemple.fr\">Me contacter</a>.",
+      'Un lien e-mail : <a href="mailto:moi@exemple.fr">Me contacter</a>.',
     ],
   },
   {
@@ -77,8 +107,21 @@ export const initialExercises: Exercise[] = [
       "script.js": `\n`,
     },
     criteria: [
-      { id: "bg", label: "Fond du bouton rgb(0, 102, 204)", points: 3, fail: "La couleur de fond de #valider n'est pas rgb(0, 102, 204) (#0066cc).", check: (d, w) => css(w, d.getElementById("valider"), "background-color") === "rgb(0, 102, 204)" },
-      { id: "color", label: "Texte du bouton en blanc", points: 2, fail: "La couleur du texte de #valider doit être blanche.", check: (d, w) => css(w, d.getElementById("valider"), "color") === "rgb(255, 255, 255)" },
+      {
+        id: "bg",
+        label: "Fond du bouton rgb(0, 102, 204)",
+        points: 3,
+        fail: "La couleur de fond de #valider n'est pas rgb(0, 102, 204) (#0066cc).",
+        check: (d, w) =>
+          css(w, d.getElementById("valider"), "background-color") === "rgb(0, 102, 204)",
+      },
+      {
+        id: "color",
+        label: "Texte du bouton en blanc",
+        points: 2,
+        fail: "La couleur du texte de #valider doit être blanche.",
+        check: (d, w) => css(w, d.getElementById("valider"), "color") === "rgb(255, 255, 255)",
+      },
       {
         id: "radius",
         label: "Coins arrondis",
@@ -87,11 +130,23 @@ export const initialExercises: Exercise[] = [
         check: (d, w) =>
           parseFloat(
             css(w, d.getElementById("valider"), "border-top-left-radius") ||
-            css(w, d.getElementById("valider"), "border-radius")
+              css(w, d.getElementById("valider"), "border-radius"),
           ) > 0,
       },
-      { id: "padding", label: "Padding non nul", points: 1, fail: "Ajoutez un padding au bouton.", check: (d, w) => parseFloat(css(w, d.getElementById("valider"), "padding-top")) > 0 },
-      { id: "center", label: "Titre centré", points: 2, fail: "Le <h1> doit avoir text-align: center.", check: (d, w) => css(w, d.querySelector("h1"), "text-align") === "center" },
+      {
+        id: "padding",
+        label: "Padding non nul",
+        points: 1,
+        fail: "Ajoutez un padding au bouton.",
+        check: (d, w) => parseFloat(css(w, d.getElementById("valider"), "padding-top")) > 0,
+      },
+      {
+        id: "center",
+        label: "Titre centré",
+        points: 2,
+        fail: "Le <h1> doit avoir text-align: center.",
+        check: (d, w) => css(w, d.querySelector("h1"), "text-align") === "center",
+      },
     ],
     hints: [
       "Le sélecteur d'un id s'écrit #valider { … }.",
@@ -105,7 +160,7 @@ export const initialExercises: Exercise[] = [
     level: "Difficile",
     competence: "JavaScript – DOM et événements",
     statement: [
-      "La page contient un bouton #plus et un <span id=\"total\"> qui affiche 0.",
+      'La page contient un bouton #plus et un <span id="total"> qui affiche 0.',
       "En JavaScript, chaque clic sur #plus augmente la valeur affichée de 1.",
       "Lorsque le total atteint 5, ajoutez la classe « max » au span.",
     ],
@@ -115,14 +170,44 @@ export const initialExercises: Exercise[] = [
       "script.js": `// Récupérez les éléments puis ajoutez un écouteur d'événement\n`,
     },
     criteria: [
-      { id: "click1", label: "Un clic affiche 1", points: 4, fail: "Après un clic sur #plus, #total devrait afficher 1.", check: (d) => { const b = d.getElementById("plus") as HTMLButtonElement | null; const t = d.getElementById("total"); if (!b || !t) return false; b.click(); return t.textContent?.trim() === "1"; } },
-      { id: "click5", label: "Cinq clics affichent 5", points: 3, fail: "Après 5 clics au total, #total devrait afficher 5.", check: (d) => { const b = d.getElementById("plus") as HTMLButtonElement | null; const t = d.getElementById("total"); if (!b || !t) return false; for (let i = 0; i < 4; i++) b.click(); return t.textContent?.trim() === "5"; } },
-      { id: "max", label: "Classe « max » à 5", points: 3, fail: "À 5, le span #total doit avoir la classe « max ».", check: (d) => !!d.getElementById("total")?.classList.contains("max") },
+      {
+        id: "click1",
+        label: "Un clic affiche 1",
+        points: 4,
+        fail: "Après un clic sur #plus, #total devrait afficher 1.",
+        check: (d) => {
+          const b = d.getElementById("plus") as HTMLButtonElement | null;
+          const t = d.getElementById("total");
+          if (!b || !t) return false;
+          b.click();
+          return t.textContent?.trim() === "1";
+        },
+      },
+      {
+        id: "click5",
+        label: "Cinq clics affichent 5",
+        points: 3,
+        fail: "Après 5 clics au total, #total devrait afficher 5.",
+        check: (d) => {
+          const b = d.getElementById("plus") as HTMLButtonElement | null;
+          const t = d.getElementById("total");
+          if (!b || !t) return false;
+          for (let i = 0; i < 4; i++) b.click();
+          return t.textContent?.trim() === "5";
+        },
+      },
+      {
+        id: "max",
+        label: "Classe « max » à 5",
+        points: 3,
+        fail: "À 5, le span #total doit avoir la classe « max ».",
+        check: (d) => !!d.getElementById("total")?.classList.contains("max"),
+      },
     ],
     hints: [
-      "document.getElementById(\"plus\") renvoie le bouton.",
-      "bouton.addEventListener(\"click\", () => { … }) réagit aux clics.",
-      "Gardez une variable let total = 0; puis span.textContent = total; et span.classList.add(\"max\").",
+      'document.getElementById("plus") renvoie le bouton.',
+      'bouton.addEventListener("click", () => { … }) réagit aux clics.',
+      'Gardez une variable let total = 0; puis span.textContent = total; et span.classList.add("max").',
     ],
   },
 ];
@@ -145,7 +230,7 @@ export function buildDocument(files: Files): string {
   const htmlKey =
     files["index.html"] !== undefined
       ? "index.html"
-      : Object.keys(files).find((k) => k.endsWith(".html")) ?? "index.html";
+      : (Object.keys(files).find((k) => k.endsWith(".html")) ?? "index.html");
   let html = files[htmlKey] ?? "<!DOCTYPE html><html><body></body></html>";
 
   // Récupérer et concaténer toutes les feuilles CSS
@@ -160,7 +245,9 @@ export function buildDocument(files: Files): string {
     .filter(([k]) => k.endsWith(".js"))
     .map(([, v]) => v)
     .join("\n");
-  const script = jsParts ? `<script>\n${jsParts.replace(/<\/script>/gi, "<" + "/script>")}\n</script>` : "";
+  const script = jsParts
+    ? `<script>\n${jsParts.replace(/<\/script>/gi, "<" + "/script>")}\n</script>`
+    : "";
 
   if (style) {
     if (html.includes("</head>")) {
@@ -186,7 +273,11 @@ export type Result = { id: string; label: string; points: number; ok: boolean; m
 export function runCriteria(criteria: Criterion[], doc: Document, win: Window): Result[] {
   return criteria.map((c) => {
     let ok = false;
-    try { ok = c.check(doc, win); } catch { ok = false; }
+    try {
+      ok = c.check(doc, win);
+    } catch {
+      ok = false;
+    }
     return { id: c.id, label: c.label, points: c.points, ok, message: ok ? "Validé" : c.fail };
   });
 }

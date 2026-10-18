@@ -143,7 +143,8 @@ export function getSecurityTestsMatrix(): SecurityTestItem[] {
       categorie: "RLS & Données",
       criticite: "Bloquant",
       statut: "PASSED",
-      detail: "Interdit la consultation ou modification des classes créées par un autre enseignant.",
+      detail:
+        "Interdit la consultation ou modification des classes créées par un autre enseignant.",
     },
     {
       code: "T-03",
@@ -151,7 +152,8 @@ export function getSecurityTestsMatrix(): SecurityTestItem[] {
       categorie: "Contrôle d'accès",
       criticite: "Bloquant",
       statut: "PASSED",
-      detail: "Trigger handle_new_user force le rôle élève ; validation admin requise pour enseignant.",
+      detail:
+        "Trigger handle_new_user force le rôle élève ; validation admin requise pour enseignant.",
     },
     {
       code: "T-04",
@@ -199,7 +201,8 @@ export function getSecurityTestsMatrix(): SecurityTestItem[] {
       categorie: "Immuabilité",
       criticite: "Bloquant",
       statut: "PASSED",
-      detail: "Vérification SHA-256 canonique. Toute tentative d'altération lève ImmutabilityViolationError.",
+      detail:
+        "Vérification SHA-256 canonique. Toute tentative d'altération lève ImmutabilityViolationError.",
     },
     {
       code: "T-10",
@@ -215,7 +218,8 @@ export function getSecurityTestsMatrix(): SecurityTestItem[] {
       categorie: "Bac à Sable",
       criticite: "Bloquant",
       statut: "PASSED",
-      detail: "Désactivation complète de fetch, XHR, WebSocket et sendBeacon dans l'iframe sandbox.",
+      detail:
+        "Désactivation complète de fetch, XHR, WebSocket et sendBeacon dans l'iframe sandbox.",
     },
     {
       code: "T-12",
@@ -223,7 +227,8 @@ export function getSecurityTestsMatrix(): SecurityTestItem[] {
       categorie: "Secrets & CI",
       criticite: "Bloquant",
       statut: "PASSED",
-      detail: "Scanner de secrets vérifiant l'absence de clé service_role ou JWT privé dans le client.",
+      detail:
+        "Scanner de secrets vérifiant l'absence de clé service_role ou JWT privé dans le client.",
     },
     {
       code: "T-13",
@@ -231,7 +236,8 @@ export function getSecurityTestsMatrix(): SecurityTestItem[] {
       categorie: "Immuabilité",
       criticite: "Bloquant",
       statut: "PASSED",
-      detail: "Trigger protect_published_version interdisant tout UPDATE ou DELETE sur version publiée.",
+      detail:
+        "Trigger protect_published_version interdisant tout UPDATE ou DELETE sur version publiée.",
     },
     {
       code: "T-14",
@@ -239,7 +245,8 @@ export function getSecurityTestsMatrix(): SecurityTestItem[] {
       categorie: "Conformité RGPD",
       criticite: "Majeur",
       statut: "PASSED",
-      detail: "Sanitizer supprimant emails, CIN, mots de passe et noms complets des logs d'erreurs.",
+      detail:
+        "Sanitizer supprimant emails, CIN, mots de passe et noms complets des logs d'erreurs.",
     },
   ];
 }
@@ -280,9 +287,7 @@ export async function getAdminUsers(): Promise<AdminUser[]> {
       return MOCK_ADMIN_USERS;
     }
 
-    const { data: roles } = await supabase
-      .from("user_roles")
-      .select("user_id, role");
+    const { data: roles } = await supabase.from("user_roles").select("user_id, role");
 
     const roleMap = new Map<string, AppRole>();
     if (roles) {
@@ -328,8 +333,11 @@ export async function validerCompteEnseignant(
     }
 
     return { success: true };
-  } catch (err: any) {
-    return { success: false, error: err?.message || "Erreur lors de la validation." };
+  } catch (err: unknown) {
+    return {
+      success: false,
+      error: err instanceof Error ? err.message : "Erreur lors de la validation.",
+    };
   }
 }
 
@@ -341,17 +349,18 @@ export async function modifierRoleUtilisateur(
   newRole: AppRole,
 ): Promise<{ success: boolean; error?: string }> {
   try {
-    const { error } = await supabase
-      .from("user_roles")
-      .upsert({ user_id: userId, role: newRole });
+    const { error } = await supabase.from("user_roles").upsert({ user_id: userId, role: newRole });
 
     if (error) {
       return { success: false, error: error.message };
     }
 
     return { success: true };
-  } catch (err: any) {
-    return { success: false, error: err?.message || "Erreur de modification du rôle." };
+  } catch (err: unknown) {
+    return {
+      success: false,
+      error: err instanceof Error ? err.message : "Erreur de modification du rôle.",
+    };
   }
 }
 
@@ -382,7 +391,10 @@ export async function anonymiserDonneesEleve(
     }
 
     return { success: true };
-  } catch (err: any) {
-    return { success: false, error: err?.message || "Erreur d'anonymisation." };
+  } catch (err: unknown) {
+    return {
+      success: false,
+      error: err instanceof Error ? err.message : "Erreur d'anonymisation.",
+    };
   }
 }
