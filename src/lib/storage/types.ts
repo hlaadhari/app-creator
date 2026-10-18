@@ -1,11 +1,11 @@
 export type SyncStatus =
-  | "local"    // Sauvegardé uniquement dans IndexedDB local (ex: anonyme ou hors-ligne)
-  | "pending"  // Modifié localement, en attente de synchronisation distante
-  | "syncing"  // Synchronisation distante en cours vers Supabase
-  | "synced"   // Parfaitement synchronisé avec Supabase
+  | "local" // Sauvegardé uniquement dans IndexedDB local (ex: anonyme ou hors-ligne)
+  | "pending" // Modifié localement, en attente de synchronisation distante
+  | "syncing" // Synchronisation distante en cours vers Supabase
+  | "synced" // Parfaitement synchronisé avec Supabase
   | "conflict" // Conflit de révision (version serveur plus récente)
-  | "offline"  // Réseau déconnecté, buffer local actif
-  | "error";   // Erreur lors de la synchronisation
+  | "offline" // Réseau déconnecté, buffer local actif
+  | "error"; // Erreur lors de la synchronisation
 
 export interface BufferFile {
   name: string;

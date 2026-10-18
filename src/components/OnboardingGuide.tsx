@@ -61,7 +61,9 @@ export function OnboardingGuide({ forceOpen = false, onClose }: OnboardingGuideP
       content: (
         <div className="space-y-3 text-xs leading-relaxed text-muted-foreground">
           <p>
-            Labo STI met à votre disposition un environnement de développement web complet directement dans votre navigateur, conçu pour vous préparer aux épreuves pratiques en conditions réelles.
+            Labo STI met à votre disposition un environnement de développement web complet
+            directement dans votre navigateur, conçu pour vous préparer aux épreuves pratiques en
+            conditions réelles.
           </p>
           <div className="grid grid-cols-2 gap-2 pt-2">
             <div className="rounded-lg border p-3 bg-muted/30">
@@ -70,7 +72,8 @@ export function OnboardingGuide({ forceOpen = false, onClose }: OnboardingGuideP
             </div>
             <div className="rounded-lg border p-3 bg-muted/30">
               <span className="font-semibold text-foreground block mb-1">Mode Classe</span>
-              Rejoignez votre classe avec le code fourni par votre enseignant pour recevoir vos sujets assignés.
+              Rejoignez votre classe avec le code fourni par votre enseignant pour recevoir vos
+              sujets assignés.
             </div>
           </div>
         </div>
@@ -83,17 +86,23 @@ export function OnboardingGuide({ forceOpen = false, onClose }: OnboardingGuideP
       content: (
         <div className="space-y-3 text-xs leading-relaxed text-muted-foreground">
           <p>
-            Profitez de l'éditeur <strong>Monaco Editor</strong> avec coloration syntaxique, auto-complétion, raccourcis clavier (<kbd className="font-mono bg-muted px-1 rounded">Ctrl+S</kbd>) et gestion multi-onglets.
+            Profitez de l'éditeur <strong>Monaco Editor</strong> avec coloration syntaxique,
+            auto-complétion, raccourcis clavier (
+            <kbd className="font-mono bg-muted px-1 rounded">Ctrl+S</kbd>) et gestion multi-onglets.
           </p>
           <ul className="space-y-2 list-disc pl-4 text-foreground/90">
             <li>
-              <strong>Dossier normalisé</strong> : vos fichiers d'exercice sont organisés selon l'arborescence officielle.
+              <strong>Dossier normalisé</strong> : vos fichiers d'exercice sont organisés selon
+              l'arborescence officielle.
             </li>
             <li>
-              <strong>Glisser-déposer de ressources</strong> : importez directement des images (<code>.png</code>, <code>.jpg</code>, <code>.svg</code>) utilisables immédiatement dans votre code.
+              <strong>Glisser-déposer de ressources</strong> : importez directement des images (
+              <code>.png</code>, <code>.jpg</code>, <code>.svg</code>) utilisables immédiatement
+              dans votre code.
             </li>
             <li>
-              <strong>Simulateur responsive</strong> : testez votre rendu en vue Ordinateur, Tablette ou Mobile.
+              <strong>Simulateur responsive</strong> : testez votre rendu en vue Ordinateur,
+              Tablette ou Mobile.
             </li>
           </ul>
         </div>
@@ -110,12 +119,14 @@ export function OnboardingGuide({ forceOpen = false, onClose }: OnboardingGuideP
             <div>
               <strong>Principe n°4 : Ne jamais perdre votre travail</strong>
               <p className="text-[11px] text-muted-foreground mt-0.5">
-                Chaque frappe est enregistrée instantanément dans votre navigateur (IndexedDB <code>labo_sti_buffer</code>) même sans connexion Internet.
+                Chaque frappe est enregistrée instantanément dans votre navigateur (IndexedDB{" "}
+                <code>labo_sti_buffer</code>) même sans connexion Internet.
               </p>
             </div>
           </div>
           <p>
-            Cliquez à tout moment sur <strong>« Vérifier »</strong> pour évaluer votre page critère par critère et débloquer des indices progressifs si vous rencontrez une difficulté.
+            Cliquez à tout moment sur <strong>« Vérifier »</strong> pour évaluer votre page critère
+            par critère et débloquer des indices progressifs si vous rencontrez une difficulté.
           </p>
         </div>
       ),
@@ -141,9 +152,7 @@ export function OnboardingGuide({ forceOpen = false, onClose }: OnboardingGuideP
           </div>
         </DialogHeader>
 
-        <div className="py-4 border-y my-2 min-h-[160px]">
-          {current.content}
-        </div>
+        <div className="py-4 border-y my-2 min-h-[160px]">{current.content}</div>
 
         {/* Indicateurs de progression et actions */}
         <div className="flex items-center justify-between pt-1">

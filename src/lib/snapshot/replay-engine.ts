@@ -5,10 +5,7 @@
  * avec les critères de notation versionnés.
  */
 
-import {
-  type CriterionDefinition,
-  evaluateCriteria,
-} from "@/lib/evaluation/probe-runner";
+import { type CriterionDefinition, evaluateCriteria } from "@/lib/evaluation/probe-runner";
 import {
   type SnapshotManifeste,
   type GrilleNotationOfficielle,
@@ -16,22 +13,23 @@ import {
   type ReplayExecutionResult,
 } from "./types";
 import { verifierIntegriteSnapshot } from "./snapshot-engine";
-import { SQLiteEngine } from "@/lib/sql/sqlite-engine";
+import { SqliteEngine } from "@/lib/sql/sqlite-engine";
 
 export interface RejouerCorrectionOptions {
   snapshot: SnapshotManifeste;
   fichiers: Record<string, string | Uint8Array>;
   criteres: CriterionDefinition[];
-  sqlDump?: string | null;
+  sqlDump?: string | null | undefined;
   baremeTotal?: number; // Par défaut 20 points
 }
 
 /**
  * Crée un environnement DOM synthétique à partir des fichiers HTML et CSS du snapshot
  */
-function preparerDocumentSnapshot(
-  fichiers: Record<string, string | Uint8Array>
-): { doc: Document; win: Window } {
+function preparerDocumentSnapshot(fichiers: Record<string, string | Uint8Array>): {
+  doc: Document;
+  win: Window;
+} {
   // Recherche du fichier HTML principal (ex: index.html, location.html, Don.html ou premier .html)
   const chemHtml =
     Object.keys(fichiers).find((k) => k.toLowerCase() === "index.html") ||
@@ -58,14 +56,15 @@ function preparerDocumentSnapshot(
   }
 
   // Window mock pour les styles calculés si non présent
-  const win = (doc.defaultView || globalThis.window || {
-    getComputedStyle: (el: Element) => {
-      const inline = (el as HTMLElement).style;
-      return {
-        getPropertyValue: (prop: string) => inline?.getPropertyValue(prop) || "",
-      };
-    },
-  }) as unknown as Window;
+  const win = (doc.defaultView ||
+    globalThis.window || {
+      getComputedStyle: (el: Element) => {
+        const inline = (el as HTMLElement).style;
+        return {
+          getPropertyValue: (prop: string) => inline?.getPropertyValue(prop) || "",
+        };
+      },
+    }) as unknown as Window;
 
   return { doc, win };
 }
@@ -77,7 +76,7 @@ async function executerPasseEvaluation(
   fichiers: Record<string, string | Uint8Array>,
   criteres: CriterionDefinition[],
   sqlDump?: string | null,
-  baremeTotal = 20
+  baremeTotal = 20,
 ): Promise<{
   grille: GrilleNotationOfficielle;
   journal: string[];
@@ -90,20 +89,17 @@ async function executerPasseEvaluation(
   const summary = evaluateCriteria(criteres, doc, win);
 
   // 2. Gestion éventuelle d'une validation SQL
-  let sqliteEngine: SQLiteEngine | null = null;
+  let sqliteEngine: SqliteEngine | null = null;
   if (sqlDump && sqlDump.trim().length > 0) {
     try {
-      sqliteEngine = new SQLiteEngine();
-      await sqliteEngine.init();
-      await sqliteEngine.chargerScript(sqlDump);
-      const tables = await sqliteEngine.listerTables();
-      journal.push(`Base SQLite initialisée avec succès pour le rejouage (${tables.length} table(s)).`);
+      sqliteEngine = new SqliteEngine();
+      await sqliteEngine.init(sqlDump);
+      const tables = await sqliteEngine.getTables();
+      journal.push(
+        `Base SQLite initialisée avec succès pour le rejouage (${tables.length} table(s)).`,
+      );
     } catch (err) {
       journal.push(`Avertissement base SQL lors du rejouage : ${String(err)}`);
-    } finally {
-      if (sqliteEngine) {
-        sqliteEngine.close();
-      }
     }
   }
 
@@ -149,7 +145,7 @@ async function executerPasseEvaluation(
  * Effectue un double passage pour attester de la stricte reproductibilité dans le temps.
  */
 export async function rejouerCorrectionReference(
-  options: RejouerCorrectionOptions
+  options: RejouerCorrectionOptions,
 ): Promise<ReplayExecutionResult> {
   const debut = performance.now();
   const journalComplet: string[] = [];
@@ -159,16 +155,16 @@ export async function rejouerCorrectionReference(
   const integ = await verifierIntegriteSnapshot(
     options.snapshot,
     options.fichiers,
-    options.sqlDump
+    options.sqlDump,
   );
 
   if (!integ.valide) {
     journalComplet.push(
-      `ALERTE INTÉGRITÉ : Sceau invalide ou altération détectée (${integ.erreurs.join(" ; ")})`
+      `ALERTE INTÉGRITÉ : Sceau invalide ou altération détectée (${integ.erreurs.join(" ; ")})`,
     );
   } else {
     journalComplet.push(
-      `Sceau cryptographique certifié conforme (SHA-256: ${options.snapshot.rootHash}).`
+      `Sceau cryptographique certifié conforme (SHA-256: ${options.snapshot.rootHash}).`,
     );
   }
 
@@ -177,7 +173,7 @@ export async function rejouerCorrectionReference(
     options.fichiers,
     options.criteres,
     options.sqlDump,
-    options.baremeTotal ?? 20
+    options.baremeTotal ?? 20,
   );
   journalComplet.push(...passe1.journal);
 
@@ -186,7 +182,7 @@ export async function rejouerCorrectionReference(
     options.fichiers,
     options.criteres,
     options.sqlDump,
-    options.baremeTotal ?? 20
+    options.baremeTotal ?? 20,
   );
 
   const reproductible =
@@ -195,14 +191,14 @@ export async function rejouerCorrectionReference(
     passe1.grille.criteres.every(
       (c, i) =>
         c.valide === passe2.grille.criteres[i]?.valide &&
-        c.pointsAuto === passe2.grille.criteres[i]?.pointsAuto
+        c.pointsAuto === passe2.grille.criteres[i]?.pointsAuto,
     );
 
   if (reproductible) {
     journalComplet.push("Déterminisme vérifié : Rejouages successifs 100% identiques.");
   } else {
     journalComplet.push(
-      "ALERTE REPRODUCTIBILITÉ : Divergence observée entre deux exécutions consécutives."
+      "ALERTE REPRODUCTIBILITÉ : Divergence observée entre deux exécutions consécutives.",
     );
   }
 

@@ -12,10 +12,7 @@ import {
   type ReplayExecutionResult,
   type NoteOfficielleRecord,
 } from "@/lib/snapshot/types";
-import {
-  verifierIntegriteSnapshot,
-  creerArchiveSnapshotZip,
-} from "@/lib/snapshot/snapshot-engine";
+import { verifierIntegriteSnapshot, creerArchiveSnapshotZip } from "@/lib/snapshot/snapshot-engine";
 import { rejouerCorrectionReference } from "@/lib/snapshot/replay-engine";
 import {
   initialiserNoteOfficielle,
@@ -55,10 +52,10 @@ export const TeacherSnapshotReplay: React.FC<TeacherSnapshotReplayProps> = ({
 
   const [noteRecord, setNoteRecord] = useState<NoteOfficielleRecord | null>(initialNote || null);
   const [justificationGlobale, setJustificationGlobale] = useState(
-    initialNote?.justification || ""
+    initialNote?.justification || "",
   );
   const [noteFinaleInput, setNoteFinaleInput] = useState<string>(
-    initialNote ? initialNote.note_finale.toString() : ""
+    initialNote ? initialNote.note_finale.toString() : "",
   );
   const [saveStatus, setSaveStatus] = useState<string | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -111,7 +108,7 @@ export const TeacherSnapshotReplay: React.FC<TeacherSnapshotReplayProps> = ({
           snapshot.projetId,
           snapshot.passageId ?? null,
           res,
-          enseignantId
+          enseignantId,
         );
         setNoteRecord(nouvelleNote);
         setNoteFinaleInput(nouvelleNote.note_finale.toString());
@@ -126,7 +123,7 @@ export const TeacherSnapshotReplay: React.FC<TeacherSnapshotReplayProps> = ({
   // Téléchargement de l'archive officielle SW_<NCIN>.zip
   const handleDownloadArchive = () => {
     const zipBytes = creerArchiveSnapshotZip(numeroCin, snapshot, fichiers, sqlDump ?? undefined);
-    const blob = new Blob([zipBytes], { type: "application/zip" });
+    const blob = new Blob([zipBytes as unknown as BlobPart], { type: "application/zip" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
@@ -175,7 +172,7 @@ export const TeacherSnapshotReplay: React.FC<TeacherSnapshotReplayProps> = ({
 
     if (valNote !== noteRecord.note_auto && justificationGlobale.trim().length < 5) {
       setErrorMsg(
-        "Motivation pédagogique obligatoire : Veuillez expliquer la raison de l'ajustement de la note."
+        "Motivation pédagogique obligatoire : Veuillez expliquer la raison de l'ajustement de la note.",
       );
       return;
     }
@@ -230,15 +227,35 @@ export const TeacherSnapshotReplay: React.FC<TeacherSnapshotReplayProps> = ({
             </div>
           ) : verifResult?.valide ? (
             <div className="flex items-center gap-2 bg-emerald-950/60 border border-emerald-600/60 text-emerald-300 px-3 py-1.5 rounded-md text-xs font-medium">
-              <svg className="w-4 h-4 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              <svg
+                className="w-4 h-4 text-emerald-400"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M5 13l4 4L19 7"
+                />
               </svg>
               <span>Sceau SHA-256 Certifié Conforme</span>
             </div>
           ) : (
             <div className="flex items-center gap-2 bg-rose-950/60 border border-rose-600 text-rose-300 px-3 py-1.5 rounded-md text-xs font-medium">
-              <svg className="w-4 h-4 text-rose-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              <svg
+                className="w-4 h-4 text-rose-400"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                />
               </svg>
               <span>ALERTE : Altération Cryptographique Détectée !</span>
             </div>
@@ -264,8 +281,18 @@ export const TeacherSnapshotReplay: React.FC<TeacherSnapshotReplayProps> = ({
           ) : (
             <>
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"
+                />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
               </svg>
               Rejouer la correction officielle de référence
             </>
@@ -277,7 +304,12 @@ export const TeacherSnapshotReplay: React.FC<TeacherSnapshotReplayProps> = ({
           className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded font-medium text-sm flex items-center gap-2 transition"
         >
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+            />
           </svg>
           Télécharger l'archive certifiée SW_{numeroCin}.zip
         </button>
@@ -325,7 +357,8 @@ export const TeacherSnapshotReplay: React.FC<TeacherSnapshotReplayProps> = ({
             <div className="bg-slate-900/60 p-3 rounded border border-slate-800">
               <div className="text-xs text-slate-400">Note finale /20</div>
               <div className="text-lg font-bold text-emerald-400">
-                {noteRecord?.note_finale.toFixed(2) ?? replayResult.grille.noteFinale20.toFixed(2)} / 20
+                {noteRecord?.note_finale.toFixed(2) ?? replayResult.grille.noteFinale20.toFixed(2)}{" "}
+                / 20
               </div>
             </div>
             <div className="bg-slate-900/60 p-3 rounded border border-slate-800">
@@ -362,7 +395,9 @@ export const TeacherSnapshotReplay: React.FC<TeacherSnapshotReplayProps> = ({
                 {noteRecord.grille.criteres.map((c) => (
                   <tr key={c.critereId} className="hover:bg-slate-800/50">
                     <td className="py-2.5 px-3">
-                      <div className="font-semibold text-slate-200">[{c.code}] {c.label}</div>
+                      <div className="font-semibold text-slate-200">
+                        [{c.code}] {c.label}
+                      </div>
                       <div className="text-[11px] text-slate-400">{c.message}</div>
                     </td>
                     <td className="py-2.5 px-3 font-mono">{c.pointsMax} pts</td>
@@ -425,7 +460,10 @@ export const TeacherSnapshotReplay: React.FC<TeacherSnapshotReplayProps> = ({
             </div>
 
             <div>
-              <label htmlFor="justifInput" className="block text-xs font-semibold text-slate-300 mb-1">
+              <label
+                htmlFor="justifInput"
+                className="block text-xs font-semibold text-slate-300 mb-1"
+              >
                 Motivation pédagogique (obligatoire si la note automatique est ajustée) :
               </label>
               <textarea
@@ -445,7 +483,9 @@ export const TeacherSnapshotReplay: React.FC<TeacherSnapshotReplayProps> = ({
               >
                 Enregistrer la décision pédagogique officielle
               </button>
-              {saveStatus && <span className="text-xs text-emerald-400 font-medium">{saveStatus}</span>}
+              {saveStatus && (
+                <span className="text-xs text-emerald-400 font-medium">{saveStatus}</span>
+              )}
             </div>
           </div>
 
@@ -457,9 +497,13 @@ export const TeacherSnapshotReplay: React.FC<TeacherSnapshotReplayProps> = ({
               </h4>
               <div className="space-y-1.5 text-[11px] text-slate-400">
                 {noteRecord.historique.map((h, i) => (
-                  <div key={i} className="p-2 bg-slate-950/60 rounded border border-slate-800 flex justify-between">
+                  <div
+                    key={i}
+                    className="p-2 bg-slate-950/60 rounded border border-slate-800 flex justify-between"
+                  >
                     <span>
-                      <strong>{new Date(h.modifieLe).toLocaleTimeString("fr-FR")}</strong> &bull; {h.justification}
+                      <strong>{new Date(h.modifieLe).toLocaleTimeString("fr-FR")}</strong> &bull;{" "}
+                      {h.justification}
                     </span>
                     <span className="font-mono text-slate-300">
                       {h.ancienneNote.toFixed(2)} &rarr; {h.nouvelleNote.toFixed(2)} / 20

@@ -18,7 +18,12 @@ interface AuthContextType {
   role: AppRole | null;
   loading: boolean;
   signInWithEmail: (email: string, pass: string) => Promise<{ error: Error | null }>;
-  signUp: (email: string, pass: string, nom: string, prenom: string) => Promise<{ error: Error | null }>;
+  signUp: (
+    email: string,
+    pass: string,
+    nom: string,
+    prenom: string,
+  ) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
   refreshProfile: () => Promise<void>;
 }

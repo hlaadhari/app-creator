@@ -19,7 +19,10 @@ import { creerArchiveZip, type ArchiveFileEntry } from "@/lib/export/archive-exp
 export async function computeSha256(data: string | Uint8Array): Promise<string> {
   const encoder = new TextEncoder();
   const buffer = typeof data === "string" ? encoder.encode(data) : data;
-  const hashBuffer = await globalThis.crypto.subtle.digest("SHA-256", buffer);
+  const hashBuffer = await globalThis.crypto.subtle.digest(
+    "SHA-256",
+    buffer as unknown as BufferSource,
+  );
   const hashArray = Array.from(new Uint8Array(hashBuffer));
   return hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
 }
@@ -28,11 +31,7 @@ export async function computeSha256(data: string | Uint8Array): Promise<string> 
  * Normalise un chemin de fichier pour garantir le déterminisme de l'arborescence
  */
 export function normaliserCheminFichier(chemin: string): string {
-  return chemin
-    .replace(/\\/g, "/")
-    .replace(/^\.\//, "")
-    .replace(/^\/+/, "")
-    .trim();
+  return chemin.replace(/\\/g, "/").replace(/^\.\//, "").replace(/^\/+/, "").trim();
 }
 
 /**
@@ -80,7 +79,7 @@ export async function scellerSnapshot(input: CreerSnapshotInput): Promise<Snapsh
 
   // 1. Trier les fichiers par chemin normalisé alphabétique
   const chemins = Object.keys(input.fichiers).sort((a, b) =>
-    normaliserCheminFichier(a).localeCompare(normaliserCheminFichier(b))
+    normaliserCheminFichier(a).localeCompare(normaliserCheminFichier(b)),
   );
 
   const encoder = new TextEncoder();
@@ -140,7 +139,7 @@ export async function scellerSnapshot(input: CreerSnapshotInput): Promise<Snapsh
 export async function verifierIntegriteSnapshot(
   manifeste: SnapshotManifeste,
   fichiers: Record<string, string | Uint8Array>,
-  dumpSql?: string | null
+  dumpSql?: string | null,
 ): Promise<VerificationIntegriteResult> {
   const erreurs: string[] = [];
   const encoder = new TextEncoder();
@@ -163,14 +162,14 @@ export async function verifierIntegriteSnapshot(
     const bytes = typeof contenu === "string" ? encoder.encode(contenu) : contenu;
     if (bytes.byteLength !== item.taille) {
       erreurs.push(
-        `Altération de taille pour "${item.chemin}" : attendu ${item.taille} octets, trouvé ${bytes.byteLength}`
+        `Altération de taille pour "${item.chemin}" : attendu ${item.taille} octets, trouvé ${bytes.byteLength}`,
       );
     }
 
     const sha256Calcule = await computeSha256(bytes);
     if (sha256Calcule !== item.sha256) {
       erreurs.push(
-        `Empreinte SHA-256 invalide pour "${item.chemin}" (altération de contenu détectée)`
+        `Empreinte SHA-256 invalide pour "${item.chemin}" (altération de contenu détectée)`,
       );
     } else {
       fichiersVerifies++;
@@ -241,7 +240,7 @@ export async function verifierIntegriteSnapshot(
 
   if (hashCalcule !== manifeste.rootHash) {
     erreurs.push(
-      `Sceau cryptographique racine corrompu : attendu ${manifeste.rootHash}, calculé ${hashCalcule}`
+      `Sceau cryptographique racine corrompu : attendu ${manifeste.rootHash}, calculé ${hashCalcule}`,
     );
   }
 
@@ -261,7 +260,7 @@ export function creerArchiveSnapshotZip(
   numeroCin: string,
   manifeste: SnapshotManifeste,
   fichiers: Record<string, string | Uint8Array>,
-  dumpSql?: string
+  dumpSql?: string,
 ): Uint8Array {
   const racine = `Travail_Eleve/SW_${numeroCin}/`;
   const entries: ArchiveFileEntry[] = [];

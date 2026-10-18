@@ -102,29 +102,26 @@ export function SyncStatusBar({
     <footer className="h-6 shrink-0 bg-background border-t border-border px-3 flex items-center justify-between text-[11px] text-muted-foreground select-none">
       <div className="flex items-center gap-4">
         {/* Statut de synchronisation */}
-        <div className="flex items-center gap-2">
-          {getStatusBadge()}
-        </div>
+        <div className="flex items-center gap-2">{getStatusBadge()}</div>
 
         {/* Tolérance de synchronisation tardive (PRD F-20, F-52) */}
         {isLateSync && (
-          <span className="flex items-center gap-1 px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-600 dark:text-amber-400 font-medium text-[10px]" title="Modifications enregistrées localement après l'échéance ou pendant une coupure, tolérées avec marquage d'audit">
+          <span
+            className="flex items-center gap-1 px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-600 dark:text-amber-400 font-medium text-[10px]"
+            title="Modifications enregistrées localement après l'échéance ou pendant une coupure, tolérées avec marquage d'audit"
+          >
             <Clock className="h-2.5 w-2.5" />
             Sync tardive tolérée
           </span>
         )}
 
         {/* Dernier horodatage local */}
-        <span className="text-muted-foreground/80">
-          Enregistré : {formatTime(lastSavedAt)}
-        </span>
+        <span className="text-muted-foreground/80">Enregistré : {formatTime(lastSavedAt)}</span>
       </div>
 
       <div className="flex items-center gap-4">
         {/* Curseur et fichier actif */}
-        <span>
-          {activeFileName}
-        </span>
+        <span>{activeFileName}</span>
         <span className="font-mono">
           Ln {cursorPos.line}, Col {cursorPos.col}
         </span>

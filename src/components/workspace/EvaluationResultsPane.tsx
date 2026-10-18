@@ -21,16 +21,15 @@ export function EvaluationResultsPane({
           <Sparkles className="h-8 w-8 text-primary" />
         </div>
         <div>
-          <h3 className="font-semibold text-base text-foreground">Évaluation Formative Instantanée</h3>
+          <h3 className="font-semibold text-base text-foreground">
+            Évaluation Formative Instantanée
+          </h3>
           <p className="text-xs text-muted-foreground mt-1 max-w-xs">
-            Testez votre code directement dans le bac à sable pour obtenir votre score sur 20 et des retours critère par critère.
+            Testez votre code directement dans le bac à sable pour obtenir votre score sur 20 et des
+            retours critère par critère.
           </p>
         </div>
-        <Button
-          onClick={onVerify}
-          disabled={verifying}
-          className="gap-2 text-xs font-medium"
-        >
+        <Button onClick={onVerify} disabled={verifying} className="gap-2 text-xs font-medium">
           <Play className="h-3.5 w-3.5 fill-current" />
           <span>Lancer la vérification</span>
         </Button>
@@ -55,11 +54,7 @@ export function EvaluationResultsPane({
         <div className="flex items-baseline justify-center gap-1 my-2">
           <span
             className={`text-4xl font-mono font-bold ${
-              note20 >= 16
-                ? "text-emerald-500"
-                : note20 >= 10
-                  ? "text-primary"
-                  : "text-amber-500"
+              note20 >= 16 ? "text-emerald-500" : note20 >= 10 ? "text-primary" : "text-amber-500"
             }`}
           >
             {note20}
@@ -68,7 +63,8 @@ export function EvaluationResultsPane({
         </div>
 
         <div className="text-xs text-muted-foreground font-mono">
-          {earnedPoints} / {totalPoints} points • {results.filter((r) => r.passed).length} sur {results.length} critères validés
+          {earnedPoints} / {totalPoints} points • {results.filter((r) => r.passed).length} sur{" "}
+          {results.length} critères validés
         </div>
       </div>
 
@@ -108,10 +104,10 @@ export function EvaluationResultsPane({
                     <AlertCircle className="h-4 w-4 text-amber-500 shrink-0 mt-0.5" />
                   )}
                   <div>
-                    <div className="text-xs font-semibold text-foreground">
-                      {r.label}
-                    </div>
-                    <p className={`text-[11px] mt-0.5 leading-relaxed ${r.passed ? "text-emerald-700 dark:text-emerald-300" : "text-amber-700 dark:text-amber-300"}`}>
+                    <div className="text-xs font-semibold text-foreground">{r.label}</div>
+                    <p
+                      className={`text-[11px] mt-0.5 leading-relaxed ${r.passed ? "text-emerald-700 dark:text-emerald-300" : "text-amber-700 dark:text-amber-300"}`}
+                    >
                       {r.message}
                     </p>
                   </div>

@@ -80,7 +80,10 @@ function evaluateDomProbe(probe: DomProbe, doc: Document): { passed: boolean; hi
   const elements = doc.querySelectorAll(probe.selector);
 
   if (elements.length === 0) {
-    return { passed: false, hint: `L'élément correspondant au sélecteur "${probe.selector}" est introuvable.` };
+    return {
+      passed: false,
+      hint: `L'élément correspondant au sélecteur "${probe.selector}" est introuvable.`,
+    };
   }
 
   if (probe.minCount !== undefined && elements.length < probe.minCount) {
@@ -119,7 +122,10 @@ function evaluateDomProbe(probe: DomProbe, doc: Document): { passed: boolean; hi
 
   if (probe.containsClass) {
     if (!first.classList.contains(probe.containsClass)) {
-      return { passed: false, hint: `La classe CSS "${probe.containsClass}" est manquante sur l'élément.` };
+      return {
+        passed: false,
+        hint: `La classe CSS "${probe.containsClass}" est manquante sur l'élément.`,
+      };
     }
   }
 
@@ -129,10 +135,17 @@ function evaluateDomProbe(probe: DomProbe, doc: Document): { passed: boolean; hi
 /**
  * Exécute une sonde CSS sur le document sandboxé
  */
-function evaluateCssProbe(probe: CssProbe, doc: Document, win: Window): { passed: boolean; hint?: string } {
+function evaluateCssProbe(
+  probe: CssProbe,
+  doc: Document,
+  win: Window,
+): { passed: boolean; hint?: string } {
   const el = doc.querySelector(probe.selector);
   if (!el) {
-    return { passed: false, hint: `Élément cible "${probe.selector}" introuvable pour vérifier le style CSS.` };
+    return {
+      passed: false,
+      hint: `Élément cible "${probe.selector}" introuvable pour vérifier le style CSS.`,
+    };
   }
 
   const actualValue = getComputedProp(win, el, probe.property);
@@ -140,7 +153,10 @@ function evaluateCssProbe(probe: CssProbe, doc: Document, win: Window): { passed
   if (probe.isGreaterThanZero) {
     const num = parseFloat(actualValue);
     if (isNaN(num) || num <= 0) {
-      return { passed: false, hint: `La propriété CSS "${probe.property}" doit être supérieure à 0 (valeur mesurée : "${actualValue}").` };
+      return {
+        passed: false,
+        hint: `La propriété CSS "${probe.property}" doit être supérieure à 0 (valeur mesurée : "${actualValue}").`,
+      };
     }
     return { passed: true };
   }
@@ -179,7 +195,10 @@ function evaluateJsProbe(probe: JsProbe, doc: Document): { passed: boolean; hint
 
   const checkEl = doc.querySelector(probe.checkSelector);
   if (!checkEl) {
-    return { passed: false, hint: `Élément de contrôle "${probe.checkSelector}" introuvable après interaction.` };
+    return {
+      passed: false,
+      hint: `Élément de contrôle "${probe.checkSelector}" introuvable après interaction.`,
+    };
   }
 
   if (probe.checkText !== undefined) {
@@ -211,7 +230,7 @@ function evaluateJsProbe(probe: JsProbe, doc: Document): { passed: boolean; hint
 export function evaluateCriteria(
   criteria: CriterionDefinition[],
   doc: Document,
-  win: Window
+  win: Window,
 ): EvaluationSummary {
   const startTime = performance.now();
   const results: CriterionEvaluationResult[] = [];
@@ -256,7 +275,7 @@ export function evaluateCriteria(
       points: pts,
       maxPoints: c.points,
       passed,
-      message: passed ? "Critère validé avec succès !" : (detailHint || c.message_echec),
+      message: passed ? "Critère validé avec succès !" : detailHint || c.message_echec,
       durationMs: cDuration,
     });
   }

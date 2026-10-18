@@ -1,9 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { JSDOM } from "jsdom";
-import {
-  evaluateCriteria,
-  type CriterionDefinition,
-} from "@/lib/evaluation/probe-runner";
+import { evaluateCriteria, type CriterionDefinition } from "@/lib/evaluation/probe-runner";
 import { debloquerNiveauIndice, getNombreIndices } from "@/lib/evaluation/hints-service";
 
 describe("Moteur d'Évaluation Formative 3 Niveaux (Issue #8 - PRD F-38 à F-48, T-04, §10)", () => {

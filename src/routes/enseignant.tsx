@@ -33,6 +33,7 @@ import {
   ArrowLeft,
   ShieldAlert,
   FolderOpen,
+  Shield,
 } from "lucide-react";
 
 export const Route = createFileRoute("/enseignant")({
@@ -390,6 +391,16 @@ function TeacherDashboardPage() {
                   "Enseignant"}
             </strong>
           </span>
+          {(role === "admin" || isDemo) && (
+            <Link
+              to="/admin"
+              search={isDemo ? { demo: "true" } : {}}
+              className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-md border border-primary/30 bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
+            >
+              <Shield className="w-3.5 h-3.5" />
+              Espace Admin
+            </Link>
+          )}
           <Button
             size="sm"
             variant="outline"

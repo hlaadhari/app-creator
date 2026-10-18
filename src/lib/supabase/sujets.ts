@@ -78,7 +78,9 @@ export async function getSujetsCatalog(): Promise<RemoteSujet[]> {
  */
 export async function getStarterFiles(sujetId: string): Promise<Files> {
   const localEx = exercises.find((e) => e.id === sujetId);
-  const fallback = localEx ? localEx.starter : { "index.html": "", "style.css": "", "script.js": "" };
+  const fallback = localEx
+    ? localEx.starter
+    : { "index.html": "", "style.css": "", "script.js": "" };
 
   try {
     // 1. Récupérer la version publiée la plus récente

@@ -43,7 +43,9 @@ export function WorkspaceFileTree({
       return <span className="font-mono text-xs font-bold text-sky-400 shrink-0">#</span>;
     }
     if (file.name.endsWith(".js")) {
-      return <span className="font-mono text-xs font-bold text-amber-400 shrink-0">&#123;&#125;</span>;
+      return (
+        <span className="font-mono text-xs font-bold text-amber-400 shrink-0">&#123;&#125;</span>
+      );
     }
     return <FileText className="h-4 w-4 text-muted-foreground shrink-0" />;
   };
