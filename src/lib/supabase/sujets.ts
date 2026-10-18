@@ -68,8 +68,12 @@ export async function getStarterFiles(sujetId: string): Promise<Files> {
       .order("numero", { ascending: false })
       .limit(1);
 
+    if (vErr || !versions || versions.length === 0) {
+      return fallback;
+    }
+
     const firstVersion = versions[0];
-    if (vErr || !firstVersion) {
+    if (!firstVersion) {
       return fallback;
     }
 
