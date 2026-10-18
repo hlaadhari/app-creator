@@ -8,7 +8,7 @@ La sécurité de la plateforme **Labo STI** et la protection des données des é
 
 ### Procédure de Signalement Responsable
 Veuillez envoyer un e-mail à :
-- **Contact Sécurité** : `hatem.zitouni.ptd@gmail.com`
+- **Contact Sécurité** : `hatem.laadhari@gmail.com`
 
 Merci d'inclure :
 1. Une description détaillée de la vulnérabilité observée.
