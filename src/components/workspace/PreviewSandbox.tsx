@@ -12,9 +12,19 @@ export function PreviewSandbox({ files, className = "" }: PreviewSandboxProps) {
   const [reloadKey, setReloadKey] = useState(0);
 
   const previewDoc = useMemo(() => {
-    let html = files["index.html"]?.content ?? "<!DOCTYPE html><html><body></body></html>";
-    const css = files["style.css"]?.content ?? "";
-    const js = files["script.js"]?.content ?? "";
+    const htmlKey =
+      files["index.html"] !== undefined
+        ? "index.html"
+        : Object.keys(files).find((k) => k.endsWith(".html")) ?? "index.html";
+    let html = files[htmlKey]?.content ?? "<!DOCTYPE html><html><body></body></html>";
+    const css = Object.entries(files)
+      .filter(([k]) => k.endsWith(".css"))
+      .map(([, f]) => f.content)
+      .join("\n");
+    const js = Object.entries(files)
+      .filter(([k]) => k.endsWith(".js"))
+      .map(([, f]) => f.content)
+      .join("\n");
 
     // 1. Remplacement des images et assets locaux par leurs données Base64 / Blobs
     for (const [name, file] of Object.entries(files)) {
