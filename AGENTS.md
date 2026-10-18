@@ -45,6 +45,10 @@ Avant toute modification structurelle ou ajout de fonctionnalité, consultez les
 5. **Isolation Stricte du Code Élève** :
    - Prévisualisation HTML/JS dans une `iframe sandbox="allow-scripts"` sans `allow-same-origin` vers le domaine maître et sans accès réseau sortant.
    - PHP (Phase 2) confiné dans un Web Worker avec watchdog (timeout 3s max) et limite de mémoire (64 Mo).
+6. **Workflow Strict par Pull Request (PR) pour chaque Issue** :
+   - Aucun commit de fonctionnalité ou de correction d'issue ne doit être poussé directement sur la branche `main`.
+   - Chaque issue résolue doit impérativement faire l'objet d'une branche dédiée (ex. `feat/issue-<num>-<nom>`), être validée par les tests et le typage strict (`bun test`, `bun run typecheck`, `bun run build`), puis être soumise sous forme d'une Pull Request (PR) référençant l'issue (`Closes #<num>`).
+   - La PR doit être passée en revue et fusionnée proprement dans `main`.
 
 ---
 
