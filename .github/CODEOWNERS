@@ -1,0 +1,22 @@
+# ==============================================================================
+# CODEOWNERS — Attribution des Responsabilités et Revues de Code
+# https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+# ==============================================================================
+
+# Propriétaire par défaut de l'ensemble du dépôt
+* @hlaadhari
+
+# Base de données, Schémas & Migrations (RLS, Intégrité des données)
+/drizzle/ @hlaadhari
+/supabase/ @hlaadhari
+
+# Sécurité, Menaces & Autorisations
+/docs/SECURITY.md @hlaadhari
+/SECURITY.md @hlaadhari
+/.github/workflows/ @hlaadhari
+
+# Spécifications & Architecture Centrale
+/docs/PRD.md @hlaadhari
+/docs/ARCHITECTURE.md @hlaadhari
+/docs/DATA_MODEL.md @hlaadhari
+/CONTEXT.md @hlaadhari

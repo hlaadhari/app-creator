@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: "💬 Forum & Discussions Pédagogiques"
+    url: "https://github.com/hlaadhari/app-creator/discussions"
+    about: "Posez vos questions sur la plateforme, l'usage en classe ou proposez de nouveaux sujets STI."
+  - name: "📖 Spécification Fonctionnelle & Technique (PRD v3.1)"
+    url: "https://github.com/hlaadhari/app-creator/blob/main/docs/PRD.md"
+    about: "Consultez le cahier des charges officiel avant toute proposition structurelle."
+  - name: "🔒 Signalement Responsable de Sécurité"
+    url: "https://github.com/hlaadhari/app-creator/blob/main/SECURITY.md"
+    about: "Consultez la procédure pour signaler une vulnérabilité en toute confidentialité."
