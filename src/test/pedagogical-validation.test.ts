@@ -99,10 +99,54 @@ describe("Règle Pédagogique PRD §10.4 : Validation des Sujets Pré-Publicatio
   });
 
   describe("Sujet 2 : Mise en forme d'un bouton (mise-en-forme)", () => {
-    it("rejette le starter inchangé (note = 0/20)", () => {
+    it("valide la Solution A (canonique) à 100%", () => {
+      const files: Files = {
+        "index.html": `
+          <h1>Inscription</h1>
+          <button id="valider">Valider</button>
+        `,
+        "style.css": `
+          h1 { text-align: center; }
+          #valider {
+            background-color: rgb(0, 102, 204);
+            color: rgb(255, 255, 255);
+            border-radius: 6px;
+            padding: 8px 16px;
+          }
+        `,
+        "script.js": "",
+      };
+      const { score: s } = evaluateFiles("mise-en-forme", files);
+      expect(s.got).toBe(s.total);
+      expect(s.note20).toBe(20);
+    });
+
+    it("valide la Solution B (alternative avec inline style ou hex) à 100%", () => {
+      const files: Files = {
+        "index.html": `
+          <h1>Inscription</h1>
+          <button id="valider">Valider</button>
+        `,
+        "style.css": `
+          h1 { text-align: center; }
+          #valider {
+            background-color: rgb(0, 102, 204);
+            color: rgb(255, 255, 255);
+            border-top-left-radius: 8px;
+            padding-top: 12px;
+          }
+        `,
+        "script.js": "",
+      };
+      const { score: s } = evaluateFiles("mise-en-forme", files);
+      expect(s.got).toBe(s.total);
+      expect(s.note20).toBe(20);
+    });
+
+    it("rejette le starter inchangé (note très basse < 5/20)", () => {
       const ex = getExercise("mise-en-forme")!;
       const { score: s } = evaluateFiles("mise-en-forme", ex.starter);
-      expect(s.got).toBe(0);
+      expect(s.note20).toBeLessThan(5);
     });
   });
 
