@@ -8,6 +8,7 @@ interface MonacoEditorPaneProps {
   theme?: "vs-dark" | "light";
   readOnly?: boolean;
   onSave?: () => void;
+  onVerify?: () => void;
   onCursorChange?: (line: number, column: number) => void;
 }
 
@@ -18,6 +19,7 @@ export function MonacoEditorPane({
   theme = "vs-dark",
   readOnly = false,
   onSave,
+  onVerify,
   onCursorChange,
 }: MonacoEditorPaneProps) {
   const [isMounted, setIsMounted] = useState(false);
@@ -33,6 +35,11 @@ export function MonacoEditorPane({
     // Raccourci de sauvegarde manuelle Ctrl+S / Cmd+S
     editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, () => {
       onSave?.();
+    });
+
+    // Raccourci de vérification automatique Ctrl+Entrée / Cmd+Entrée
+    editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter, () => {
+      onVerify?.();
     });
 
     // Suivi de la position du curseur

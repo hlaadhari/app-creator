@@ -272,6 +272,281 @@ export type Database = {
         }
         Relationships: []
       }
+      classes: {
+        Row: {
+          id: string
+          nom: string
+          enseignant_id: string
+          annee: string
+          archivee: boolean
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          nom: string
+          enseignant_id: string
+          annee?: string
+          archivee?: boolean
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          nom?: string
+          enseignant_id?: string
+          annee?: string
+          archivee?: boolean
+          created_at?: string
+        }
+        Relationships: []
+      }
+      class_invitations: {
+        Row: {
+          id: string
+          class_id: string
+          code: string
+          expire_le: string
+          revoque: boolean
+          utilisations_max: number
+          nb_utilisations: number
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          class_id: string
+          code: string
+          expire_le: string
+          revoque?: boolean
+          utilisations_max?: number
+          nb_utilisations?: number
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          class_id?: string
+          code?: string
+          expire_le?: string
+          revoque?: boolean
+          utilisations_max?: number
+          nb_utilisations?: number
+          created_at?: string
+        }
+        Relationships: []
+      }
+      class_members: {
+        Row: {
+          class_id: string
+          eleve_id: string
+          joined_at: string
+          left_at: string | null
+          classes?: Database["public"]["Tables"]["classes"]["Row"] | null
+          profiles?: Database["public"]["Tables"]["profiles"]["Row"] | null
+        }
+        Insert: {
+          class_id: string
+          eleve_id: string
+          joined_at?: string
+          left_at?: string | null
+        }
+        Update: {
+          class_id?: string
+          eleve_id?: string
+          joined_at?: string
+          left_at?: string | null
+        }
+        Relationships: []
+      }
+      class_sujets: {
+        Row: {
+          id: string
+          class_id: string
+          sujet_id: string
+          version_id: string | null
+          actif: boolean
+          ouvert: boolean
+          date_limite: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          class_id: string
+          sujet_id: string
+          version_id?: string | null
+          actif?: boolean
+          ouvert?: boolean
+          date_limite?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          class_id?: string
+          sujet_id?: string
+          version_id?: string | null
+          actif?: boolean
+          ouvert?: boolean
+          date_limite?: string | null
+          created_at?: string
+        }
+        Relationships: []
+      }
+      projets: {
+        Row: {
+          id: string
+          eleve_id: string
+          version_id: string
+          titre: string | null
+          statut: string
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          eleve_id: string
+          version_id: string
+          titre?: string | null
+          statut?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          eleve_id?: string
+          version_id?: string
+          titre?: string | null
+          statut?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      projet_fichiers: {
+        Row: {
+          id: string
+          projet_id: string
+          chemin: string
+          contenu: string
+          rev: number
+          supprime: boolean
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          projet_id: string
+          chemin: string
+          contenu?: string
+          rev?: number
+          supprime?: boolean
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          projet_id?: string
+          chemin?: string
+          contenu?: string
+          rev?: number
+          supprime?: boolean
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      tentatives: {
+        Row: {
+          id: string
+          eleve_id: string | null
+          sujet_version_id: string | null
+          projet_id: string | null
+          points_obtenus: number | null
+          points_total: number | null
+          note20: number
+          details: Json | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          eleve_id?: string | null
+          sujet_version_id?: string | null
+          projet_id?: string | null
+          points_obtenus?: number | null
+          points_total?: number | null
+          note20: number
+          details?: Json | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          eleve_id?: string | null
+          sujet_version_id?: string | null
+          projet_id?: string | null
+          points_obtenus?: number | null
+          points_total?: number | null
+          note20?: number
+          details?: Json | null
+          created_at?: string
+        }
+        Relationships: []
+      }
+      contestations: {
+        Row: {
+          id: string
+          critere_id: string
+          eleve_id: string
+          projet_id: string | null
+          sujet_version_id: string | null
+          texte: string
+          statut: "en_attente" | "acceptee" | "rejetee"
+          motif_rejet: string | null
+          traitee_le: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          critere_id: string
+          eleve_id: string
+          projet_id?: string | null
+          sujet_version_id?: string | null
+          texte: string
+          statut?: "en_attente" | "acceptee" | "rejetee"
+          motif_rejet?: string | null
+          traitee_le?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          critere_id?: string
+          eleve_id?: string
+          projet_id?: string | null
+          sujet_version_id?: string | null
+          texte?: string
+          statut?: "en_attente" | "acceptee" | "rejetee"
+          motif_rejet?: string | null
+          traitee_le?: string | null
+          created_at?: string
+        }
+        Relationships: []
+      }
+      journal_securite: {
+        Row: {
+          id: string
+          type: string
+          acteur_id: string | null
+          meta: Json
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          type: string
+          acteur_id?: string | null
+          meta?: Json
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          type?: string
+          acteur_id?: string | null
+          meta?: Json
+          created_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -286,6 +561,30 @@ export type Database = {
         Returns: boolean
       }
       nb_indices: { Args: { _version_id: string }; Returns: number }
+      rejoindre_classe: {
+        Args: { _code: string }
+        Returns: string | { class_id?: string }
+      }
+      initialiser_projet: {
+        Args: { _version_id: string; _titre?: string }
+        Returns: string
+      }
+      sauvegarder_fichier: {
+        Args: {
+          _projet_id: string
+          _chemin: string
+          _contenu: string
+          _expected_rev: number
+        }
+        Returns: number
+      }
+      debloquer_solution: {
+        Args: {
+          p_version_id: string
+          p_motif?: string
+        }
+        Returns: Array<{ chemin: string; contenu: string }>
+      }
     }
     Enums: {
       app_role: "eleve" | "enseignant" | "admin"
