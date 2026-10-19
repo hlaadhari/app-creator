@@ -645,7 +645,7 @@ function TeacherDashboardPage() {
     );
   }
 
-  // 2. Contrôle d'accès strict (T-02, PRD F-01) avec proposition de Mode Démo
+  // 2. Contrôle d'accès strict (T-02, PRD F-01)
   if (!isDemo && (!user || (role !== "enseignant" && role !== "admin"))) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background px-4">
@@ -655,25 +655,17 @@ function TeacherDashboardPage() {
           </div>
           <h1 className="text-xl font-bold text-foreground">Accès Réservé aux Enseignants</h1>
           <p className="text-xs text-muted-foreground leading-relaxed">
-            L'espace de supervision de classe est restreint aux comptes enseignants validés par
-            l'administration (T-02, T-03).
+            {user
+              ? `Votre compte connecté (${user.email}) possède le rôle "${role}". L'espace de supervision de classe requiert le rôle enseignant.`
+              : "Vous devez être connecté avec le compte enseignant (hatem.laadhari.dev02@gmail.com) ou administrateur pour accéder à cette interface."}
           </p>
           <div className="pt-2 flex flex-col gap-2">
-            <Button
-              onClick={() => {
-                setIsDemo(true);
-                loadClasses();
-              }}
-              className="w-full bg-primary text-primary-foreground text-xs font-medium h-9"
-            >
-              Explorer en Mode Démo Enseignant
-            </Button>
             <Link
               to="/"
               className="inline-flex items-center justify-center rounded-md border px-4 py-2 text-xs font-medium hover:bg-muted transition-colors gap-2 text-muted-foreground hover:text-foreground"
             >
               <ArrowLeft className="w-4 h-4" />
-              Retourner à l'espace élève
+              Retourner à l'accueil
             </Link>
           </div>
         </div>

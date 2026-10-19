@@ -110,7 +110,8 @@ function Index() {
             <span className="hidden sm:inline">Guide de démarrage</span>
           </Button>
 
-          {role === "enseignant" || role === "admin" ? (
+          {/* Espace Enseignant réservé aux rôles enseignant et admin connectés */}
+          {(role === "enseignant" || role === "admin") && (
             <Link to="/enseignant">
               <Button
                 variant="outline"
@@ -121,21 +122,10 @@ function Index() {
                 <span className="hidden sm:inline">Espace Enseignant</span>
               </Button>
             </Link>
-          ) : (
-            <Link to="/enseignant" search={{ demo: "true" }}>
-              <Button
-                variant="outline"
-                size="sm"
-                className="gap-1.5 text-xs text-muted-foreground hover:text-foreground border-dashed hover:border-primary/40"
-                title="Accéder au tableau de bord enseignant et au studio de création de sujets (Mode Démo)"
-              >
-                <GraduationCap className="h-4 w-4 text-primary" />
-                <span className="hidden sm:inline">Espace Enseignant (Aperçu)</span>
-              </Button>
-            </Link>
           )}
 
-          {role === "admin" ? (
+          {/* Espace Administration réservé aux administrateurs connectés */}
+          {role === "admin" && (
             <Link to="/admin">
               <Button
                 variant="outline"
@@ -144,18 +134,6 @@ function Index() {
               >
                 <Shield className="h-4 w-4" />
                 <span className="hidden sm:inline">Administration</span>
-              </Button>
-            </Link>
-          ) : (
-            <Link to="/admin" search={{ demo: "true" }}>
-              <Button
-                variant="outline"
-                size="sm"
-                className="gap-1.5 text-xs text-rose-500/80 hover:text-rose-600 border-dashed hover:border-rose-500/40"
-                title="Accéder au panneau d'administration centrale (Mode Démo)"
-              >
-                <Shield className="h-4 w-4 text-rose-500" />
-                <span className="hidden sm:inline">Admin (Aperçu)</span>
               </Button>
             </Link>
           )}
