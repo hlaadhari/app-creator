@@ -18,6 +18,7 @@ import { StudentCopyModal } from "@/components/teacher/StudentCopyModal";
 import { InvitationsManager } from "@/components/teacher/InvitationsManager";
 import { SubjectStudioTab } from "@/components/teacher/SubjectStudioTab";
 import { ContestationsManager } from "@/components/teacher/ContestationsManager";
+import { ClassAnalyticsDashboard } from "@/components/teacher/ClassAnalyticsDashboard";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
@@ -34,7 +35,14 @@ import {
   ShieldAlert,
   FolderOpen,
   Shield,
+  BarChart3,
+  Download,
 } from "lucide-react";
+import {
+  detecterBlocagesEtAlertes,
+  type StudentAttemptHistory,
+} from "@/lib/analytics/class-analytics";
+import { telechargerExportPronote } from "@/lib/export/pronote-export";
 
 export const Route = createFileRoute("/enseignant")({
   component: TeacherDashboardPage,
@@ -107,8 +115,115 @@ const DEMO_STUDENTS: TeacherClassMember[] = [
     criteres_reussis: 2,
     total_criteres: 6,
     joined_at: new Date(Date.now() - 86400000 * 2).toISOString(),
-    derniere_activite: new Date().toISOString(),
+    derniere_activite: new Date(Date.now() - 45 * 60 * 1000).toISOString(),
     points_faibles: ["Syntaxe requête SQL JOIN", "Sélection d'élément DOM"],
+  },
+];
+
+const DEMO_ATTEMPTS: StudentAttemptHistory[] = [
+  {
+    eleveId: "demo-s1",
+    nom: "Bernard",
+    prenom: "Lucas",
+    projetStatut: "rendu",
+    derniereActivite: new Date().toISOString(),
+    attempts: [
+      {
+        score: 18,
+        pointsTotal: 20,
+        timestamp: new Date().toISOString(),
+        criteres: [
+          { critereCode: "HTML.STRUCT", critereTitre: "Structure HTML5", valide: true },
+          { critereCode: "CSS.LAYOUT", critereTitre: "Mise en page CSS", valide: true },
+          { critereCode: "JS.VALIDATION", critereTitre: "Validation formulaire JS", valide: true },
+          { critereCode: "PHP.INSERT", critereTitre: "Insertion SQL PHP", valide: true },
+        ],
+      },
+    ],
+  },
+  {
+    eleveId: "demo-s2",
+    nom: "Khelifi",
+    prenom: "Inès",
+    projetStatut: "en_cours",
+    derniereActivite: new Date().toISOString(),
+    attempts: [
+      {
+        score: 10,
+        pointsTotal: 20,
+        timestamp: new Date(Date.now() - 3600000).toISOString(),
+        criteres: [
+          { critereCode: "HTML.STRUCT", critereTitre: "Structure HTML5", valide: true },
+          { critereCode: "CSS.LAYOUT", critereTitre: "Mise en page CSS", valide: true },
+          {
+            critereCode: "JS.VALIDATION",
+            critereTitre: "Contrôle de saisie CIN (8 chiffres)",
+            valide: false,
+          },
+        ],
+      },
+      {
+        score: 10,
+        pointsTotal: 20,
+        timestamp: new Date(Date.now() - 2400000).toISOString(),
+        criteres: [
+          { critereCode: "HTML.STRUCT", critereTitre: "Structure HTML5", valide: true },
+          { critereCode: "CSS.LAYOUT", critereTitre: "Mise en page CSS", valide: true },
+          {
+            critereCode: "JS.VALIDATION",
+            critereTitre: "Contrôle de saisie CIN (8 chiffres)",
+            valide: false,
+          },
+        ],
+      },
+      {
+        score: 10,
+        pointsTotal: 20,
+        timestamp: new Date(Date.now() - 1200000).toISOString(),
+        criteres: [
+          { critereCode: "HTML.STRUCT", critereTitre: "Structure HTML5", valide: true },
+          { critereCode: "CSS.LAYOUT", critereTitre: "Mise en page CSS", valide: true },
+          {
+            critereCode: "JS.VALIDATION",
+            critereTitre: "Contrôle de saisie CIN (8 chiffres)",
+            valide: false,
+          },
+        ],
+      },
+      {
+        score: 10,
+        pointsTotal: 20,
+        timestamp: new Date(Date.now() - 300000).toISOString(),
+        criteres: [
+          { critereCode: "HTML.STRUCT", critereTitre: "Structure HTML5", valide: true },
+          { critereCode: "CSS.LAYOUT", critereTitre: "Mise en page CSS", valide: true },
+          {
+            critereCode: "JS.VALIDATION",
+            critereTitre: "Contrôle de saisie CIN (8 chiffres)",
+            valide: false,
+          },
+        ],
+      },
+    ],
+  },
+  {
+    eleveId: "demo-s4",
+    nom: "Moreau",
+    prenom: "Camille",
+    projetStatut: "en_cours",
+    derniereActivite: new Date(Date.now() - 45 * 60 * 1000).toISOString(),
+    attempts: [
+      {
+        score: 8,
+        pointsTotal: 20,
+        timestamp: new Date(Date.now() - 50 * 60 * 1000).toISOString(),
+        criteres: [
+          { critereCode: "HTML.STRUCT", critereTitre: "Structure HTML5", valide: true },
+          { critereCode: "SQL.JOIN", critereTitre: "Requête SQL JOIN", valide: false },
+          { critereCode: "JS.DOM", critereTitre: "Sélection d'élément DOM", valide: false },
+        ],
+      },
+    ],
   },
 ];
 
@@ -275,7 +390,7 @@ function TeacherDashboardPage() {
     setLoadingCopy(false);
   };
 
-  // Export CSV
+  // Export CSV Standard
   const handleExportCsv = () => {
     const activeClass = classes.find((c) => c.id === selectedClassId);
     const nomClasse = activeClass?.nom || "classe";
@@ -290,6 +405,19 @@ function TeacherDashboardPage() {
     link.click();
     document.body.removeChild(link);
   };
+
+  // Export CSV Normalisé Pronote / ENT
+  const handleExportPronote = () => {
+    const activeClass = classes.find((c) => c.id === selectedClassId);
+    const nomClasse = activeClass?.nom || "classe";
+    telechargerExportPronote(students, nomClasse);
+  };
+
+  // Détection en direct des situations de blocage (> 3 tentatives ou inactivité)
+  const alerts = React.useMemo(
+    () => detecterBlocagesEtAlertes(students, isDemo ? DEMO_ATTEMPTS : undefined),
+    [students, isDemo],
+  );
 
   // 1. Écran de chargement initial d'authentification
   if (authLoading && !isDemo) {
@@ -535,22 +663,50 @@ function TeacherDashboardPage() {
                 <CardContent className="p-4 flex items-center justify-between">
                   <div>
                     <p className="text-xs text-muted-foreground font-medium">
-                      Alertes / Difficultés
+                      Alertes & Blocages (F-62)
                     </p>
-                    <h3 className="text-2xl font-bold mt-1 text-amber-500">{elevesEnDifficulte}</h3>
+                    <div className="flex items-baseline gap-2 mt-1">
+                      <h3
+                        className={`text-2xl font-bold ${
+                          alerts.length > 0 ? "text-destructive" : "text-amber-500"
+                        }`}
+                      >
+                        {alerts.length > 0 ? alerts.length : elevesEnDifficulte}
+                      </h3>
+                      {alerts.length > 0 && (
+                        <Badge variant="destructive" className="text-[10px] h-4 px-1 py-0">
+                          {alerts.filter((a) => a.severite === "critique").length} critique(s)
+                        </Badge>
+                      )}
+                    </div>
                   </div>
-                  <div className="w-10 h-10 rounded-lg bg-amber-500/10 text-amber-500 flex items-center justify-center">
+                  <div
+                    className={`w-10 h-10 rounded-lg flex items-center justify-center ${
+                      alerts.length > 0
+                        ? "bg-destructive/10 text-destructive animate-pulse"
+                        : "bg-amber-500/10 text-amber-500"
+                    }`}
+                  >
                     <AlertTriangle className="w-5 h-5" />
                   </div>
                 </CardContent>
               </Card>
             </div>
 
-            {/* Onglets : Suivi en direct & Gestion des invitations */}
+            {/* Onglets : Suivi en direct, Analytics & Pilotage, Invitations, Studio */}
             <Tabs defaultValue="progression" className="space-y-4">
-              <TabsList className="bg-muted/40 p-1">
+              <TabsList className="bg-muted/40 p-1 flex-wrap">
                 <TabsTrigger value="progression" className="text-xs">
                   Suivi de progression en temps réel
+                </TabsTrigger>
+                <TabsTrigger value="analytics" className="text-xs flex items-center gap-1.5">
+                  <BarChart3 className="w-3.5 h-3.5" />
+                  <span>Analytics & Alertes de Classe</span>
+                  {alerts.length > 0 && (
+                    <Badge variant="destructive" className="text-[10px] h-4 px-1.5 py-0 font-bold">
+                      {alerts.length}
+                    </Badge>
+                  )}
                 </TabsTrigger>
                 <TabsTrigger value="invitations" className="text-xs">
                   Codes d'invitation ({invitations.length})
@@ -569,6 +725,17 @@ function TeacherDashboardPage() {
                   loading={loadingData}
                   onInspectCopy={handleInspectCopy}
                   onExportCsv={handleExportCsv}
+                  onExportPronote={handleExportPronote}
+                  alerts={alerts}
+                />
+              </TabsContent>
+
+              <TabsContent value="analytics">
+                <ClassAnalyticsDashboard
+                  className={activeClass.nom}
+                  students={students}
+                  attemptHistories={isDemo ? DEMO_ATTEMPTS : undefined}
+                  onInspectCopy={handleInspectCopy}
                 />
               </TabsContent>
 
