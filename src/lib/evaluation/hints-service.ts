@@ -76,32 +76,39 @@ export async function debloquerNiveauIndice(
   };
   const levelName = levelNames[targetLevel] || "Conceptuel";
 
-  // 1. Tenter le déblocage sécurisé via Supabase RPC (T-04)
+  // 1. Tenter le déblocage sécurisé via Supabase RPC (T-04) avec timeout 1500ms
   try {
-    const { data: v } = await supabase
-      .from("sujet_versions")
-      .select("id")
-      .eq("sujet_id", sujetId)
-      .eq("publiee", true)
-      .maybeSingle();
+    const supaPromise = async () => {
+      const { data: v } = await supabase
+        .from("sujet_versions")
+        .select("id")
+        .eq("sujet_id", sujetId)
+        .eq("publiee", true)
+        .maybeSingle();
 
-    if (v) {
-      const { data, error } = await supabase.rpc("debloquer_indice", {
-        _version_id: v.id,
-      });
+      if (v) {
+        const { data, error } = await supabase.rpc("debloquer_indice", {
+          _version_id: v.id,
+        });
 
-      if (!error && data) {
-        return {
-          success: true,
-          hint: {
-            level: targetLevel,
-            levelName,
-            texte: data,
-            unlockedAt: Date.now(),
-          },
-        };
+        if (!error && data) {
+          return {
+            success: true,
+            hint: {
+              level: targetLevel,
+              levelName,
+              texte: data,
+              unlockedAt: Date.now(),
+            },
+          };
+        }
       }
-    }
+      return null;
+    };
+
+    const timeoutPromise = new Promise<null>((resolve) => setTimeout(() => resolve(null), 1500));
+    const res = await Promise.race([supaPromise(), timeoutPromise]);
+    if (res) return res;
   } catch {
     // Repli local
   }
