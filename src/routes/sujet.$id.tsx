@@ -37,7 +37,7 @@ import {
 import { SubjectCompetencesPill } from "@/components/competences/SubjectCompetencesPill";
 import { ProgressionModal } from "@/components/competences/ProgressionModal";
 import { PedagogicalTutorPane } from "@/components/workspace/PedagogicalTutorPane";
-import { CourseModal } from "@/components/course/CourseModal";
+import { CourseDrawer } from "@/components/course/CourseDrawer";
 
 export const Route = createFileRoute("/sujet/$id")({
   loader: ({ params }) => {
@@ -100,12 +100,16 @@ function Workspace() {
   const [unlockingHint, setUnlockingHint] = useState(false);
   const [verifying, setVerifying] = useState(false);
   const [cursorPos, setCursorPos] = useState({ line: 1, col: 1 });
-  const [showCourseModal, setShowCourseModal] = useState(false);
+  const [showCourseDrawer, setShowCourseDrawer] = useState(false);
 
-  const handleInsertCourseCode = (snippet: string) => {
-    const current = files[activeFileName]?.content || "";
+  const handleInsertCourseCode = (snippet: string, targetFile?: string | undefined) => {
+    const destFile = targetFile && files[targetFile] ? targetFile : activeFileName;
+    if (destFile !== activeFileName) {
+      setActiveFileName(destFile);
+    }
+    const current = files[destFile]?.content || "";
     const updated = current.trim() === "" ? snippet : `${current}\n\n${snippet}`;
-    updateFileContent(activeFileName, updated);
+    updateFileContent(destFile, updated);
   };
 
   const isExamMode = Boolean(ex.examMode);
@@ -378,7 +382,7 @@ function Workspace() {
 
           {!isExamMode && (
             <button
-              onClick={() => setShowCourseModal(true)}
+              onClick={() => setShowCourseDrawer(true)}
               className="flex items-center gap-1.5 rounded border border-border/80 bg-background/80 hover:bg-accent/40 px-2.5 py-1 text-xs font-mono transition-colors cursor-pointer text-foreground"
               title="Consulter le support de cours officiel et insérer des extraits de code"
             >
@@ -656,8 +660,20 @@ function Workspace() {
               })}
             </div>
 
-            {/* Actions de l'éditeur : Réinitialiser & Vérifier mon code (Item 5) */}
+            {/* Actions de l'éditeur : Mémento, Réinitialiser & Vérifier mon code */}
             <div className="flex items-center gap-2 px-2 py-1 shrink-0">
+              {!isExamMode && (
+                <button
+                  type="button"
+                  onClick={() => setShowCourseDrawer(true)}
+                  className="flex items-center gap-1.5 rounded border border-primary/35 bg-primary/10 hover:bg-primary/20 text-primary px-2.5 py-1 text-xs font-medium transition-colors cursor-pointer"
+                  title="Ouvrir le panneau Mémento Bac STI avec injection directe dans Monaco"
+                >
+                  <BookOpen className="h-3 w-3" />
+                  <span className="hidden md:inline">📘 Cours & Mémento</span>
+                </button>
+              )}
+
               <button
                 onClick={handleReset}
                 disabled={isExamExpired}
@@ -800,10 +816,10 @@ function Workspace() {
       {/* Modale d'arbitrage de conflit explicite (Inviolable #4) */}
       <ConflictModal open={Boolean(conflict)} conflict={conflict} onResolve={resolveConflict} />
 
-      {/* Support de Cours Interactif & Mémento Bac STI */}
-      <CourseModal
-        open={showCourseModal}
-        onOpenChange={setShowCourseModal}
+      {/* Panneau Latéral Escamotable : Cours & Mémento Bac STI */}
+      <CourseDrawer
+        open={showCourseDrawer}
+        onOpenChange={setShowCourseDrawer}
         onInsertCode={handleInsertCourseCode}
         activeFileName={activeFileName}
       />

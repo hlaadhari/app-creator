@@ -1,0 +1,52 @@
+{
+  "id": "sql",
+  "badge": "Fiche 5",
+  "title": "SQL LDD, LMD & LID",
+  "shortTitle": "SQL (MySQL)",
+  "description": "Création de tables, contraintes d'intégrité référentielle, requêtes d'insertion, mise à jour et consultations avancées.",
+  "piegeBac": "Attention aux guillemets simples obligatoires autour des chaînes de caractères (VARCHAR, CHAR) et des dates (DATE) dans vos requêtes SQL construites en PHP ! Exemple : WHERE cin = '$cin' et non WHERE cin = $cin.",
+  "sections": [
+    {
+      "id": "sql-ldd",
+      "title": "1. LDD : Création de Tables & Contraintes",
+      "description": "Syntaxe officielle CREATE TABLE avec clés primaires, clés étrangères et contrainte CHECK.",
+      "snippets": [
+        {
+          "title": "Création de tables avec clés étrangères et CHECK",
+          "language": "sql",
+          "targetFile": "schema.sql",
+          "keywords": ["CREATE TABLE", "PRIMARY KEY", "FOREIGN KEY", "REFERENCES", "CHECK"],
+          "code": "-- Table mère : section\nCREATE TABLE IF NOT EXISTS section (\n  code_sec VARCHAR(10),\n  libelle VARCHAR(50) NOT NULL,\n  CONSTRAINT pk_section PRIMARY KEY (code_sec)\n);\n\n-- Table fille : candidat avec contrainte d'intégrité et validation CHECK\nCREATE TABLE IF NOT EXISTS candidat (\n  cin CHAR(8),\n  nom VARCHAR(30) NOT NULL,\n  genre CHAR(1) CHECK (genre IN ('M', 'F')),\n  moyenne DECIMAL(4, 2) DEFAULT 0.00,\n  code_sec VARCHAR(10) NOT NULL,\n  CONSTRAINT pk_candidat PRIMARY KEY (cin),\n  CONSTRAINT fk_cand_sec FOREIGN KEY (code_sec) REFERENCES section(code_sec)\n    ON UPDATE CASCADE ON DELETE RESTRICT,\n  CONSTRAINT chk_moyenne CHECK (moyenne BETWEEN 0 AND 20)\n);"
+        }
+      ]
+    },
+    {
+      "id": "sql-lmd",
+      "title": "2. LMD : Insertion, Modification & Suppression",
+      "description": "Commandes INSERT INTO, UPDATE et DELETE FROM.",
+      "snippets": [
+        {
+          "title": "Opérations de mise à jour des données",
+          "language": "sql",
+          "targetFile": "schema.sql",
+          "keywords": ["INSERT INTO", "UPDATE", "DELETE FROM", "WHERE"],
+          "code": "-- 1. Insertion d'enregistrements\nINSERT INTO section (code_sec, libelle) VALUES \n  ('SI', 'Sciences de l''Informatique'),\n  ('MATH', 'Mathématiques');\n\nINSERT INTO candidat (cin, nom, genre, moyenne, code_sec) VALUES \n  ('08123456', 'BEN SALAH MOHAMED', 'M', 16.50, 'SI');\n\n-- 2. Mise à jour avec condition\nUPDATE candidat \nSET moyenne = moyenne + 0.50 \nWHERE code_sec = 'SI' AND moyenne <= 19.50;\n\n-- 3. Suppression ciblée\nDELETE FROM candidat \nWHERE cin = '08123456';"
+        }
+      ]
+    },
+    {
+      "id": "sql-lid",
+      "title": "3. LID : Requêtes de Consultation & Agrégats",
+      "description": "Requêtes SELECT complexes avec jointure, calcul d'agrégats (COUNT, AVG), GROUP BY et HAVING.",
+      "snippets": [
+        {
+          "title": "Consultation avec jointure, tri et agrégation",
+          "language": "sql",
+          "targetFile": "schema.sql",
+          "keywords": ["SELECT", "JOIN", "GROUP BY", "HAVING", "ORDER BY", "COUNT", "AVG"],
+          "code": "-- 1. Consultation avec projection et jointure relationnelle\nSELECT c.cin, c.nom, s.libelle, c.moyenne\nFROM candidat c\nINNER JOIN section s ON c.code_sec = s.code_sec\nWHERE c.moyenne >= 10.00\nORDER BY c.moyenne DESC;\n\n-- 2. Statistiques et regroupement avec HAVING\nSELECT s.libelle, \n       COUNT(c.cin) AS total_inscrits, \n       ROUND(AVG(c.moyenne), 2) AS moyenne_section\nFROM section s\nLEFT JOIN candidat c ON s.code_sec = c.code_sec\nGROUP BY s.code_sec, s.libelle\nHAVING total_inscrits >= 1\nORDER BY moyenne_section DESC;"
+        }
+      ]
+    }
+  ]
+}

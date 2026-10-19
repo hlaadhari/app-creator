@@ -1,0 +1,58 @@
+{
+  "id": "php",
+  "badge": "Fiche 4",
+  "title": "PHP 8.2 & Procédural MySQLi",
+  "shortTitle": "PHP / MySQLi",
+  "description": "Récupération des données postées ($_POST), fonctions procédurales MySQLi officielles et enregistrement en base.",
+  "piegeBac": "Utilisez EXCLUSIVEMENT l'extension procédurale mysqli_* (ex: mysqli_connect, mysqli_query, mysqli_fetch_array). L'utilisation de PDO ou des anciennes fonctions mysql_* est strictement pénalisée au barème du Bac STI.",
+  "sections": [
+    {
+      "id": "php-post",
+      "title": "1. Récupération des Variables Superglobales",
+      "description": "Lecture des champs envoyés depuis le formulaire HTML via la méthode POST.",
+      "snippets": [
+        {
+          "title": "Extraction sécurisée des champs $_POST",
+          "language": "php",
+          "targetFile": "traitement.php",
+          "keywords": ["_POST", "extract", "trim", "isset", "php"],
+          "code": "<?php\n// Récupération explicite des champs du formulaire\n$cin = trim($_POST['cin']);\n$nom = trim($_POST['nom']);\n$genre = $_POST['genre'];\n$section = $_POST['section'];\n\n// Alternative fréquemment tolérée au Bac :\n// extract($_POST);\n?>"
+        }
+      ]
+    },
+    {
+      "id": "php-mysqli-fonctions",
+      "title": "2. Les 4 Fonctions MySQLi Fondamentales",
+      "description": "Les 4 fonctions imposées par le programme de 4ème SI pour communiquer avec MySQL.",
+      "snippets": [
+        {
+          "title": "Connexion, Requête, Nombre de Lignes et Lecture",
+          "language": "php",
+          "targetFile": "traitement.php",
+          "keywords": [
+            "mysqli_connect",
+            "mysqli_query",
+            "mysqli_num_rows",
+            "mysqli_fetch_array",
+            "mysqli_error"
+          ],
+          "code": "<?php\n// 1. Établissement de la connexion au serveur MySQL\n$cnx = mysqli_connect(\"localhost\", \"root\", \"\", \"bd_bac\") \n       or die(\"Erreur de connexion : \" . mysqli_connect_error());\n\n// 2. Exécution d'une requête SQL\n$req = \"SELECT * FROM candidat WHERE cin = '$cin'\";\n$res = mysqli_query($cnx, $req) \n       or die(\"Erreur d'exécution de la requête : \" . mysqli_error($cnx));\n\n// 3. Comptage du nombre de lignes retournées\n$nb = mysqli_num_rows($res);\n\n// 4. Extraction d'une ligne de résultat sous forme de tableau\nwhile ($ligne = mysqli_fetch_array($res)) {\n  echo \"Nom : \" . $ligne['nom'] . \" - Section : \" . $ligne['section'] . \"<br>\";\n}\n\n// 5. Fermeture propre de la connexion\nmysqli_close($cnx);\n?>"
+        }
+      ]
+    },
+    {
+      "id": "php-patron-complet",
+      "title": "3. Script d'Ajout Type Baccalauréat",
+      "description": "Architecture complète : test d'existence préalable puis insertion avec message de confirmation.",
+      "snippets": [
+        {
+          "title": "Script complet ajout.php",
+          "language": "php",
+          "targetFile": "ajout.php",
+          "keywords": ["INSERT INTO", "SELECT", "mysqli_affected_rows", "ajout.php"],
+          "code": "<?php\n// 1. Connexion BDD\n$cnx = mysqli_connect(\"localhost\", \"root\", \"\", \"bd_bac\")\n       or die(mysqli_error($cnx));\n\n// 2. Récupération des données postées\n$cin = trim($_POST['cin']);\n$nom = trim($_POST['nom']);\n$genre = $_POST['genre'];\n$section = $_POST['section'];\n\n// 3. Test d'unicité préalable (Le candidat existe-t-il déjà ?)\n$req_test = \"SELECT cin FROM candidat WHERE cin = '$cin'\";\n$res_test = mysqli_query($cnx, $req_test);\n\nif (mysqli_num_rows($res_test) > 0) {\n  echo \"<h3 style='color:red;'>Erreur : Ce candidat portant le CIN $cin est déjà enregistré !</h3>\";\n} else {\n  // 4. Insertion du nouvel enregistrement\n  $req_insert = \"INSERT INTO candidat (cin, nom, genre, section) \n                 VALUES ('$cin', '$nom', '$genre', '$section')\";\n  $res_insert = mysqli_query($cnx, $req_insert) or die(mysqli_error($cnx));\n  \n  if (mysqli_affected_rows($cnx) > 0) {\n    echo \"<h3 style='color:green;'>Succès : Candidat $nom enregistré avec succès !</h3>\";\n  }\n}\n\n// 5. Clôture de connexion\nmysqli_close($cnx);\n?>"
+        }
+      ]
+    }
+  ]
+}

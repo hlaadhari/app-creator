@@ -1,0 +1,66 @@
+{
+  "id": "css3",
+  "badge": "Fiche 2",
+  "title": "CSS3 & Modèle de Boîte",
+  "shortTitle": "CSS3",
+  "description": "Sélecteurs, Box Model, alignement de formulaires, transitions fluides et animations 2D.",
+  "piegeBac": "Un élément <label> est de type inline par défaut ! Sans la règle display: inline-block;, le navigateur ignore complètement les propriétés width, margin-top et margin-bottom définies pour aligner vos champs de formulaire.",
+  "sections": [
+    {
+      "id": "css-selecteurs",
+      "title": "1. Sélecteurs Usuels du Bac STI",
+      "description": "Cibler précisément les balises HTML, classes, identifiants et états interactifs.",
+      "snippets": [
+        {
+          "title": "Sélecteurs de balise, classe, id et pseudo-classes",
+          "language": "css",
+          "targetFile": "mesStyles.css",
+          "keywords": ["selecteur", "classe", "id", "hover", "pseudo-classe"],
+          "code": "/* Sélecteur de balise universel */\nbody {\n  font-family: Arial, sans-serif;\n  background-color: #f8fafc;\n  color: #1e293b;\n}\n\n/* Sélecteur d'identifiant unique (#) */\n#titre {\n  text-align: center;\n  color: #2563eb;\n  text-transform: uppercase;\n}\n\n/* Sélecteur de classe réutilisable (.) */\n.L1 {\n  background-color: #f1f5f9;\n  font-weight: bold;\n}\n\n/* Pseudo-classe d'état :hover au survol */\ninput[type=\"submit\"]:hover {\n  background-color: #1d4ed8;\n  cursor: pointer;\n}"
+        }
+      ]
+    },
+    {
+      "id": "css-boxmodel",
+      "title": "2. Modèle de Boîte (Box Model)",
+      "description": "Maîtrise des 4 couches : contenu, marge interne (padding), bordure (border) et marge externe (margin).",
+      "snippets": [
+        {
+          "title": "Configuration Box Model pour conteneurs",
+          "language": "css",
+          "targetFile": "mesStyles.css",
+          "keywords": ["box-model", "margin", "padding", "border", "width", "height"],
+          "code": "fieldset {\n  width: 550px;\n  margin: 20px auto; /* Centrage horizontal automatique */\n  padding: 15px 25px;\n  border: 2px solid #3b82f6;\n  border-radius: 8px;\n  background-color: #ffffff;\n  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);\n}"
+        }
+      ]
+    },
+    {
+      "id": "css-alignement",
+      "title": "3. Alignement des Formulaires & Labels",
+      "description": "Technique officielle pour obtenir un formulaire propre avec des libellés parfaitement alignés sur la gauche.",
+      "snippets": [
+        {
+          "title": "Alignement des <label> avec display: inline-block",
+          "language": "css",
+          "targetFile": "mesStyles.css",
+          "keywords": ["label", "display", "inline-block", "width", "alignement", "formulaire"],
+          "code": "label {\n  display: inline-block;\n  width: 180px; /* Largeur fixe pour aligner tous les champs */\n  font-weight: 600;\n  margin-bottom: 8px;\n  color: #334155;\n}\n\ninput[type=\"text\"],\ninput[type=\"number\"],\nselect {\n  width: 260px;\n  padding: 6px 10px;\n  border: 1px solid #cbd5e1;\n  border-radius: 4px;\n}"
+        }
+      ]
+    },
+    {
+      "id": "css-effets",
+      "title": "4. Transitions & Transformations 2D",
+      "description": "Mise à l'échelle, rotations légères et transitions fluides lors du survol de l'utilisateur.",
+      "snippets": [
+        {
+          "title": "Boutons interactifs avec transition et transformation",
+          "language": "css",
+          "targetFile": "mesStyles.css",
+          "keywords": ["transition", "transform", "scale", "opacity", "animation"],
+          "code": "input[type=\"submit\"] {\n  background-color: #2563eb;\n  color: #ffffff;\n  padding: 8px 20px;\n  border: none;\n  border-radius: 6px;\n  font-size: 14px;\n  /* Définition de la transition fluide */\n  transition: all 1s ease-in-out;\n}\n\ninput[type=\"submit\"]:hover {\n  background-color: #1d4ed8;\n  transform: scale(1.1); /* Agrandissement de 10% */\n  opacity: 0.9;\n}"
+        }
+      ]
+    }
+  ]
+}
