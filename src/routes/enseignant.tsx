@@ -37,12 +37,15 @@ import {
   Shield,
   BarChart3,
   Download,
+  Scale,
 } from "lucide-react";
 import {
   detecterBlocagesEtAlertes,
   type StudentAttemptHistory,
 } from "@/lib/analytics/class-analytics";
 import { telechargerExportPronote } from "@/lib/export/pronote-export";
+import { SimilarityAnalysisTab } from "@/components/teacher/SimilarityAnalysisTab";
+import type { StudentCopyData } from "@/lib/similarity/types";
 
 export const Route = createFileRoute("/enseignant")({
   component: TeacherDashboardPage,
@@ -264,6 +267,206 @@ const DEMO_FILES: StudentFile[] = [
   },
 ];
 
+const DEMO_SIMILARITY_COPIES: StudentCopyData[] = [
+  {
+    eleveId: "demo-s1",
+    nom: "Bernard",
+    prenom: "Lucas",
+    statut: "rendu",
+    derniereActivite: new Date().toISOString(),
+    fichiers: [
+      {
+        chemin: "index.html",
+        contenu: `<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Don de Sang - Lycée</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <h2>Formulaire d'enregistrement Don</h2>
+    <form id="form-don">
+      <label for="cin">Numéro CIN (8 chiffres) :</label>
+      <input type="text" id="cin" name="cin" required>
+      <button type="submit" id="btn-submit">Valider</button>
+    </form>
+    <div id="message"></div>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>`,
+      },
+      {
+        chemin: "style.css",
+        contenu: `body {
+  font-family: Arial, sans-serif;
+  background-color: #f0f4f8;
+  margin: 0;
+  padding: 20px;
+}
+.container {
+  max-width: 500px;
+  margin: 0 auto;
+  background: white;
+  padding: 24px;
+  border-radius: 8px;
+}
+.error { color: #dc2626; font-weight: bold; }
+.success { color: #16a34a; font-weight: bold; }`,
+      },
+      {
+        chemin: "script.js",
+        contenu: `// Formulaire de don
+const form = document.querySelector("#form-don");
+const cinInput = document.querySelector("#cin");
+const messageBox = document.querySelector("#message");
+
+form.addEventListener("submit", function(event) {
+  event.preventDefault();
+  const cinValue = cinInput.value.trim();
+  if (cinValue.length !== 8 || isNaN(cinValue)) {
+    messageBox.textContent = "Le numéro CIN doit comporter exactement 8 chiffres.";
+    messageBox.className = "error";
+    return false;
+  }
+  messageBox.textContent = "Validation réussie !";
+  messageBox.className = "success";
+  return true;
+});`,
+      },
+    ],
+  },
+  {
+    eleveId: "demo-s2",
+    nom: "Khelifi",
+    prenom: "Inès",
+    statut: "rendu",
+    derniereActivite: new Date().toISOString(),
+    fichiers: [
+      {
+        chemin: "index.html",
+        contenu: `<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Don de Sang - Lycée</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <h2>Formulaire d'enregistrement Don</h2>
+    <form id="form-don">
+      <label for="cin">Numéro CIN (8 chiffres) :</label>
+      <input type="text" id="cin" name="cin" required>
+      <button type="submit" id="btn-submit">Valider</button>
+    </form>
+    <div id="message"></div>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>`,
+      },
+      {
+        chemin: "style.css",
+        contenu: `body {
+  font-family: Arial, sans-serif;
+  background-color: #f0f4f8;
+  margin: 0;
+  padding: 20px;
+}
+.container {
+  max-width: 500px;
+  margin: 0 auto;
+  background: white;
+  padding: 24px;
+  border-radius: 8px;
+}
+.error { color: #dc2626; font-weight: bold; }
+.success { color: #16a34a; font-weight: bold; }`,
+      },
+      {
+        chemin: "script.js",
+        contenu: `// Script de saisie
+const monFormulaire = document.querySelector("#form-don");
+const champCin = document.querySelector("#cin");
+const divMessage = document.querySelector("#message");
+
+monFormulaire.addEventListener("submit", function(e) {
+  e.preventDefault();
+  const valCin = champCin.value.trim();
+  if (valCin.length !== 8 || isNaN(valCin)) {
+    divMessage.textContent = "Le numéro CIN doit comporter exactement 8 chiffres.";
+    divMessage.className = "error";
+    return false;
+  }
+  divMessage.textContent = "Validation réussie !";
+  divMessage.className = "success";
+  return true;
+});`,
+      },
+    ],
+  },
+  {
+    eleveId: "demo-s3",
+    nom: "Zitouni",
+    prenom: "Mehdi",
+    statut: "rendu",
+    derniereActivite: new Date().toISOString(),
+    fichiers: [
+      {
+        chemin: "index.html",
+        contenu: `<!DOCTYPE html>
+<html>
+<head>
+  <title>Gestionnaire Dons</title>
+</head>
+<body>
+  <main class="grid-panel">
+    <section>
+      <h1>Portail Donneurs</h1>
+      <input id="input-national-id" placeholder="CIN..." />
+      <button id="action-verify">Tester</button>
+    </section>
+  </main>
+  <script src="script.js"></script>
+</body>
+</html>`,
+      },
+      {
+        chemin: "style.css",
+        contenu: `.grid-panel { display: grid; grid-template-columns: 1fr; gap: 1rem; }`,
+      },
+      {
+        chemin: "script.js",
+        contenu: `document.getElementById("action-verify")?.addEventListener("click", () => {
+  const code = document.getElementById("input-national-id")?.value ?? "";
+  const estValide = /^\\d{8}$/.test(code);
+  console.log("Statut:", estValide);
+});`,
+      },
+    ],
+  },
+  {
+    eleveId: "demo-s4",
+    nom: "Moreau",
+    prenom: "Camille",
+    statut: "en_cours",
+    derniereActivite: new Date(Date.now() - 45 * 60 * 1000).toISOString(),
+    fichiers: [
+      {
+        chemin: "index.html",
+        contenu: `<h1>Page en construction</h1>`,
+      },
+      {
+        chemin: "script.js",
+        contenu: `// TODO: coder la validation CIN`,
+      },
+    ],
+  },
+];
+
 function TeacherDashboardPage() {
   const { user, profile, role, loading: authLoading } = useAuth();
   const navigate = useNavigate();
@@ -418,6 +621,20 @@ function TeacherDashboardPage() {
     () => detecterBlocagesEtAlertes(students, isDemo ? DEMO_ATTEMPTS : undefined),
     [students, isDemo],
   );
+
+  const similarityCopies: StudentCopyData[] = React.useMemo(() => {
+    if (isDemo || students.length <= 1) {
+      return DEMO_SIMILARITY_COPIES;
+    }
+    return students.map((s) => ({
+      eleveId: s.eleve_id,
+      nom: s.nom,
+      prenom: s.prenom,
+      statut: s.projet_statut,
+      derniereActivite: s.derniere_activite,
+      fichiers: DEMO_FILES.map((f) => ({ chemin: f.chemin, contenu: f.contenu })),
+    }));
+  }, [students, isDemo]);
 
   // 1. Écran de chargement initial d'authentification
   if (authLoading && !isDemo) {
@@ -714,6 +931,10 @@ function TeacherDashboardPage() {
                 <TabsTrigger value="contestations" className="text-xs">
                   Contestations d'élèves (F-44)
                 </TabsTrigger>
+                <TabsTrigger value="similarity" className="text-xs flex items-center gap-1.5">
+                  <Scale className="w-3.5 h-3.5" />
+                  <span>Similarité & Anti-Plagiat</span>
+                </TabsTrigger>
                 <TabsTrigger value="studio" className="text-xs">
                   Studio de Sujets & Immuabilité
                 </TabsTrigger>
@@ -736,6 +957,14 @@ function TeacherDashboardPage() {
                   students={students}
                   attemptHistories={isDemo ? DEMO_ATTEMPTS : undefined}
                   onInspectCopy={handleInspectCopy}
+                />
+              </TabsContent>
+
+              <TabsContent value="similarity">
+                <SimilarityAnalysisTab
+                  classId={activeClass.id}
+                  className={activeClass.nom}
+                  copies={similarityCopies}
                 />
               </TabsContent>
 
