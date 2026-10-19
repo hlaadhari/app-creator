@@ -10,8 +10,8 @@
 | Jalon  | Étape & Périmètre                        | Livrable Clé                               | Condition de Sortie / Seuil                               | Statut                       |
 | ------ | ---------------------------------------- | ------------------------------------------ | --------------------------------------------------------- | ---------------------------- |
 | **M0** | **Phase 0 : Validation Technique**       | Rapport de faisabilité + banc de test      | Décision Go / Go conditionnel / No-Go (§7.5)              | **Validé (Go conditionnel)** |
-| **M1** | **Phase 1 : Fondations & Base**          | Schéma Supabase, Auth, RLS, CI             | Démarrage en environnement vierge, RLS testées            | **Partiellement réalisé**    |
-| **M2** | **Phase 1 : MVP Parcours Élève**         | Parcours complet HTML/CSS/JS               | Critères d'acceptation Phase 1 validés                    | **En cours**                 |
+| **M1** | **Phase 1 : Fondations & Base**          | Schéma Supabase, Auth, RLS, CI             | Démarrage en environnement vierge, RLS testées            | **Validé**                   |
+| **M2** | **Phase 1 : MVP Parcours Élève**         | Parcours complet HTML/CSS/JS               | Critères d'acceptation Phase 1 validés                    | **Validé**                   |
 | **M3** | **Pilote Court HTML/CSS/JS**             | Retour terrain sur 1 classe (4-6 sem.)     | 0 perte de données, satisfaction ≥ 4/5                    | Planifié                     |
 | **M4** | **Phase 2 : PHP & SQL Local**            | Exécution WASM, panneau SQL, dialecte      | Scénarios essentiels du Bac conformes                     | **Validé**                   |
 | **M5** | **Phase 3 : Correction Étendue & Aides** | Indices 3 niveaux, corrigés, contestations | Faux négatifs < 3%, faux positifs < 1%                    | Planifié                     |
@@ -45,23 +45,23 @@
 
 ### Jalon M2 — Phase 1 (Lot B & C) : MVP Parcours Élève HTML/CSS/JS
 
-- [ ] **Étape 2.1 - Authentification & Onboarding** ([Issue #7](https://github.com/hlaadhari/app-creator/issues/7)) :
-  - [ ] Écran de connexion / inscription Supabase Auth.
-  - [ ] Rejoindre une classe via code d'invitation avec vérification expiration/quota.
-  - [ ] Visite guidée (Onboarding) lors de la première connexion.
-- [ ] **Étape 2.2 - Espace de Travail & Éditeur Monaco** ([Issue #5](https://github.com/hlaadhari/app-creator/issues/5)) :
-  - [ ] Intégration de Monaco Editor en remplacement du textarea actuel.
-  - [ ] Arborescence de fichiers normalisée `Travail_Eleve/SW_<numéro>`.
-  - [ ] Import de ressources locales (images, polices, CSS) par glisser-déposer et rendu dans l'aperçu.
-- [ ] **Étape 2.3 - Résilience & Tampon Local** ([Issue #6](https://github.com/hlaadhari/app-creator/issues/6)) :
-  - [ ] Remplacement de `localStorage` par IndexedDB (`labo_sti_buffer`).
-  - [ ] Synchronisation avec numéro de révision (`rev`) et détection de conflits.
-  - [ ] Indicateur d'état temps réel (Enregistré local / En cours de synchronisation / Synchronisé / Hors ligne).
-  - [ ] Reprise sans perte de travail après coupure réseau simulée.
-- [ ] **Étape 2.4 - Correction Formative** ([Issue #8](https://github.com/hlaadhari/app-creator/issues/8)) :
-  - [ ] Exécution dynamique des sondes JSON stockées en base dans la table `criteres`.
-  - [ ] Bouton « Vérifier » renvoyant le détail critère par critère en moins de 3 secondes.
-  - [ ] Validation de chaque sujet avec au moins 2 solutions valides différentes et 1 solution invalide.
+- [x] **Étape 2.1 - Authentification & Onboarding** ([Issue #7](https://github.com/hlaadhari/app-creator/issues/7)) :
+  - [x] Écran de connexion / inscription Supabase Auth.
+  - [x] Rejoindre une classe via code d'invitation avec vérification expiration/quota.
+  - [x] Visite guidée (Onboarding) lors de la première connexion.
+- [x] **Étape 2.2 - Espace de Travail & Éditeur Monaco** ([Issue #5](https://github.com/hlaadhari/app-creator/issues/5)) :
+  - [x] Intégration de Monaco Editor en remplacement du textarea actuel.
+  - [x] Arborescence de fichiers normalisée `Travail_Eleve/SW_<numéro>`.
+  - [x] Import de ressources locales (images, polices, CSS) par glisser-déposer et rendu dans l'aperçu.
+- [x] **Étape 2.3 - Résilience & Tampon Local** ([Issue #6](https://github.com/hlaadhari/app-creator/issues/6)) :
+  - [x] Remplacement de `localStorage` par IndexedDB (`labo_sti_buffer`).
+  - [x] Synchronisation avec numéro de révision (`rev`) et détection de conflits.
+  - [x] Indicateur d'état temps réel (Enregistré local / En cours de synchronisation / Synchronisé / Hors ligne).
+  - [x] Reprise sans perte de travail après coupure réseau simulée.
+- [x] **Étape 2.4 - Correction Formative** ([Issue #8](https://github.com/hlaadhari/app-creator/issues/8)) :
+  - [x] Exécution dynamique des sondes JSON stockées en base dans la table `criteres`.
+  - [x] Bouton « Vérifier » renvoyant le détail critère par critère en moins de 3 secondes.
+  - [x] Validation de chaque sujet avec au moins 2 solutions valides différentes et 1 solution invalide.
 - [x] **Étape 2.5 - Espace Enseignant de base** ([Issue #10](https://github.com/hlaadhari/app-creator/issues/10) & [Issue #11](https://github.com/hlaadhari/app-creator/issues/11)) :
   - [x] Consultation en lecture seule du travail des élèves de sa classe.
   - [x] Publication de nouvelles versions de sujets (garantie d'immuabilité des projets en cours).

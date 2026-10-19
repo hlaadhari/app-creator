@@ -26,13 +26,7 @@ function genererReponseMaieutique(
     : failedCriteria[0];
 
   // 1. Si l'élève interroge sur un critère en échec spécifique ou demande pourquoi ça ne marche pas
-  if (
-    p.includes("crit[eè]re") ||
-    p.includes("pourquoi") ||
-    p.includes("[eé]choue") ||
-    p.includes("marche pas") ||
-    p.includes("erreur")
-  ) {
+  if (/crit[eè]re|pourquoi|[eé]choue|marche pas|erreur/.test(p)) {
     if (targetCritere) {
       const code = targetCritere.code || targetCritere.id;
       const label = targetCritere.label;
