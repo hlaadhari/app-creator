@@ -30,10 +30,7 @@ drop policy if exists "Admin modifie competences" on public.competences;
 create policy "Admin modifie competences"
   on public.competences for all to authenticated
   using (
-    exists (
-      select 1 from public.profiles p
-      where p.id = auth.uid() and p.role = 'admin'
-    )
+    public.has_role(auth.uid(),'admin')
   );
 
 
@@ -61,10 +58,7 @@ drop policy if exists "Enseignant et admin gerent critere_competences" on public
 create policy "Enseignant et admin gerent critere_competences"
   on public.critere_competences for all to authenticated
   using (
-    exists (
-      select 1 from public.profiles p
-      where p.id = auth.uid() and p.role in ('enseignant', 'admin')
-    )
+    (public.has_role(auth.uid(),'enseignant') or public.has_role(auth.uid(),'admin'))
   );
 
 
@@ -114,10 +108,7 @@ create policy "Enseignant lit maitrise de ses classes"
         and c.enseignant_id = auth.uid()
         and m.left_at is null
     )
-    or exists (
-      select 1 from public.profiles p
-      where p.id = auth.uid() and p.role = 'admin'
-    )
+    or public.has_role(auth.uid(),'admin')
   );
 
 
@@ -180,10 +171,7 @@ create policy "Enseignant lit badges de ses classes"
         and c.enseignant_id = auth.uid()
         and m.left_at is null
     )
-    or exists (
-      select 1 from public.profiles p
-      where p.id = auth.uid() and p.role = 'admin'
-    )
+    or public.has_role(auth.uid(),'admin')
   );
 
 

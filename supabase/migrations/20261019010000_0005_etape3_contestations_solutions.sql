@@ -18,10 +18,7 @@ drop policy if exists "Enseignant et admin lisent journal securite" on public.jo
 create policy "Enseignant et admin lisent journal securite"
   on public.journal_securite for select to authenticated
   using (
-    exists (
-      select 1 from public.profiles p
-      where p.id = auth.uid() and p.role in ('enseignant', 'admin')
-    )
+    (public.has_role(auth.uid(),'enseignant') or public.has_role(auth.uid(),'admin'))
   );
 
 -- Tout utilisateur authentifié ou le système peut consigner un incident
@@ -78,10 +75,7 @@ create policy "Enseignant lit contestations eleves"
         and c.enseignant_id = auth.uid()
         and m.left_at is null
     )
-    or exists (
-      select 1 from public.profiles p
-      where p.id = auth.uid() and p.role = 'admin'
-    )
+    or public.has_role(auth.uid(),'admin')
   );
 
 -- Enseignant : arbitre les contestations de ses élèves ou si admin
@@ -96,10 +90,7 @@ create policy "Enseignant arbitre contestations eleves"
         and c.enseignant_id = auth.uid()
         and m.left_at is null
     )
-    or exists (
-      select 1 from public.profiles p
-      where p.id = auth.uid() and p.role = 'admin'
-    )
+    or public.has_role(auth.uid(),'admin')
   );
 
 
@@ -137,7 +128,7 @@ create policy "Utilisateur consigne son acces solution"
 drop policy if exists "Utilisateur consulte ses acces solution" on public.journal_acces_solutions;
 create policy "Utilisateur consulte ses acces solution"
   on public.journal_acces_solutions for select to authenticated
-  using (user_id = auth.uid() or exists (select 1 from public.profiles p where p.id = auth.uid() and p.role in ('enseignant', 'admin')));
+  using (user_id = auth.uid() or (public.has_role(auth.uid(),'enseignant') or public.has_role(auth.uid(),'admin')));
 
 
 -- 5. RPC Sécurisée debloquer_solution avec garde-fous anti-triche (T-04 / T-06)
@@ -156,7 +147,6 @@ set search_path = public
 as $$
 declare
   v_user_id uuid;
-  v_role text;
   v_is_in_active_exam boolean;
 begin
   v_user_id := auth.uid();
@@ -164,10 +154,9 @@ begin
     raise exception 'Authentification requise pour accéder aux corrigés (T-04)';
   end if;
 
-  select role into v_role from public.profiles where id = v_user_id;
 
   -- Si l'utilisateur est enseignant ou admin : accès libre
-  if v_role in ('enseignant', 'admin') then
+  if public.has_role(v_user_id,'enseignant') or public.has_role(v_user_id,'admin') then
     insert into public.journal_acces_solutions (user_id, version_id, motif)
     values (v_user_id, p_version_id, 'consultation_enseignant');
 
@@ -212,3 +201,6 @@ begin
   where s.version_id = p_version_id;
 end;
 $$;
+
+revoke execute on function public.debloquer_solution(uuid, text) from public, anon;
+grant execute on function public.debloquer_solution(uuid, text) to authenticated;
