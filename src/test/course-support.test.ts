@@ -101,4 +101,75 @@ describe("Support de Cours Interactif & Mémento Bac STI (feat/course-support-ht
     expect(html).toContain("AVG(");
     expect(html).toContain("COUNT(");
   });
+
+  describe("Fiches Mémento Structurées & Pièges Bac STI (refactor/course-module-interactive)", () => {
+    it("exporte les 5 fiches mémento avec métadonnées et icônes", async () => {
+      const { MEMENTO_CARDS } = await import("@/content/mementos");
+      expect(MEMENTO_CARDS).toHaveLength(5);
+      const ids = MEMENTO_CARDS.map((f) => f.id);
+      expect(ids).toEqual(["html5", "css3", "js", "php", "sql"]);
+    });
+
+    it("Fiche 1 (HTML5) contient le piège Bac sur l'attribut name et les formulaires", async () => {
+      const { MEMENTO_CARDS } = await import("@/content/mementos");
+      const f1 = MEMENTO_CARDS.find((f) => f.id === "html5")!;
+      expect(f1).toBeDefined();
+      expect(f1.piegeBac).toContain("name");
+      expect(f1.piegeBac).toContain("$_POST");
+
+      const allSnippets = f1.sections.flatMap((s) => s.snippets);
+      expect(allSnippets.some((sn) => sn.code.includes('onsubmit="return verif();"'))).toBe(true);
+      expect(allSnippets.some((sn) => sn.code.includes('<script src="controle.js"'))).toBe(true);
+    });
+
+    it("Fiche 2 (CSS3) contient le piège Bac sur display: inline-block pour les labels", async () => {
+      const { MEMENTO_CARDS } = await import("@/content/mementos");
+      const f2 = MEMENTO_CARDS.find((f) => f.id === "css3")!;
+      expect(f2).toBeDefined();
+      expect(f2.piegeBac).toContain("display: inline-block;");
+      expect(f2.piegeBac).toContain("<label>");
+
+      const allSnippets = f2.sections.flatMap((s) => s.snippets);
+      expect(allSnippets.some((sn) => sn.code.includes("display: inline-block;"))).toBe(true);
+      expect(allSnippets.some((sn) => sn.code.includes("transition:"))).toBe(true);
+    });
+
+    it("Fiche 3 (JS) contient le piège Bac sur return false pour bloquer la soumission", async () => {
+      const { MEMENTO_CARDS } = await import("@/content/mementos");
+      const f3 = MEMENTO_CARDS.find((f) => f.id === "js")!;
+      expect(f3).toBeDefined();
+      expect(f3.piegeBac).toContain("return false;");
+
+      const allSnippets = f3.sections.flatMap((s) => s.snippets);
+      expect(allSnippets.some((sn) => sn.code.includes("document.getElementById"))).toBe(true);
+      expect(allSnippets.some((sn) => sn.code.includes("length !== 8"))).toBe(true);
+      expect(allSnippets.some((sn) => sn.code.includes("selectedIndex"))).toBe(true);
+      expect(allSnippets.some((sn) => sn.code.includes("checked"))).toBe(true);
+    });
+
+    it("Fiche 4 (PHP) contient le piège Bac sur l'usage obligatoire de mysqli procédural", async () => {
+      const { MEMENTO_CARDS } = await import("@/content/mementos");
+      const f4 = MEMENTO_CARDS.find((f) => f.id === "php")!;
+      expect(f4).toBeDefined();
+      expect(f4.piegeBac).toContain("mysqli_*");
+
+      const allSnippets = f4.sections.flatMap((s) => s.snippets);
+      expect(allSnippets.some((sn) => sn.code.includes("mysqli_connect"))).toBe(true);
+      expect(allSnippets.some((sn) => sn.code.includes("mysqli_query"))).toBe(true);
+      expect(allSnippets.some((sn) => sn.code.includes("mysqli_num_rows"))).toBe(true);
+      expect(allSnippets.some((sn) => sn.code.includes("mysqli_fetch_array"))).toBe(true);
+    });
+
+    it("Fiche 5 (SQL) contient le piège Bac sur les guillemets VARCHAR/DATE en PHP", async () => {
+      const { MEMENTO_CARDS } = await import("@/content/mementos");
+      const f5 = MEMENTO_CARDS.find((f) => f.id === "sql")!;
+      expect(f5).toBeDefined();
+      expect(f5.piegeBac).toContain("guillemets");
+
+      const allSnippets = f5.sections.flatMap((s) => s.snippets);
+      expect(allSnippets.some((sn) => sn.code.includes("CREATE TABLE"))).toBe(true);
+      expect(allSnippets.some((sn) => sn.code.includes("PRIMARY KEY"))).toBe(true);
+      expect(allSnippets.some((sn) => sn.code.includes("CHECK"))).toBe(true);
+    });
+  });
 });

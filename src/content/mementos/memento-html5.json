@@ -1,0 +1,73 @@
+{
+  "id": "html5",
+  "badge": "Fiche 1",
+  "title": "HTML5 & Formulaires Sémantiques",
+  "shortTitle": "HTML5",
+  "description": "Squelette de document, balises de structuration et formulaires interactifs normalisés Bac STI.",
+  "piegeBac": "Ne jamais oublier l'attribut name sur chaque champ <input> et <select> ! Sans l'attribut name, la valeur saisie par l'élève ne sera jamais transmise dans le tableau superglobal $_POST en PHP.",
+  "sections": [
+    {
+      "id": "html-squelette",
+      "title": "1. Squelette Minimal Obligatoire",
+      "description": "Structure standard d'une page Web avec encodage UTF-8, liaison de la feuille de style mesStyles.css et du script de contrôle controle.js.",
+      "snippets": [
+        {
+          "title": "Structure de base index.html",
+          "language": "html",
+          "targetFile": "index.html",
+          "keywords": ["doctype", "html", "head", "utf-8", "link", "script", "controle.js"],
+          "code": "<!DOCTYPE html>\n<html lang=\"fr\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Portail Candidats - Bac STI</title>\n  <link rel=\"stylesheet\" href=\"mesStyles.css\">\n  <script src=\"controle.js\" defer></script>\n</head>\n<body>\n  <!-- Contenu principal -->\n</body>\n</html>"
+        }
+      ]
+    },
+    {
+      "id": "html-formulaire",
+      "title": "2. Balise Formulaire & Événement onsubmit",
+      "description": "Déclaration du formulaire d'envoi vers la page serveur PHP avec interception JavaScript obligatoire.",
+      "snippets": [
+        {
+          "title": "Balise <form> avec onsubmit",
+          "language": "html",
+          "targetFile": "index.html",
+          "keywords": ["form", "onsubmit", "method", "post", "action", "traitement.php"],
+          "code": "<form action=\"traitement.php\" method=\"post\" onsubmit=\"return verif();\">\n  <fieldset>\n    <legend>Identification du Candidat</legend>\n    <!-- Champs de formulaire ici -->\n  </fieldset>\n</form>"
+        }
+      ]
+    },
+    {
+      "id": "html-champs",
+      "title": "3. Contrôles de Saisie Usuels",
+      "description": "Champs texte, numérique, boutons radio exclusifs, cases à cocher et liste déroulante.",
+      "snippets": [
+        {
+          "title": "Champs CIN & Âge",
+          "language": "html",
+          "targetFile": "index.html",
+          "keywords": ["input", "text", "number", "label", "id", "name", "cin"],
+          "code": "<p>\n  <label for=\"cin\">Numéro CIN (8 chiffres) :</label>\n  <input type=\"text\" id=\"cin\" name=\"cin\" maxlength=\"8\" required>\n</p>\n<p>\n  <label for=\"age\">Âge :</label>\n  <input type=\"number\" id=\"age\" name=\"age\" min=\"17\" max=\"30\">\n</p>"
+        },
+        {
+          "title": "Boutons Radio Exclusifs (Genre)",
+          "language": "html",
+          "targetFile": "index.html",
+          "keywords": ["radio", "genre", "input", "checked", "name"],
+          "code": "<p>\n  <span>Genre :</span>\n  <input type=\"radio\" id=\"genreM\" name=\"genre\" value=\"M\" checked>\n  <label for=\"genreM\">Masculin</label>\n  <input type=\"radio\" id=\"genreF\" name=\"genre\" value=\"F\">\n  <label for=\"genreF\">Féminin</label>\n</p>"
+        },
+        {
+          "title": "Liste Déroulante avec Option Neutre",
+          "language": "html",
+          "targetFile": "index.html",
+          "keywords": ["select", "option", "selected", "selectedIndex", "dropdown"],
+          "code": "<p>\n  <label for=\"section\">Section :</label>\n  <select id=\"section\" name=\"section\">\n    <option value=\"\">-- Sélectionner une section --</option>\n    <option value=\"SI\">Sciences de l'Informatique</option>\n    <option value=\"MATH\">Mathématiques</option>\n    <option value=\"SC\">Sciences Expérimentales</option>\n  </select>\n</p>"
+        },
+        {
+          "title": "Boutons de Validation et d'Annulation",
+          "language": "html",
+          "targetFile": "index.html",
+          "keywords": ["submit", "reset", "bouton", "input"],
+          "code": "<p>\n  <input type=\"submit\" value=\"Enregistrer\">\n  <input type=\"reset\" value=\"Annuler\">\n</p>"
+        }
+      ]
+    }
+  ]
+}

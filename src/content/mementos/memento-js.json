@@ -1,0 +1,66 @@
+{
+  "id": "js",
+  "badge": "Fiche 3",
+  "title": "JavaScript & Validation Client",
+  "shortTitle": "JavaScript",
+  "description": "Contrôles de saisie, extraction DOM, vérification de types et fonction canonique verif() dans controle.js.",
+  "piegeBac": "Ne jamais oublier d'exécuter return false; dès qu'une erreur de saisie est constatée ! Sans return false;, le navigateur poursuivra immédiatement la soumission HTTP du formulaire vers PHP malgré l'alerte affichée.",
+  "sections": [
+    {
+      "id": "js-dom",
+      "title": "1. Extraction des Valeurs depuis le DOM",
+      "description": "Accès direct aux éléments HTML via document.getElementById().",
+      "snippets": [
+        {
+          "title": "Lecture des valeurs et états du formulaire",
+          "language": "javascript",
+          "targetFile": "controle.js",
+          "keywords": ["document", "getElementById", "value", "checked", "selectedIndex"],
+          "code": "// 1. Valeur textuelle d'un champ input\nlet cin = document.getElementById(\"cin\").value.trim();\n\n// 2. État d'un bouton radio ou case à cocher (true / false)\nlet estMasculin = document.getElementById(\"genreM\").checked;\nlet estFeminin = document.getElementById(\"genreF\").checked;\n\n// 3. Option sélectionnée dans une liste déroulante (index 0 = premier choix)\nlet choixSection = document.getElementById(\"section\").selectedIndex;"
+        }
+      ]
+    },
+    {
+      "id": "js-controles",
+      "title": "2. Contrôles Classiques du Bac STI",
+      "description": "Vérification de la longueur et de la nature numérique du CIN, choix obligatoire et non-sélection.",
+      "snippets": [
+        {
+          "title": "Vérification CIN (8 chiffres obligatoires)",
+          "language": "javascript",
+          "targetFile": "controle.js",
+          "keywords": ["cin", "length", "isNaN", "alert", "return false"],
+          "code": "if (cin.length !== 8 || isNaN(cin)) {\n  alert(\"Le numéro de CIN doit être obligatoirement composé de 8 chiffres décimaux !\");\n  document.getElementById(\"cin\").focus();\n  return false;\n}"
+        },
+        {
+          "title": "Contrôle de Sélection de Liste Déroulante",
+          "language": "javascript",
+          "targetFile": "controle.js",
+          "keywords": ["selectedIndex", "select", "dropdown", "alert"],
+          "code": "if (document.getElementById(\"section\").selectedIndex === 0) {\n  alert(\"Veuillez choisir une section dans la liste !\");\n  document.getElementById(\"section\").focus();\n  return false;\n}"
+        },
+        {
+          "title": "Contrôle de Sélection de Boutons Radio",
+          "language": "javascript",
+          "targetFile": "controle.js",
+          "keywords": ["radio", "checked", "genre", "alert"],
+          "code": "if (!document.getElementById(\"genreM\").checked && !document.getElementById(\"genreF\").checked) {\n  alert(\"Veuillez obligatoirement sélectionner votre genre !\");\n  return false;\n}"
+        }
+      ]
+    },
+    {
+      "id": "js-verif",
+      "title": "3. Fonction Canonique Complète verif()",
+      "description": "Patron officiel complet prêt pour l'épreuve pratique du Baccalauréat.",
+      "snippets": [
+        {
+          "title": "Patron complet controle.js",
+          "language": "javascript",
+          "targetFile": "controle.js",
+          "keywords": ["verif", "controle.js", "onsubmit", "formulaire"],
+          "code": "/**\n * Fichier : controle.js\n * Épreuve Pratique Bac STI - Contrôle de Saisie Officiel\n */\nfunction verif() {\n  let cin = document.getElementById(\"cin\").value.trim();\n  let nom = document.getElementById(\"nom\").value.trim();\n  let genreM = document.getElementById(\"genreM\");\n  let genreF = document.getElementById(\"genreF\");\n  let section = document.getElementById(\"section\");\n\n  // Règle 1 : CIN composé de 8 chiffres\n  if (cin.length !== 8 || isNaN(cin)) {\n    alert(\"Erreur : Le numéro de CIN doit comporter exactement 8 chiffres décimaux !\");\n    document.getElementById(\"cin\").focus();\n    return false;\n  }\n\n  // Règle 2 : Nom et prénom non vides\n  if (nom === \"\") {\n    alert(\"Erreur : Veuillez renseigner le nom et prénom !\");\n    document.getElementById(\"nom\").focus();\n    return false;\n  }\n\n  // Règle 3 : Genre sélectionné\n  if (!genreM.checked && !genreF.checked) {\n    alert(\"Erreur : Veuillez sélectionner le genre (Masculin / Féminin) !\");\n    return false;\n  }\n\n  // Règle 4 : Sélection effective dans la liste\n  if (section.selectedIndex === 0 || section.value === \"\") {\n    alert(\"Erreur : Veuillez sélectionner une section dans la liste !\");\n    section.focus();\n    return false;\n  }\n\n  // Toutes les conditions sont remplies : validation du formulaire\n  return true;\n}"
+        }
+      ]
+    }
+  ]
+}
