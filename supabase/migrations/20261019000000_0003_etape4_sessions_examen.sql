@@ -39,6 +39,10 @@ create index if not exists idx_passages_examen_eleve on public.passages_examen (
 create index if not exists idx_passages_examen_projet on public.passages_examen (projet_id);
 
 -- Activation RLS
+grant select, insert, update, delete on public.sessions_examen to authenticated;
+grant all on public.sessions_examen to service_role;
+grant select, insert, update on public.passages_examen to authenticated;
+grant all on public.passages_examen to service_role;
 alter table public.sessions_examen enable row level security;
 alter table public.passages_examen enable row level security;
 
@@ -130,6 +134,9 @@ begin
   if not found then
     raise exception 'Session d''examen introuvable';
   end if;
+  if not (public.est_enseignant_classe(_session.class_id) or public.has_role(auth.uid(),'admin')) then
+    raise exception 'Accès refusé';
+  end if;
 
   -- Calcul de l'échéance officielle serveur
   _echeance := _now + (_session.duree_min || ' minutes')::interval;
@@ -171,9 +178,9 @@ using (
   exists (
     select 1 from public.class_members cm
     where cm.class_id = sessions_examen.class_id
-    and cm.user_id = auth.uid()
+    and cm.eleve_id = auth.uid()
   )
-  or public.has_role('admin')
+  or public.has_role(auth.uid(),'admin')
 );
 
 create policy "sessions_examen_gestion_enseignants"
@@ -183,14 +190,14 @@ using (
   exists (
     select 1 from public.classes c
     where c.id = sessions_examen.class_id
-    and (c.enseignant_id = auth.uid() or public.has_role('admin'))
+    and (c.enseignant_id = auth.uid() or public.has_role(auth.uid(),'admin'))
   )
 )
 with check (
   exists (
     select 1 from public.classes c
     where c.id = sessions_examen.class_id
-    and (c.enseignant_id = auth.uid() or public.has_role('admin'))
+    and (c.enseignant_id = auth.uid() or public.has_role(auth.uid(),'admin'))
   )
 );
 
@@ -204,7 +211,7 @@ using (
     select 1 from public.sessions_examen se
     join public.classes c on c.id = se.class_id
     where se.id = passages_examen.session_id
-    and (c.enseignant_id = auth.uid() or public.has_role('admin'))
+    and (c.enseignant_id = auth.uid() or public.has_role(auth.uid(),'admin'))
   )
 );
 
@@ -217,6 +224,12 @@ using (
     select 1 from public.sessions_examen se
     join public.classes c on c.id = se.class_id
     where se.id = passages_examen.session_id
-    and (c.enseignant_id = auth.uid() or public.has_role('admin'))
+    and (c.enseignant_id = auth.uid() or public.has_role(auth.uid(),'admin'))
   )
 );
+
+create policy "passages_examen_inscription_eleve"
+on public.passages_examen for insert to authenticated
+with check (eleve_id = auth.uid() and exists (select 1 from public.sessions_examen se where se.id = session_id and public.est_membre_classe(se.class_id)));
+revoke execute on function public.lancer_coup_denvoi_examen(uuid) from public, anon;
+grant execute on function public.lancer_coup_denvoi_examen(uuid) to authenticated;

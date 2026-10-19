@@ -53,6 +53,10 @@ create index if not exists idx_notes_snapshot on public.notes (snapshot_id);
 create index if not exists idx_notes_corrige_par on public.notes (corrige_par);
 
 -- 3. Activation RLS
+grant select, insert on public.snapshots to authenticated;
+grant all on public.snapshots to service_role;
+grant select, insert, update on public.notes to authenticated;
+grant all on public.notes to service_role;
 alter table public.snapshots enable row level security;
 alter table public.notes enable row level security;
 
@@ -97,6 +101,9 @@ begin
 
   if not found then
     raise exception 'Passage d examen introuvable : %', p_passage_id;
+  end if;
+  if v_passage.eleve_id <> auth.uid() then
+    raise exception 'Accès refusé';
   end if;
 
   if v_passage.statut = 'rendu' and v_passage.snapshot_final_id is not null then
@@ -159,13 +166,7 @@ create policy "snapshots_lecture_enseignant"
 on public.snapshots for select
 to authenticated
 using (
-  exists (
-    select 1
-    from public.projets p
-    join public.classes c on p.classe_id = c.id
-    where p.id = snapshots.projet_id
-      and c.enseignant_id = auth.uid()
-  )
+  public.est_eleve_de_enseignant(snapshots.eleve_id)
   or exists (
     select 1
     from public.passages_examen pe
@@ -205,14 +206,7 @@ create policy "notes_gestion_enseignant"
 on public.notes for all
 to authenticated
 using (
-  exists (
-    select 1
-    from public.snapshots s
-    join public.projets p on s.projet_id = p.id
-    join public.classes c on p.classe_id = c.id
-    where s.id = notes.snapshot_id
-      and c.enseignant_id = auth.uid()
-  )
+  exists (select 1 from public.snapshots s where s.id = notes.snapshot_id and public.est_eleve_de_enseignant(s.eleve_id))
   or exists (
     select 1
     from public.passages_examen pe
@@ -223,14 +217,7 @@ using (
   )
 )
 with check (
-  exists (
-    select 1
-    from public.snapshots s
-    join public.projets p on s.projet_id = p.id
-    join public.classes c on p.classe_id = c.id
-    where s.id = notes.snapshot_id
-      and c.enseignant_id = auth.uid()
-  )
+  exists (select 1 from public.snapshots s where s.id = notes.snapshot_id and public.est_eleve_de_enseignant(s.eleve_id))
   or exists (
     select 1
     from public.passages_examen pe
@@ -240,3 +227,6 @@ with check (
       and c.enseignant_id = auth.uid()
   )
 );
+
+revoke execute on function public.sceller_snapshot_examen(uuid, text, jsonb, text) from public, anon;
+grant execute on function public.sceller_snapshot_examen(uuid, text, jsonb, text) to authenticated;
