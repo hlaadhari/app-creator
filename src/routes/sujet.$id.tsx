@@ -12,6 +12,7 @@ import type { EvaluationSummary } from "@/lib/evaluation/probe-runner";
 import { SproutLogo } from "@/components/SproutLogo";
 import { AuthModal } from "@/components/AuthModal";
 import { enregistrerTentative } from "@/lib/supabase/projets";
+import { enregistrerNouvelleTentative } from "@/lib/pedagogy/attempts-service";
 import { MonacoEditorPane } from "@/components/workspace/MonacoEditorPane";
 import { WorkspaceFileTree } from "@/components/workspace/WorkspaceFileTree";
 import { PreviewSandbox } from "@/components/workspace/PreviewSandbox";
@@ -163,6 +164,22 @@ function Workspace() {
           pointsTotal: sc.total,
           note20: sc.note20,
           details: Object.fromEntries(r.map((c) => [c.id, { ok: c.ok, label: c.label }])),
+        });
+
+        enregistrerNouvelleTentative({
+          sujetId: id,
+          note20: sc.note20,
+          pointsObtenus: sc.got,
+          pointsTotal: sc.total,
+          dureeMs: duration,
+          criteres: r.map((c) => ({
+            id: c.id,
+            label: c.label,
+            ok: c.ok,
+            points: c.ok ? c.points : 0,
+            maxPoints: c.points,
+            message: c.message,
+          })),
         });
       } catch (err) {
         console.error("Erreur lors de l'évaluation formative :", err);
@@ -403,6 +420,9 @@ function Workspace() {
                 summary={evaluationSummary}
                 onVerify={handleVerify}
                 verifying={verifying}
+                sujetId={id}
+                sujetTitle={ex.title}
+                examMode={ex.examMode}
               />
             )}
           </div>

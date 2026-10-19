@@ -555,12 +555,135 @@ export type Database = {
           },
         ];
       };
+      contestations: {
+        Row: {
+          created_at: string;
+          critere_id: string;
+          eleve_id: string;
+          id: string;
+          motif_rejet: string | null;
+          projet_id: string | null;
+          statut: "en_attente" | "acceptee" | "rejetee";
+          sujet_version_id: string | null;
+          texte: string;
+          traitee_le: string | null;
+          traitee_par: string | null;
+        };
+        Insert: {
+          created_at?: string;
+          critere_id: string;
+          eleve_id: string;
+          id?: string;
+          motif_rejet?: string | null;
+          projet_id?: string | null;
+          statut?: "en_attente" | "acceptee" | "rejetee";
+          sujet_version_id?: string | null;
+          texte: string;
+          traitee_le?: string | null;
+          traitee_par?: string | null;
+        };
+        Update: {
+          created_at?: string;
+          critere_id?: string;
+          eleve_id?: string;
+          id?: string;
+          motif_rejet?: string | null;
+          projet_id?: string | null;
+          statut?: "en_attente" | "acceptee" | "rejetee";
+          sujet_version_id?: string | null;
+          texte?: string;
+          traitee_le?: string | null;
+          traitee_par?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "contestations_critere_id_fkey";
+            columns: ["critere_id"];
+            isOneToOne: false;
+            referencedRelation: "criteres";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "contestations_eleve_id_fkey";
+            columns: ["eleve_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "contestations_projet_id_fkey";
+            columns: ["projet_id"];
+            isOneToOne: false;
+            referencedRelation: "projets";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      journal_acces_solutions: {
+        Row: {
+          date: string;
+          id: string;
+          motif: string;
+          user_id: string;
+          version_id: string;
+        };
+        Insert: {
+          date?: string;
+          id?: string;
+          motif?: string;
+          user_id: string;
+          version_id: string;
+        };
+        Update: {
+          date?: string;
+          id?: string;
+          motif?: string;
+          user_id?: string;
+          version_id?: string;
+        };
+        Relationships: [];
+      };
+      journal_securite: {
+        Row: {
+          acteur_id: string | null;
+          date: string;
+          id: string;
+          meta: Json;
+          type: string;
+        };
+        Insert: {
+          acteur_id?: string | null;
+          date?: string;
+          id?: string;
+          meta?: Json;
+          type: string;
+        };
+        Update: {
+          acteur_id?: string | null;
+          date?: string;
+          id?: string;
+          meta?: Json;
+          type?: string;
+        };
+        Relationships: [];
+      };
     };
     Views: {
       [_ in never]: never;
     };
     Functions: {
       debloquer_indice: { Args: { _version_id: string }; Returns: string };
+      debloquer_solution: {
+        Args: {
+          p_version_id: string;
+          p_motif?: string;
+        };
+        Returns: {
+          chemin: string;
+          contenu: string;
+          id: string;
+        }[];
+      };
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"];
