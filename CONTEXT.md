@@ -199,15 +199,16 @@ L'intégralité des 14 tests négatifs obligatoires définis dans [`docs/SECURIT
 
 | Domaine / Composant | État Réel d'Implémentation | Couverture & Validation |
 |---|---|---|
-| **Base de Données & RLS** | 26 tables relationnelles, 6 migrations SQL (`0000` à `0005`) complètes, RLS sur toutes les tables, triggers immuabilité et anti-triche. | Conforme PRD v3.1, déployable sur Supabase. |
+| **Base de Données & RLS** | 26 tables relationnelles, 7 migrations SQL (`0000` à `0006`) complètes, RLS sur toutes les tables, triggers immuabilité et anti-triche. | Conforme PRD v3.1, déployable sur Supabase. |
 | **Éditeur de Code** | Monaco Editor intégré, coloration syntaxique multi-langages, arborescence VS Code normalisée `Travail_Eleve/SW_<NCIN>`. | Validé sous toutes résolutions (≥ 1024px). |
 | **Runtimes & Moteurs** | PHP 8.2 WASM avec watchdog 3s, SQLite Engine avec visualiseur interactif de tables, contrôleur de dialecte MySQL/MariaDB. | Tests de faisabilité et d'isolation au vert. |
 | **Pédagogie & Résilience Élève (Jalon M5)** | Interface de contestation élève (`ContestationModal`), historique des tentatives avec deltas didactiques (`AttemptsTimelineDrawer`), déblocage tracé des corrigés (`ReferenceSolutionModal`) et garde-fou strict T-04/T-06 en examen. | 14 tests dédiés validés, neutralisation et recalcul de classe en direct. |
+| **Compétences & Progression (Jalon M7)** | Référentiel officiel de 25 compétences Bac STI, calcul déterministe de maîtrise v1.0, 8 badges pédagogiques, radar 5 axes et modale interactive `ProgressionModal`. | 20 tests dédiés validés, points forts et axes prioritaires calculés automatiquement. |
 | **Mode Examen** | Salle d'attente Realtime, coup d'envoi simultané, tiers-temps (1.33x), minuteur asservi à l'horloge serveur, coupure des aides. | Verrouillage T-06 et transitions T-07 validés. |
 | **Snapshots & Rejouage** | Scellement cryptographique SHA-256 canonique, trigger T-08, rejouage de référence reproductible, grille sur 20 points avec motivation obligatoire. | Rejouabilité déterministe certifiée (100%). |
 | **Catalogue de Contenu** | 7 sujets complets intégrés : Modules A (Formatifs HTML/CSS, JS CIN, SQL LDD), B (TP Full-Stack Don, TP Météo Bac 2021) et C (Annales Bac 2023, Bac 2018). | Solutions valides et critères testés. |
 | **Espaces Dédiés** | Espace Élève (`/`, `/sujet/$id`), Espace Enseignant (`/enseignant` avec gestionnaire de classes, invitations et contestations), Espace Admin (`/admin`). | Routes typées TanStack Router, Mode Démo interactif. |
-| **Suite de Tests CI** | **227 tests automatisés** au vert across 19 fichiers de test (`vitest run`). Typage strict TypeScript (`tsc --noEmit`) à 0 erreur. | CI GitHub Actions 100% verte sur `main`. |
+| **Suite de Tests CI** | **247 tests automatisés** au vert across 20 fichiers de test (`vitest run`). Typage strict TypeScript (`tsc --noEmit`) à 0 erreur. | CI GitHub Actions 100% verte sur `main`. |
 | **Build & Déploiement** | Build de production réussi (Client Vite + SSR Nitro / Cloudflare & Vercel Edge). | Déployable en production. |
 
 ---

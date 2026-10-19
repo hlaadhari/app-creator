@@ -9,7 +9,8 @@ import { getMesClasses, type ClassInfo } from "@/lib/supabase/classes";
 import { getAllBuffers } from "@/lib/storage/indexeddb";
 import { useAuth } from "@/lib/supabase/auth";
 import { Button } from "@/components/ui/button";
-import { HelpCircle, GraduationCap, Users, Clock, Award, ShieldAlert, Shield } from "lucide-react";
+import { ProgressionModal } from "@/components/competences/ProgressionModal";
+import { HelpCircle, GraduationCap, Users, Clock, Award, ShieldAlert, Shield, TrendingUp } from "lucide-react";
 
 export const Route = createFileRoute("/")({
   loader: async () => {
@@ -150,6 +151,8 @@ function Index() {
             </Link>
           )}
 
+          <ProgressionModal />
+
           {user && <JoinClassModal onClassJoined={loadData} />}
 
           <AuthModal />
@@ -171,21 +174,34 @@ function Index() {
             </p>
           </div>
 
-          {!user && (
-            <div className="shrink-0">
+          <div className="shrink-0 flex items-center flex-wrap gap-2.5">
+            <ProgressionModal
+              triggerButton={
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="gap-2 text-xs border-primary/40 text-primary hover:bg-primary/10 font-medium cursor-pointer"
+                >
+                  <TrendingUp className="h-4 w-4" />
+                  <span>Bilan Compétences</span>
+                </Button>
+              }
+            />
+
+            {!user && (
               <JoinClassModal
                 triggerButton={
                   <Button
                     size="sm"
-                    className="gap-2 text-xs bg-primary text-primary-foreground font-medium"
+                    className="gap-2 text-xs bg-primary text-primary-foreground font-medium cursor-pointer"
                   >
                     <Users className="h-4 w-4" />
                     <span>Rejoindre ma classe</span>
                   </Button>
                 }
               />
-            </div>
-          )}
+            )}
+          </div>
         </div>
 
         {/* Bloc classes actives pour l'élève connecté */}

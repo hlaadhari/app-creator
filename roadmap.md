@@ -99,7 +99,13 @@
 ---
 
 ### Jalon M7 & M8 — Phase 5 & Version 1.0
-- [ ] [Issue #33](https://github.com/hlaadhari/app-creator/issues/33) : Référentiel de compétences du Bac STI et matrice de maîtrise.
+- [x] [Issue #33](https://github.com/hlaadhari/app-creator/issues/33) : Référentiel de compétences du Bac STI, calcul de maîtrise et progression élève.
+  - [x] Migration SQL Domaine 6 (`competences`, `critere_competences`, `maitrise`, `badges_definition`, `badges`, RLS complètes T-01/T-02).
+  - [x] Référentiel officiel des 25 compétences Bac STI couvrant HTML, CSS, JavaScript, PHP, SQL et Algorithmique/Architecture.
+  - [x] Moteur déterministe de calcul de maîtrise v1.0 avec taux de succès brut, bonus de premier essai (+0.15), régularité et pondération de récence.
+  - [x] Identification didactique des points forts (score >= 75%) et des axes prioritaires de révision (< 50%).
+  - [x] Système de badges pédagogiques (8 distinctions) avec attribution automatique au fil des tentatives.
+  - [x] Visualisation interactive élève : graphique radar 5 axes, barres de progression avec seuils didactiques et modale complète `ProgressionModal`.
 - [ ] [Issue #34](https://github.com/hlaadhari/app-creator/issues/34) : Tableau de bord statistique de classe et détection des décrochages.
 - [ ] [Issue #35](https://github.com/hlaadhari/app-creator/issues/35) : Tuteur IA pédagogique (sans révélation de la solution, coupé en examen).
 - [ ] [Issue #36](https://github.com/hlaadhari/app-creator/issues/36) : Détection indicative de similarité entre rendus de classe (anti-plagiat).
