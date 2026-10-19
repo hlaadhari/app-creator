@@ -76,3 +76,176 @@
     font-family: var(--font-sans);
   }
 }
+
+/* ==========================================================================
+   Styles Mémento & Support de Cours Officiel Bac STI
+   ========================================================================== */
+.course-viewer {
+  font-family: var(--font-sans);
+  line-height: 1.65;
+}
+
+.course-module .course-header {
+  margin-bottom: 2rem;
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.course-module .module-badge {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.2rem 0.5rem;
+  border-radius: var(--radius-sm);
+  background-color: color-mix(in oklch, var(--color-primary) 15%, transparent);
+  color: var(--color-primary);
+  border: 1px solid color-mix(in oklch, var(--color-primary) 30%, transparent);
+  margin-bottom: 0.5rem;
+}
+
+.course-module .course-header h1 {
+  font-size: 1.75rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin-top: 0.25rem;
+  margin-bottom: 0.5rem;
+}
+
+.course-module .module-desc {
+  font-size: 0.95rem;
+  color: var(--color-muted-foreground);
+  max-width: 48rem;
+}
+
+.course-section {
+  margin-top: 2.5rem;
+  padding-top: 1.25rem;
+  border-top: 1px dashed color-mix(in oklch, var(--color-border) 60%, transparent);
+}
+
+.course-section:first-of-type {
+  border-top: none;
+  margin-top: 1rem;
+}
+
+.course-section h2 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--color-foreground);
+  margin-bottom: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.course-section h3 {
+  font-size: 1.05rem;
+  font-weight: 600;
+  margin-top: 1.25rem;
+  margin-bottom: 0.5rem;
+}
+
+.course-section p {
+  font-size: 0.9rem;
+  color: var(--color-foreground);
+  margin-bottom: 1rem;
+}
+
+.course-section code {
+  font-family: var(--font-mono);
+  font-size: 0.85em;
+  background-color: var(--color-muted);
+  color: var(--color-primary);
+  padding: 0.15em 0.35em;
+  border-radius: var(--radius-sm);
+  border: 1px solid color-mix(in oklch, var(--color-border) 50%, transparent);
+}
+
+/* Blocs de code & Cartes interactives */
+.code-card {
+  margin: 1.25rem 0;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  background-color: var(--color-editor);
+  overflow: hidden;
+  box-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -2px rgba(0, 0, 0, 0.1);
+}
+
+.code-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.4rem 0.75rem;
+  background-color: color-mix(in oklch, var(--color-panel) 80%, black);
+  border-bottom: 1px solid var(--color-border);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--color-muted-foreground);
+}
+
+.code-card pre {
+  margin: 0;
+  padding: 1rem;
+  overflow-x: auto;
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  line-height: 1.6;
+  color: oklch(0.92 0.02 145);
+  tab-size: 2;
+}
+
+.code-card pre code {
+  background: transparent;
+  padding: 0;
+  border: none;
+  color: inherit;
+  font-size: inherit;
+}
+
+/* Tableaux pédagogiques */
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  margin: 1.25rem 0;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background-color: var(--color-panel);
+}
+
+.course-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+  text-align: left;
+}
+
+.course-table th {
+  background-color: color-mix(in oklch, var(--color-card) 70%, transparent);
+  padding: 0.65rem 0.85rem;
+  font-family: var(--font-mono);
+  font-weight: 600;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid var(--color-border);
+  color: var(--color-foreground);
+}
+
+.course-table td {
+  padding: 0.65rem 0.85rem;
+  border-bottom: 1px solid color-mix(in oklch, var(--color-border) 40%, transparent);
+  vertical-align: middle;
+}
+
+.course-table tr:last-child td {
+  border-bottom: none;
+}
+
+.course-table tr:hover td {
+  background-color: color-mix(in oklch, var(--color-muted) 30%, transparent);
+}

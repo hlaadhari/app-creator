@@ -1,0 +1,390 @@
+<article class="course-module" data-module="html5">
+  <header class="course-header">
+    <div class="course-badge">Module 1 • Standard Bac STI</div>
+    <h1>HTML5 & Structuration Web Sémantique</h1>
+    <p class="course-intro">
+      Le langage HTML5 (HyperText Markup Language 5) constitue le squelette de toute application
+      web. Au Baccalauréat STI, il permet de structurer rigoureusement les pages, les médias et les
+      formulaires interactifs d'acquisition de données.
+    </p>
+  </header>
+
+  <nav class="course-toc">
+    <h3>Sommaire du Chapitre</h3>
+    <ul>
+      <li><a href="#structure-base">1. Squelette et Métadonnées d'une Page HTML5</a></li>
+      <li><a href="#balises-semantiques">2. Balises Sémantiques de Sectionnement</a></li>
+      <li><a href="#contenu-media">3. Éléments de Contenu, Liens et Médias</a></li>
+      <li><a href="#tableaux">4. Tableaux de Données Structurés</a></li>
+      <li><a href="#formulaires">5. Formulaires Interactifs et Contrôles de Saisie</a></li>
+      <li><a href="#cadres-conteneurs">6. Conteneurs Génériques et Cadres (iframe)</a></li>
+      <li><a href="#evenements-html">7. Attributs d'Événements HTML</a></li>
+    </ul>
+  </nav>
+
+  <!-- 1. Structure de base -->
+  <section id="structure-base" class="course-section">
+    <h2>1. Squelette et Métadonnées d'une Page HTML5</h2>
+    <p>
+      Tout document HTML5 débute obligatoirement par la déclaration du doctype
+      <code>&lt;!DOCTYPE html&gt;</code> suivi de la balise racine <code>&lt;html&gt;</code>.
+      L'en-tête <code>&lt;head&gt;</code> héberge les métadonnées indispensables au navigateur.
+    </p>
+
+    <div class="code-example">
+      <div class="code-header">
+        <span class="code-lang">HTML5</span>
+        <span class="code-desc">Structure canonique d'une page Bac STI</span>
+      </div>
+      <pre><code class="language-html">&lt;!DOCTYPE html&gt;
+&lt;html lang="fr"&gt;
+&lt;head&gt;
+  &lt;meta charset="utf-8"&gt;
+  &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+  &lt;title&gt;Gestion des Candidats – Bac STI&lt;/title&gt;
+  &lt;!-- Liaison vers la feuille de style externe --&gt;
+  &lt;link rel="stylesheet" href="mesStyles.css"&gt;
+  &lt;!-- Liaison vers le script de validation client --&gt;
+  &lt;script src="controle.js" defer&gt;&lt;/script&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;h1&gt;Bienvenue sur le portail d'inscription&lt;/h1&gt;
+  &lt;p&gt;Ce portail permet aux élèves de s'inscrire aux épreuves pratiques.&lt;/p&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+    </div>
+  </section>
+
+  <!-- 2. Balises Sémantiques -->
+  <section id="balises-semantiques" class="course-section">
+    <h2>2. Balises Sémantiques de Sectionnement</h2>
+    <p>
+      HTML5 introduit des balises spécifiques décrivant le rôle fonctionnel de chaque zone du
+      document au lieu d'utiliser exclusivement des balises <code>&lt;div&gt;</code> neutres.
+    </p>
+
+    <div class="table-responsive">
+      <table class="course-table">
+        <thead>
+          <tr>
+            <th>Balise</th>
+            <th>Rôle Sémantique</th>
+            <th>Emplacement Typique</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>&lt;header&gt;</code></td>
+            <td>En-tête de page ou de section (titres, logos, devise).</td>
+            <td>Haut de page ou début d'un <code>&lt;article&gt;</code>.</td>
+          </tr>
+          <tr>
+            <td><code>&lt;nav&gt;</code></td>
+            <td>Zone de navigation regroupant les liens principaux.</td>
+            <td>Menu horizontal ou barre latérale.</td>
+          </tr>
+          <tr>
+            <td><code>&lt;main&gt;</code></td>
+            <td>Cœur du contenu principal, unique par document.</td>
+            <td>Corps central de la page.</td>
+          </tr>
+          <tr>
+            <td><code>&lt;section&gt;</code></td>
+            <td>Section thématique avec un en-tête dédié.</td>
+            <td>Chapitres, catégories de services.</td>
+          </tr>
+          <tr>
+            <td><code>&lt;article&gt;</code></td>
+            <td>Contenu autonome et réutilisable (actualité, fiche).</td>
+            <td>Fiche candidat, article de blog.</td>
+          </tr>
+          <tr>
+            <td><code>&lt;aside&gt;</code></td>
+            <td>Contenu secondaire ou complémentaire au sujet principal.</td>
+            <td>Barre latérale, encadré d'astuces.</td>
+          </tr>
+          <tr>
+            <td><code>&lt;footer&gt;</code></td>
+            <td>Pied de page (mentions légales, date, copyright).</td>
+            <td>Bas de page ou de section.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="code-example">
+      <div class="code-header">
+        <span class="code-lang">HTML5</span>
+        <span class="code-desc">Organisation sémantique globale</span>
+      </div>
+      <pre><code class="language-html">&lt;header&gt;
+  &lt;h1&gt;Lycée Technique Pilote&lt;/h1&gt;
+  &lt;nav&gt;
+    &lt;ul&gt;
+      &lt;li&gt;&lt;a href="index.html"&gt;Accueil&lt;/a&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;a href="inscription.html"&gt;Inscription&lt;/a&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;a href="resultats.php"&gt;Résultats&lt;/a&gt;&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/nav&gt;
+&lt;/header&gt;
+
+&lt;main&gt;
+  &lt;section id="presentation"&gt;
+    &lt;h2&gt;Épreuve Pratique de Web (Bac STI)&lt;/h2&gt;
+    &lt;article class="fiche-sujet"&gt;
+      &lt;h3&gt;Sujet : Gestion d'un Club Robotique&lt;/h3&gt;
+      &lt;p&gt;Concevoir l'interface HTML/CSS et le script PHP d'enregistrement.&lt;/p&gt;
+    &lt;/article&gt;
+  &lt;/section&gt;
+
+  &lt;aside&gt;
+    &lt;h3&gt;Rappel Consignes&lt;/h3&gt;
+    &lt;p&gt;Durée : 1h30. Enregistrez vos fichiers dans &lt;mark&gt;Travail_Eleve&lt;/mark&gt;.&lt;/p&gt;
+  &lt;/aside&gt;
+&lt;/main&gt;
+
+&lt;footer&gt;
+  &lt;p&gt;&amp;copy; 2026 – Ministère de l'Éducation Nationale – Section STI&lt;/p&gt;
+&lt;/footer&gt;</code></pre>
+    </div>
+  </section>
+
+  <!-- 3. Contenu et Médias -->
+  <section id="contenu-media" class="course-section">
+    <h2>3. Éléments de Contenu, Liens et Médias</h2>
+    <p>
+      HTML5 gère nativement le multimédia (audio, vidéo) sans nécessiter de greffon externe, ainsi
+      que la hiérarchie textuelle.
+    </p>
+
+    <div class="code-example">
+      <div class="code-header">
+        <span class="code-lang">HTML5</span>
+        <span class="code-desc">Images, Médias et Hyperliens</span>
+      </div>
+      <pre><code class="language-html">&lt;!-- Liens hypertextes absolus et relatifs --&gt;
+&lt;p&gt;
+  Consultez le &lt;a href="https://bac.edunet.tn" target="_blank"&gt;site officiel Edunet&lt;/a&gt;
+  ou téléchargez le &lt;a href="docs/enonce.pdf" download&gt;sujet officiel (PDF)&lt;/a&gt;.
+&lt;/p&gt;
+
+&lt;!-- Figure avec légende explicative --&gt;
+&lt;figure&gt;
+  &lt;img src="images/carte-arduino.jpg" alt="Schéma de câblage Arduino STI" width="400"&gt;
+  &lt;figcaption&gt;Fig 1. Câblage des capteurs ultrasoniques.&lt;/figcaption&gt;
+&lt;/figure&gt;
+
+&lt;!-- Lecteur Audio HTML5 --&gt;
+&lt;audio controls preload="metadata"&gt;
+  &lt;source src="audio/consignes.mp3" type="audio/mpeg"&gt;
+  &lt;source src="audio/consignes.ogg" type="audio/ogg"&gt;
+  Votre navigateur ne supporte pas l'élément audio HTML5.
+&lt;/audio&gt;
+
+&lt;!-- Lecteur Vidéo HTML5 avec poster d'aperçu --&gt;
+&lt;video controls width="480" poster="images/miniature.jpg"&gt;
+  &lt;source src="videos/demonstration.mp4" type="video/mp4"&gt;
+  &lt;source src="videos/demonstration.webm" type="video/webm"&gt;
+  Format vidéo non supporté.
+&lt;/video&gt;
+
+&lt;!-- Balises de détails pliables --&gt;
+&lt;details&gt;
+  &lt;summary&gt;Cliquez ici pour afficher le barème officiel&lt;/summary&gt;
+  &lt;p&gt;Validation HTML : 4 pts | Mise en forme CSS : 4 pts | Contrôle JS : 6 pts | PHP/SQL : 6 pts.&lt;/p&gt;
+&lt;/details&gt;</code></pre>
+    </div>
+  </section>
+
+  <!-- 4. Tableaux -->
+  <section id="tableaux" class="course-section">
+    <h2>4. Tableaux de Données Structurés</h2>
+    <p>
+      Un tableau de données comporte un titre facultatif <code>&lt;caption&gt;</code>, des lignes
+      <code>&lt;tr&gt;</code>, des cellules d'en-tête <code>&lt;th&gt;</code> et des cellules de
+      données <code>&lt;td&gt;</code>.
+    </p>
+
+    <div class="code-example">
+      <div class="code-header">
+        <span class="code-lang">HTML5</span>
+        <span class="code-desc">Tableau avec bordures et cellules fusionnées</span>
+      </div>
+      <pre><code class="language-html">&lt;table border="1" cellpadding="6" cellspacing="0"&gt;
+  &lt;caption&gt;&lt;strong&gt;Liste des Candidats Admis aux Épreuves Pratiques&lt;/strong&gt;&lt;/caption&gt;
+  &lt;thead&gt;
+    &lt;tr&gt;
+      &lt;th&gt;Numéro CIN&lt;/th&gt;
+      &lt;th&gt;Nom &amp; Prénom&lt;/th&gt;
+      &lt;th&gt;Section&lt;/th&gt;
+      &lt;th&gt;Moyenne&lt;/th&gt;
+    &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;td&gt;08123456&lt;/td&gt;
+      &lt;td&gt;Ben Salah Mohamed&lt;/td&gt;
+      &lt;td&gt;Informatique&lt;/td&gt;
+      &lt;td align="right"&gt;16.75&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;09876543&lt;/td&gt;
+      &lt;td&gt;Trabelsi Mariem&lt;/td&gt;
+      &lt;td&gt;Informatique&lt;/td&gt;
+      &lt;td align="right"&gt;18.25&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+  &lt;tfoot&gt;
+    &lt;tr&gt;
+      &lt;td colspan="3"&gt;&lt;strong&gt;Moyenne Générale du Groupe&lt;/strong&gt;&lt;/td&gt;
+      &lt;td align="right"&gt;&lt;strong&gt;17.50&lt;/strong&gt;&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tfoot&gt;
+&lt;/table&gt;</code></pre>
+    </div>
+  </section>
+
+  <!-- 5. Formulaires Interactifs -->
+  <section id="formulaires" class="course-section">
+    <h2>5. Formulaires Interactifs et Contrôles de Saisie</h2>
+    <p>
+      La conception de formulaires interactifs est un volet capital de l'épreuve du Bac STI.
+      L'événement <code>onsubmit="return verif()"</code> permet d'intercepter l'envoi pour
+      validation JavaScript avant transmission à la page serveur PHP.
+    </p>
+
+    <div class="code-example">
+      <div class="code-header">
+        <span class="code-lang">HTML5</span>
+        <span class="code-desc">Formulaire d'inscription type Bac STI</span>
+      </div>
+      <pre><code class="language-html">&lt;form id="formCandidat" name="f" action="enregistrer.php" method="post" onsubmit="return verif();"&gt;
+  &lt;fieldset&gt;
+    &lt;legend&gt;Informations Personnelles du Candidat&lt;/legend&gt;
+
+    &lt;!-- Champ texte classique avec identifiant et libellé lié --&gt;
+    &lt;p&gt;
+      &lt;label for="cin"&gt;Numéro CIN (8 chiffres) :&lt;/label&gt;
+      &lt;input type="text" id="cin" name="cin" maxlength="8" placeholder="Ex: 08123456" required&gt;
+    &lt;/p&gt;
+
+    &lt;p&gt;
+      &lt;label for="nom"&gt;Nom complet :&lt;/label&gt;
+      &lt;input type="text" id="nom" name="nom" required&gt;
+    &lt;/p&gt;
+
+    &lt;p&gt;
+      &lt;label for="mdp"&gt;Mot de passe :&lt;/label&gt;
+      &lt;input type="password" id="mdp" name="mdp" minlength="6"&gt;
+    &lt;/p&gt;
+
+    &lt;p&gt;
+      &lt;label for="email"&gt;Adresse courriel :&lt;/label&gt;
+      &lt;input type="email" id="email" name="email"&gt;
+    &lt;/p&gt;
+
+    &lt;p&gt;
+      &lt;label for="dateNaiss"&gt;Date de naissance :&lt;/label&gt;
+      &lt;input type="date" id="dateNaiss" name="dateNaiss"&gt;
+    &lt;/p&gt;
+
+    &lt;!-- Boutons Radio avec même attribut 'name' pour exclusivité --&gt;
+    &lt;p&gt;
+      &lt;span&gt;Genre :&lt;/span&gt;
+      &lt;input type="radio" id="genreM" name="genre" value="M" checked&gt;
+      &lt;label for="genreM"&gt;Masculin&lt;/label&gt;
+      &lt;input type="radio" id="genreF" name="genre" value="F"&gt;
+      &lt;label for="genreF"&gt;Féminin&lt;/label&gt;
+    &lt;/p&gt;
+
+    &lt;!-- Cases à cocher (choix multiple) --&gt;
+    &lt;p&gt;
+      &lt;span&gt;Options choisies :&lt;/span&gt;
+      &lt;input type="checkbox" id="optWeb" name="options[]" value="WEB"&gt;
+      &lt;label for="optWeb"&gt;Développement Web&lt;/label&gt;
+      &lt;input type="checkbox" id="optRob" name="options[]" value="ROB"&gt;
+      &lt;label for="optRob"&gt;Robotique&lt;/label&gt;
+    &lt;/p&gt;
+
+    &lt;!-- Liste déroulante --&gt;
+    &lt;p&gt;
+      &lt;label for="gouvernorat"&gt;Gouvernorat :&lt;/label&gt;
+      &lt;select id="gouvernorat" name="gouvernorat"&gt;
+        &lt;option value=""&gt;-- Sélectionner votre ville --&lt;/option&gt;
+        &lt;option value="Tunis"&gt;Tunis&lt;/option&gt;
+        &lt;option value="Ariana"&gt;Ariana&lt;/option&gt;
+        &lt;option value="Sousse"&gt;Sousse&lt;/option&gt;
+        &lt;option value="Sfax"&gt;Sfax&lt;/option&gt;
+      &lt;/select&gt;
+    &lt;/p&gt;
+
+    &lt;!-- Zone de texte multilignes --&gt;
+    &lt;p&gt;
+      &lt;label for="remarques"&gt;Observations :&lt;/label&gt;&lt;br&gt;
+      &lt;textarea id="remarques" name="remarques" rows="3" cols="40" placeholder="Notes complémentaires..."&gt;&lt;/textarea&gt;
+    &lt;/p&gt;
+
+    &lt;!-- Boutons d'action : soumission et réinitialisation --&gt;
+    &lt;p&gt;
+      &lt;input type="submit" id="btnSubmit" value="Valider l'Inscription"&gt;
+      &lt;input type="reset" id="btnReset" value="Effacer les champs"&gt;
+    &lt;/p&gt;
+  &lt;/fieldset&gt;
+&lt;/form&gt;</code></pre>
+    </div>
+  </section>
+
+  <!-- 6. Cadres et Conteneurs -->
+  <section id="cadres-conteneurs" class="course-section">
+    <h2>6. Conteneurs Génériques et Cadres (iframe)</h2>
+    <p>
+      Les balises <code>&lt;div&gt;</code> (bloc) et <code>&lt;span&gt;</code> (en ligne) permettent
+      de regrouper des éléments pour leur appliquer un style CSS spécifique. La balise
+      <code>&lt;iframe&gt;</code> permet d'intégrer un document externe.
+    </p>
+
+    <div class="code-example">
+      <div class="code-header">
+        <span class="code-lang">HTML5</span>
+        <span class="code-desc">Intégration d'un sous-document via iframe</span>
+      </div>
+      <pre><code class="language-html">&lt;div class="conteneur-central"&gt;
+  &lt;p&gt;
+    Consultez le résultat de l'exécution dans le cadre &lt;span class="badge"&gt;Aperçu&lt;/span&gt; ci-dessous :
+  &lt;/p&gt;
+  &lt;iframe src="resultat.html" name="zoneApercu" width="100%" height="250" frameborder="0"&gt;
+    Votre navigateur ne prend pas en charge les iframes.
+  &lt;/iframe&gt;
+&lt;/div&gt;</code></pre>
+    </div>
+  </section>
+
+  <!-- 7. Événements HTML -->
+  <section id="evenements-html" class="course-section">
+    <h2>7. Attributs d'Événements HTML</h2>
+    <p>
+      Les attributs d'événements déclenchent des fonctions JavaScript au comportement de
+      l'utilisateur :
+    </p>
+    <ul>
+      <li>
+        <code>onload</code> : Déclenché lorsque la page ou l'image a terminé son chargement complet.
+      </li>
+      <li>
+        <code>onsubmit</code> : Exécuté lors du clic sur le bouton d'envoi du formulaire. Retourner
+        <code>false</code> bloque l'expédition.
+      </li>
+      <li><code>onclick</code> : Déclenché lors du clic sur un bouton, un lien ou une image.</li>
+      <li><code>onfocus</code> : Quand le champ obtient le focus de saisie (curseur présent).</li>
+      <li><code>onblur</code> : Quand le champ perd le focus (sortie du champ).</li>
+      <li>
+        <code>oninput</code> / <code>onchange</code> : Lors de la modification de la valeur d'un
+        contrôle de saisie.
+      </li>
+      <li>
+        <code>onmouseover</code> / <code>onmouseout</code> : Lorsque le pointeur de la souris
+        survole ou quitte un élément.
+      </li>
+    </ul>
+  </section>
+</article>

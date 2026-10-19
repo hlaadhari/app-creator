@@ -1,0 +1,271 @@
+<section id="module-sql" class="course-module">
+  <header class="course-header">
+    <span class="module-badge">Module 5</span>
+    <h1>Bases de Données Relationnelles & Langage SQL</h1>
+    <p class="module-desc">
+      Définition de structures (LDD), contraintes d'intégrité référentielle, manipulation de données
+      (LMD), requêtes de consultation complexes (LID) et fonctions d'agrégation.
+    </p>
+  </header>
+
+  <!-- 1. Types de Données -->
+  <article id="sql-types" class="course-section">
+    <h2>1. Types de Données SGBD (MySQL)</h2>
+    <p>
+      Le choix judicieux du type de données garantit l'intégrité et la performance de la base de
+      données relationnelle :
+    </p>
+
+    <div class="table-responsive">
+      <table class="course-table">
+        <thead>
+          <tr>
+            <th>Type SQL</th>
+            <th>Description & Format</th>
+            <th>Exemple d'Usage Bac STI</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>INT</code> / <code>INTEGER</code></td>
+            <td>Entier relatif 32 bits (-2^31 à +2^31 - 1).</td>
+            <td>
+              Identifiant auto-incrémenté <code>id INT AUTO_INCREMENT</code>, nombre de places.
+            </td>
+          </tr>
+          <tr>
+            <td><code>DECIMAL(M, D)</code></td>
+            <td>Nombre décimal exact (M chiffres au total, D après la virgule).</td>
+            <td>
+              Moyenne <code>DECIMAL(4,2)</code> (ex: 15.75), Prix <code>DECIMAL(6,3)</code> (DT).
+            </td>
+          </tr>
+          <tr>
+            <td><code>CHAR(N)</code></td>
+            <td>Chaîne de caractères à longueur fixe de N caractères.</td>
+            <td>
+              Numéro de CIN <code>CHAR(8)</code>, Code pays <code>CHAR(2)</code>, Genre
+              <code>CHAR(1)</code>.
+            </td>
+          </tr>
+          <tr>
+            <td><code>VARCHAR(N)</code></td>
+            <td>Chaîne de caractères à longueur variable jusqu'à N caractères.</td>
+            <td>
+              Nom <code>VARCHAR(30)</code>, Email <code>VARCHAR(50)</code>, Adresse
+              <code>VARCHAR(100)</code>.
+            </td>
+          </tr>
+          <tr>
+            <td><code>DATE</code></td>
+            <td>Date calendaire au format officiel <code>'AAAA-MM-JJ'</code>.</td>
+            <td>Date de naissance <code>date_naiss DATE</code>, Date inscription.</td>
+          </tr>
+          <tr>
+            <td><code>TIME</code></td>
+            <td>Heure au format <code>'HH:MM:SS'</code>.</td>
+            <td>Heure de début d'épreuve <code>heure_deb TIME</code>.</td>
+          </tr>
+          <tr>
+            <td><code>TEXT</code></td>
+            <td>Chaîne longue pour du texte libre non indexé.</td>
+            <td>Remarques ou observations du correcteur.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </article>
+
+  <!-- 2. Contraintes d'Intégrité -->
+  <article id="sql-contraintes" class="course-section">
+    <h2>2. Contraintes d'Intégrité</h2>
+    <p>Les règles assurant la cohérence sémantique des données au sein de la base :</p>
+
+    <div class="table-responsive">
+      <table class="course-table">
+        <thead>
+          <tr>
+            <th>Contrainte</th>
+            <th>Signification & Rôle</th>
+            <th>Exemple de Syntaxe</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>PRIMARY KEY</code></td>
+            <td>Identifie de façon unique et non nulle chaque enregistrement.</td>
+            <td><code>PRIMARY KEY (cin)</code></td>
+          </tr>
+          <tr>
+            <td><code>FOREIGN KEY ... REFERENCES</code></td>
+            <td>
+              Garantit l'intégrité référentielle en liant un champ à la clé primaire d'une autre
+              table.
+            </td>
+            <td><code>FOREIGN KEY (code_sec) REFERENCES section(code)</code></td>
+          </tr>
+          <tr>
+            <td><code>NOT NULL</code></td>
+            <td>Interdit la valeur nulle pour ce champ.</td>
+            <td><code>nom VARCHAR(30) NOT NULL</code></td>
+          </tr>
+          <tr>
+            <td><code>UNIQUE</code></td>
+            <td>Empêche les doublons dans une colonne.</td>
+            <td><code>email VARCHAR(60) UNIQUE</code></td>
+          </tr>
+          <tr>
+            <td><code>CHECK</code></td>
+            <td>Valide une condition logique sur la valeur insérée.</td>
+            <td><code>CHECK (moyenne BETWEEN 0 AND 20)</code></td>
+          </tr>
+          <tr>
+            <td><code>DEFAULT</code></td>
+            <td>Attribue une valeur par défaut en cas d'omission.</td>
+            <td><code>statut VARCHAR(10) DEFAULT 'En attente'</code></td>
+          </tr>
+          <tr>
+            <td><code>ON DELETE / UPDATE CASCADE</code></td>
+            <td>Propage automatiquement les suppressions ou mises à jour aux tables filles.</td>
+            <td><code>ON DELETE CASCADE ON UPDATE CASCADE</code></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </article>
+
+  <!-- 3. Langage de Définition de Données (LDD) -->
+  <article id="sql-ldd" class="course-section">
+    <h2>3. Langage de Définition de Données (LDD)</h2>
+    <p>Commandes pour créer, modifier ou supprimer la base et ses tables :</p>
+
+    <div class="code-card">
+      <div class="code-card-header">
+        <span>Création de Base & Tables</span>
+        <span class="lang-tag">SQL</span>
+      </div>
+      <pre><code class="language-sql">-- Création de la base de données
+CREATE DATABASE IF NOT EXISTS gestion_lycee;
+USE gestion_lycee;
+
+-- Création de la table 'section' (Table mère)
+CREATE TABLE IF NOT EXISTS section (
+  code_sec VARCHAR(10),
+  libelle_sec VARCHAR(50) NOT NULL,
+  CONSTRAINT pk_section PRIMARY KEY (code_sec)
+);
+
+-- Création de la table 'eleve' (Table fille avec clé étrangère)
+CREATE TABLE IF NOT EXISTS eleve (
+  cin CHAR(8),
+  nom VARCHAR(30) NOT NULL,
+  prenom VARCHAR(30) NOT NULL,
+  genre CHAR(1) CHECK (genre IN ('M', 'F')),
+  date_naiss DATE NOT NULL,
+  code_sec VARCHAR(10) NOT NULL,
+  moyenne DECIMAL(4, 2) DEFAULT 0.00,
+  CONSTRAINT pk_eleve PRIMARY KEY (cin),
+  CONSTRAINT fk_eleve_section FOREIGN KEY (code_sec) 
+    REFERENCES section(code_sec) 
+    ON DELETE RESTRICT ON UPDATE CASCADE,
+  CONSTRAINT chk_moyenne CHECK (moyenne BETWEEN 0 AND 20)
+);
+
+-- Modifications de structure (ALTER TABLE)
+-- Ajouter une colonne
+ALTER TABLE eleve ADD COLUMN telephone CHAR(8);
+
+-- Modifier le type d'une colonne existante
+ALTER TABLE eleve MODIFY COLUMN nom VARCHAR(40) NOT NULL;
+
+-- Supprimer une colonne
+ALTER TABLE eleve DROP COLUMN telephone;
+
+-- Supprimer une table
+DROP TABLE IF EXISTS eleve;</code></pre>
+    </div>
+  </article>
+
+  <!-- 4. Langage de Manipulation de Données (LMD) -->
+  <article id="sql-lmd" class="course-section">
+    <h2>4. Langage de Manipulation de Données (LMD)</h2>
+    <p>Commandes d'insertion, mise à jour et suppression des enregistrements :</p>
+
+    <div class="code-card">
+      <div class="code-card-header">
+        <span>Insertion, Mise à jour & Suppression</span>
+        <span class="lang-tag">SQL</span>
+      </div>
+      <pre><code class="language-sql">-- 1. Insertion d'enregistrements (INSERT INTO)
+INSERT INTO section (code_sec, libelle_sec) 
+VALUES ('SI', 'Sciences de l''Informatique'),
+       ('MATH', 'Mathématiques'),
+       ('SC', 'Sciences Expérimentales');
+
+INSERT INTO eleve (cin, nom, prenom, genre, date_naiss, code_sec, moyenne) 
+VALUES ('08945612', 'BEN SALAH', 'Mohamed', 'M', '2006-04-15', 'SI', 16.50),
+       ('07123984', 'TRABELSI', 'Amina', 'F', '2006-11-20', 'SI', 17.25),
+       ('09874561', 'GHARBI', 'Sami', 'M', '2005-08-05', 'MATH', 13.00);
+
+-- 2. Mise à jour de données (UPDATE)
+UPDATE eleve 
+SET moyenne = moyenne + 0.50 
+WHERE code_sec = 'SI' AND moyenne <= 19.50;
+
+-- 3. Suppression ciblée (DELETE)
+DELETE FROM eleve 
+WHERE cin = '09874561';</code></pre>
+    </div>
+  </article>
+
+  <!-- 5. Langage d'Interrogation de Données (LID / SELECT) -->
+  <article id="sql-lid" class="course-section">
+    <h2>5. Langage d'Interrogation de Données (LID / SELECT)</h2>
+    <p>
+      La clause <code>SELECT</code> permet d'extraire et filtrer les informations selon des critères
+      précis.
+    </p>
+
+    <div class="code-card">
+      <div class="code-card-header">
+        <span>Requêtes SELECT, Jointures & Fonctions d'Agrégation</span>
+        <span class="lang-tag">SQL</span>
+      </div>
+      <pre><code class="language-sql">-- 1. Sélection avec projection et critères de filtrage
+SELECT cin, CONCAT(nom, ' ', prenom) AS nom_complet, moyenne
+FROM eleve
+WHERE code_sec = 'SI' AND moyenne >= 10.00
+ORDER BY moyenne DESC;
+
+-- 2. Jointure relationnelle entre deux tables
+SELECT e.cin, e.nom, e.prenom, s.libelle_sec, e.moyenne
+FROM eleve e
+INNER JOIN section s ON e.code_sec = s.code_sec
+WHERE YEAR(e.date_naiss) = 2006;
+
+-- 3. Fonctions d'agrégation (COUNT, AVG, SUM, MAX, MIN)
+SELECT COUNT(*) AS total_eleves,
+       ROUND(AVG(moyenne), 2) AS moyenne_generale,
+       MAX(moyenne) AS meilleure_note,
+       MIN(moyenne) AS note_minimale
+FROM eleve;
+
+-- 4. Regroupement par critères (GROUP BY) et filtrage post-agrégation (HAVING)
+SELECT s.libelle_sec, 
+       COUNT(e.cin) AS effectif, 
+       ROUND(AVG(e.moyenne), 2) AS moyenne_section
+FROM section s
+LEFT JOIN eleve e ON s.code_sec = e.code_sec
+GROUP BY s.code_sec, s.libelle_sec
+HAVING effectif >= 1
+ORDER BY moyenne_section DESC;
+
+-- 5. Fonctions SQL sur les dates
+-- YEAR(d), MONTH(d), DAY(d), NOW()
+SELECT cin, nom, date_naiss,
+       (YEAR(NOW()) - YEAR(date_naiss)) AS age
+FROM eleve
+WHERE MONTH(date_naiss) = 4;</code></pre>
+    </div>
+  </article>
+</section>
