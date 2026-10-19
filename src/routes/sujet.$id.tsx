@@ -30,9 +30,12 @@ import {
   Clock,
   Save,
   TrendingUp,
+  Bot,
+  Lock,
 } from "lucide-react";
 import { SubjectCompetencesPill } from "@/components/competences/SubjectCompetencesPill";
 import { ProgressionModal } from "@/components/competences/ProgressionModal";
+import { PedagogicalTutorPane } from "@/components/workspace/PedagogicalTutorPane";
 
 export const Route = createFileRoute("/sujet/$id")({
   loader: ({ params }) => {
@@ -87,7 +90,9 @@ function Workspace() {
   const [activeFileName, setActiveFileName] = useState<string>(
     () => Object.keys(ex.starter)[0] ?? "index.html",
   );
-  const [sidebarTab, setSidebarTab] = useState<"enonce" | "fichiers" | "resultats">("enonce");
+  const [sidebarTab, setSidebarTab] = useState<"enonce" | "fichiers" | "resultats" | "tuteur">(
+    "enonce",
+  );
   const [evaluationSummary, setEvaluationSummary] = useState<EvaluationSummary | null>(null);
   const [unlockedHints, setUnlockedHints] = useState<UnlockedHint[]>([]);
   const [unlockingHint, setUnlockingHint] = useState(false);
@@ -273,6 +278,26 @@ function Workspace() {
               </button>
             }
           />
+          <button
+            onClick={() => setSidebarTab("tuteur")}
+            className={`flex items-center gap-1.5 rounded border px-2.5 py-1 text-xs font-mono transition-colors cursor-pointer ${
+              ex.examMode
+                ? "border-destructive/30 bg-destructive/10 text-destructive opacity-75"
+                : sidebarTab === "tuteur"
+                  ? "border-primary bg-primary text-primary-foreground font-semibold"
+                  : "border-primary/30 bg-primary/10 text-primary hover:bg-primary/20"
+            }`}
+            title={
+              ex.examMode
+                ? "Tuteur neutralisé en mode examen (PRD F-56, T-06)"
+                : "Consulter le tuteur pédagogique d'aide contextuelle"
+            }
+          >
+            {ex.examMode ? <Lock className="h-3 w-3" /> : <Bot className="h-3 w-3" />}
+            <span className="hidden sm:inline">
+              {ex.examMode ? "Tuteur (Neutralisé)" : "Tuteur STI"}
+            </span>
+          </button>
           <AuthModal />
           <button
             onClick={handleReset}
@@ -335,6 +360,26 @@ function Workspace() {
                   {evaluationSummary.note20}/20
                 </span>
               )}
+            </button>
+            <button
+              onClick={() => setSidebarTab("tuteur")}
+              className={`flex-1 py-2 flex items-center justify-center gap-1.5 uppercase tracking-wider text-[11px] transition-colors ${
+                sidebarTab === "tuteur"
+                  ? "border-b-2 border-primary text-foreground font-semibold bg-background/40"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+              title={
+                ex.examMode
+                  ? "Tuteur neutralisé en examen (PRD F-56, T-06)"
+                  : "Dialogue socratique & questionnement guidé"
+              }
+            >
+              {ex.examMode ? (
+                <Lock className="h-3.5 w-3.5 text-destructive" />
+              ) : (
+                <Bot className="h-3.5 w-3.5 text-primary" />
+              )}
+              <span>Tuteur</span>
             </button>
           </div>
 
@@ -443,6 +488,29 @@ function Workspace() {
                 sujetId={id}
                 sujetTitle={ex.title}
                 examMode={ex.examMode}
+              />
+            )}
+
+            {sidebarTab === "tuteur" && (
+              <PedagogicalTutorPane
+                context={{
+                  sujetId: id,
+                  sujetTitre: ex.title,
+                  competence: ex.competence,
+                  activeFile: activeFileName,
+                  fileContent: files[activeFileName]?.content,
+                  activeCriteria: ex.criteria.map((c) => {
+                    const evalRes = evaluationSummary?.results.find((r) => r.id === c.id);
+                    return {
+                      id: c.id,
+                      code: c.id.toUpperCase(),
+                      label: c.label,
+                      ok: evalRes?.passed,
+                      message: evalRes?.message,
+                    };
+                  }),
+                  isExamMode: Boolean(ex.examMode),
+                }}
               />
             )}
           </div>
