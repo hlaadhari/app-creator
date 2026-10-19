@@ -37,6 +37,7 @@ import {
 import { SubjectCompetencesPill } from "@/components/competences/SubjectCompetencesPill";
 import { ProgressionModal } from "@/components/competences/ProgressionModal";
 import { PedagogicalTutorPane } from "@/components/workspace/PedagogicalTutorPane";
+import { CourseModal } from "@/components/course/CourseModal";
 
 export const Route = createFileRoute("/sujet/$id")({
   loader: ({ params }) => {
@@ -99,6 +100,13 @@ function Workspace() {
   const [unlockingHint, setUnlockingHint] = useState(false);
   const [verifying, setVerifying] = useState(false);
   const [cursorPos, setCursorPos] = useState({ line: 1, col: 1 });
+  const [showCourseModal, setShowCourseModal] = useState(false);
+
+  const handleInsertCourseCode = (snippet: string) => {
+    const current = files[activeFileName]?.content || "";
+    const updated = current.trim() === "" ? snippet : `${current}\n\n${snippet}`;
+    updateFileContent(activeFileName, updated);
+  };
 
   const isExamMode = Boolean(ex.examMode);
 
@@ -367,6 +375,17 @@ function Workspace() {
               </button>
             }
           />
+
+          {!isExamMode && (
+            <button
+              onClick={() => setShowCourseModal(true)}
+              className="flex items-center gap-1.5 rounded border border-border/80 bg-background/80 hover:bg-accent/40 px-2.5 py-1 text-xs font-mono transition-colors cursor-pointer text-foreground"
+              title="Consulter le support de cours officiel et insérer des extraits de code"
+            >
+              <BookOpen className="h-3 w-3 text-primary" />
+              <span className="hidden sm:inline">Mémento STI</span>
+            </button>
+          )}
 
           {!isExamMode && (
             <button
@@ -780,6 +799,14 @@ function Workspace() {
 
       {/* Modale d'arbitrage de conflit explicite (Inviolable #4) */}
       <ConflictModal open={Boolean(conflict)} conflict={conflict} onResolve={resolveConflict} />
+
+      {/* Support de Cours Interactif & Mémento Bac STI */}
+      <CourseModal
+        open={showCourseModal}
+        onOpenChange={setShowCourseModal}
+        onInsertCode={handleInsertCourseCode}
+        activeFileName={activeFileName}
+      />
     </div>
   );
 }

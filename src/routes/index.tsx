@@ -23,6 +23,7 @@ import {
   Shield,
   TrendingUp,
   CheckCircle2,
+  BookOpen,
 } from "lucide-react";
 
 export const Route = createFileRoute("/")({
@@ -181,6 +182,18 @@ function Index() {
       <header className="border-b px-6 py-3.5 flex items-center justify-between">
         <SproutLogo size="sm" subtitle="Labo STI" />
         <div className="flex items-center gap-3">
+          {/* Mémento & Support de cours officiel */}
+          <Link to="/cours">
+            <Button
+              variant="outline"
+              size="sm"
+              className="gap-1.5 text-xs text-foreground border-border hover:bg-accent/40"
+            >
+              <BookOpen className="h-4 w-4 text-primary" />
+              <span className="hidden sm:inline">Mémento STI</span>
+            </Button>
+          </Link>
+
           <Button
             variant="ghost"
             size="sm"

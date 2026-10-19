@@ -1,0 +1,284 @@
+<section id="module-php" class="course-module">
+  <header class="course-header">
+    <span class="module-badge">Module 4</span>
+    <h1>PHP 8.2 & Traitement Serveur</h1>
+    <p class="module-desc">
+      Récupération des formulaires HTTP, manipulation procédurale de MySQLi, fonctions natives de
+      chaînes et patron officiel d'enregistrement en base de données.
+    </p>
+  </header>
+
+  <!-- 1. Structure de Base -->
+  <article id="php-syntaxe" class="course-section">
+    <h2>1. Structure de Base & Syntaxe PHP</h2>
+    <p>
+      Tout script PHP est délimité par les balises <code>&lt;?php</code> et <code>?&gt;</code>.
+      Chaque instruction se termine obligatoirement par un point-virgule <code>;</code>. Les
+      variables commencent impérativement par le symbole dollar <code>$</code>.
+    </p>
+
+    <div class="code-card">
+      <div class="code-card-header">
+        <span>Syntaxe & Affichage</span>
+        <span class="lang-tag">PHP</span>
+      </div>
+      <pre><code class="language-php">&lt;?php
+// Déclaration de variables typées dynamiquement
+$titre = "Épreuve Pratique STI";
+$annee = 2024;
+$moyenne = 15.75;
+$reussite = true;
+
+// Affichage avec echo et concaténation via le point (.)
+echo "Session : " . $titre . " (" . $annee . ")&lt;br&gt;";
+echo "Moyenne obtenue : &lt;strong&gt;" . $moyenne . "/20&lt;/strong&gt;";
+
+// Structures conditionnelles classiques
+if ($moyenne >= 10) {
+  echo "&lt;p style='color:green;'&gt;Admis avec succès !&lt;/p&gt;";
+} else {
+  echo "&lt;p style='color:red;'&gt;Ajourné.&lt;/p&gt;";
+}
+
+// Boucle for usuelle
+for ($i = 1; $i <= 5; $i++) {
+  echo "Étape $i &lt;br&gt;";
+}
+?&gt;</code></pre>
+    </div>
+  </article>
+
+  <!-- 2. Récupération des Données de Formulaire -->
+  <article id="php-formulaires" class="course-section">
+    <h2>2. Récupération des Données de Formulaire</h2>
+    <p>
+      Lorsqu'un formulaire HTML transmet ses champs via <code>method="post"</code>, les valeurs sont
+      accessibles sur le serveur via le tableau associatif superglobal <code>$_POST</code> ou par
+      l'instruction <code>extract($_POST)</code>.
+    </p>
+
+    <div class="code-card">
+      <div class="code-card-header">
+        <span>Récupération standard et sécurisée</span>
+        <span class="lang-tag">PHP</span>
+      </div>
+      <pre><code class="language-php">&lt;?php
+// Méthode 1 : Récupération explicite champ par champ (Recommandée)
+if (isset($_POST["cin"]) && isset($_POST["nom"])) {
+  $cin = trim($_POST["cin"]);
+  $nom = trim($_POST["nom"]);
+  $genre = $_POST["genre"];
+  $section = $_POST["section"];
+}
+
+// Méthode 2 : Importation globale via extract() (Fréquente au Bac)
+extract($_POST);
+// Crée directement les variables $cin, $nom, $genre, $section...
+?&gt;</code></pre>
+    </div>
+  </article>
+
+  <!-- 3. Fonctions Natives de Chaînes et Dates -->
+  <article id="php-chaines" class="course-section">
+    <h2>3. Fonctions Natives Essentielles</h2>
+    <p>
+      Les fonctions indispensables pour valider et formater les entrées utilisateurs selon le
+      programme officiel :
+    </p>
+
+    <div class="table-responsive">
+      <table class="course-table">
+        <thead>
+          <tr>
+            <th>Fonction PHP</th>
+            <th>Exemple d'Appel</th>
+            <th>Résultat</th>
+            <th>Usage type Bac STI</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>strlen($ch)</code></td>
+            <td><code>strlen("12345678")</code></td>
+            <td><code>8</code></td>
+            <td>Tester la longueur d'une chaîne (CIN, code postal).</td>
+          </tr>
+          <tr>
+            <td><code>substr($ch, deb, lg)</code></td>
+            <td><code>substr("2024-05-18", 0, 4)</code></td>
+            <td><code>"2024"</code></td>
+            <td>Extraire une sous-chaîne ou décomposer une date.</td>
+          </tr>
+          <tr>
+            <td><code>strpos($ch, sub)</code></td>
+            <td><code>strpos("test@dom.tn", "@")</code></td>
+            <td><code>4</code> (ou <code>false</code>)</td>
+            <td>Vérifier la position d'un caractère.</td>
+          </tr>
+          <tr>
+            <td><code>strtoupper($ch)</code></td>
+            <td><code>strtoupper("tunisie")</code></td>
+            <td><code>"TUNISIE"</code></td>
+            <td>Normaliser le texte en majuscules avant insertion.</td>
+          </tr>
+          <tr>
+            <td><code>strtolower($ch)</code></td>
+            <td><code>strtolower("ADMIN")</code></td>
+            <td><code>"admin"</code></td>
+            <td>Normaliser le texte en minuscules.</td>
+          </tr>
+          <tr>
+            <td><code>trim($ch)</code></td>
+            <td><code>trim(" saisie ")</code></td>
+            <td><code>"saisie"</code></td>
+            <td>Éliminer les espaces en début et fin de chaîne.</td>
+          </tr>
+          <tr>
+            <td><code>date($format)</code></td>
+            <td><code>date("Y-m-d H:i:s")</code></td>
+            <td><code>"2024-06-12 10:30:00"</code></td>
+            <td>Générer la date et l'heure système actuelles.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </article>
+
+  <!-- 4. Interfaçage MySQLi Procédural -->
+  <article id="php-mysqli" class="course-section">
+    <h2>4. Interfaçage MySQLi Procédural (Standard Officiel Bac STI)</h2>
+    <p>
+      Au Bac STI, toutes les interactions avec le serveur SGBD MySQL se réalisent via l'extension
+      procédurale <code>mysqli_*</code>.
+    </p>
+
+    <div class="table-responsive">
+      <table class="course-table">
+        <thead>
+          <tr>
+            <th>Fonction MySQLi</th>
+            <th>Syntaxe & Paramètres</th>
+            <th>Rôle</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>mysqli_connect()</code></td>
+            <td><code>mysqli_connect($hote, $user, $mdp, $bdd)</code></td>
+            <td>
+              Établit la connexion avec le serveur MySQL. Retourne l'identifiant de connexion ou
+              <code>false</code>.
+            </td>
+          </tr>
+          <tr>
+            <td><code>mysqli_query()</code></td>
+            <td><code>mysqli_query($cnx, $sql)</code></td>
+            <td>
+              Exécute la requête SQL. Retourne un jeu de résultats (pour <code>SELECT</code>) ou
+              <code>true/false</code> (pour <code>INSERT/UPDATE/DELETE</code>).
+            </td>
+          </tr>
+          <tr>
+            <td><code>mysqli_num_rows()</code></td>
+            <td><code>mysqli_num_rows($res)</code></td>
+            <td>
+              Renvoie le nombre de lignes retournées par un <code>SELECT</code> (très utile pour
+              tester l'unicité).
+            </td>
+          </tr>
+          <tr>
+            <td><code>mysqli_fetch_array()</code></td>
+            <td><code>mysqli_fetch_array($res)</code></td>
+            <td>Lit une ligne du jeu de résultats sous forme de tableau associatif et indexé.</td>
+          </tr>
+          <tr>
+            <td><code>mysqli_affected_rows()</code></td>
+            <td><code>mysqli_affected_rows($cnx)</code></td>
+            <td>Renvoie le nombre de lignes modifiées ou supprimées par la dernière requête.</td>
+          </tr>
+          <tr>
+            <td><code>mysqli_error()</code></td>
+            <td><code>mysqli_error($cnx)</code></td>
+            <td>Retourne le libellé textuel de l'erreur SQL survenue.</td>
+          </tr>
+          <tr>
+            <td><code>mysqli_close()</code></td>
+            <td><code>mysqli_close($cnx)</code></td>
+            <td>Ferme proprement la connexion à la base de données.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </article>
+
+  <!-- 5. Patron Canonique d'Insertion et Consultation -->
+  <article id="php-patron" class="course-section">
+    <h2>5. Patron Canonique de Script d'Insertion & Consultation (Bac STI)</h2>
+    <p>
+      Voici la structure officielle d'un fichier <code>enregistrement.php</code> respectant
+      l'ensemble des critères de notation :
+    </p>
+
+    <div class="code-card">
+      <div class="code-card-header">
+        <span>Fichier enregistrement.php complet</span>
+        <span class="lang-tag">PHP</span>
+      </div>
+      <pre><code class="language-php">&lt;?php
+// 1. Connexion au serveur de base de données
+$cnx = mysqli_connect("localhost", "root", "", "gestion_bac") 
+       or die("Erreur de connexion au serveur MySQL : " . mysqli_connect_error());
+
+// 2. Récupération des données postées
+$cin = trim($_POST["cin"]);
+$nom = trim($_POST["nom"]);
+$genre = $_POST["genre"];
+$section = $_POST["section"];
+
+// 3. Vérification d'unicité (Le candidat existe-t-il déjà ?)
+$req_verif = "SELECT cin FROM candidat WHERE cin = '$cin'";
+$res_verif = mysqli_query($cnx, $req_verif) 
+             or die("Erreur lors de la vérification : " . mysqli_error($cnx));
+
+if (mysqli_num_rows($res_verif) > 0) {
+  // Enregistrement déjà existant : message d'erreur
+  echo "&lt;h3 style='color:red;'&gt;Erreur : Le candidat portant le CIN $cin est déjà enregistré !&lt;/h3&gt;";
+} else {
+  // 4. Insertion du nouvel enregistrement
+  $req_insert = "INSERT INTO candidat (cin, nom, genre, section, date_inscription) 
+                 VALUES ('$cin', '$nom', '$genre', '$section', NOW())";
+                 
+  $res_insert = mysqli_query($cnx, $req_insert) 
+                or die("Erreur lors de l'insertion : " . mysqli_error($cnx));
+                
+  if (mysqli_affected_rows($cnx) > 0) {
+    echo "&lt;h3 style='color:green;'&gt;Félicitations, candidat $nom enregistré avec succès !&lt;/h3&gt;";
+    echo "&lt;p&gt;Numéro CIN : &lt;strong&gt;$cin&lt;/strong&gt; | Section : &lt;strong&gt;$section&lt;/strong&gt;&lt;/p&gt;";
+  }
+}
+
+// 5. Affichage récapitulatif du nombre d'inscrits par section
+echo "&lt;hr&gt;&lt;h4&gt;Statistiques des candidatures par section :&lt;/h4&gt;";
+$req_stats = "SELECT section, COUNT(*) AS total FROM candidat GROUP BY section";
+$res_stats = mysqli_query($cnx, $req_stats);
+
+echo "&lt;table border='1' cellpadding='6' cellspacing='0'&gt;
+        &lt;tr bgcolor='#f1f5f9'&gt;
+          &lt;th&gt;Section&lt;/th&gt;
+          &lt;th&gt;Nombre de Candidats&lt;/th&gt;
+        &lt;/tr&gt;";
+        
+while ($ligne = mysqli_fetch_array($res_stats)) {
+  echo "&lt;tr&gt;
+          &lt;td&gt;" . $ligne["section"] . "&lt;/td&gt;
+          &lt;td align='center'&gt;&lt;b&gt;" . $ligne["total"] . "&lt;/b&gt;&lt;/td&gt;
+        &lt;/tr&gt;";
+}
+echo "&lt;/table&gt;";
+
+// 6. Fermeture de la connexion
+mysqli_close($cnx);
+?&gt;</code></pre>
+    </div>
+  </article>
+</section>

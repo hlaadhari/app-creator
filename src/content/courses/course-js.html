@@ -1,0 +1,385 @@
+<section id="module-js" class="course-module">
+  <header class="course-header">
+    <span class="module-badge">Module 3</span>
+    <h1>JavaScript & Manipulation du DOM Client</h1>
+    <p class="module-desc">
+      Contrôle de saisie côté client, manipulation interactive des éléments HTML, objets prédéfinis
+      et fonction canonique <code>verif()</code> conforme aux épreuves pratiques du Bac STI.
+    </p>
+  </header>
+
+  <!-- 1. Structure & Inclusion -->
+  <article id="js-inclusion" class="course-section">
+    <h2>1. Inclusion du script JavaScript</h2>
+    <p>
+      En conformité avec le programme du Bac STI, le code de contrôle doit être placé dans un
+      fichier externe distinct nommé <code>controle.js</code> et lié dans l'en-tête ou au bas du
+      document HTML.
+    </p>
+
+    <div class="code-card">
+      <div class="code-card-header">
+        <span>Liaison dans index.html</span>
+        <span class="lang-tag">HTML</span>
+      </div>
+      <pre><code class="language-html">&lt;!DOCTYPE html&gt;
+&lt;html lang="fr"&gt;
+&lt;head&gt;
+  &lt;meta charset="utf-8"&gt;
+  &lt;title&gt;Inscription&lt;/title&gt;
+  &lt;link rel="stylesheet" href="mesStyles.css"&gt;
+  &lt;!-- Inclusion du script de contrôle obligatoire --&gt;
+  &lt;script src="controle.js" defer&gt;&lt;/script&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;!-- Appel lors de la soumission du formulaire --&gt;
+  &lt;form action="ajout.php" method="post" onsubmit="return verif();"&gt;
+    ...
+  &lt;/form&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+    </div>
+  </article>
+
+  <!-- 2. Boîtes de dialogue & Entrées/Sorties -->
+  <article id="js-dialogues" class="course-section">
+    <h2>2. Boîtes de dialogue & Entrées / Sorties</h2>
+    <p>
+      Les 3 boîtes de dialogue standard utilisées en Bac STI pour afficher un message d'alerte,
+      demander une saisie ou inspecter le résultat :
+    </p>
+
+    <div class="code-card">
+      <div class="code-card-header">
+        <span>Boîtes de dialogue & Écriture</span>
+        <span class="lang-tag">JavaScript</span>
+      </div>
+      <pre><code class="language-javascript">// 1. Alerte modale bloquante pour signaler une erreur de saisie
+alert("Veuillez saisir un numéro de CIN composé exactement de 8 chiffres !");
+
+// 2. Demande de confirmation (retourne true ou false)
+if (confirm("Voulez-vous vraiment valider l'enregistrement ?")) {
+  console.log("Action confirmée par l'élève.");
+}
+
+// 3. Saisie directe (retourne la chaîne ou null)
+let age = prompt("Entrez votre âge :");
+
+// 4. Écriture directe dans le flux du document (déconseillé pour DOM moderne mais présent en programme)
+document.write("&lt;h3&gt;Bienvenue sur le portail STI&lt;/h3&gt;");</code></pre>
+    </div>
+  </article>
+
+  <!-- 3. Manipulation du DOM -->
+  <article id="js-dom" class="course-section">
+    <h2>3. Manipulation des Éléments du DOM (Document Object Model)</h2>
+    <p>
+      L'accès aux champs du formulaire s'effectue principalement par l'identifiant unique avec
+      <code>document.getElementById('id')</code>.
+    </p>
+
+    <div class="table-responsive">
+      <table class="course-table">
+        <thead>
+          <tr>
+            <th>Propriété / Méthode</th>
+            <th>Type</th>
+            <th>Description & Usage Bac STI</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>.value</code></td>
+            <td>Chaîne</td>
+            <td>
+              Valeur textuelle saisie dans un <code>&lt;input&gt;</code> ou
+              <code>&lt;textarea&gt;</code>.
+            </td>
+          </tr>
+          <tr>
+            <td><code>.checked</code></td>
+            <td>Booléen</td>
+            <td>État d'un bouton radio ou d'une case à cocher (<code>true</code> si coché).</td>
+          </tr>
+          <tr>
+            <td><code>.selectedIndex</code></td>
+            <td>Entier</td>
+            <td>
+              Indice de l'option choisie dans une liste <code>&lt;select&gt;</code> (0 = première
+              option, -1 = rien).
+            </td>
+          </tr>
+          <tr>
+            <td><code>.innerHTML</code> / <code>.textContent</code></td>
+            <td>Chaîne</td>
+            <td>
+              Contenu textuel ou balisé d'une balise conteneur (ex.
+              <code>&lt;div id="msg"&gt;</code>).
+            </td>
+          </tr>
+          <tr>
+            <td><code>.style.propriete</code></td>
+            <td>Style CSS</td>
+            <td>
+              Modification dynamique du style (ex. <code>ch.style.borderColor = "red";</code>).
+            </td>
+          </tr>
+          <tr>
+            <td><code>.focus()</code></td>
+            <td>Méthode</td>
+            <td>Place le curseur sur le champ incriminé pour faciliter la correction.</td>
+          </tr>
+          <tr>
+            <td><code>.disabled</code></td>
+            <td>Booléen</td>
+            <td>Active ou désactive un contrôle ou le bouton de soumission.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="code-card">
+      <div class="code-card-header">
+        <span>Lecture & Écriture du DOM</span>
+        <span class="lang-tag">JavaScript</span>
+      </div>
+      <pre><code class="language-javascript">// Récupérer les éléments
+const nomInput = document.getElementById("nom");
+const sexeMasculin = document.getElementById("sexeM");
+const classeSelect = document.getElementById("classe");
+const zoneErreur = document.getElementById("erreurMsg");
+
+// Lire les valeurs
+let nom = nomInput.value.trim();
+let estMasculin = sexeMasculin.checked;
+let classeIndex = classeSelect.selectedIndex;
+
+// Modifier l'apparence et afficher un retour visuel
+if (nom === "") {
+  nomInput.style.borderColor = "#e11d48"; // Bordure rouge
+  zoneErreur.innerHTML = "&lt;strong&gt;Erreur :&lt;/strong&gt; Le nom est obligatoire.";
+  nomInput.focus();
+} else {
+  nomInput.style.borderColor = "#10b981"; // Bordure verte
+  zoneErreur.innerHTML = "";
+}</code></pre>
+    </div>
+  </article>
+
+  <!-- 4. Fonctions de Validation & Conversion -->
+  <article id="js-conversion" class="course-section">
+    <h2>4. Fonctions de Validation & Conversion de Types</h2>
+    <p>
+      JavaScript gère les valeurs des formulaires sous forme de chaînes de caractères
+      (<code>string</code>). La conversion et les tests numériques sont indispensables.
+    </p>
+
+    <div class="code-card">
+      <div class="code-card-header">
+        <span>Tests numériques et conversions</span>
+        <span class="lang-tag">JavaScript</span>
+      </div>
+      <pre><code class="language-javascript">// isNaN() teste si une valeur N'EST PAS un nombre
+isNaN("12345678"); // false (c'est bien un nombre valide)
+isNaN("12A45");    // true (caractère invalide)
+isNaN("");         // false (attention: chaîne vide évaluée à 0 !)
+
+// Conversion de type
+let note1 = parseInt("15");      // 15 (entier)
+let note2 = parseFloat("14.75"); // 14.75 (décimal)
+let total = Number("12.50");     // 12.5
+let chaine = String(2024);       // "2024"
+
+// Test rigoureux d'un entier positif
+function estEntierPositif(val) {
+  let n = Number(val);
+  return !isNaN(val) && val.trim() !== "" && Number.isInteger(n) && n >= 0;
+}</code></pre>
+    </div>
+  </article>
+
+  <!-- 5. Méthodes sur les Chaînes -->
+  <article id="js-strings" class="course-section">
+    <h2>5. Manipulation des Chaînes de Caractères</h2>
+    <p>
+      Les méthodes essentielles pour inspecter la longueur, extraire des segments et formater les
+      textes saisis :
+    </p>
+
+    <div class="table-responsive">
+      <table class="course-table">
+        <thead>
+          <tr>
+            <th>Méthode</th>
+            <th>Exemple</th>
+            <th>Résultat</th>
+            <th>Usage type Bac STI</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>.length</code></td>
+            <td><code>"08451236".length</code></td>
+            <td><code>8</code></td>
+            <td>Vérifier la longueur exacte d'un CIN (8 chiffres).</td>
+          </tr>
+          <tr>
+            <td><code>.charAt(i)</code></td>
+            <td><code>"TUNIS".charAt(0)</code></td>
+            <td><code>"T"</code></td>
+            <td>Parcourir lettre par lettre pour vérifier l'alphabet.</td>
+          </tr>
+          <tr>
+            <td><code>.toUpperCase()</code></td>
+            <td><code>"nom".toUpperCase()</code></td>
+            <td><code>"NOM"</code></td>
+            <td>Uniformiser en majuscules avant contrôle.</td>
+          </tr>
+          <tr>
+            <td><code>.toLowerCase()</code></td>
+            <td><code>"ADMIN".toLowerCase()</code></td>
+            <td><code>"admin"</code></td>
+            <td>Vérifier sans tenir compte de la casse.</td>
+          </tr>
+          <tr>
+            <td><code>.substr(start, len)</code></td>
+            <td><code>"BAC2024".substr(3, 4)</code></td>
+            <td><code>"2024"</code></td>
+            <td>Extraire une sous-chaîne (année, code série).</td>
+          </tr>
+          <tr>
+            <td><code>.indexOf(sub)</code></td>
+            <td><code>"contact@dom.tn".indexOf("@")</code></td>
+            <td><code>7</code> (ou <code>-1</code> si absent)</td>
+            <td>Vérifier la présence d'un symbole (@ ou .).</td>
+          </tr>
+          <tr>
+            <td><code>.trim()</code></td>
+            <td><code>" test ".trim()</code></td>
+            <td><code>"test"</code></td>
+            <td>Supprimer les espaces parasites avant/après.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </article>
+
+  <!-- 6. Objets Math & Date -->
+  <article id="js-objets" class="course-section">
+    <h2>6. Objets Prédéfinis : Math & Date</h2>
+
+    <div class="code-card">
+      <div class="code-card-header">
+        <span>Objet Math & Calculs</span>
+        <span class="lang-tag">JavaScript</span>
+      </div>
+      <pre><code class="language-javascript">// Méthodes mathématiques courantes
+let absolu = Math.abs(-15);     // 15
+let racine = Math.sqrt(81);     // 9
+let arrondi = Math.round(14.6); // 15
+let plancher = Math.floor(14.9);// 14 (partie entière)
+let hasard = Math.floor(Math.random() * 100) + 1; // Nombre aléatoire entre 1 et 100</code></pre>
+    </div>
+
+    <div class="code-card">
+      <div class="code-card-header">
+        <span>Objet Date & Comparaison</span>
+        <span class="lang-tag">JavaScript</span>
+      </div>
+      <pre><code class="language-javascript">// Date système actuelle
+const aujourdhui = new Date();
+let annee = aujourdhui.getFullYear(); // ex: 2024
+let mois = aujourdhui.getMonth() + 1; // 1 à 12 (attention: 0 = janvier)
+let jour = aujourdhui.getDate();      // 1 à 31
+
+// Exemple : Calculer l'âge à partir d'une date de naissance (YYYY-MM-DD)
+function calculerAge(dateNaissStr) {
+  let dateN = new Date(dateNaissStr);
+  let age = aujourdhui.getFullYear() - dateN.getFullYear();
+  let m = aujourdhui.getMonth() - dateN.getMonth();
+  if (m < 0 || (m === 0 && aujourdhui.getDate() < dateN.getDate())) {
+    age--;
+  }
+  return age;
+}</code></pre>
+    </div>
+  </article>
+
+  <!-- 7. Patron Canonique de la Fonction verif() -->
+  <article id="js-verif" class="course-section">
+    <h2>7. Patron Canonique de la Fonction <code>verif()</code> (Bac STI)</h2>
+    <p>
+      Voici l'implémentation type requise dans les épreuves pratiques, assurant la validation
+      complète de l'ensemble des contrôles de saisie avant soumission au serveur PHP :
+    </p>
+
+    <div class="code-card">
+      <div class="code-card-header">
+        <span>Fichier controle.js officiel</span>
+        <span class="lang-tag">JavaScript</span>
+      </div>
+      <pre><code class="language-javascript">/**
+ * Contrôle de saisie officiel - Épreuve Pratique Bac STI
+ * Fichier : controle.js
+ * Retourne false si une règle est violée, sinon true pour soumettre le formulaire.
+ */
+function verif() {
+  // 1. Récupération des références du formulaire
+  let fCin = document.getElementById("cin");
+  let fNom = document.getElementById("nom");
+  let fAge = document.getElementById("age");
+  let rGenreM = document.getElementById("genreM");
+  let rGenreF = document.getElementById("genreF");
+  let sSection = document.getElementById("section");
+
+  // 2. Contrôle du CIN : Exactement 8 chiffres obligatoires
+  let cin = fCin.value.trim();
+  if (cin.length !== 8 || isNaN(cin)) {
+    alert("Le numéro de CIN doit être obligatoirement composé de 8 chiffres décimaux !");
+    fCin.focus();
+    return false;
+  }
+
+  // 3. Contrôle du Nom & Prénom : Non vide et uniquement alphabétique + espaces
+  let nom = fNom.value.trim().toUpperCase();
+  if (nom === "") {
+    alert("Veuillez renseigner votre Nom et Prénom !");
+    fNom.focus();
+    return false;
+  }
+  for (let i = 0; i < nom.length; i++) {
+    let car = nom.charAt(i);
+    if ((car < "A" || car > "Z") && car !== " ") {
+      alert("Le Nom et Prénom ne doivent comporter que des lettres alphabétiques !");
+      fNom.focus();
+      return false;
+    }
+  }
+
+  // 4. Contrôle de l'Âge : Entier numérique entre 17 et 25
+  let age = Number(fAge.value);
+  if (isNaN(fAge.value) || fAge.value.trim() === "" || age < 17 || age > 25) {
+    alert("L'âge doit être un entier valide compris entre 17 et 25 ans !");
+    fAge.focus();
+    return false;
+  }
+
+  // 5. Contrôle du Choix Radio (Genre) : Au moins un bouton coché
+  if (!rGenreM.checked && !rGenreF.checked) {
+    alert("Veuillez sélectionner votre genre (Masculin ou Féminin) !");
+    return false;
+  }
+
+  // 6. Contrôle de la Liste Déroulante : Sélection d'une option valide (index > 0)
+  if (sSection.selectedIndex === 0 || sSection.value === "") {
+    alert("Veuillez choisir une section dans la liste déroulante !");
+    sSection.focus();
+    return false;
+  }
+
+  // Si toutes les validations ont réussi, autoriser la soumission
+  return true;
+}</code></pre>
+    </div>
+  </article>
+</section>

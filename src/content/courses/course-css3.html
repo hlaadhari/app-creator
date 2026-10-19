@@ -1,0 +1,359 @@
+<article class="course-module" data-module="css3">
+  <header class="course-header">
+    <div class="course-badge">Module 2 • Standard Bac STI</div>
+    <h1>CSS3 & Mise en Forme des Interfaces Web</h1>
+    <p class="course-intro">
+      Les feuilles de style en cascade CSS3 (Cascading Style Sheets) gèrent la présentation, la
+      typographie, l'agencement spatial et les animations des pages Web. Maîtriser le modèle de
+      boîte et le positionnement est indispensable pour réussir l'épreuve du Bac STI.
+    </p>
+  </header>
+
+  <nav class="course-toc">
+    <h3>Sommaire du Chapitre</h3>
+    <ul>
+      <li><a href="#selecteurs-css">1. Sélecteurs, Combinaisons et Pseudo-Classes</a></li>
+      <li><a href="#modele-boite">2. Le Modèle de Boîte (Box Model)</a></li>
+      <li><a href="#positionnement">3. Positionnement Spatial et Débordement (overflow)</a></li>
+      <li><a href="#typographie-couleurs">4. Typographie, Alignement et Couleurs</a></li>
+      <li><a href="#arriere-plans">5. Arrière-Plans et Effets Visuels</a></li>
+      <li>
+        <a href="#transitions-transformations">6. Transformations 2D et Transitions Fluides</a>
+      </li>
+    </ul>
+  </nav>
+
+  <!-- 1. Sélecteurs CSS -->
+  <section id="selecteurs-css" class="course-section">
+    <h2>1. Sélecteurs, Combinaisons et Pseudo-Classes</h2>
+    <p>
+      Le sélecteur désigne les éléments HTML ciblés par la règle de style. La priorité suit l'ordre
+      : <code>Style en ligne &gt; #identifiant &gt; .classe &gt; balise</code>.
+    </p>
+
+    <div class="code-example">
+      <div class="code-header">
+        <span class="code-lang">CSS3</span>
+        <span class="code-desc">Exemples des différents types de sélecteurs</span>
+      </div>
+      <pre><code class="language-css">/* 1. Sélecteur universel : réinitialise les marges par défaut */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* 2. Sélecteur de balise : s'applique à tous les titres h1 */
+h1 {
+  color: #1e3a8a;
+  font-family: Arial, sans-serif;
+  margin-bottom: 12px;
+}
+
+/* 3. Sélecteur d'identifiant unique (#) */
+#formCandidat {
+  background-color: #f8fafc;
+  padding: 20px;
+}
+
+/* 4. Sélecteur de classe réutilisable (.) */
+.champ-obligatoire {
+  border-left: 3px solid #dc2626;
+}
+
+/* 5. Sélecteur combiné : balise ET classe */
+input.erreur {
+  border-color: #ef4444;
+  background-color: #fef2f2;
+}
+
+/* 6. Pseudo-classes d'état des hyperliens et boutons */
+a:link {
+  color: #2563eb;
+  text-decoration: none;
+}
+a:visited {
+  color: #7c3aed;
+}
+a:hover, button:hover {
+  color: #1d4ed8;
+  text-decoration: underline;
+  cursor: pointer;
+}
+button:active {
+  transform: scale(0.98);
+}</code></pre>
+    </div>
+  </section>
+
+  <!-- 2. Modèle de Boîte -->
+  <section id="modele-boite" class="course-section">
+    <h2>2. Le Modèle de Boîte (Box Model)</h2>
+    <p>
+      Chaque élément HTML est représenté par une boîte rectangulaire composée de quatre zones
+      concentriques : le <strong>contenu</strong> (width/height), les
+      <strong>marges intérieures</strong> (padding), la <strong>bordure</strong> (border) et les
+      <strong>marges extérieures</strong> (margin).
+    </p>
+
+    <div class="code-example">
+      <div class="code-header">
+        <span class="code-lang">CSS3</span>
+        <span class="code-desc">Configuration complète du modèle de boîte</span>
+      </div>
+      <pre><code class="language-css">/* Fiche candidat stylisée selon le modèle de boîte standard */
+.carte-profil {
+  /* Dimensions du bloc */
+  width: 420px;
+  max-width: 100%;
+  
+  /* Marges intérieures : espace entre texte et bordure */
+  padding: 16px 24px;
+  
+  /* Bordure visible avec angles arrondis */
+  border-width: 2px;
+  border-style: solid;
+  border-color: #cbd5e1;
+  border-radius: 8px; /* Coins arrondis */
+  
+  /* Ombre portée élégante (décalage-X, décalage-Y, flou, couleur) */
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  
+  /* Marges extérieures : centrage horizontal automatique */
+  margin: 30px auto;
+  
+  /* Type d'affichage */
+  display: block;
+}
+
+/* Contrôle du type d'affichage des balises */
+.badge-niveau {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  background-color: #e0f2fe;
+  color: #0369a1;
+  font-weight: bold;
+}
+
+.element-masque {
+  display: none; /* Disparaît complètement du flux d'affichage */
+}</code></pre>
+    </div>
+  </section>
+
+  <!-- 3. Positionnement Spatial -->
+  <section id="positionnement" class="course-section">
+    <h2>3. Positionnement Spatial et Débordement (overflow)</h2>
+    <p>
+      La propriété <code>position</code> détermine comment un élément est placé par rapport au flux
+      normal du document.
+    </p>
+
+    <div class="table-responsive">
+      <table class="course-table">
+        <thead>
+          <tr>
+            <th>Valeur de <code>position</code></th>
+            <th>Description & Comportement</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>static</code></td>
+            <td>Position par défaut dans le flux normal (top/left sans effet).</td>
+          </tr>
+          <tr>
+            <td><code>relative</code></td>
+            <td>
+              Décalé par rapport à sa position normale sans impacter ses voisins. Sert de repère
+              pour les enfants absolus.
+            </td>
+          </tr>
+          <tr>
+            <td><code>absolute</code></td>
+            <td>
+              Retiré du flux normal, positionné par rapport au premier ancêtre non
+              <code>static</code>.
+            </td>
+          </tr>
+          <tr>
+            <td><code>fixed</code></td>
+            <td>Fixé par rapport à la fenêtre du navigateur (ne défile pas au scroll).</td>
+          </tr>
+          <tr>
+            <td><code>sticky</code></td>
+            <td>
+              Se comporte comme <code>relative</code> jusqu'à un seuil de défilement, puis se fige
+              comme <code>fixed</code>.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="code-example">
+      <div class="code-header">
+        <span class="code-lang">CSS3</span>
+        <span class="code-desc">Exemple de bandeau fixe et conteneur avec scrollbar</span>
+      </div>
+      <pre><code class="language-css">/* Barre d'en-tête figée en haut de l'écran */
+.header-fixe {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 60px;
+  background-color: #0f172a;
+  color: #ffffff;
+  z-index: 1000; /* Toujours au premier plan */
+  opacity: 0.95;
+}
+
+/* Pastille absolue positionnée dans le coin d'une carte relative */
+.carte-parent {
+  position: relative;
+  width: 300px;
+  height: 200px;
+  border: 1px solid #ccc;
+}
+
+.pastille-promo {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background-color: #e11d48;
+  color: #fff;
+  padding: 4px 8px;
+}
+
+/* Zone avec défilement interne automatique en cas de débordement */
+.zone-commentaires {
+  width: 100%;
+  height: 180px;
+  overflow: auto; /* Affiche une barre de défilement si nécessaire */
+  border: 1px solid #e2e8f0;
+}</code></pre>
+    </div>
+  </section>
+
+  <!-- 4. Typographie et Couleurs -->
+  <section id="typographie-couleurs" class="course-section">
+    <h2>4. Typographie, Alignement et Couleurs</h2>
+    <p>Les règles typographiques définissent la lisibilité et l'aspect des textes.</p>
+
+    <div class="code-example">
+      <div class="code-header">
+        <span class="code-lang">CSS3</span>
+        <span class="code-desc">Styles de texte, alignement et ombrage</span>
+      </div>
+      <pre><code class="language-css">body {
+  /* Famille de polices avec alternatives de repli */
+  font-family: "Segoe UI", Roboto, Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.5; /* Interligne confortable */
+  color: #334155;   /* Couleur de texte sombre lisible */
+}
+
+.titre-section {
+  font-size: 24px;
+  font-weight: 700;           /* Gras */
+  font-style: normal;
+  text-align: center;         /* Centrage horizontal */
+  text-transform: uppercase;  /* MAJUSCULES automatiques */
+  letter-spacing: 1.5px;      /* Espacement inter-lettres */
+  color: #1e293b;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.15); /* Ombre de texte */
+}
+
+.texte-justifie {
+  text-align: justify;
+}
+
+.prix-important {
+  color: #059669;
+  font-weight: bold;
+}</code></pre>
+    </div>
+  </section>
+
+  <!-- 5. Arrière-Plans -->
+  <section id="arriere-plans" class="course-section">
+    <h2>5. Arrière-Plans et Effets Visuels</h2>
+    <p>CSS3 offre un contrôle fin sur les couleurs unies, dégradés et images de fond.</p>
+
+    <div class="code-example">
+      <div class="code-header">
+        <span class="code-lang">CSS3</span>
+        <span class="code-desc">Images de fond et dimensionnement</span>
+      </div>
+      <pre><code class="language-css">/* Section héro avec image d'arrière-plan centrée et non répétée */
+.banniere-accueil {
+  background-color: #1e1e2f;
+  background-image: url("images/fond-lycee.jpg");
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: cover; /* Remplit tout le conteneur sans déformation */
+  min-height: 280px;
+  color: #ffffff;
+}
+
+/* Dégradé linéaire CSS3 */
+.bouton-degrade {
+  background-image: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  padding: 10px 20px;
+}</code></pre>
+    </div>
+  </section>
+
+  <!-- 6. Transformations et Transitions -->
+  <section id="transitions-transformations" class="course-section">
+    <h2>6. Transformations 2D et Transitions Fluides</h2>
+    <p>
+      Les transformations 2D permettent de modifier l'échelle (<code>scale</code>), la rotation
+      (<code>rotate</code>) ou le déplacement (<code>translate</code>). Couplées aux transitions,
+      elles animent agréablement les interactions.
+    </p>
+
+    <div class="code-example">
+      <div class="code-header">
+        <span class="code-lang">CSS3</span>
+        <span class="code-desc">Animation au survol avec transition fluide</span>
+      </div>
+      <pre><code class="language-css">/* Bouton interactif avec effet d'agrandissement et transition */
+.btn-interactif {
+  display: inline-block;
+  background-color: #2563eb;
+  color: #ffffff;
+  padding: 12px 24px;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: 600;
+  
+  /* Définition de la transition : propriété, durée, fonction de lissage */
+  transition-property: transform, background-color, box-shadow;
+  transition-duration: 0.3s;
+  transition-timing-function: ease-in-out;
+  transition-delay: 0s;
+}
+
+/* Effet déclenché lors du survol de la souris */
+.btn-interactif:hover {
+  background-color: #1d4ed8;
+  transform: scale(1.05) translateY(-2px); /* Légère mise à l'échelle et élévation */
+  box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.3);
+}
+
+/* Image pivotante au survol */
+.vignette-robot {
+  transition: transform 0.4s ease;
+}
+.vignette-robot:hover {
+  transform: rotate(5deg) scale(1.08);
+}</code></pre>
+    </div>
+  </section>
+</article>
