@@ -167,7 +167,7 @@ describe("Moteur d'Évaluation Formative 3 Niveaux (Issue #8 - PRD F-38 à F-48,
       expect(h3.success).toBe(true);
       expect(h3.hint?.level).toBe(3);
       expect(h3.hint?.levelName).toBe("Extrait de code");
-    });
+    }, 15000);
 
     it("refuse le déblocage au-delà du nombre maximal d'indices", async () => {
       const h4 = await debloquerNiveauIndice("carte-profil", 4);

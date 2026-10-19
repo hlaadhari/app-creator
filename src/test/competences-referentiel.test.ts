@@ -258,25 +258,41 @@ describe("Attribution Automatique des Badges Pédagogiques", () => {
 
 describe("Inférence Heuristique des Compétences depuis les Critères", () => {
   it("associe correctement les critères de formulaire et HTML", () => {
-    expect(inferCompetenceForCriterion("form", "Formulaire avec input et bouton")).toBe("HTML.FORM");
+    expect(inferCompetenceForCriterion("form", "Formulaire avec input et bouton")).toBe(
+      "HTML.FORM",
+    );
     expect(inferCompetenceForCriterion("art", "Un élément article existe")).toBe("HTML.SEMANTIC");
     expect(inferCompetenceForCriterion("lien", "Lien vers la documentation")).toBe("HTML.MEDIA");
   });
 
   it("associe correctement les critères CSS", () => {
-    expect(inferCompetenceForCriterion("btn", "Mise en page flexible avec display flex")).toBe("CSS.FLEX");
+    expect(inferCompetenceForCriterion("btn", "Mise en page flexible avec display flex")).toBe(
+      "CSS.FLEX",
+    );
     expect(inferCompetenceForCriterion("bg", "Couleur de fond et padding")).toBe("CSS.BOXMODEL");
-    expect(inferCompetenceForCriterion("mob", "Media queries responsive mobile")).toBe("CSS.RESPONSIVE");
+    expect(inferCompetenceForCriterion("mob", "Media queries responsive mobile")).toBe(
+      "CSS.RESPONSIVE",
+    );
   });
 
   it("associe correctement les critères JS, PHP et SQL", () => {
     expect(inferCompetenceForCriterion("btn", "Écouteur click sur bouton")).toBe("JS.EVENTS");
-    expect(inferCompetenceForCriterion("cin", "Validation du format du numéro CIN")).toBe("JS.VALIDATION");
-    expect(inferCompetenceForCriterion("php", "Traitement des paramètres POST")).toBe("PHP.SUPERGLOBALS_POST");
-    expect(inferCompetenceForCriterion("sess", "Initialisation de session PHP")).toBe("PHP.SESSIONS");
-    expect(inferCompetenceForCriterion("ddl", "Création de la table avec clé primaire")).toBe("SQL.DDL");
+    expect(inferCompetenceForCriterion("cin", "Validation du format du numéro CIN")).toBe(
+      "JS.VALIDATION",
+    );
+    expect(inferCompetenceForCriterion("php", "Traitement des paramètres POST")).toBe(
+      "PHP.SUPERGLOBALS_POST",
+    );
+    expect(inferCompetenceForCriterion("sess", "Initialisation de session PHP")).toBe(
+      "PHP.SESSIONS",
+    );
+    expect(inferCompetenceForCriterion("ddl", "Création de la table avec clé primaire")).toBe(
+      "SQL.DDL",
+    );
     expect(inferCompetenceForCriterion("join", "Requête SELECT avec jointure")).toBe("SQL.JOIN");
-    expect(inferCompetenceForCriterion("count", "Calcul avec fonction d'agrégation COUNT")).toBe("SQL.AGGREGATE");
+    expect(inferCompetenceForCriterion("count", "Calcul avec fonction d'agrégation COUNT")).toBe(
+      "SQL.AGGREGATE",
+    );
   });
 
   it("extrait les compétences ciblées pour un sujet complet", () => {

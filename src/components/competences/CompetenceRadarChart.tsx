@@ -5,9 +5,7 @@ interface CompetenceRadarChartProps {
   categories: CategoryMasteryScore[];
 }
 
-export const CompetenceRadarChart: React.FC<CompetenceRadarChartProps> = ({
-  categories,
-}) => {
+export const CompetenceRadarChart: React.FC<CompetenceRadarChartProps> = ({ categories }) => {
   // Coordonnées pour un graphique en toile d'araignée / radar SVG à 5 axes principaux (HTML, CSS, JS, PHP, SQL)
   const mainCats = categories.filter((c) => c.categorie !== "ALGO_ARCHI");
   const count = mainCats.length;
@@ -17,11 +15,17 @@ export const CompetenceRadarChart: React.FC<CompetenceRadarChartProps> = ({
 
   // Calcul des sommets de la toile polygonale
   const points = mainCats.map((cat, idx) => {
-    const angle = (Math.PI * 2 / count) * idx - Math.PI / 2;
+    const angle = ((Math.PI * 2) / count) * idx - Math.PI / 2;
     const valueRadius = radius * (Math.max(10, cat.percentage) / 100);
     const x = centerX + valueRadius * Math.cos(angle);
     const y = centerY + valueRadius * Math.sin(angle);
-    return { x, y, labelX: centerX + (radius + 22) * Math.cos(angle), labelY: centerY + (radius + 16) * Math.sin(angle), cat };
+    return {
+      x,
+      y,
+      labelX: centerX + (radius + 22) * Math.cos(angle),
+      labelY: centerY + (radius + 16) * Math.sin(angle),
+      cat,
+    };
   });
 
   const polygonPointsStr = points.map((p) => `${p.x},${p.y}`).join(" ");
@@ -53,7 +57,7 @@ export const CompetenceRadarChart: React.FC<CompetenceRadarChartProps> = ({
 
           {/* Rayons vers les sommets */}
           {points.map((p, i) => {
-            const angle = (Math.PI * 2 / count) * i - Math.PI / 2;
+            const angle = ((Math.PI * 2) / count) * i - Math.PI / 2;
             const lineX = centerX + radius * Math.cos(angle);
             const lineY = centerY + radius * Math.sin(angle);
             return (

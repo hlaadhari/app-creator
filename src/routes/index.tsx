@@ -10,7 +10,16 @@ import { getAllBuffers } from "@/lib/storage/indexeddb";
 import { useAuth } from "@/lib/supabase/auth";
 import { Button } from "@/components/ui/button";
 import { ProgressionModal } from "@/components/competences/ProgressionModal";
-import { HelpCircle, GraduationCap, Users, Clock, Award, ShieldAlert, Shield, TrendingUp } from "lucide-react";
+import {
+  HelpCircle,
+  GraduationCap,
+  Users,
+  Clock,
+  Award,
+  ShieldAlert,
+  Shield,
+  TrendingUp,
+} from "lucide-react";
 
 export const Route = createFileRoute("/")({
   loader: async () => {

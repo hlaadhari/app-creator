@@ -3,11 +3,7 @@
  * et Définitions des Badges Pédagogiques (PRD Domaine 6, Jalon M7)
  */
 
-import type {
-  Competence,
-  CompetenceCategory,
-  BadgeDefinition,
-} from "./types";
+import type { Competence, CompetenceCategory, BadgeDefinition } from "./types";
 
 export const CATEGORY_LABELS: Record<CompetenceCategory, string> = {
   HTML: "HTML & Balisage Sémantique",
@@ -32,7 +28,8 @@ export const OFFICIAL_COMPETENCES: Competence[] = [
     id: "HTML.SEMANTIC",
     code: "HTML.SEMANTIC",
     libelle: "Balises de structure et sémantique",
-    description: "Employer les balises sémantiques adaptées (header, nav, main, article, section, footer).",
+    description:
+      "Employer les balises sémantiques adaptées (header, nav, main, article, section, footer).",
     categorie: "HTML",
     ordre: 2,
   },
@@ -40,7 +37,8 @@ export const OFFICIAL_COMPETENCES: Competence[] = [
     id: "HTML.FORM",
     code: "HTML.FORM",
     libelle: "Formulaires interactifs et champs de saisie",
-    description: "Concevoir des formulaires avec labels, inputs typés, boutons et attributs requis.",
+    description:
+      "Concevoir des formulaires avec labels, inputs typés, boutons et attributs requis.",
     categorie: "HTML",
     ordre: 3,
   },
@@ -58,7 +56,8 @@ export const OFFICIAL_COMPETENCES: Competence[] = [
     id: "CSS.SELECTORS",
     code: "CSS.SELECTORS",
     libelle: "Sélecteurs, classes et pseudo-classes",
-    description: "Cibler précisément les éléments du DOM via sélecteurs de balises, classes, ID et pseudo-classes.",
+    description:
+      "Cibler précisément les éléments du DOM via sélecteurs de balises, classes, ID et pseudo-classes.",
     categorie: "CSS",
     ordre: 10,
   },
@@ -74,7 +73,8 @@ export const OFFICIAL_COMPETENCES: Competence[] = [
     id: "CSS.FLEX",
     code: "CSS.FLEX",
     libelle: "Mise en page flexible (Flexbox)",
-    description: "Gérer l'alignement et la répartition unidimensionnelle (justify-content, align-items, flex-direction).",
+    description:
+      "Gérer l'alignement et la répartition unidimensionnelle (justify-content, align-items, flex-direction).",
     categorie: "CSS",
     ordre: 12,
   },
@@ -108,7 +108,8 @@ export const OFFICIAL_COMPETENCES: Competence[] = [
     id: "JS.DOM",
     code: "JS.DOM",
     libelle: "Sélection et modification dynamique du DOM",
-    description: "Manipuler le texte, les attributs et les classes d'éléments avec querySelector et classList.",
+    description:
+      "Manipuler le texte, les attributs et les classes d'éléments avec querySelector et classList.",
     categorie: "JAVASCRIPT",
     ordre: 21,
   },
@@ -116,7 +117,8 @@ export const OFFICIAL_COMPETENCES: Competence[] = [
     id: "JS.EVENTS",
     code: "JS.EVENTS",
     libelle: "Gestion des événements utilisateur",
-    description: "Attacher des écouteurs addEventListener (click, submit, input) avec gestion des événements.",
+    description:
+      "Attacher des écouteurs addEventListener (click, submit, input) avec gestion des événements.",
     categorie: "JAVASCRIPT",
     ordre: 22,
   },
@@ -124,7 +126,8 @@ export const OFFICIAL_COMPETENCES: Competence[] = [
     id: "JS.VALIDATION",
     code: "JS.VALIDATION",
     libelle: "Contrôle de saisie et validation côté client",
-    description: "Vérifier la validité des champs (formats, regex, contraintes, messages d'erreur).",
+    description:
+      "Vérifier la validité des champs (formats, regex, contraintes, messages d'erreur).",
     categorie: "JAVASCRIPT",
     ordre: 23,
   },
@@ -132,7 +135,8 @@ export const OFFICIAL_COMPETENCES: Competence[] = [
     id: "JS.ASYNC",
     code: "JS.ASYNC",
     libelle: "Traitements temporels et asynchrones",
-    description: "Utiliser temporisateurs (setTimeout) et requêtes asynchrones pour dynamiser l'interface.",
+    description:
+      "Utiliser temporisateurs (setTimeout) et requêtes asynchrones pour dynamiser l'interface.",
     categorie: "JAVASCRIPT",
     ordre: 24,
   },
@@ -142,7 +146,8 @@ export const OFFICIAL_COMPETENCES: Competence[] = [
     id: "PHP.SYNTAX",
     code: "PHP.SYNTAX",
     libelle: "Fondamentaux et scripts PHP",
-    description: "Écrire des scripts PHP structurés avec variables, boucles et fonctions personnalisées.",
+    description:
+      "Écrire des scripts PHP structurés avec variables, boucles et fonctions personnalisées.",
     categorie: "PHP",
     ordre: 30,
   },
@@ -158,7 +163,8 @@ export const OFFICIAL_COMPETENCES: Competence[] = [
     id: "PHP.SESSIONS",
     code: "PHP.SESSIONS",
     libelle: "Gestion de l'état et sessions utilisateur",
-    description: "Maintenir l'état de connexion via session_start() et le tableau superglobal $_SESSION.",
+    description:
+      "Maintenir l'état de connexion via session_start() et le tableau superglobal $_SESSION.",
     categorie: "PHP",
     ordre: 32,
   },
@@ -174,7 +180,8 @@ export const OFFICIAL_COMPETENCES: Competence[] = [
     id: "PHP.ROUTING",
     code: "PHP.ROUTING",
     libelle: "Navigation et redirections serveur",
-    description: "Gérer les en-têtes HTTP de redirection (header Location) et l'inclusion de gabarits.",
+    description:
+      "Gérer les en-têtes HTTP de redirection (header Location) et l'inclusion de gabarits.",
     categorie: "PHP",
     ordre: 34,
   },
@@ -184,7 +191,8 @@ export const OFFICIAL_COMPETENCES: Competence[] = [
     id: "SQL.DDL",
     code: "SQL.DDL",
     libelle: "Création de tables et schéma relationnel (LDD)",
-    description: "Définir des tables CREATE TABLE avec contraintes PRIMARY KEY, FOREIGN KEY, NOT NULL.",
+    description:
+      "Définir des tables CREATE TABLE avec contraintes PRIMARY KEY, FOREIGN KEY, NOT NULL.",
     categorie: "SQL",
     ordre: 40,
   },
@@ -192,7 +200,8 @@ export const OFFICIAL_COMPETENCES: Competence[] = [
     id: "SQL.DML_INSERT",
     code: "SQL.DML_INSERT",
     libelle: "Insertion et mise à jour de données",
-    description: "Insérer des données fiables (INSERT INTO) et mettre à jour des enregistrements (UPDATE).",
+    description:
+      "Insérer des données fiables (INSERT INTO) et mettre à jour des enregistrements (UPDATE).",
     categorie: "SQL",
     ordre: 41,
   },
@@ -208,7 +217,8 @@ export const OFFICIAL_COMPETENCES: Competence[] = [
     id: "SQL.JOIN",
     code: "SQL.JOIN",
     libelle: "Jointures multi-tables relationnelles",
-    description: "Combiner plusieurs tables par des jointures relationnelles (INNER JOIN, LEFT JOIN).",
+    description:
+      "Combiner plusieurs tables par des jointures relationnelles (INNER JOIN, LEFT JOIN).",
     categorie: "SQL",
     ordre: 43,
   },
@@ -216,7 +226,8 @@ export const OFFICIAL_COMPETENCES: Competence[] = [
     id: "SQL.AGGREGATE",
     code: "SQL.AGGREGATE",
     libelle: "Fonctions d'agrégation et regroupements",
-    description: "Calculer des statistiques et regrouper les données (COUNT, SUM, AVG, GROUP BY, HAVING).",
+    description:
+      "Calculer des statistiques et regrouper les données (COUNT, SUM, AVG, GROUP BY, HAVING).",
     categorie: "SQL",
     ordre: 44,
   },
@@ -234,7 +245,8 @@ export const OFFICIAL_COMPETENCES: Competence[] = [
     id: "ARCHI.FULLSTACK",
     code: "ARCHI.FULLSTACK",
     libelle: "Architecture Web Client-Serveur-Base",
-    description: "Articuler de bout en bout l'interface, le backend serveur et la persistance relationnelle.",
+    description:
+      "Articuler de bout en bout l'interface, le backend serveur et la persistance relationnelle.",
     categorie: "ALGO_ARCHI",
     ordre: 51,
   },
@@ -260,7 +272,8 @@ export const OFFICIAL_BADGES: BadgeDefinition[] = [
   {
     id: "STYLISTE_CSS",
     titre: "Styliste CSS",
-    description: "Maîtriser les sélecteurs, le modèle de boîte et la mise en page flexbox (>= 70%).",
+    description:
+      "Maîtriser les sélecteurs, le modèle de boîte et la mise en page flexbox (>= 70%).",
     icone: "Palette",
     categorie: "CSS",
     seuilPoints: 15,
@@ -292,7 +305,8 @@ export const OFFICIAL_BADGES: BadgeDefinition[] = [
   {
     id: "MAJOR_BAC_BLANC",
     titre: "Major de Promo",
-    description: "Obtenir une note supérieure ou égale à 16/20 sur une épreuve d'examen blanc officiel.",
+    description:
+      "Obtenir une note supérieure ou égale à 16/20 sur une épreuve d'examen blanc officiel.",
     icone: "Trophy",
     categorie: "Examen",
     seuilPoints: 16,
@@ -373,10 +387,15 @@ export function inferCompetenceForCriterion(
   if (isPhp) {
     if (normLabel.includes("session")) return "PHP.SESSIONS";
     if (normLabel.includes("pdo") || normLabel.includes("mysqli")) return "PHP.DB_CONNECT";
-    if (normLabel.includes("redirection") || normLabel.includes("location") || normLabel.includes("header")) {
+    if (
+      normLabel.includes("redirection") ||
+      normLabel.includes("location") ||
+      normLabel.includes("header")
+    ) {
       return "PHP.ROUTING";
     }
-    if (normLabel.includes("post") || normLabel.includes("traitement")) return "PHP.SUPERGLOBALS_POST";
+    if (normLabel.includes("post") || normLabel.includes("traitement"))
+      return "PHP.SUPERGLOBALS_POST";
     return "PHP.SYNTAX";
   }
 
@@ -488,10 +507,21 @@ export function inferCompetenceForCriterion(
   }
 
   // 5. HTML
-  if (normId.includes("form") || normLabel.includes("formulaire") || normLabel.includes("input") || normLabel.includes("select")) {
+  if (
+    normId.includes("form") ||
+    normLabel.includes("formulaire") ||
+    normLabel.includes("input") ||
+    normLabel.includes("select")
+  ) {
     return "HTML.FORM";
   }
-  if (normId.includes("mail") || normLabel.includes("lien") || normLabel.includes("href") || normLabel.includes("image") || normLabel.includes("mailto")) {
+  if (
+    normId.includes("mail") ||
+    normLabel.includes("lien") ||
+    normLabel.includes("href") ||
+    normLabel.includes("image") ||
+    normLabel.includes("mailto")
+  ) {
     return "HTML.MEDIA";
   }
   if (

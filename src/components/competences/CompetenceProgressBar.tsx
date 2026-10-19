@@ -61,7 +61,9 @@ export const CompetenceProgressBar: React.FC<CompetenceProgressBarProps> = ({
               style={{ width: `${percentage}%` }}
             />
           </div>
-          <span className={`font-mono text-[11px] font-semibold ${colorStyles.text} w-8 text-right`}>
+          <span
+            className={`font-mono text-[11px] font-semibold ${colorStyles.text} w-8 text-right`}
+          >
             {percentage}%
           </span>
         </div>
@@ -88,7 +90,9 @@ export const CompetenceProgressBar: React.FC<CompetenceProgressBarProps> = ({
               </span>
             )}
           </div>
-          <p className="text-xs text-muted-foreground mt-1 line-clamp-1">{competence.description}</p>
+          <p className="text-xs text-muted-foreground mt-1 line-clamp-1">
+            {competence.description}
+          </p>
         </div>
 
         <div className="text-right shrink-0">

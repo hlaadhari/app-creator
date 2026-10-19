@@ -2,11 +2,7 @@
  * Moteur Déterministe de Calcul de Maîtrise (v1.0) et Détection de Progression (PRD F-57 à F-60)
  */
 
-import {
-  OFFICIAL_COMPETENCES,
-  OFFICIAL_BADGES,
-  CATEGORY_LABELS,
-} from "./referentiel";
+import { OFFICIAL_COMPETENCES, OFFICIAL_BADGES, CATEGORY_LABELS } from "./referentiel";
 import type {
   CompetenceCategory,
   MasteryLevelClassification,
@@ -53,9 +49,7 @@ export function calculerMaitriseScore(
   let facteurRecence = 1.0;
   if (derniereDate) {
     const dateMs =
-      typeof derniereDate === "number"
-        ? derniereDate
-        : new Date(derniereDate).getTime();
+      typeof derniereDate === "number" ? derniereDate : new Date(derniereDate).getTime();
     if (!isNaN(dateMs)) {
       const joursEcoules = (Date.now() - dateMs) / (1000 * 60 * 60 * 24);
       if (joursEcoules > 30) {

@@ -4,10 +4,7 @@
  */
 
 import { supabase } from "@/integrations/supabase/client";
-import {
-  OFFICIAL_BADGES,
-  inferCompetenceForCriterion,
-} from "./referentiel";
+import { OFFICIAL_BADGES, inferCompetenceForCriterion } from "./referentiel";
 import {
   calculerMaitriseScore,
   buildStudentProgressionReport,
@@ -87,6 +84,19 @@ function saveLocalBadges(badges: BadgeEleve[]): void {
   }
 }
 
+interface DbQueryBuilder {
+  select: (cols?: string) => DbQueryBuilder;
+  eq: (col: string, val: unknown) => Promise<{ data: unknown[] | null; error: unknown }>;
+  insert: (data: unknown) => Promise<{ data: unknown; error: unknown }>;
+  upsert: (data: unknown, opts?: unknown) => Promise<{ data: unknown; error: unknown }>;
+}
+
+interface DynamicSupabaseClient {
+  from: (table: string) => DbQueryBuilder;
+}
+
+const dbClient = supabase as unknown as DynamicSupabaseClient;
+
 /**
  * Récupère les données de maîtrise d'un élève (depuis Supabase si connecté, sinon local)
  */
@@ -100,10 +110,7 @@ export async function getStudentMasteryRecords(
   }
 
   try {
-    const { data, error } = await (supabase as any)
-      .from("maitrise")
-      .select("*")
-      .eq("eleve_id", eleveId);
+    const { data, error } = await dbClient.from("maitrise").select("*").eq("eleve_id", eleveId);
 
     if (error || !data || data.length === 0) {
       return localList.filter((r) => !r.eleveId || r.eleveId === eleveId);
@@ -133,9 +140,7 @@ export async function getStudentMasteryRecords(
 /**
  * Récupère les badges obtenus par l'élève
  */
-export async function getStudentBadges(
-  eleveId?: string | null | undefined,
-): Promise<BadgeEleve[]> {
+export async function getStudentBadges(eleveId?: string | null | undefined): Promise<BadgeEleve[]> {
   const localBadges = getLocalBadges();
 
   if (!eleveId) {
@@ -143,10 +148,7 @@ export async function getStudentBadges(
   }
 
   try {
-    const { data, error } = await (supabase as any)
-      .from("badges")
-      .select("*")
-      .eq("eleve_id", eleveId);
+    const { data, error } = await dbClient.from("badges").select("*").eq("eleve_id", eleveId);
 
     if (error || !data || data.length === 0) {
       return localBadges.filter((b) => !b.eleveId || b.eleveId === eleveId);
@@ -202,8 +204,7 @@ export async function updateMasteryFromAttempt(params: {
   newBadgesAwarded: BadgeEleve[];
   report: StudentProgressionReport;
 }> {
-  const { sujetId, criteres, eleveId, noteExamen, consecutiveFailuresOnCriterion } =
-    params;
+  const { sujetId, criteres, eleveId, noteExamen, consecutiveFailuresOnCriterion } = params;
   const currentEleveId = eleveId || "invite-eleve";
 
   const existingRecords = await getStudentMasteryRecords(currentEleveId);
@@ -226,18 +227,11 @@ export async function updateMasteryFromAttempt(params: {
     // Détection du premier coup réussi
     const premierCoupSucces = isNew
       ? c.ok
-      : (existing?.premierCoupSucces || (existing?.nbTentatives === 0 && c.ok));
+      : existing?.premierCoupSucces || (existing?.nbTentatives === 0 && c.ok);
 
-    const dernierSucces = c.ok
-      ? new Date().toISOString()
-      : existing?.dernierSucces || null;
+    const dernierSucces = c.ok ? new Date().toISOString() : existing?.dernierSucces || null;
 
-    const niveau = calculerMaitriseScore(
-      nbSucces,
-      nbTentatives,
-      premierCoupSucces,
-      dernierSucces,
-    );
+    const niveau = calculerMaitriseScore(nbSucces, nbTentatives, premierCoupSucces, dernierSucces);
 
     recordsMap.set(compId, {
       eleveId: currentEleveId,
@@ -270,7 +264,7 @@ export async function updateMasteryFromAttempt(params: {
         updated_at: r.updatedAt,
       }));
 
-      await (supabase as any).from("maitrise").upsert(rowsToUpsert, {
+      await dbClient.from("maitrise").upsert(rowsToUpsert, {
         onConflict: "eleve_id,competence_id",
       });
     } catch (err) {
@@ -328,7 +322,7 @@ export async function updateMasteryFromAttempt(params: {
     // Sync Supabase badge
     if (eleveId && eleveId !== "invite-eleve") {
       try {
-        await (supabase as any).from("badges").insert({
+        await dbClient.from("badges").insert({
           eleve_id: eleveId,
           badge_id: bId,
           obtenu_le: newBadge.obtenuLe,

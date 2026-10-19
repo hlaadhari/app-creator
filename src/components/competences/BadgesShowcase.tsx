@@ -30,10 +30,7 @@ const ICON_MAP: Record<string, React.ElementType> = {
   Award,
 };
 
-export const BadgesShowcase: React.FC<BadgesShowcaseProps> = ({
-  definitions,
-  studentBadges,
-}) => {
+export const BadgesShowcase: React.FC<BadgesShowcaseProps> = ({ definitions, studentBadges }) => {
   const studentBadgeMap = new Map<string, BadgeEleve>();
   for (const b of studentBadges) {
     studentBadgeMap.set(b.badgeId, b);

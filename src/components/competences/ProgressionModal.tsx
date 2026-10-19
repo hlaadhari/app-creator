@@ -37,7 +37,7 @@ export function ProgressionModal({ triggerButton }: ProgressionModalProps) {
   const [loading, setLoading] = useState(false);
   const [selectedCatFilter, setSelectedCatFilter] = useState<string>("all");
 
-  const loadReport = async () => {
+  const loadReport = React.useCallback(async () => {
     setLoading(true);
     try {
       const data = await getStudentProgressionReport(user?.id);
@@ -45,13 +45,13 @@ export function ProgressionModal({ triggerButton }: ProgressionModalProps) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user?.id]);
 
   useEffect(() => {
     if (open) {
-      loadReport();
+      void loadReport();
     }
-  }, [open, user]);
+  }, [open, loadReport]);
 
   const filteredCompetences = React.useMemo(() => {
     if (!report) return [];
@@ -223,19 +223,19 @@ export function ProgressionModal({ triggerButton }: ProgressionModalProps) {
                 >
                   Toutes ({report.competences.length})
                 </Button>
-                {(["HTML", "CSS", "JAVASCRIPT", "PHP", "SQL", "ALGO_ARCHI"] as CompetenceCategory[]).map(
-                  (cat) => (
-                    <Button
-                      key={cat}
-                      variant={selectedCatFilter === cat ? "default" : "outline"}
-                      size="sm"
-                      onClick={() => setSelectedCatFilter(cat)}
-                      className="text-xs h-7 px-2.5"
-                    >
-                      {cat}
-                    </Button>
-                  ),
-                )}
+                {(
+                  ["HTML", "CSS", "JAVASCRIPT", "PHP", "SQL", "ALGO_ARCHI"] as CompetenceCategory[]
+                ).map((cat) => (
+                  <Button
+                    key={cat}
+                    variant={selectedCatFilter === cat ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setSelectedCatFilter(cat)}
+                    className="text-xs h-7 px-2.5"
+                  >
+                    {cat}
+                  </Button>
+                ))}
               </div>
 
               {/* Liste des compétences filtrées */}
@@ -258,10 +258,7 @@ export function ProgressionModal({ triggerButton }: ProgressionModalProps) {
                     {report.badgesObtenusCount} sur {report.badgesDisponiblesCount} débloqués
                   </span>
                 </div>
-                <BadgesShowcase
-                  definitions={OFFICIAL_BADGES}
-                  studentBadges={report.badges}
-                />
+                <BadgesShowcase definitions={OFFICIAL_BADGES} studentBadges={report.badges} />
               </div>
             </TabsContent>
           </Tabs>

@@ -3,19 +3,13 @@
  * du Calcul de Maîtrise (v1.0) et des Badges Pédagogiques (PRD Domaine 6, Jalon M7)
  */
 
-export type CompetenceCategory =
-  | "HTML"
-  | "CSS"
-  | "JAVASCRIPT"
-  | "PHP"
-  | "SQL"
-  | "ALGO_ARCHI";
+export type CompetenceCategory = "HTML" | "CSS" | "JAVASCRIPT" | "PHP" | "SQL" | "ALGO_ARCHI";
 
 export type MasteryLevelClassification =
-  | "non_acquis"     // < 40%
-  | "en_cours"       // 40% - 69%
-  | "acquis"         // 70% - 84%
-  | "maitrise";      // >= 85%
+  | "non_acquis" // < 40%
+  | "en_cours" // 40% - 69%
+  | "acquis" // 70% - 84%
+  | "maitrise"; // >= 85%
 
 export interface Competence {
   id: string;
@@ -54,7 +48,7 @@ export interface CompetenceMasteryView {
   nbSucces: number;
   premierCoupSucces: boolean;
   dernierSucces?: string | null | undefined;
-  estPointFort: boolean;      // >= 75%
+  estPointFort: boolean; // >= 75%
   estAxePrioritaire: boolean; // < 50% avec au moins 1 tentative ou compétence clé sans succès
 }
 
