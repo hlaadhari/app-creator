@@ -11,14 +11,25 @@ import {
   TableBody,
   TableCell,
 } from "@/components/ui/table";
-import { FileSearch, AlertTriangle, CheckCircle2, Clock, Search, Download } from "lucide-react";
+import {
+  FileSearch,
+  AlertTriangle,
+  CheckCircle2,
+  Clock,
+  Search,
+  Download,
+  AlertOctagon,
+} from "lucide-react";
 import type { TeacherClassMember } from "@/lib/supabase/teacher";
+import type { StudentBlockageAlert } from "@/lib/analytics/class-analytics";
 
 interface StudentProgressTableProps {
   students: TeacherClassMember[];
   loading: boolean;
   onInspectCopy: (student: TeacherClassMember) => void;
   onExportCsv: () => void;
+  onExportPronote?: (() => void) | undefined;
+  alerts?: StudentBlockageAlert[] | undefined;
 }
 
 export function StudentProgressTable({
@@ -26,6 +37,8 @@ export function StudentProgressTable({
   loading,
   onInspectCopy,
   onExportCsv,
+  onExportPronote,
+  alerts = [],
 }: StudentProgressTableProps) {
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -37,7 +50,7 @@ export function StudentProgressTable({
 
   return (
     <div className="space-y-4">
-      {/* Barre d'outils (Recherche + Export) */}
+      {/* Barre d'outils (Recherche + Exports) */}
       <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
         <div className="relative w-full sm:w-72">
           <Search className="w-4 h-4 absolute left-3 top-2.5 text-muted-foreground" />
@@ -50,6 +63,18 @@ export function StudentProgressTable({
         </div>
 
         <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
+          {onExportPronote && (
+            <Button
+              size="sm"
+              variant="default"
+              onClick={onExportPronote}
+              disabled={students.length === 0}
+              className="text-xs gap-1.5 h-9 bg-primary text-primary-foreground hover:bg-primary/90"
+            >
+              <Download className="w-3.5 h-3.5" />
+              Export Pronote / ENT (.csv)
+            </Button>
+          )}
           <Button
             size="sm"
             variant="outline"
@@ -58,7 +83,7 @@ export function StudentProgressTable({
             className="text-xs gap-1.5 h-9"
           >
             <Download className="w-3.5 h-3.5" />
-            Exporter la classe (CSV)
+            CSV Standard
           </Button>
         </div>
       </div>
@@ -152,21 +177,62 @@ export function StudentProgressTable({
                     </TableCell>
 
                     <TableCell>
-                      {hasStruggles ? (
-                        <div className="flex items-center gap-1 text-[11px] text-amber-500">
-                          <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
-                          <span
-                            className="truncate max-w-[150px]"
-                            title={eleve.points_faibles?.join(", ")}
-                          >
-                            {eleve.points_faibles?.[0]}
-                            {(eleve.points_faibles?.length ?? 0) > 1 &&
-                              ` (+${(eleve.points_faibles?.length ?? 0) - 1})`}
+                      {(() => {
+                        const studentAlerts = alerts.filter((a) => a.eleveId === eleve.eleve_id);
+                        const criticalAlert = studentAlerts.find((a) => a.severite === "critique");
+                        const inactivityAlert = studentAlerts.find(
+                          (a) => a.severite === "inactivite",
+                        );
+
+                        if (criticalAlert) {
+                          return (
+                            <Badge
+                              variant="destructive"
+                              className="text-[10px] gap-1 py-0.5 px-2 bg-destructive text-destructive-foreground font-semibold"
+                              title={criticalAlert.description}
+                            >
+                              <AlertOctagon className="w-3 h-3" />
+                              Bloqué ({criticalAlert.consecutiveFailures ?? ">3"} échecs)
+                            </Badge>
+                          );
+                        }
+
+                        if (inactivityAlert) {
+                          return (
+                            <Badge
+                              variant="outline"
+                              className="text-[10px] gap-1 py-0.5 px-2 bg-amber-500/10 text-amber-500 border-amber-500/30 font-medium"
+                              title={inactivityAlert.description}
+                            >
+                              <Clock className="w-3 h-3" />
+                              Inactif ({inactivityAlert.inactivityMinutes} min)
+                            </Badge>
+                          );
+                        }
+
+                        if (hasStruggles) {
+                          return (
+                            <div className="flex items-center gap-1 text-[11px] text-amber-500">
+                              <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
+                              <span
+                                className="truncate max-w-[150px]"
+                                title={eleve.points_faibles?.join(", ")}
+                              >
+                                {eleve.points_faibles?.[0]}
+                                {(eleve.points_faibles?.length ?? 0) > 1 &&
+                                  ` (+${(eleve.points_faibles?.length ?? 0) - 1})`}
+                              </span>
+                            </div>
+                          );
+                        }
+
+                        return (
+                          <span className="text-muted-foreground text-[10px] flex items-center gap-1">
+                            <CheckCircle2 className="w-3 h-3 text-green-500/70" />
+                            Progression fluide
                           </span>
-                        </div>
-                      ) : (
-                        <span className="text-muted-foreground text-[10px]">Aucun blocage</span>
-                      )}
+                        );
+                      })()}
                     </TableCell>
 
                     <TableCell className="text-muted-foreground text-[11px]">
