@@ -208,7 +208,7 @@ function AdminDashboardPage() {
     );
   }
 
-  // Contrôle d'accès strict (T-02/T-03) avec proposition de Mode Démo
+  // Contrôle d'accès strict (T-02/T-03)
   if (!isDemo && (!user || role !== "admin")) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background px-4">
@@ -218,20 +218,11 @@ function AdminDashboardPage() {
           </div>
           <h1 className="text-xl font-bold text-foreground">Accès Réservé à l'Administration</h1>
           <p className="text-xs text-muted-foreground leading-relaxed">
-            L'espace d'administration centrale est réservé aux comptes dotés du rôle administrateur
-            (T-03, PRD §4.1).
+            {user
+              ? `Votre compte connecté (${user.email}) possède le rôle "${role}". L'espace d'administration nécessite le rôle administrateur.`
+              : "Vous devez être connecté avec le compte administrateur (hatem.laadhari.dev01@gmail.com) pour accéder à cette interface."}
           </p>
           <div className="pt-2 flex flex-col gap-2">
-            <Button
-              onClick={() => {
-                setIsDemo(true);
-                loadData();
-              }}
-              className="w-full bg-rose-600 hover:bg-rose-700 text-white text-xs font-medium h-9 gap-1.5"
-            >
-              <Shield className="w-4 h-4" />
-              <span>Explorer en Mode Démo Administrateur</span>
-            </Button>
             <Link
               to="/"
               className="inline-flex items-center justify-center rounded-md border px-4 py-2 text-xs font-medium hover:bg-muted transition-colors gap-2 text-muted-foreground hover:text-foreground"

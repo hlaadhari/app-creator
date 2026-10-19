@@ -277,6 +277,21 @@ export async function getAdminMetrics(): Promise<AdminMetrics> {
 /**
  * Récupère la liste des utilisateurs pour la gestion des rôles
  */
+const OFFICIAL_ACCOUNTS: Record<string, { email: string; role: AppRole }> = {
+  "a3ea041c-9587-4836-8ef2-eb00df162f99": {
+    email: "hatem.laadhari.dev01@gmail.com",
+    role: "admin",
+  },
+  "f17699a0-de97-450a-9386-388f6ea54a90": {
+    email: "hatem.laadhari.dev02@gmail.com",
+    role: "enseignant",
+  },
+  "5993a72b-827f-4c6d-b824-8b4a5ddb5eaa": {
+    email: "hatem.laadhari.dev03@gmail.com",
+    role: "eleve",
+  },
+};
+
 export async function getAdminUsers(): Promise<AdminUser[]> {
   try {
     const { data: profiles, error } = await supabase
@@ -297,12 +312,15 @@ export async function getAdminUsers(): Promise<AdminUser[]> {
     }
 
     return profiles.map((p) => {
-      const userRole: AppRole = roleMap.get(p.id) || "eleve";
+      const official = OFFICIAL_ACCOUNTS[p.id];
+      const userRole: AppRole = official?.role || roleMap.get(p.id) || "eleve";
+      const userEmail: string =
+        official?.email || `${p.prenom.toLowerCase()}.${p.nom.toLowerCase()}@lycee.fr`;
       return {
         id: p.id,
         nom: p.nom,
         prenom: p.prenom,
-        email: `${p.prenom.toLowerCase()}.${p.nom.toLowerCase()}@lycee.fr`,
+        email: userEmail,
         role: userRole,
         valide_par: userRole === "enseignant" ? "admin-id" : null,
         valide_at: userRole === "enseignant" ? p.created_at : null,

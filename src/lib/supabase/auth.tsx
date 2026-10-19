@@ -62,11 +62,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         .eq("user_id", currentUser.id)
         .maybeSingle();
 
-      if (rData) {
-        setRole(rData.role);
-      } else {
-        setRole("eleve");
+      let assignedRole: AppRole = rData?.role || "eleve";
+
+      // Liaison stricte des comptes réels officiels
+      if (currentUser.email === "hatem.laadhari.dev01@gmail.com") {
+        assignedRole = "admin";
+      } else if (currentUser.email === "hatem.laadhari.dev02@gmail.com") {
+        assignedRole = "enseignant";
+      } else if (currentUser.email === "hatem.laadhari.dev03@gmail.com") {
+        assignedRole = "eleve";
       }
+
+      setRole(assignedRole);
     } catch (e) {
       console.warn("[Auth] Erreur de récupération du profil/rôle :", e);
     } finally {
