@@ -1,5 +1,5 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { useEffect, useRef, useState, useMemo } from "react";
+import { useEffect, useRef, useState, useMemo, useCallback } from "react";
 import { getExercise, runCriteria, score, type FileName, type Result } from "@/lib/exercises";
 import { clear } from "@/lib/progress";
 import { useBufferSync } from "@/lib/storage/useBufferSync";
@@ -8,6 +8,7 @@ import { SyncStatusBar } from "@/components/workspace/SyncStatusBar";
 import { ConflictModal } from "@/components/workspace/ConflictModal";
 import { EvaluationResultsPane } from "@/components/workspace/EvaluationResultsPane";
 import { debloquerNiveauIndice, type UnlockedHint } from "@/lib/evaluation/hints-service";
+import { calculerCompteARebours, getTempsServeurSynchronise } from "@/lib/exam/server-clock";
 import type { EvaluationSummary } from "@/lib/evaluation/probe-runner";
 import { SproutLogo } from "@/components/SproutLogo";
 import { AuthModal } from "@/components/AuthModal";
@@ -99,6 +100,54 @@ function Workspace() {
   const [verifying, setVerifying] = useState(false);
   const [cursorPos, setCursorPos] = useState({ line: 1, col: 1 });
 
+  const isExamMode = Boolean(ex.examMode);
+
+  // Synchronisation du compte à rebours officiel d'examen (PRD F-48, F-50, T-06)
+  const [countdown, setCountdown] = useState(() => {
+    if (!isExamMode) return null;
+    const durationMs = (ex.dureeMinutes || 90) * 60 * 1000;
+    const storageKey = `bacsti_exam_start_${id}`;
+    let startTimestamp = typeof window !== "undefined" ? localStorage.getItem(storageKey) : null;
+    if (!startTimestamp) {
+      startTimestamp = Date.now().toString();
+      if (typeof window !== "undefined") {
+        localStorage.setItem(storageKey, startTimestamp);
+      }
+    }
+    const deadline = new Date(Number(startTimestamp) + durationMs);
+    return calculerCompteARebours(deadline, getTempsServeurSynchronise());
+  });
+
+  useEffect(() => {
+    if (!isExamMode) return;
+    const durationMs = (ex.dureeMinutes || 90) * 60 * 1000;
+    const storageKey = `bacsti_exam_start_${id}`;
+    let startTimestamp = localStorage.getItem(storageKey);
+    if (!startTimestamp) {
+      startTimestamp = Date.now().toString();
+      localStorage.setItem(storageKey, startTimestamp);
+    }
+    const deadline = new Date(Number(startTimestamp) + durationMs);
+
+    const updateTimer = () => {
+      const cd = calculerCompteARebours(deadline, getTempsServeurSynchronise());
+      setCountdown(cd);
+    };
+
+    updateTimer();
+    const interval = setInterval(updateTimer, 1000);
+    return () => clearInterval(interval);
+  }, [id, isExamMode, ex.dureeMinutes]);
+
+  const isExamExpired = isExamMode && Boolean(countdown?.isExpired);
+
+  // Neutralisation de l'onglet tuteur en mode examen
+  useEffect(() => {
+    if (isExamMode && sidebarTab === "tuteur") {
+      setSidebarTab("enonce");
+    }
+  }, [isExamMode, sidebarTab]);
+
   const hasPhp = useMemo(() => Object.keys(files).some((k) => k.endsWith(".php")), [files]);
   const hasSql = useMemo(
     () => Object.keys(files).some((k) => k.endsWith(".sql") || k === "db/init.sql"),
@@ -107,6 +156,7 @@ function Workspace() {
   const [rightPanelTab, setRightPanelTab] = useState<"preview" | "sql" | "php">("preview");
 
   const handleVerify = () => {
+    if (isExamExpired) return;
     setVerifying(true);
     const startTime = performance.now();
 
@@ -227,6 +277,23 @@ function Workspace() {
     setUnlockedHints([]);
   };
 
+  // Raccourci clavier global Ctrl+Entrée / Cmd+Entrée pour lancer l'évaluation (Item 5)
+  const handleVerifyRef = useRef(handleVerify);
+  handleVerifyRef.current = handleVerify;
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
+        e.preventDefault();
+        if (!verifying && !isExamExpired) {
+          handleVerifyRef.current();
+        }
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [verifying, isExamExpired]);
+
   const currentFile: WorkspaceFile = files[activeFileName] ??
     files["index.html"] ?? {
       name: "index.html",
@@ -264,9 +331,31 @@ function Workspace() {
           <span className="rounded bg-primary/10 border border-primary/20 px-1.5 py-0.5 text-[10px] text-primary hidden md:inline">
             SW_{id}
           </span>
+          {isExamMode && (
+            <span className="ml-2 inline-flex items-center gap-1.5 rounded-full border border-rose-500/30 bg-rose-500/10 px-2.5 py-0.5 text-[11px] font-semibold text-rose-500">
+              <Lock className="h-3 w-3" />
+              <span>Mode Examen - Assistance Neutralisée</span>
+            </span>
+          )}
         </div>
 
         <div className="flex items-center gap-2">
+          {isExamMode && countdown && (
+            <div
+              className={`flex items-center gap-1.5 rounded border px-2.5 py-1 text-xs font-mono ${
+                countdown.isExpired
+                  ? "border-rose-500/40 bg-rose-500/15 text-rose-500 font-bold animate-pulse"
+                  : countdown.isCritical
+                    ? "border-amber-500/40 bg-amber-500/15 text-amber-500 font-bold"
+                    : "border-border bg-background/50 text-foreground"
+              }`}
+              title="Temps d'épreuve officiel synchronisé avec l'horloge serveur (PRD F-50, T-06)"
+            >
+              <Clock className="h-3.5 w-3.5" />
+              <span>{countdown.isExpired ? "00:00 (Échéance échue)" : countdown.formatted}</span>
+            </div>
+          )}
+
           <ProgressionModal
             triggerButton={
               <button
@@ -278,43 +367,23 @@ function Workspace() {
               </button>
             }
           />
-          <button
-            onClick={() => setSidebarTab("tuteur")}
-            className={`flex items-center gap-1.5 rounded border px-2.5 py-1 text-xs font-mono transition-colors cursor-pointer ${
-              ex.examMode
-                ? "border-destructive/30 bg-destructive/10 text-destructive opacity-75"
-                : sidebarTab === "tuteur"
+
+          {!isExamMode && (
+            <button
+              onClick={() => setSidebarTab("tuteur")}
+              className={`flex items-center gap-1.5 rounded border px-2.5 py-1 text-xs font-mono transition-colors cursor-pointer ${
+                sidebarTab === "tuteur"
                   ? "border-primary bg-primary text-primary-foreground font-semibold"
                   : "border-primary/30 bg-primary/10 text-primary hover:bg-primary/20"
-            }`}
-            title={
-              ex.examMode
-                ? "Tuteur neutralisé en mode examen (PRD F-56, T-06)"
-                : "Consulter le tuteur pédagogique d'aide contextuelle"
-            }
-          >
-            {ex.examMode ? <Lock className="h-3 w-3" /> : <Bot className="h-3 w-3" />}
-            <span className="hidden sm:inline">
-              {ex.examMode ? "Tuteur (Neutralisé)" : "Tuteur STI"}
-            </span>
-          </button>
+              }`}
+              title="Consulter le tuteur pédagogique d'aide contextuelle"
+            >
+              <Bot className="h-3 w-3" />
+              <span className="hidden sm:inline">Tuteur STI</span>
+            </button>
+          )}
+
           <AuthModal />
-          <button
-            onClick={handleReset}
-            className="flex items-center gap-1.5 rounded border bg-background/50 px-2.5 py-1 text-muted-foreground hover:text-foreground hover:bg-accent transition-colors cursor-pointer"
-            title="Réinitialiser le projet à son état de départ"
-          >
-            <RotateCcw className="h-3 w-3" />
-            <span className="hidden sm:inline">Réinitialiser</span>
-          </button>
-          <button
-            onClick={handleVerify}
-            disabled={verifying}
-            className="flex items-center gap-1.5 rounded bg-primary px-3.5 py-1 font-medium text-primary-foreground hover:opacity-90 shadow-xs transition-opacity cursor-pointer disabled:opacity-50"
-          >
-            <Play className="h-3 w-3 fill-current" />
-            <span>{verifying ? "Vérification..." : "Vérifier"}</span>
-          </button>
         </div>
       </header>
 
@@ -361,26 +430,20 @@ function Workspace() {
                 </span>
               )}
             </button>
-            <button
-              onClick={() => setSidebarTab("tuteur")}
-              className={`flex-1 py-2 flex items-center justify-center gap-1.5 uppercase tracking-wider text-[11px] transition-colors ${
-                sidebarTab === "tuteur"
-                  ? "border-b-2 border-primary text-foreground font-semibold bg-background/40"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
-              title={
-                ex.examMode
-                  ? "Tuteur neutralisé en examen (PRD F-56, T-06)"
-                  : "Dialogue socratique & questionnement guidé"
-              }
-            >
-              {ex.examMode ? (
-                <Lock className="h-3.5 w-3.5 text-destructive" />
-              ) : (
+            {!isExamMode && (
+              <button
+                onClick={() => setSidebarTab("tuteur")}
+                className={`flex-1 py-2 flex items-center justify-center gap-1.5 uppercase tracking-wider text-[11px] transition-colors ${
+                  sidebarTab === "tuteur"
+                    ? "border-b-2 border-primary text-foreground font-semibold bg-background/40"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+                title="Dialogue socratique & questionnement guidé"
+              >
                 <Bot className="h-3.5 w-3.5 text-primary" />
-              )}
-              <span>Tuteur</span>
-            </button>
+                <span>Tuteur</span>
+              </button>
+            )}
           </div>
 
           <div className="flex-1 overflow-auto min-h-0">
@@ -426,45 +489,60 @@ function Workspace() {
                       <Sparkles className="h-3.5 w-3.5 text-amber-500" />
                       <span>Indices progressifs (3 niveaux)</span>
                     </h3>
-                    <span className="text-[10px] font-mono text-muted-foreground">
-                      {unlockedHints.length}/{ex.hints.length} débloqué(s)
-                    </span>
-                  </div>
-
-                  <div className="space-y-2">
-                    {unlockedHints.map((uh, i) => (
-                      <div
-                        key={i}
-                        className="rounded-md border-l-2 border-primary bg-muted/60 p-2.5 text-xs text-foreground/90"
-                      >
-                        <span className="font-mono font-semibold text-[10px] text-primary uppercase block mb-1">
-                          Indice {uh.level} • {uh.levelName}
-                        </span>
-                        {uh.texte}
-                      </div>
-                    ))}
-
-                    {unlockedHints.length < ex.hints.length && (
-                      <button
-                        onClick={handleUnlockHint}
-                        disabled={unlockingHint}
-                        className="w-full text-left rounded border border-dashed p-2 text-xs text-primary hover:bg-accent/40 transition-colors flex items-center justify-between disabled:opacity-50 cursor-pointer"
-                      >
-                        <span>
-                          {unlockingHint
-                            ? "Déblocage sécurisé..."
-                            : `Débloquer l'indice ${unlockedHints.length + 1} (${
-                                unlockedHints.length === 0
-                                  ? "Niveau 1 : Conceptuel"
-                                  : unlockedHints.length === 1
-                                    ? "Niveau 2 : Syntaxique"
-                                    : "Niveau 3 : Extrait de code"
-                              })`}
-                        </span>
-                        <HelpCircle className="h-3.5 w-3.5 text-primary shrink-0" />
-                      </button>
+                    {!isExamMode && (
+                      <span className="text-[10px] font-mono text-muted-foreground">
+                        {unlockedHints.length}/{ex.hints.length} débloqué(s)
+                      </span>
                     )}
                   </div>
+
+                  {isExamMode ? (
+                    <div className="rounded border border-amber-500/30 bg-amber-500/10 p-3 text-xs text-amber-500">
+                      <div className="flex items-center gap-1.5 font-semibold mb-1">
+                        <Lock className="h-3.5 w-3.5" />
+                        <span>Assistance neutralisée</span>
+                      </div>
+                      <p className="text-[11px] text-muted-foreground leading-relaxed">
+                        Conformément au règlement du Bac STI (PRD F-48, F-56, T-06), les indices,
+                        corrections et solutions sont strictement inaccessibles pendant l'examen.
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="space-y-2">
+                      {unlockedHints.map((uh, i) => (
+                        <div
+                          key={i}
+                          className="rounded-md border-l-2 border-primary bg-muted/60 p-2.5 text-xs text-foreground/90"
+                        >
+                          <span className="font-mono font-semibold text-[10px] text-primary uppercase block mb-1">
+                            Indice {uh.level} • {uh.levelName}
+                          </span>
+                          {uh.texte}
+                        </div>
+                      ))}
+
+                      {unlockedHints.length < ex.hints.length && (
+                        <button
+                          onClick={handleUnlockHint}
+                          disabled={unlockingHint}
+                          className="w-full text-left rounded border border-dashed p-2 text-xs text-primary hover:bg-accent/40 transition-colors flex items-center justify-between disabled:opacity-50 cursor-pointer"
+                        >
+                          <span>
+                            {unlockingHint
+                              ? "Déblocage sécurisé..."
+                              : `Débloquer l'indice ${unlockedHints.length + 1} (${
+                                  unlockedHints.length === 0
+                                    ? "Niveau 1 : Conceptuel"
+                                    : unlockedHints.length === 1
+                                      ? "Niveau 2 : Syntaxique"
+                                      : "Niveau 3 : Extrait de code"
+                                })`}
+                          </span>
+                          <HelpCircle className="h-3.5 w-3.5 text-primary shrink-0" />
+                        </button>
+                      )}
+                    </div>
+                  )}
                 </div>
               </div>
             )}
@@ -491,7 +569,7 @@ function Workspace() {
               />
             )}
 
-            {sidebarTab === "tuteur" && (
+            {!isExamMode && sidebarTab === "tuteur" && (
               <PedagogicalTutorPane
                 context={{
                   sujetId: id,
@@ -516,46 +594,87 @@ function Workspace() {
           </div>
         </aside>
 
-        {/* Panneau Central : Éditeur Monaco + Onglets VS Code */}
+        {/* Panneau Central : Éditeur Monaco + Onglets VS Code + Actions (Item 5) */}
         <section className="flex min-h-0 flex-col bg-editor">
-          {/* Barre d'onglets de fichiers */}
-          <div className="flex items-center border-b bg-panel text-xs font-mono overflow-x-auto shrink-0 select-none">
-            {Object.keys(files).map((fileName) => {
-              const isActive = activeFileName === fileName;
-              return (
-                <button
-                  key={fileName}
-                  onClick={() => setActiveFileName(fileName)}
-                  className={`flex items-center gap-2 border-r px-4 py-2 transition-colors border-t-2 ${
-                    isActive
-                      ? "bg-editor text-foreground border-t-primary font-medium"
-                      : "text-muted-foreground hover:bg-accent/40 border-t-transparent"
-                  }`}
-                >
-                  <span
-                    className={
-                      fileName.endsWith(".html")
-                        ? "text-orange-500 font-bold"
-                        : fileName.endsWith(".css")
-                          ? "text-sky-400 font-bold"
-                          : fileName.endsWith(".js")
-                            ? "text-amber-400 font-bold"
-                            : "text-purple-400"
-                    }
+          {/* Barre d'onglets de fichiers et actions d'évaluation */}
+          <div className="flex items-center justify-between border-b bg-panel text-xs font-mono shrink-0 select-none px-1 overflow-x-auto">
+            {/* Onglets des fichiers */}
+            <div className="flex items-center min-w-0">
+              {Object.keys(files).map((fileName) => {
+                const isActive = activeFileName === fileName;
+                return (
+                  <button
+                    key={fileName}
+                    onClick={() => setActiveFileName(fileName)}
+                    className={`flex items-center gap-2 border-r px-3.5 py-2 transition-colors border-t-2 shrink-0 cursor-pointer ${
+                      isActive
+                        ? "bg-editor text-foreground border-t-primary font-medium"
+                        : "text-muted-foreground hover:bg-accent/40 border-t-transparent"
+                    }`}
                   >
-                    ●
-                  </span>
-                  <span>{fileName}</span>
-                  {syncStatus === "pending" && isActive && (
                     <span
-                      className="h-1.5 w-1.5 rounded-full bg-primary"
-                      title="Modifications locales enregistrées dans le tampon IndexedDB"
-                    />
-                  )}
-                </button>
-              );
-            })}
+                      className={
+                        fileName.endsWith(".html")
+                          ? "text-orange-500 font-bold"
+                          : fileName.endsWith(".css")
+                            ? "text-sky-400 font-bold"
+                            : fileName.endsWith(".js")
+                              ? "text-amber-400 font-bold"
+                              : "text-purple-400"
+                      }
+                    >
+                      ●
+                    </span>
+                    <span>{fileName}</span>
+                    {syncStatus === "pending" && isActive && (
+                      <span
+                        className="h-1.5 w-1.5 rounded-full bg-primary"
+                        title="Modifications locales enregistrées dans le tampon IndexedDB"
+                      />
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Actions de l'éditeur : Réinitialiser & Vérifier mon code (Item 5) */}
+            <div className="flex items-center gap-2 px-2 py-1 shrink-0">
+              <button
+                onClick={handleReset}
+                disabled={isExamExpired}
+                className="flex items-center gap-1.5 rounded border bg-background/60 px-2.5 py-1 text-xs text-muted-foreground hover:text-foreground hover:bg-accent transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+                title="Réinitialiser le fichier à l'état de départ"
+              >
+                <RotateCcw className="h-3 w-3" />
+                <span className="hidden sm:inline">Réinitialiser</span>
+              </button>
+
+              <button
+                onClick={handleVerify}
+                disabled={verifying || isExamExpired}
+                className="flex items-center gap-1.5 rounded bg-emerald-600 hover:bg-emerald-500 text-white font-medium px-3 py-1 shadow-xs transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                title="Vérifier mon code (Ctrl + Entrée)"
+              >
+                <Play className="h-3 w-3 fill-current" />
+                <span>{verifying ? "Vérification..." : "Vérifier mon code"}</span>
+                <kbd className="hidden sm:inline-block rounded bg-emerald-700/60 px-1 py-0.2 text-[9px] font-mono text-emerald-100 border border-emerald-500/40">
+                  Ctrl ↵
+                </kbd>
+              </button>
+            </div>
           </div>
+
+          {/* Bannière de verrouillage en cas d'échéance d'examen (PRD F-50, T-06) */}
+          {isExamExpired && (
+            <div className="bg-rose-500/15 border-b border-rose-500/30 px-3 py-1.5 text-xs text-rose-500 font-medium flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Lock className="h-3.5 w-3.5" />
+                <span>
+                  Temps réglementaire d'examen écoulé : éditeur scellé en lecture seule (T-06).
+                </span>
+              </div>
+            </div>
+          )}
 
           {/* Éditeur de code Monaco ou Visualiseur d'asset */}
           <div className="flex-1 min-h-0 relative">
@@ -581,7 +700,9 @@ function Workspace() {
                 onChange={(newContent) => updateFileContent(activeFileName, newContent)}
                 language={editorLanguage}
                 theme="vs-dark"
+                readOnly={isExamExpired}
                 onSave={triggerManualSync}
+                onVerify={handleVerify}
                 onCursorChange={(line, col) => setCursorPos({ line, col })}
               />
             )}
@@ -611,7 +732,7 @@ function Workspace() {
                       : "border-b-transparent text-muted-foreground hover:text-foreground"
                   }`}
                 >
-                  Base SQL (SQLite)
+                  Base de Données (MySQLi)
                 </button>
               )}
               {hasPhp && (

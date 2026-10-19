@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { Monitor, Smartphone, Tablet, RotateCw } from "lucide-react";
 import type { WorkspaceFile, ViewportMode } from "./types";
 
@@ -11,23 +11,36 @@ export function PreviewSandbox({ files, className = "" }: PreviewSandboxProps) {
   const [viewport, setViewport] = useState<ViewportMode>("desktop");
   const [reloadKey, setReloadKey] = useState(0);
 
+  // Rafraîchissement à chaud avec debounce 300ms lors de la saisie
+  const [debouncedFiles, setDebouncedFiles] = useState(files);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedFiles(files);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [files]);
+
   const previewDoc = useMemo(() => {
     const htmlKey =
-      files["index.html"] !== undefined
+      debouncedFiles["index.html"] !== undefined
         ? "index.html"
-        : (Object.keys(files).find((k) => k.endsWith(".html")) ?? "index.html");
-    let html = files[htmlKey]?.content ?? "<!DOCTYPE html><html><body></body></html>";
-    const css = Object.entries(files)
+        : (Object.keys(debouncedFiles).find((k) => k.endsWith(".html")) ?? "index.html");
+    let html = debouncedFiles[htmlKey]?.content ?? "<!DOCTYPE html><html><body></body></html>";
+
+    // Collecter l'ensemble des fichiers CSS (style.css, mesStyles.css, etc.)
+    const css = Object.entries(debouncedFiles)
       .filter(([k]) => k.endsWith(".css"))
-      .map(([, f]) => f.content)
-      .join("\n");
-    const js = Object.entries(files)
+      .map(([name, f]) => `/* === ${name} === */\n${f.content}`)
+      .join("\n\n");
+
+    const js = Object.entries(debouncedFiles)
       .filter(([k]) => k.endsWith(".js"))
       .map(([, f]) => f.content)
       .join("\n");
 
     // 1. Remplacement des images et assets locaux par leurs données Base64 / Blobs
-    for (const [name, file] of Object.entries(files)) {
+    for (const [name, file] of Object.entries(debouncedFiles)) {
       if (file.type === "asset" && file.content) {
         // Remplacement des occurrences relatives (ex: "photo.jpg", "./photo.jpg")
         const regex = new RegExp(
@@ -38,7 +51,13 @@ export function PreviewSandbox({ files, className = "" }: PreviewSandboxProps) {
       }
     }
 
-    // 2. Injection du style CSS (dans la balise <head> ou au début)
+    // Neutraliser les balises <link rel="stylesheet"> locales pour éviter les 404 dans l'iframe
+    html = html.replace(
+      /<link\s+[^>]*rel=["']stylesheet["'][^>]*href=["'](?:\.\/)?[^"']+\.css["'][^>]*\/?>/gi,
+      "<!-- Feuille de style injectée dynamiquement par le bac à sable STI -->",
+    );
+
+    // 2. Injection dynamique du style CSS3 (dans la balise <head> ou au début)
     const styleTag = `<style id="labo-sti-styles">\n${css}\n</style>`;
     if (html.includes("</head>")) {
       html = html.replace("</head>", `${styleTag}\n</head>`);
@@ -46,11 +65,32 @@ export function PreviewSandbox({ files, className = "" }: PreviewSandboxProps) {
       html = `${styleTag}\n${html}`;
     }
 
-    // 3. Script d'isolation de sécurité T-11 (blocage absolu des requêtes sortantes)
+    // 3. Script d'isolation de sécurité T-11 et blocage de stockage parent (PRD F-24, T-11)
     const securityScript = `
 <script id="labo-sti-security">
   (function() {
-    // T-11 : Blocage des appels réseau sortants
+    // Isolation du stockage et cookies de l'application hôte
+    try {
+      Object.defineProperty(window, 'localStorage', {
+        get: function() { throw new Error("Accès à localStorage interdit dans le bac à sable."); },
+        configurable: false
+      });
+    } catch(e) {}
+    try {
+      Object.defineProperty(window, 'sessionStorage', {
+        get: function() { throw new Error("Accès à sessionStorage interdit dans le bac à sable."); },
+        configurable: false
+      });
+    } catch(e) {}
+    try {
+      Object.defineProperty(document, 'cookie', {
+        get: function() { return ""; },
+        set: function() { throw new Error("Accès aux cookies interdit dans le bac à sable."); },
+        configurable: false
+      });
+    } catch(e) {}
+
+    // Blocage absolu des requêtes réseau sortantes (T-11)
     window.fetch = function() {
       console.warn("[Sandbox Labo STI] Appel fetch bloqué par sécurité.");
       return Promise.reject(new Error("Accès réseau sortant interdit dans le bac à sable"));
@@ -81,7 +121,7 @@ export function PreviewSandbox({ files, className = "" }: PreviewSandboxProps) {
     }
 
     return html;
-  }, [files, reloadKey]);
+  }, [debouncedFiles]);
 
   const viewportWidths: Record<ViewportMode, string> = {
     desktop: "100%",
@@ -96,7 +136,7 @@ export function PreviewSandbox({ files, className = "" }: PreviewSandboxProps) {
         <div className="flex items-center gap-2 text-muted-foreground">
           <span className="font-semibold text-foreground">Aperçu en direct</span>
           <span className="text-[10px] text-muted-foreground/80 hidden sm:inline">
-            (Isolation sandbox sécurisée)
+            (Isolation sandbox étanche)
           </span>
         </div>
 
@@ -154,7 +194,7 @@ export function PreviewSandbox({ files, className = "" }: PreviewSandboxProps) {
           <iframe
             key={reloadKey}
             title="Aperçu du travail élève"
-            sandbox="allow-scripts"
+            sandbox="allow-scripts allow-forms"
             srcDoc={previewDoc}
             className="flex-1 w-full h-full border-none bg-white"
           />

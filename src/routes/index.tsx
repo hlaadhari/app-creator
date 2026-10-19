@@ -10,6 +10,9 @@ import { getAllBuffers } from "@/lib/storage/indexeddb";
 import { useAuth } from "@/lib/supabase/auth";
 import { Button } from "@/components/ui/button";
 import { ProgressionModal } from "@/components/competences/ProgressionModal";
+import { getLocalAttempts } from "@/lib/pedagogy/attempts-service";
+import { getExercise } from "@/lib/exercises";
+import { load as loadProgress } from "@/lib/progress";
 import {
   HelpCircle,
   GraduationCap,
@@ -19,6 +22,7 @@ import {
   ShieldAlert,
   Shield,
   TrendingUp,
+  CheckCircle2,
 } from "lucide-react";
 
 export const Route = createFileRoute("/")({
@@ -52,21 +56,98 @@ function Index() {
   const [sujets, setSujets] = useState<RemoteSujet[]>(loaderData?.initialSujets || []);
   const [selectedFilter, setSelectedFilter] = useState<string>("all");
   const [best, setBest] = useState<Record<string, number | undefined>>({});
+  const [progressMap, setProgressMap] = useState<
+    Record<
+      string,
+      {
+        status: "non_commence" | "en_cours" | "valide";
+        passedCriteria?: number;
+        totalCriteria?: number;
+        score?: number;
+      }
+    >
+  >({});
   const [mesClasses, setMesClasses] = useState<ClassInfo[]>([]);
   const [showGuide, setShowGuide] = useState(false);
+
+  const computeProgress = async (catalog: RemoteSujet[]) => {
+    try {
+      const buffers = await getAllBuffers();
+      const bufferMap = new Map(buffers.map((b) => [b.exerciseId, b]));
+      const scores: Record<string, number | undefined> = {};
+      const map: Record<
+        string,
+        {
+          status: "non_commence" | "en_cours" | "valide";
+          passedCriteria?: number;
+          totalCriteria?: number;
+          score?: number;
+        }
+      > = {};
+
+      for (const s of catalog) {
+        const ex = getExercise(s.id);
+        const totalCriteria = ex?.criteria.length || 0;
+        const buf = bufferMap.get(s.id);
+        const local = loadProgress(s.id);
+        const attempts = getLocalAttempts(s.id);
+
+        const latestAttempt = attempts.length > 0 ? attempts[attempts.length - 1] : null;
+        const bestScore =
+          buf?.bestScore ?? local?.best ?? (latestAttempt ? latestAttempt.note20 : undefined);
+        scores[s.id] = bestScore;
+
+        if (
+          bestScore === 20 ||
+          (latestAttempt &&
+            totalCriteria > 0 &&
+            latestAttempt.criteres.filter((c) => c.ok).length === totalCriteria)
+        ) {
+          map[s.id] = {
+            status: "valide",
+            passedCriteria: totalCriteria,
+            totalCriteria,
+            score: 20,
+          };
+        } else if (latestAttempt) {
+          const passed = latestAttempt.criteres.filter((c) => c.ok).length;
+          map[s.id] = {
+            status: "en_cours",
+            passedCriteria: passed,
+            totalCriteria: totalCriteria || latestAttempt.criteres.length,
+            score: latestAttempt.note20,
+          };
+        } else if (bestScore !== undefined && bestScore > 0) {
+          map[s.id] = {
+            status: "en_cours",
+            score: bestScore,
+            totalCriteria,
+          };
+        } else if (buf || local) {
+          map[s.id] = {
+            status: "en_cours",
+            passedCriteria: 0,
+            totalCriteria,
+            score: 0,
+          };
+        } else {
+          map[s.id] = {
+            status: "non_commence",
+          };
+        }
+      }
+
+      setBest(scores);
+      setProgressMap(map);
+    } catch (e) {
+      console.warn("Erreur calcul progression catalogue :", e);
+    }
+  };
 
   const loadData = () => {
     getSujetsCatalog().then((list) => {
       setSujets(list);
-    });
-
-    // Chargement des scores depuis le tampon garanti IndexedDB
-    getAllBuffers().then((buffers) => {
-      const scores: Record<string, number | undefined> = {};
-      for (const b of buffers) {
-        scores[b.exerciseId] = b.bestScore;
-      }
-      setBest(scores);
+      computeProgress(list);
     });
 
     if (user) {
@@ -363,17 +444,41 @@ function Index() {
                     </span>
                   </div>
 
-                  <span
-                    className={`w-16 text-right font-mono text-sm font-semibold ${
-                      best[e.id] === 20
-                        ? "text-emerald-500"
-                        : best[e.id] !== undefined
-                          ? "text-primary"
-                          : "text-muted-foreground/50"
-                    }`}
-                  >
-                    {best[e.id] !== undefined ? `${best[e.id]}/20` : "—"}
-                  </span>
+                  <div className="w-40 flex justify-end">
+                    {(() => {
+                      const prog = progressMap[e.id];
+                      if (prog?.status === "valide") {
+                        return (
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-500 border border-emerald-500/25 shrink-0">
+                            <CheckCircle2 className="w-3.5 h-3.5" />
+                            <span>Validé (20/20)</span>
+                          </span>
+                        );
+                      }
+                      if (prog?.status === "en_cours") {
+                        const label =
+                          prog.passedCriteria !== undefined &&
+                          prog.totalCriteria !== undefined &&
+                          prog.totalCriteria > 0
+                            ? `${prog.passedCriteria}/${prog.totalCriteria} critères`
+                            : prog.score !== undefined
+                              ? `${prog.score}/20`
+                              : "En cours";
+                        return (
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-500/10 text-amber-500 border border-amber-500/25 shrink-0">
+                            <span className="h-2 w-2 rounded-full bg-amber-500 animate-pulse" />
+                            <span>En cours ({label})</span>
+                          </span>
+                        );
+                      }
+                      return (
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 text-xs font-mono text-muted-foreground/60 shrink-0">
+                          <span className="h-1.5 w-1.5 rounded-full bg-muted-foreground/30" />
+                          <span>Non commencé</span>
+                        </span>
+                      );
+                    })()}
+                  </div>
                 </div>
               </Link>
             ))}

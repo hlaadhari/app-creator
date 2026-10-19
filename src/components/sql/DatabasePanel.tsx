@@ -131,11 +131,9 @@ export function DatabasePanel({
       <CardHeader className="flex flex-row items-center justify-between border-b px-4 py-3">
         <div className="flex items-center gap-2">
           <Database className="h-5 w-5 text-primary" />
-          <CardTitle className="text-base font-semibold">
-            Panneau Base de données (SQLite WASM)
-          </CardTitle>
+          <CardTitle className="text-base font-semibold">Base de Données (MySQLi)</CardTitle>
           <Badge variant="outline" className="text-xs">
-            Dialecte Bac STI actif
+            Standard Bac STI (MySQL / MariaDB)
           </Badge>
         </div>
 
