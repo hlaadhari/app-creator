@@ -76,29 +76,31 @@
 ---
 
 ### Jalon M5 — Phase 3 : Correction Étendue & Aides
-- [ ] Support des critères multi-langages (tests d'effets de bord PHP et assertions SQL).
-- [ ] Système d'indices progressifs (3 niveaux) avec déblocage sécurisé par RPC serveur (`debloquer_indice`).
-- [ ] Déblocage tracé des corrigés de référence selon les règles de l'enseignant.
-- [ ] Bouton « Contester ce critère » côté élève avec file de traitement enseignant.
+- [x] [Issue #32](https://github.com/hlaadhari/app-creator/issues/32) : Interface de contestation de critère élève, historique des tentatives et déblocage des corrigés de référence (PR #37).
+- [x] Bouton « Contester ce critère » côté élève avec file de traitement enseignant (PRD F-44, F-45).
+- [x] Historique chronologique des tentatives avec calcul des deltas de progression (+/- pts) et suivi critère par critère.
+- [x] Déblocage tracé des corrigés de référence selon les règles de l'enseignant avec garde-fous anti-triche stricts en mode examen (T-04 / T-06).
+- [x] Support des critères multi-langages (tests d'effets de bord PHP et assertions SQL).
+- [x] Système d'indices progressifs (3 niveaux) avec déblocage sécurisé par RPC serveur (`debloquer_indice`).
 - [x] Possibilité pour l'enseignant de désactiver un critère contesté et de recalculer les notes automatiquement ([Issue #11](https://github.com/hlaadhari/app-creator/issues/11)).
 
 ---
 
 ### Jalon M6 — Phase 4 : Mode Examen Blanc & Snapshots
-- [x] [Issue #15](https://github.com/hlaadhari/app-creator/issues/15) : Sessions d'examen synchronisées avec gestion de la salle d'attente.
+- [x] [Issue #15](https://github.com/hlaadhari/app-creator/issues/15) : Sessions d'examen synchronisées avec gestion de la salle d'attente (PR #28).
 - [x] Minuteur et calcul du temps sous contrôle strict de l'horloge serveur.
 - [x] Verrouillage automatique des écritures à l'échéance serveur.
-- [x] [Issue #16](https://github.com/hlaadhari/app-creator/issues/16) : Génération du **Snapshot immuable** du rendu (hash SHA-256, fichiers, base, versions).
+- [x] [Issue #16](https://github.com/hlaadhari/app-creator/issues/16) : Génération du **Snapshot immuable** du rendu (hash SHA-256, fichiers, base, versions) (PR #29).
 - [x] Rejouage reproductible de la correction de référence.
 - [x] Grille de notation assistée pour l'enseignant avec journalisation des justifications.
-- [x] [Issue #27](https://github.com/hlaadhari/app-creator/issues/27) : Catalogue étendu des sujets (Modules A, B, C) et accès Espace Enseignant / Mode Démo.
-- [x] [Issue #30](https://github.com/hlaadhari/app-creator/issues/30) : Espace d'administration centrale, validation des enseignants (`valide_par`) et conformité RGPD.
+- [x] [Issue #27](https://github.com/hlaadhari/app-creator/issues/27) : Catalogue étendu des sujets (Modules A, B, C) et accès Espace Enseignant / Mode Démo (PR #28).
+- [x] [Issue #30](https://github.com/hlaadhari/app-creator/issues/30) : Espace d'administration centrale, validation des enseignants (`valide_par`) et conformité RGPD (PR #31).
 
 ---
 
 ### Jalon M7 & M8 — Phase 5 & Version 1.0
-- [ ] Référentiel de compétences du Bac STI et matrice de maîtrise.
-- [ ] Tableau de bord statistique de classe et détection des élèves en difficulté.
-- [ ] Tuteur IA pédagogique (sans révélation de la solution, coupé en examen).
-- [ ] Détection indicative de similarité entre rendus de classe.
+- [ ] [Issue #33](https://github.com/hlaadhari/app-creator/issues/33) : Référentiel de compétences du Bac STI et matrice de maîtrise.
+- [ ] [Issue #34](https://github.com/hlaadhari/app-creator/issues/34) : Tableau de bord statistique de classe et détection des décrochages.
+- [ ] [Issue #35](https://github.com/hlaadhari/app-creator/issues/35) : Tuteur IA pédagogique (sans révélation de la solution, coupé en examen).
+- [ ] [Issue #36](https://github.com/hlaadhari/app-creator/issues/36) : Détection indicative de similarité entre rendus de classe (anti-plagiat).
 - [ ] Audit d'accessibilité (contrastes, navigation clavier) et audit légal des licences de dépendances WASM.
