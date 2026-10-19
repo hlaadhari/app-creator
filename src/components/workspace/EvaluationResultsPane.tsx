@@ -23,10 +23,7 @@ import {
   listerContestationsEleve,
   getContestationPourCritere,
 } from "@/lib/pedagogy/contestations-client";
-import {
-  listerHistoriqueAvecDeltas,
-  type AttemptWithDelta,
-} from "@/lib/pedagogy/attempts-service";
+import { listerHistoriqueAvecDeltas, type AttemptWithDelta } from "@/lib/pedagogy/attempts-service";
 import type { ContestationRecord } from "@/lib/subjects/contestations-service";
 
 interface EvaluationResultsPaneProps {
@@ -105,7 +102,11 @@ export function EvaluationResultsPane({
           </p>
         </div>
         <div className="flex flex-col gap-2 w-full max-w-xs">
-          <Button onClick={onVerify} disabled={verifying} className="gap-2 text-xs font-medium w-full">
+          <Button
+            onClick={onVerify}
+            disabled={verifying}
+            className="gap-2 text-xs font-medium w-full"
+          >
             <Play className="h-3.5 w-3.5 fill-current" />
             <span>Lancer la vérification</span>
           </Button>
@@ -118,7 +119,9 @@ export function EvaluationResultsPane({
               className="gap-2 text-xs w-full"
             >
               <History className="h-3.5 w-3.5" />
-              <span>Historique ({latestAttempts.length} tentative{latestAttempts.length > 1 ? "s" : ""})</span>
+              <span>
+                Historique ({latestAttempts.length} tentative{latestAttempts.length > 1 ? "s" : ""})
+              </span>
             </Button>
           )}
         </div>

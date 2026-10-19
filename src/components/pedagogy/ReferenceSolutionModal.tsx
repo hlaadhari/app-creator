@@ -9,19 +9,8 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import {
-  BookOpen,
-  Copy,
-  Check,
-  ShieldAlert,
-  FileCode,
-  Sparkles,
-  Lock,
-} from "lucide-react";
-import {
-  consulterSolutionReference,
-  type SolutionFile,
-} from "@/lib/pedagogy/solutions-client";
+import { BookOpen, Copy, Check, ShieldAlert, FileCode, Sparkles, Lock } from "lucide-react";
+import { consulterSolutionReference, type SolutionFile } from "@/lib/pedagogy/solutions-client";
 
 interface ReferenceSolutionModalProps {
   isOpen: boolean;
@@ -105,7 +94,10 @@ export function ReferenceSolutionModal({
               </DialogTitle>
             </div>
             {!examMode && !error && files.length > 0 && (
-              <Badge variant="outline" className="text-[11px] gap-1 bg-emerald-500/10 text-emerald-600 border-emerald-500/30">
+              <Badge
+                variant="outline"
+                className="text-[11px] gap-1 bg-emerald-500/10 text-emerald-600 border-emerald-500/30"
+              >
                 <Sparkles className="h-3 w-3" />
                 Validé par l'inspection STI
               </Badge>

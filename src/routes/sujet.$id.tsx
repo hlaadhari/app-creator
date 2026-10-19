@@ -29,7 +29,10 @@ import {
   HelpCircle,
   Clock,
   Save,
+  TrendingUp,
 } from "lucide-react";
+import { SubjectCompetencesPill } from "@/components/competences/SubjectCompetencesPill";
+import { ProgressionModal } from "@/components/competences/ProgressionModal";
 
 export const Route = createFileRoute("/sujet/$id")({
   loader: ({ params }) => {
@@ -259,6 +262,17 @@ function Workspace() {
         </div>
 
         <div className="flex items-center gap-2">
+          <ProgressionModal
+            triggerButton={
+              <button
+                className="flex items-center gap-1.5 rounded border border-primary/30 bg-primary/10 px-2.5 py-1 text-primary hover:bg-primary/20 transition-colors cursor-pointer text-xs font-mono"
+                title="Consulter mon bilan de compétences et badges"
+              >
+                <TrendingUp className="h-3 w-3" />
+                <span className="hidden md:inline">Bilan Compétences</span>
+              </button>
+            }
+          />
           <AuthModal />
           <button
             onClick={handleReset}
@@ -341,6 +355,12 @@ function Workspace() {
                         Meilleur score : {bestScore}/20
                       </span>
                     )}
+                  </div>
+                  <div className="mt-2.5">
+                    <SubjectCompetencesPill
+                      exerciseId={id}
+                      criteria={ex.criteria.map((c) => ({ id: c.id, label: c.label }))}
+                    />
                   </div>
                 </div>
 

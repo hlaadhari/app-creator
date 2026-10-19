@@ -7,23 +7,24 @@
 
 ## Synthèse Globale des Jalons (M0 à M8)
 
-| Jalon | Étape & Périmètre | Livrable Clé | Condition de Sortie / Seuil | Statut |
-|---|---|---|---|---|
-| **M0** | **Phase 0 : Validation Technique** | Rapport de faisabilité + banc de test | Décision Go / Go conditionnel / No-Go (§7.5) | **Validé (Go conditionnel)** |
-| **M1** | **Phase 1 : Fondations & Base** | Schéma Supabase, Auth, RLS, CI | Démarrage en environnement vierge, RLS testées | **Partiellement réalisé** |
-| **M2** | **Phase 1 : MVP Parcours Élève** | Parcours complet HTML/CSS/JS | Critères d'acceptation Phase 1 validés | **En cours** |
-| **M3** | **Pilote Court HTML/CSS/JS** | Retour terrain sur 1 classe (4-6 sem.) | 0 perte de données, satisfaction ≥ 4/5 | Planifié |
-| **M4** | **Phase 2 : PHP & SQL Local** | Exécution WASM, panneau SQL, dialecte | Scénarios essentiels du Bac conformes | **Validé** |
-| **M5** | **Phase 3 : Correction Étendue & Aides** | Indices 3 niveaux, corrigés, contestations | Faux négatifs < 3%, faux positifs < 1% | Planifié |
-| **M6** | **Phase 4 : Mode Examen & Snapshots** | Sessions synchronisées, grille notation | Écritures refusées après temps serveur, snapshots scellés | **Validé** |
-| **M7** | **Phase 5 : Pilotage & Compétences** | Référentiel, points faibles, tuteur IA | Formule de maîtrise testée, tuteur coupé en examen | Planifié |
-| **M8** | **Version 1.0 & Déploiement** | Déploiement étendu lycée | KPIs globaux au vert (§3) | Planifié |
+| Jalon  | Étape & Périmètre                        | Livrable Clé                               | Condition de Sortie / Seuil                               | Statut                       |
+| ------ | ---------------------------------------- | ------------------------------------------ | --------------------------------------------------------- | ---------------------------- |
+| **M0** | **Phase 0 : Validation Technique**       | Rapport de faisabilité + banc de test      | Décision Go / Go conditionnel / No-Go (§7.5)              | **Validé (Go conditionnel)** |
+| **M1** | **Phase 1 : Fondations & Base**          | Schéma Supabase, Auth, RLS, CI             | Démarrage en environnement vierge, RLS testées            | **Partiellement réalisé**    |
+| **M2** | **Phase 1 : MVP Parcours Élève**         | Parcours complet HTML/CSS/JS               | Critères d'acceptation Phase 1 validés                    | **En cours**                 |
+| **M3** | **Pilote Court HTML/CSS/JS**             | Retour terrain sur 1 classe (4-6 sem.)     | 0 perte de données, satisfaction ≥ 4/5                    | Planifié                     |
+| **M4** | **Phase 2 : PHP & SQL Local**            | Exécution WASM, panneau SQL, dialecte      | Scénarios essentiels du Bac conformes                     | **Validé**                   |
+| **M5** | **Phase 3 : Correction Étendue & Aides** | Indices 3 niveaux, corrigés, contestations | Faux négatifs < 3%, faux positifs < 1%                    | Planifié                     |
+| **M6** | **Phase 4 : Mode Examen & Snapshots**    | Sessions synchronisées, grille notation    | Écritures refusées après temps serveur, snapshots scellés | **Validé**                   |
+| **M7** | **Phase 5 : Pilotage & Compétences**     | Référentiel, points faibles, tuteur IA     | Formule de maîtrise testée, tuteur coupé en examen        | Planifié                     |
+| **M8** | **Version 1.0 & Déploiement**            | Déploiement étendu lycée                   | KPIs globaux au vert (§3)                                 | Planifié                     |
 
 ---
 
 ## Détail des Étapes et Critères d'Acceptation
 
 ### Jalon M0 — Phase 0 : Validation Technique (Jalon de Décision)
+
 - [x] Spécification du protocole de test sur poste de référence (4 Go RAM, CPU double cœur).
 - [x] Définition des 3 sujets représentatifs (S1 : Formulaire PHP POST, S2 : SQL avancé, S3 : Multi-pages & sessions).
 - [x] [Issue #12](https://github.com/hlaadhari/app-creator/issues/12) : Conception du harnais de comparaison (sortie HTML, état base, codes retours entre MariaDB/PHP natif et WASM).
@@ -34,6 +35,7 @@
 ---
 
 ### Jalon M1 — Phase 1 (Lot A) : Fondations & Données
+
 - [x] **Étape 1.1 - Rôles & Profils** : Migration `0000_etape1_profiles_roles.sql` (enum `app_role`, table `profiles`, trigger `handle_new_user`, fonction `has_role`).
 - [x] **Étape 1.2 - Sujets & Immuabilité** : Migration `0001_etape2_sujets.sql` (tables `sujets`, `sujet_versions`, `sujet_version_fichiers`, `criteres`, `solutions`, `indices`, triggers `protect_published_version` et `protect_published_children`, seed 3 sujets initiaux).
 - [x] **Étape 1.3 - Classes, Invitations & Projets** : Migration `0002_etape3_classes_projets.sql` (tables `classes`, `class_invitations`, `class_members`, `class_sujets`, `projets`, `projet_fichiers`, `tentatives`, RPC `rejoindre_classe` et `initialiser_projet`, RLS complètes).
@@ -42,6 +44,7 @@
 ---
 
 ### Jalon M2 — Phase 1 (Lot B & C) : MVP Parcours Élève HTML/CSS/JS
+
 - [ ] **Étape 2.1 - Authentification & Onboarding** ([Issue #7](https://github.com/hlaadhari/app-creator/issues/7)) :
   - [ ] Écran de connexion / inscription Supabase Auth.
   - [ ] Rejoindre une classe via code d'invitation avec vérification expiration/quota.
@@ -66,6 +69,7 @@
 ---
 
 ### Jalon M4 — Phase 2 : PHP + SQL Local
+
 - [x] [Issue #13](https://github.com/hlaadhari/app-creator/issues/13) : Intégration de PHP WASM dans un Web Worker avec limites de ressources (watchdog 3s, max 64 Mo).
 - [x] [Issue #14](https://github.com/hlaadhari/app-creator/issues/14) : Intégration du moteur SQLite WASM et chargement des scripts `.sql` du sujet.
 - [x] Panneau « Base de données » (visualiseur de tables, exécution de requêtes interactives).
@@ -76,6 +80,7 @@
 ---
 
 ### Jalon M5 — Phase 3 : Correction Étendue & Aides
+
 - [x] [Issue #32](https://github.com/hlaadhari/app-creator/issues/32) : Interface de contestation de critère élève, historique des tentatives et déblocage des corrigés de référence (PR #37).
 - [x] Bouton « Contester ce critère » côté élève avec file de traitement enseignant (PRD F-44, F-45).
 - [x] Historique chronologique des tentatives avec calcul des deltas de progression (+/- pts) et suivi critère par critère.
@@ -87,6 +92,7 @@
 ---
 
 ### Jalon M6 — Phase 4 : Mode Examen Blanc & Snapshots
+
 - [x] [Issue #15](https://github.com/hlaadhari/app-creator/issues/15) : Sessions d'examen synchronisées avec gestion de la salle d'attente (PR #28).
 - [x] Minuteur et calcul du temps sous contrôle strict de l'horloge serveur.
 - [x] Verrouillage automatique des écritures à l'échéance serveur.
@@ -99,7 +105,14 @@
 ---
 
 ### Jalon M7 & M8 — Phase 5 & Version 1.0
-- [ ] [Issue #33](https://github.com/hlaadhari/app-creator/issues/33) : Référentiel de compétences du Bac STI et matrice de maîtrise.
+
+- [x] [Issue #33](https://github.com/hlaadhari/app-creator/issues/33) : Référentiel de compétences du Bac STI, calcul de maîtrise et progression élève.
+  - [x] Migration SQL Domaine 6 (`competences`, `critere_competences`, `maitrise`, `badges_definition`, `badges`, RLS complètes T-01/T-02).
+  - [x] Référentiel officiel des 25 compétences Bac STI couvrant HTML, CSS, JavaScript, PHP, SQL et Algorithmique/Architecture.
+  - [x] Moteur déterministe de calcul de maîtrise v1.0 avec taux de succès brut, bonus de premier essai (+0.15), régularité et pondération de récence.
+  - [x] Identification didactique des points forts (score >= 75%) et des axes prioritaires de révision (< 50%).
+  - [x] Système de badges pédagogiques (8 distinctions) avec attribution automatique au fil des tentatives.
+  - [x] Visualisation interactive élève : graphique radar 5 axes, barres de progression avec seuils didactiques et modale complète `ProgressionModal`.
 - [ ] [Issue #34](https://github.com/hlaadhari/app-creator/issues/34) : Tableau de bord statistique de classe et détection des décrochages.
 - [ ] [Issue #35](https://github.com/hlaadhari/app-creator/issues/35) : Tuteur IA pédagogique (sans révélation de la solution, coupé en examen).
 - [ ] [Issue #36](https://github.com/hlaadhari/app-creator/issues/36) : Détection indicative de similarité entre rendus de classe (anti-plagiat).

@@ -10,14 +10,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import {
-  AlertCircle,
-  CheckCircle2,
-  Clock,
-  Send,
-  MessageSquare,
-  ShieldAlert,
-} from "lucide-react";
+import { AlertCircle, CheckCircle2, Clock, Send, MessageSquare, ShieldAlert } from "lucide-react";
 import {
   soumettreContestation,
   type ContestationSubmission,
@@ -99,7 +92,8 @@ export function ContestationModal({
             </DialogTitle>
           </div>
           <DialogDescription className="text-xs text-muted-foreground">
-            Signalez un critère d'évaluation jugé erroné ou trop restrictif par rapport à votre code.
+            Signalez un critère d'évaluation jugé erroné ou trop restrictif par rapport à votre
+            code.
           </DialogDescription>
         </DialogHeader>
 
@@ -142,8 +136,10 @@ export function ContestationModal({
 
               <div className="space-y-1">
                 <div className="font-semibold">
-                  {existingContestation.statut === "en_attente" && "Contestation en cours d'analyse"}
-                  {existingContestation.statut === "acceptee" && "Contestation validée par l'enseignant"}
+                  {existingContestation.statut === "en_attente" &&
+                    "Contestation en cours d'analyse"}
+                  {existingContestation.statut === "acceptee" &&
+                    "Contestation validée par l'enseignant"}
                   {existingContestation.statut === "rejetee" && "Contestation rejetée après examen"}
                 </div>
                 <p className="text-[11px] opacity-90">

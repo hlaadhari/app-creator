@@ -12,9 +12,7 @@ import {
   resetAttemptsCache,
   type AttemptRecord,
 } from "@/lib/pedagogy/attempts-service";
-import {
-  consulterSolutionReference,
-} from "@/lib/pedagogy/solutions-client";
+import { consulterSolutionReference } from "@/lib/pedagogy/solutions-client";
 import {
   arbitrerContestation,
   recalculerNotesClasseApresDesactivation,
@@ -56,7 +54,8 @@ describe("Pédagogie & Résilience Élève (Issue #32 - PRD F-44, F-45, T-04, T-
     });
 
     it("enregistre avec succès une contestation valide (>= 10 caractères) avec statut initial 'en_attente'", async () => {
-      const motifValide = "J'ai utilisé une balise <section> au lieu de <article>, ce qui est sémantiquement recevable.";
+      const motifValide =
+        "J'ai utilisé une balise <section> au lieu de <article>, ce qui est sémantiquement recevable.";
       const res = await soumettreContestation({
         critereId: "crit-dom-1",
         critereCode: "DOM-01",

@@ -17,10 +17,7 @@ import {
   History,
   Sparkles,
 } from "lucide-react";
-import {
-  listerHistoriqueAvecDeltas,
-  type AttemptWithDelta,
-} from "@/lib/pedagogy/attempts-service";
+import { listerHistoriqueAvecDeltas, type AttemptWithDelta } from "@/lib/pedagogy/attempts-service";
 
 interface AttemptsTimelineDrawerProps {
   isOpen: boolean;
@@ -68,7 +65,10 @@ export function AttemptsTimelineDrawer({
           ) : (
             <div className="space-y-4">
               <div className="text-xs font-mono text-muted-foreground flex items-center justify-between">
-                <span>{history.length} vérification{history.length > 1 ? "s" : ""} effectuée{history.length > 1 ? "s" : ""}</span>
+                <span>
+                  {history.length} vérification{history.length > 1 ? "s" : ""} effectuée
+                  {history.length > 1 ? "s" : ""}
+                </span>
                 <span>Ordre antichronologique</span>
               </div>
 
@@ -153,7 +153,9 @@ export function AttemptsTimelineDrawer({
                           <div
                             key={crit.id}
                             className={`flex items-center justify-between p-1.5 rounded transition-colors ${
-                              crit.ok ? "bg-emerald-500/5 text-emerald-800 dark:text-emerald-300" : "bg-muted/40 text-muted-foreground"
+                              crit.ok
+                                ? "bg-emerald-500/5 text-emerald-800 dark:text-emerald-300"
+                                : "bg-muted/40 text-muted-foreground"
                             }`}
                           >
                             <div className="flex items-center gap-2 truncate">
@@ -177,7 +179,8 @@ export function AttemptsTimelineDrawer({
                                 </span>
                               )}
                               <span>
-                                {crit.ok ? `+${crit.points}` : "0"} / {crit.maxPoints} pt{crit.maxPoints > 1 ? "s" : ""}
+                                {crit.ok ? `+${crit.points}` : "0"} / {crit.maxPoints} pt
+                                {crit.maxPoints > 1 ? "s" : ""}
                               </span>
                             </div>
                           </div>

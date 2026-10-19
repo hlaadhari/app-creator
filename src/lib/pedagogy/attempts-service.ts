@@ -180,6 +180,24 @@ export async function enregistrerNouvelleTentative(params: {
     console.warn("[Tentatives] Synchronisation distante ignorée en local :", err);
   }
 
+  // Mise à jour automatique de la maîtrise de compétences Bac STI (PRD F-57, F-58, Jalon M7)
+  try {
+    const { updateMasteryFromAttempt } = await import("@/lib/competences/competences-service");
+    await updateMasteryFromAttempt({
+      sujetId: params.sujetId,
+      criteres: params.criteres.map((c) => ({
+        id: c.id,
+        label: c.label,
+        ok: c.ok,
+        points: c.points,
+      })),
+      eleveId: record.eleveId,
+      noteExamen: params.note20,
+    });
+  } catch (err) {
+    console.warn("[Maitrise] Mise à jour asynchrone locale :", err);
+  }
+
   return record;
 }
 
