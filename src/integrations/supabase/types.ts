@@ -270,6 +270,70 @@ export type Database = {
           },
         ]
       }
+      notes: {
+        Row: {
+          corrige_par: string
+          created_at: string
+          grille: Json
+          historique: Json
+          id: string
+          justification: string
+          note_auto: number
+          note_finale: number
+          passage_id: string | null
+          snapshot_id: string
+          updated_at: string
+        }
+        Insert: {
+          corrige_par: string
+          created_at?: string
+          grille: Json
+          historique?: Json
+          id?: string
+          justification?: string
+          note_auto: number
+          note_finale: number
+          passage_id?: string | null
+          snapshot_id: string
+          updated_at?: string
+        }
+        Update: {
+          corrige_par?: string
+          created_at?: string
+          grille?: Json
+          historique?: Json
+          id?: string
+          justification?: string
+          note_auto?: number
+          note_finale?: number
+          passage_id?: string | null
+          snapshot_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notes_corrige_par_fkey"
+            columns: ["corrige_par"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "notes_passage_id_fkey"
+            columns: ["passage_id"]
+            isOneToOne: false
+            referencedRelation: "passages_examen"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "notes_snapshot_id_fkey"
+            columns: ["snapshot_id"]
+            isOneToOne: false
+            referencedRelation: "snapshots"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       passages_examen: {
         Row: {
           created_at: string
@@ -311,6 +375,13 @@ export type Database = {
           temps_supp_min?: number
         }
         Relationships: [
+          {
+            foreignKeyName: "fk_passages_examen_snapshot_final"
+            columns: ["snapshot_final_id"]
+            isOneToOne: false
+            referencedRelation: "snapshots"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "passages_examen_eleve_id_fkey"
             columns: ["eleve_id"]
@@ -495,6 +566,71 @@ export type Database = {
           },
           {
             foreignKeyName: "sessions_examen_version_id_fkey"
+            columns: ["version_id"]
+            isOneToOne: false
+            referencedRelation: "sujet_versions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      snapshots: {
+        Row: {
+          date: string
+          eleve_id: string
+          hash: string
+          id: string
+          manifeste: Json
+          passage_id: string | null
+          projet_id: string
+          storage_archive_path: string
+          version_id: string
+        }
+        Insert: {
+          date?: string
+          eleve_id: string
+          hash: string
+          id?: string
+          manifeste: Json
+          passage_id?: string | null
+          projet_id: string
+          storage_archive_path?: string
+          version_id: string
+        }
+        Update: {
+          date?: string
+          eleve_id?: string
+          hash?: string
+          id?: string
+          manifeste?: Json
+          passage_id?: string | null
+          projet_id?: string
+          storage_archive_path?: string
+          version_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "snapshots_eleve_id_fkey"
+            columns: ["eleve_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "snapshots_passage_id_fkey"
+            columns: ["passage_id"]
+            isOneToOne: false
+            referencedRelation: "passages_examen"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "snapshots_projet_id_fkey"
+            columns: ["projet_id"]
+            isOneToOne: false
+            referencedRelation: "projets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "snapshots_version_id_fkey"
             columns: ["version_id"]
             isOneToOne: false
             referencedRelation: "sujet_versions"
@@ -709,6 +845,15 @@ export type Database = {
       nb_indices: { Args: { _version_id: string }; Returns: number }
       obtenir_horloge_serveur: { Args: never; Returns: string }
       rejoindre_classe: { Args: { _code: string }; Returns: Json }
+      sceller_snapshot_examen: {
+        Args: {
+          p_hash: string
+          p_manifeste: Json
+          p_passage_id: string
+          p_storage_path?: string
+        }
+        Returns: string
+      }
     }
     Enums: {
       app_role: "eleve" | "enseignant" | "admin"
