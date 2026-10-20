@@ -1,4 +1,9 @@
 import { supabase } from "@/integrations/supabase/client";
+import type {
+  ContestationRecord,
+  StudentAttemptRecord,
+} from "@/lib/subjects/contestations-service";
+import type { StudentCopyData } from "@/lib/similarity/types";
 
 export interface TeacherClass {
   id: string;
@@ -350,6 +355,200 @@ export async function getStudentCopyFiles(eleveId: string): Promise<StudentFile[
     }));
   } catch (err) {
     console.error("[Teacher] Erreur lors de la lecture des fichiers élève :", err);
+    return [];
+  }
+}
+
+/**
+ * Récupère les contestations d'une classe depuis Supabase (PRD F-44, F-45)
+ */
+export async function getClassContestations(
+  classId: string,
+  className: string = "Classe",
+): Promise<ContestationRecord[]> {
+  try {
+    // 1. Récupérer les membres de la classe
+    const { data: members, error: membersError } = await supabase
+      .from("class_members")
+      .select("eleve_id, profiles(id, nom, prenom)")
+      .eq("class_id", classId)
+      .is("left_at", null);
+
+    if (membersError || !members || members.length === 0) return [];
+
+    const memberIds = members.map((m) => m.eleve_id);
+    const profileMap = new Map<string, { nom: string; prenom: string }>();
+    members.forEach((m) => {
+      const prof = m.profiles as unknown as { id: string; nom: string; prenom: string } | null;
+      if (prof) {
+        profileMap.set(m.eleve_id, { nom: prof.nom || "Élève", prenom: prof.prenom || "" });
+      }
+    });
+
+    // 2. Récupérer les contestations des élèves de la classe
+    const { data: contestationsData, error: contError } = await supabase
+      .from("contestations")
+      .select("*, criteres(id, code, label)")
+      .in("eleve_id", memberIds)
+      .order("created_at", { ascending: false });
+
+    if (contError || !contestationsData) return [];
+
+    return contestationsData.map((c) => {
+      const crit = c.criteres as unknown as { id: string; code: string; label: string } | null;
+      const prof = profileMap.get(c.eleve_id);
+      const studentName = prof ? `${prof.prenom} ${prof.nom}`.trim() : "Élève STI";
+
+      return {
+        id: c.id,
+        critere_id: c.critere_id,
+        critere_code: crit?.code || "CRIT",
+        critere_label: crit?.label || "Critère d'évaluation",
+        eleve_id: c.eleve_id,
+        eleve_nom: studentName,
+        classe_id: classId,
+        classe_nom: className,
+        texte: c.texte,
+        statut: (c.statut as "en_attente" | "acceptee" | "rejetee") || "en_attente",
+        created_at: c.created_at,
+        traitee_le: c.traitee_le,
+        motif_rejet: c.motif_rejet,
+      };
+    });
+  } catch (err) {
+    console.warn("[Teacher] Erreur chargement contestations :", err);
+    return [];
+  }
+}
+
+/**
+ * Récupère les copies d'élèves complètes avec leurs fichiers pour analyse de similarité (PRD §16, F-65)
+ */
+export async function getClassStudentCopies(classId: string): Promise<StudentCopyData[]> {
+  try {
+    const { data: members, error: mError } = await supabase
+      .from("class_members")
+      .select("eleve_id, profiles(id, nom, prenom)")
+      .eq("class_id", classId)
+      .is("left_at", null);
+
+    if (mError || !members || members.length === 0) return [];
+
+    const copies: StudentCopyData[] = [];
+
+    for (const m of members) {
+      const prof = m.profiles as unknown as { id: string; nom: string; prenom: string } | null;
+      const eleveId = m.eleve_id;
+
+      // Dernier projet
+      const { data: proj } = await supabase
+        .from("projets")
+        .select("id, statut, updated_at")
+        .eq("eleve_id", eleveId)
+        .order("updated_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (!proj) continue;
+
+      // Fichiers du projet
+      const { data: files } = await supabase
+        .from("projet_fichiers")
+        .select("chemin, contenu")
+        .eq("projet_id", proj.id)
+        .eq("supprime", false);
+
+      if (files && files.length > 0) {
+        copies.push({
+          eleveId,
+          nom: prof?.nom || "Élève",
+          prenom: prof?.prenom || "STI",
+          statut: proj.statut as "rendu" | "en_cours" | "non_commence" | undefined,
+          derniereActivite: proj.updated_at,
+          fichiers: files.map((f) => ({ chemin: f.chemin, contenu: f.contenu || "" })),
+        });
+      }
+    }
+
+    return copies;
+  } catch (err) {
+    console.warn("[Teacher] Erreur chargement copies de similarité :", err);
+    return [];
+  }
+}
+
+/**
+ * Récupère les tentatives d'évaluation récentes pour l'arbitrage des contestations de classe
+ */
+export async function getClassStudentAttempts(classId: string): Promise<StudentAttemptRecord[]> {
+  try {
+    const { data: members, error: mError } = await supabase
+      .from("class_members")
+      .select("eleve_id, profiles(id, nom, prenom)")
+      .eq("class_id", classId)
+      .is("left_at", null);
+
+    if (mError || !members || members.length === 0) return [];
+
+    const records: StudentAttemptRecord[] = [];
+
+    for (const m of members) {
+      const prof = m.profiles as unknown as { id: string; nom: string; prenom: string } | null;
+      const eleveId = m.eleve_id;
+      const eleveNom = prof ? `${prof.prenom} ${prof.nom}`.trim() : "Élève";
+
+      const { data: proj } = await supabase
+        .from("projets")
+        .select("id")
+        .eq("eleve_id", eleveId)
+        .order("updated_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (!proj) continue;
+
+      const { data: tentative } = await supabase
+        .from("tentatives")
+        .select("id, note20, points_obtenus, points_total, details, date")
+        .eq("projet_id", proj.id)
+        .order("date", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (tentative) {
+        const rawDetails = tentative.details as {
+          criteres?: Array<{
+            id?: string;
+            code?: string;
+            label?: string;
+            titre?: string;
+            points?: number;
+            valide?: boolean;
+          }>;
+        } | null;
+        const criteresList = (rawDetails?.criteres || []).map((c, idx) => ({
+          id: c.id || `c-${idx}`,
+          code: c.code || `C-${idx + 1}`,
+          label: c.label || c.titre || "Critère",
+          points: c.points ?? 1,
+          valide: c.valide === true,
+        }));
+
+        records.push({
+          id: tentative.id,
+          eleve_id: eleveId,
+          eleve_nom: eleveNom,
+          note20: tentative.note20 ?? 0,
+          points_obtenus: tentative.points_obtenus ?? 0,
+          points_total: tentative.points_total ?? 20,
+          criteres: criteresList,
+        });
+      }
+    }
+
+    return records;
+  } catch (err) {
+    console.warn("[Teacher] Erreur chargement tentatives élèves :", err);
     return [];
   }
 }

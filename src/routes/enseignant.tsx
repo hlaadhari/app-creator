@@ -11,8 +11,15 @@ import {
   getClassStudentsProgress,
   getClassInvitations,
   getStudentCopyFiles,
+  getClassContestations,
+  getClassStudentCopies,
+  getClassStudentAttempts,
   exporterResultatsCsv,
 } from "@/lib/supabase/teacher";
+import type {
+  ContestationRecord,
+  StudentAttemptRecord,
+} from "@/lib/subjects/contestations-service";
 import { StudentProgressTable } from "@/components/teacher/StudentProgressTable";
 import { StudentCopyModal } from "@/components/teacher/StudentCopyModal";
 import { InvitationsManager } from "@/components/teacher/InvitationsManager";
@@ -482,6 +489,9 @@ function TeacherDashboardPage() {
   const [selectedClassId, setSelectedClassId] = useState<string | null>(null);
   const [students, setStudents] = useState<TeacherClassMember[]>([]);
   const [invitations, setInvitations] = useState<ClassInvitationRecord[]>([]);
+  const [contestations, setContestations] = useState<ContestationRecord[]>([]);
+  const [studentAttempts, setStudentAttempts] = useState<StudentAttemptRecord[]>([]);
+  const [realCopies, setRealCopies] = useState<StudentCopyData[]>([]);
 
   const [loadingData, setLoadingData] = useState(false);
   const [isCreatingClass, setIsCreatingClass] = useState(false);
@@ -519,16 +529,28 @@ function TeacherDashboardPage() {
     if (isDemo) {
       setStudents(DEMO_STUDENTS);
       setInvitations(DEMO_INVITATIONS);
+      setContestations([]);
+      setStudentAttempts([]);
+      setRealCopies([]);
       return;
     }
 
     setLoadingData(true);
-    const [progress, invs] = await Promise.all([
+    const currentClass = classes.find((c) => c.id === classId);
+    const className = currentClass?.nom || "Classe";
+
+    const [progress, invs, conts, attempts, copies] = await Promise.all([
       getClassStudentsProgress(classId),
       getClassInvitations(classId),
+      getClassContestations(classId, className),
+      getClassStudentAttempts(classId),
+      getClassStudentCopies(classId),
     ]);
     setStudents(progress);
     setInvitations(invs);
+    setContestations(conts);
+    setStudentAttempts(attempts);
+    setRealCopies(copies);
     setLoadingData(false);
   };
 
@@ -623,18 +645,11 @@ function TeacherDashboardPage() {
   );
 
   const similarityCopies: StudentCopyData[] = React.useMemo(() => {
-    if (isDemo || students.length <= 1) {
+    if (isDemo) {
       return DEMO_SIMILARITY_COPIES;
     }
-    return students.map((s) => ({
-      eleveId: s.eleve_id,
-      nom: s.nom,
-      prenom: s.prenom,
-      statut: s.projet_statut,
-      derniereActivite: s.derniere_activite,
-      fichiers: DEMO_FILES.map((f) => ({ chemin: f.chemin, contenu: f.contenu })),
-    }));
-  }, [students, isDemo]);
+    return realCopies;
+  }, [realCopies, isDemo]);
 
   // 1. Écran de chargement initial d'authentification
   if (authLoading && !isDemo) {
@@ -970,7 +985,12 @@ function TeacherDashboardPage() {
               </TabsContent>
 
               <TabsContent value="contestations">
-                <ContestationsManager classId={activeClass.id} className={activeClass.nom} />
+                <ContestationsManager
+                  classId={activeClass.id}
+                  className={activeClass.nom}
+                  initialContestations={contestations}
+                  initialAttempts={studentAttempts}
+                />
               </TabsContent>
 
               <TabsContent value="studio">

@@ -22,90 +22,33 @@ import {
 interface ContestationsManagerProps {
   classId: string;
   className: string;
+  initialContestations?: ContestationRecord[];
+  initialAttempts?: StudentAttemptRecord[];
 }
 
-// Jeu de données initial simulé pour la classe
-const INITIAL_CONTESTATIONS: ContestationRecord[] = [
-  {
-    id: "cont-1",
-    critere_id: "c3",
-    critere_code: "DOM-03",
-    critere_label: "Liste de 3 centres d'intérêt minimum",
-    eleve_id: "eleve-101",
-    eleve_nom: "Amira Trabelsi",
-    classe_id: "class-1",
-    classe_nom: "Terminale STI2D 1",
-    texte:
-      "L'énoncé indiquait 'au moins 3 centres d'intérêt', j'ai utilisé une balise <ol> au lieu d'une <ul> et mon code a été rejeté par la sonde selector.",
-    statut: "en_attente",
-    created_at: new Date(Date.now() - 3600000 * 2).toISOString(),
-  },
-  {
-    id: "cont-2",
-    critere_id: "c4",
-    critere_code: "DOM-04",
-    critere_label: "Lien email mailto:",
-    eleve_id: "eleve-102",
-    eleve_nom: "Sami Ben Ali",
-    classe_id: "class-1",
-    classe_nom: "Terminale STI2D 1",
-    texte:
-      "Mon lien commence par mailto: avec un sujet pré-rempli (?subject=test), la sonde prefix a fonctionné pour moi mais mon camarade a eu une erreur de casse.",
-    statut: "en_attente",
-    created_at: new Date(Date.now() - 3600000 * 5).toISOString(),
-  },
-];
-
-// Copies des élèves de la classe associées
-const INITIAL_ATTEMPTS: StudentAttemptRecord[] = [
-  {
-    id: "att-1",
-    eleve_id: "eleve-101",
-    eleve_nom: "Amira Trabelsi",
-    note20: 14,
-    points_obtenus: 14,
-    points_total: 20,
-    criteres: [
-      { id: "c1", code: "DOM-01", label: "Article carte", points: 4, valide: true },
-      { id: "c2", code: "DOM-02", label: "Titre h1", points: 5, valide: true },
-      { id: "c3", code: "DOM-03", label: "Liste 3 items", points: 6, valide: false },
-      { id: "c4", code: "DOM-04", label: "Lien mailto", points: 5, valide: true },
-    ],
-  },
-  {
-    id: "att-2",
-    eleve_id: "eleve-102",
-    eleve_nom: "Sami Ben Ali",
-    note20: 9,
-    points_obtenus: 9,
-    points_total: 20,
-    criteres: [
-      { id: "c1", code: "DOM-01", label: "Article carte", points: 4, valide: true },
-      { id: "c2", code: "DOM-02", label: "Titre h1", points: 5, valide: true },
-      { id: "c3", code: "DOM-03", label: "Liste 3 items", points: 6, valide: false },
-      { id: "c4", code: "DOM-04", label: "Lien mailto", points: 5, valide: false },
-    ],
-  },
-  {
-    id: "att-3",
-    eleve_id: "eleve-103",
-    eleve_nom: "Yassine Mansour",
-    note20: 20,
-    points_obtenus: 20,
-    points_total: 20,
-    criteres: [
-      { id: "c1", code: "DOM-01", label: "Article carte", points: 4, valide: true },
-      { id: "c2", code: "DOM-02", label: "Titre h1", points: 5, valide: true },
-      { id: "c3", code: "DOM-03", label: "Liste 3 items", points: 6, valide: true },
-      { id: "c4", code: "DOM-04", label: "Lien mailto", points: 5, valide: true },
-    ],
-  },
-];
-
-export function ContestationsManager({ classId, className }: ContestationsManagerProps) {
-  const [contestations, setContestations] = useState<ContestationRecord[]>(INITIAL_CONTESTATIONS);
-  const [attempts, setAttempts] = useState<StudentAttemptRecord[]>(INITIAL_ATTEMPTS);
+export function ContestationsManager({
+  classId,
+  className,
+  initialContestations,
+  initialAttempts,
+}: ContestationsManagerProps) {
+  const [contestations, setContestations] = useState<ContestationRecord[]>(
+    initialContestations ?? [],
+  );
+  const [attempts, setAttempts] = useState<StudentAttemptRecord[]>(initialAttempts ?? []);
   const [lastRecalcul, setLastRecalcul] = useState<RecalculationResult | null>(null);
+
+  React.useEffect(() => {
+    if (initialContestations) {
+      setContestations(initialContestations);
+    }
+  }, [initialContestations]);
+
+  React.useEffect(() => {
+    if (initialAttempts) {
+      setAttempts(initialAttempts);
+    }
+  }, [initialAttempts]);
 
   const pendingCount = contestations.filter((c) => c.statut === "en_attente").length;
 
