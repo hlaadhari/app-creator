@@ -13,7 +13,7 @@ Cette PR ne contient **que le plan** ; chaque lot ci-dessous fera l'objet d'une 
 | C4 | Élevée | Tableau admin : « 14 / 14 » et « 100 % Validé » écrits en dur ; liste d'utilisateurs de repli issue de `OFFICIAL_SYSTEM_ACCOUNTS` quand `profiles` échoue. Affiche des garanties non prouvées. | `src/routes/admin.tsx:360,572`, `src/lib/supabase/admin.ts:263,396-414` |
 | C5 | Moyenne | E-mail personnel `dev02` affiché aux visiteurs non connectés ; e-mails/UUID de comptes codés en dur. | `enseignant.tsx:675`, `admin.ts:266-285` |
 | C6 | Moyenne | `bun audit` : 17 vulnérabilités (1 critique `shell-quote`, 11 élevées), surtout chaîne de build/dev. | `bun.lock` |
-| C7 | Moyenne | 12 tests en échec sur 294 (« Environnement DOM non disponible » dans le studio de sujets ; échecs sur tampon local, contestations, scellement/rejouage). CI : à vérifier. | `src/lib/subjects/subject-studio.ts:104` |
+| C7 | ~~Moyenne~~ Retiré | **Faux positif** : les 12 échecs venaient de `bun test` (runner natif Bun, sans jsdom). Le projet utilise `bun run test` (vitest + jsdom, comme la CI) : 294/294 tests passent. | `package.json` |
 | C8 | Faible | Requêtes de profil/rôle répétées 3× sur échec → écran « Vérification des droits » > 4 s. | `auth.tsx` |
 | C9 | Faible | Marque « Sprout Workshop » vs « Labo STI » ; onglets sur 2 lignes à 800 px. | `__root.tsx:82`, `index.tsx:36` |
 
@@ -36,9 +36,8 @@ Cette PR ne contient **que le plan** ; chaque lot ci-dessous fera l'objet d'une 
 - Remplacer 14/14 par le résultat réel de la CI (fichier de résultats généré ou RPC), « inconnu » si indisponible.
 - Supprimer le repli sur `OFFICIAL_SYSTEM_ACCOUNTS` : afficher l'erreur plutôt que des données fictives.
 
-### Lot 4 — Santé des tests et dépendances (C6, C7)
-- Fournir un DOM aux tests concernés (happy-dom/jsdom via `bunfig.toml` ou environnement vitest) ; analyser les 4 autres familles d'échecs une par une.
-- Vérifier que la CI exécute bien `bun test`, `bun run typecheck`, `bun run build`.
+### Lot 4 — Dépendances et documentation des commandes (C6)
+- Tests : rien à corriger (C7 retiré). Documenter dans AGENTS.md que la commande est `bun run test` et non `bun test` (AGENTS.md §2.6 cite `bun test`).
 - `bun audit fix` ; traiter `shell-quote` en priorité.
 
 ### Lot 5 — Finitions (C9)
