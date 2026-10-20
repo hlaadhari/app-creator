@@ -22,6 +22,27 @@
       "when": 1792322500000,
       "tag": "0002_etape3_classes_projets",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1792490615046,
+      "tag": "0003_verification_schema",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1792490656101,
+      "tag": "0004_etape4_sessions_examen",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1792490678329,
+      "tag": "0005_etape4_snapshots_rejouage",
+      "breakpoints": true
     }
   ]
 }
