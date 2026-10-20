@@ -14,6 +14,75 @@ export type Database = {
   }
   public: {
     Tables: {
+      badges: {
+        Row: {
+          badge_id: string
+          eleve_id: string
+          id: string
+          meta: Json
+          obtenu_le: string
+        }
+        Insert: {
+          badge_id: string
+          eleve_id: string
+          id?: string
+          meta?: Json
+          obtenu_le?: string
+        }
+        Update: {
+          badge_id?: string
+          eleve_id?: string
+          id?: string
+          meta?: Json
+          obtenu_le?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "badges_badge_id_fkey"
+            columns: ["badge_id"]
+            isOneToOne: false
+            referencedRelation: "badges_definition"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "badges_eleve_id_fkey"
+            columns: ["eleve_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      badges_definition: {
+        Row: {
+          categorie: string
+          created_at: string
+          description: string
+          icone: string
+          id: string
+          seuil_points: number | null
+          titre: string
+        }
+        Insert: {
+          categorie: string
+          created_at?: string
+          description: string
+          icone: string
+          id: string
+          seuil_points?: number | null
+          titre: string
+        }
+        Update: {
+          categorie?: string
+          created_at?: string
+          description?: string
+          icone?: string
+          id?: string
+          seuil_points?: number | null
+          titre?: string
+        }
+        Relationships: []
+      }
       class_invitations: {
         Row: {
           class_id: string
@@ -171,6 +240,158 @@ export type Database = {
           },
         ]
       }
+      competences: {
+        Row: {
+          categorie: string
+          code: string
+          created_at: string
+          description: string | null
+          id: string
+          libelle: string
+          ordre: number
+          parent_id: string | null
+        }
+        Insert: {
+          categorie: string
+          code: string
+          created_at?: string
+          description?: string | null
+          id: string
+          libelle: string
+          ordre?: number
+          parent_id?: string | null
+        }
+        Update: {
+          categorie?: string
+          code?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          libelle?: string
+          ordre?: number
+          parent_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "competences_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "competences"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      contestations: {
+        Row: {
+          created_at: string
+          critere_id: string
+          eleve_id: string
+          id: string
+          motif_rejet: string | null
+          projet_id: string | null
+          statut: string
+          sujet_version_id: string | null
+          texte: string
+          traitee_le: string | null
+          traitee_par: string | null
+        }
+        Insert: {
+          created_at?: string
+          critere_id: string
+          eleve_id: string
+          id?: string
+          motif_rejet?: string | null
+          projet_id?: string | null
+          statut?: string
+          sujet_version_id?: string | null
+          texte: string
+          traitee_le?: string | null
+          traitee_par?: string | null
+        }
+        Update: {
+          created_at?: string
+          critere_id?: string
+          eleve_id?: string
+          id?: string
+          motif_rejet?: string | null
+          projet_id?: string | null
+          statut?: string
+          sujet_version_id?: string | null
+          texte?: string
+          traitee_le?: string | null
+          traitee_par?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contestations_critere_id_fkey"
+            columns: ["critere_id"]
+            isOneToOne: false
+            referencedRelation: "criteres"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contestations_eleve_id_fkey"
+            columns: ["eleve_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contestations_projet_id_fkey"
+            columns: ["projet_id"]
+            isOneToOne: false
+            referencedRelation: "projets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contestations_sujet_version_id_fkey"
+            columns: ["sujet_version_id"]
+            isOneToOne: false
+            referencedRelation: "sujet_versions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contestations_traitee_par_fkey"
+            columns: ["traitee_par"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      critere_competences: {
+        Row: {
+          competence_id: string
+          critere_id: string
+          poids: number
+        }
+        Insert: {
+          competence_id: string
+          critere_id: string
+          poids?: number
+        }
+        Update: {
+          competence_id?: string
+          critere_id?: string
+          poids?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "critere_competences_competence_id_fkey"
+            columns: ["competence_id"]
+            isOneToOne: false
+            referencedRelation: "competences"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "critere_competences_critere_id_fkey"
+            columns: ["critere_id"]
+            isOneToOne: false
+            referencedRelation: "criteres"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       criteres: {
         Row: {
           attendu: Json
@@ -266,6 +487,128 @@ export type Database = {
             columns: ["indice_id"]
             isOneToOne: false
             referencedRelation: "indices"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      journal_acces_solutions: {
+        Row: {
+          date: string
+          id: string
+          motif: string
+          user_id: string
+          version_id: string
+        }
+        Insert: {
+          date?: string
+          id?: string
+          motif?: string
+          user_id: string
+          version_id: string
+        }
+        Update: {
+          date?: string
+          id?: string
+          motif?: string
+          user_id?: string
+          version_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "journal_acces_solutions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "journal_acces_solutions_version_id_fkey"
+            columns: ["version_id"]
+            isOneToOne: false
+            referencedRelation: "sujet_versions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      journal_securite: {
+        Row: {
+          acteur_id: string | null
+          date: string
+          id: string
+          meta: Json
+          type: string
+        }
+        Insert: {
+          acteur_id?: string | null
+          date?: string
+          id?: string
+          meta?: Json
+          type: string
+        }
+        Update: {
+          acteur_id?: string | null
+          date?: string
+          id?: string
+          meta?: Json
+          type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "journal_securite_acteur_id_fkey"
+            columns: ["acteur_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      maitrise: {
+        Row: {
+          competence_id: string
+          dernier_succes: string | null
+          eleve_id: string
+          nb_succes: number
+          nb_tentatives: number
+          niveau: number
+          premier_coup_succes: boolean
+          updated_at: string
+          version_formule: string
+        }
+        Insert: {
+          competence_id: string
+          dernier_succes?: string | null
+          eleve_id: string
+          nb_succes?: number
+          nb_tentatives?: number
+          niveau?: number
+          premier_coup_succes?: boolean
+          updated_at?: string
+          version_formule?: string
+        }
+        Update: {
+          competence_id?: string
+          dernier_succes?: string | null
+          eleve_id?: string
+          nb_succes?: number
+          nb_tentatives?: number
+          niveau?: number
+          premier_coup_succes?: boolean
+          updated_at?: string
+          version_formule?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "maitrise_competence_id_fkey"
+            columns: ["competence_id"]
+            isOneToOne: false
+            referencedRelation: "competences"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "maitrise_eleve_id_fkey"
+            columns: ["eleve_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -762,39 +1105,71 @@ export type Database = {
         Row: {
           date: string
           detail: Json
+          details: Json | null
+          eleve_id: string | null
           id: string
           max: number
-          projet_id: string
+          note20: number | null
+          points_obtenus: number | null
+          points_total: number | null
+          projet_id: string | null
           score: number
+          sujet_version_id: string | null
           version_criteres: number
           version_moteur: string
         }
         Insert: {
           date?: string
           detail: Json
+          details?: Json | null
+          eleve_id?: string | null
           id?: string
           max: number
-          projet_id: string
+          note20?: number | null
+          points_obtenus?: number | null
+          points_total?: number | null
+          projet_id?: string | null
           score: number
+          sujet_version_id?: string | null
           version_criteres?: number
           version_moteur?: string
         }
         Update: {
           date?: string
           detail?: Json
+          details?: Json | null
+          eleve_id?: string | null
           id?: string
           max?: number
-          projet_id?: string
+          note20?: number | null
+          points_obtenus?: number | null
+          points_total?: number | null
+          projet_id?: string | null
           score?: number
+          sujet_version_id?: string | null
           version_criteres?: number
           version_moteur?: string
         }
         Relationships: [
           {
+            foreignKeyName: "tentatives_eleve_id_fkey"
+            columns: ["eleve_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "tentatives_projet_id_fkey"
             columns: ["projet_id"]
             isOneToOne: false
             referencedRelation: "projets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tentatives_sujet_version_id_fkey"
+            columns: ["sujet_version_id"]
+            isOneToOne: false
+            referencedRelation: "sujet_versions"
             referencedColumns: ["id"]
           },
         ]
@@ -822,7 +1197,24 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      calculer_score_maitrise_v1: {
+        Args: {
+          p_derniere_date: string
+          p_premier_coup: boolean
+          p_succes: number
+          p_tentatives: number
+        }
+        Returns: number
+      }
       debloquer_indice: { Args: { _version_id: string }; Returns: string }
+      debloquer_solution: {
+        Args: { p_motif?: string; p_version_id: string }
+        Returns: {
+          chemin: string
+          contenu: string
+          id: string
+        }[]
+      }
       est_eleve_de_enseignant: { Args: { _eleve_id: string }; Returns: boolean }
       est_enseignant_classe: { Args: { _class_id: string }; Returns: boolean }
       est_enseignant_session: {

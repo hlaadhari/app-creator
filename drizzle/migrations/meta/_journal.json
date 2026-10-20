@@ -43,6 +43,20 @@
       "when": 1792490678329,
       "tag": "0005_etape4_snapshots_rejouage",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1792491003372,
+      "tag": "0006_etape3_contestations_solutions",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1792491029302,
+      "tag": "0007_etape5_competences_maitrise",
+      "breakpoints": true
     }
   ]
 }
