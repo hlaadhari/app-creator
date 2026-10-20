@@ -24,7 +24,11 @@ export function CourseViewer({
   // Faire défiler vers la section demandée lorsqu'elle change
   useEffect(() => {
     if (!targetSectionId || !containerRef.current) return;
-    const targetEl = containerRef.current.querySelector(`#${targetSectionId}`);
+    const cleanId = targetSectionId.replace(/^(html-|css-)/, "");
+    const targetEl =
+      containerRef.current.querySelector(`#${targetSectionId}`) ||
+      containerRef.current.querySelector(`#${cleanId}`) ||
+      containerRef.current.querySelector(`[id*="${cleanId}"]`);
     if (targetEl) {
       targetEl.scrollIntoView({ behavior: "smooth", block: "start" });
     }
