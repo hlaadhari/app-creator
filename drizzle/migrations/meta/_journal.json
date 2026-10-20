@@ -29,6 +29,13 @@
       "when": 1792490615046,
       "tag": "0003_verification_schema",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1792490656101,
+      "tag": "0004_etape4_sessions_examen",
+      "breakpoints": true
     }
   ]
 }

@@ -270,6 +270,70 @@ export type Database = {
           },
         ]
       }
+      passages_examen: {
+        Row: {
+          created_at: string
+          debut_reel: string | null
+          echeance_eleve: string | null
+          eleve_id: string
+          evenements: Json
+          id: string
+          projet_id: string | null
+          session_id: string
+          snapshot_final_id: string | null
+          statut: string
+          temps_supp_min: number
+        }
+        Insert: {
+          created_at?: string
+          debut_reel?: string | null
+          echeance_eleve?: string | null
+          eleve_id: string
+          evenements?: Json
+          id?: string
+          projet_id?: string | null
+          session_id: string
+          snapshot_final_id?: string | null
+          statut?: string
+          temps_supp_min?: number
+        }
+        Update: {
+          created_at?: string
+          debut_reel?: string | null
+          echeance_eleve?: string | null
+          eleve_id?: string
+          evenements?: Json
+          id?: string
+          projet_id?: string | null
+          session_id?: string
+          snapshot_final_id?: string | null
+          statut?: string
+          temps_supp_min?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "passages_examen_eleve_id_fkey"
+            columns: ["eleve_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "passages_examen_projet_id_fkey"
+            columns: ["projet_id"]
+            isOneToOne: false
+            referencedRelation: "projets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "passages_examen_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "sessions_examen"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           created_at: string
@@ -367,6 +431,70 @@ export type Database = {
           },
           {
             foreignKeyName: "projets_version_id_fkey"
+            columns: ["version_id"]
+            isOneToOne: false
+            referencedRelation: "sujet_versions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sessions_examen: {
+        Row: {
+          class_id: string
+          created_at: string
+          created_by: string | null
+          debut_prevu: string
+          debut_serveur: string | null
+          duree_min: number
+          echeance_serveur: string | null
+          id: string
+          statut: string
+          titre: string
+          version_id: string
+        }
+        Insert: {
+          class_id: string
+          created_at?: string
+          created_by?: string | null
+          debut_prevu: string
+          debut_serveur?: string | null
+          duree_min?: number
+          echeance_serveur?: string | null
+          id?: string
+          statut?: string
+          titre: string
+          version_id: string
+        }
+        Update: {
+          class_id?: string
+          created_at?: string
+          created_by?: string | null
+          debut_prevu?: string
+          debut_serveur?: string | null
+          duree_min?: number
+          echeance_serveur?: string | null
+          id?: string
+          statut?: string
+          titre?: string
+          version_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sessions_examen_class_id_fkey"
+            columns: ["class_id"]
+            isOneToOne: false
+            referencedRelation: "classes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sessions_examen_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sessions_examen_version_id_fkey"
             columns: ["version_id"]
             isOneToOne: false
             referencedRelation: "sujet_versions"
@@ -561,6 +689,10 @@ export type Database = {
       debloquer_indice: { Args: { _version_id: string }; Returns: string }
       est_eleve_de_enseignant: { Args: { _eleve_id: string }; Returns: boolean }
       est_enseignant_classe: { Args: { _class_id: string }; Returns: boolean }
+      est_enseignant_session: {
+        Args: { _session_id: string }
+        Returns: boolean
+      }
       est_membre_classe: { Args: { _class_id: string }; Returns: boolean }
       has_role: {
         Args: {
@@ -570,7 +702,12 @@ export type Database = {
         Returns: boolean
       }
       initialiser_projet: { Args: { _version_id: string }; Returns: string }
+      lancer_coup_denvoi_examen: {
+        Args: { p_session_id: string }
+        Returns: Json
+      }
       nb_indices: { Args: { _version_id: string }; Returns: number }
+      obtenir_horloge_serveur: { Args: never; Returns: string }
       rejoindre_classe: { Args: { _code: string }; Returns: Json }
     }
     Enums: {
