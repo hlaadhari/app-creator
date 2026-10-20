@@ -14,6 +14,75 @@ export type Database = {
   }
   public: {
     Tables: {
+      badges: {
+        Row: {
+          badge_id: string
+          eleve_id: string
+          id: string
+          meta: Json
+          obtenu_le: string
+        }
+        Insert: {
+          badge_id: string
+          eleve_id: string
+          id?: string
+          meta?: Json
+          obtenu_le?: string
+        }
+        Update: {
+          badge_id?: string
+          eleve_id?: string
+          id?: string
+          meta?: Json
+          obtenu_le?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "badges_badge_id_fkey"
+            columns: ["badge_id"]
+            isOneToOne: false
+            referencedRelation: "badges_definition"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "badges_eleve_id_fkey"
+            columns: ["eleve_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      badges_definition: {
+        Row: {
+          categorie: string
+          created_at: string
+          description: string
+          icone: string
+          id: string
+          seuil_points: number | null
+          titre: string
+        }
+        Insert: {
+          categorie: string
+          created_at?: string
+          description: string
+          icone: string
+          id: string
+          seuil_points?: number | null
+          titre: string
+        }
+        Update: {
+          categorie?: string
+          created_at?: string
+          description?: string
+          icone?: string
+          id?: string
+          seuil_points?: number | null
+          titre?: string
+        }
+        Relationships: []
+      }
       class_invitations: {
         Row: {
           class_id: string
@@ -171,6 +240,47 @@ export type Database = {
           },
         ]
       }
+      competences: {
+        Row: {
+          categorie: string
+          code: string
+          created_at: string
+          description: string | null
+          id: string
+          libelle: string
+          ordre: number
+          parent_id: string | null
+        }
+        Insert: {
+          categorie: string
+          code: string
+          created_at?: string
+          description?: string | null
+          id: string
+          libelle: string
+          ordre?: number
+          parent_id?: string | null
+        }
+        Update: {
+          categorie?: string
+          code?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          libelle?: string
+          ordre?: number
+          parent_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "competences_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "competences"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       contestations: {
         Row: {
           created_at: string
@@ -245,6 +355,39 @@ export type Database = {
             columns: ["traitee_par"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      critere_competences: {
+        Row: {
+          competence_id: string
+          critere_id: string
+          poids: number
+        }
+        Insert: {
+          competence_id: string
+          critere_id: string
+          poids?: number
+        }
+        Update: {
+          competence_id?: string
+          critere_id?: string
+          poids?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "critere_competences_competence_id_fkey"
+            columns: ["competence_id"]
+            isOneToOne: false
+            referencedRelation: "competences"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "critere_competences_critere_id_fkey"
+            columns: ["critere_id"]
+            isOneToOne: false
+            referencedRelation: "criteres"
             referencedColumns: ["id"]
           },
         ]
@@ -413,6 +556,57 @@ export type Database = {
           {
             foreignKeyName: "journal_securite_acteur_id_fkey"
             columns: ["acteur_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      maitrise: {
+        Row: {
+          competence_id: string
+          dernier_succes: string | null
+          eleve_id: string
+          nb_succes: number
+          nb_tentatives: number
+          niveau: number
+          premier_coup_succes: boolean
+          updated_at: string
+          version_formule: string
+        }
+        Insert: {
+          competence_id: string
+          dernier_succes?: string | null
+          eleve_id: string
+          nb_succes?: number
+          nb_tentatives?: number
+          niveau?: number
+          premier_coup_succes?: boolean
+          updated_at?: string
+          version_formule?: string
+        }
+        Update: {
+          competence_id?: string
+          dernier_succes?: string | null
+          eleve_id?: string
+          nb_succes?: number
+          nb_tentatives?: number
+          niveau?: number
+          premier_coup_succes?: boolean
+          updated_at?: string
+          version_formule?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "maitrise_competence_id_fkey"
+            columns: ["competence_id"]
+            isOneToOne: false
+            referencedRelation: "competences"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "maitrise_eleve_id_fkey"
+            columns: ["eleve_id"]
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
@@ -1003,6 +1197,15 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      calculer_score_maitrise_v1: {
+        Args: {
+          p_derniere_date: string
+          p_premier_coup: boolean
+          p_succes: number
+          p_tentatives: number
+        }
+        Returns: number
+      }
       debloquer_indice: { Args: { _version_id: string }; Returns: string }
       debloquer_solution: {
         Args: { p_motif?: string; p_version_id: string }
