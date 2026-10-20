@@ -72,7 +72,7 @@ export async function getTeacherClasses(teacherId: string): Promise<TeacherClass
           .from("class_sujets")
           .select("*", { count: "exact", head: true })
           .eq("class_id", c.id)
-          .eq("actif", true);
+          .eq("ouvert", true);
 
         return {
           id: c.id,
@@ -266,15 +266,16 @@ export async function getClassStudentsProgress(classId: string): Promise<Teacher
         if (proj) {
           const { data: tentative } = await supabase
             .from("tentatives")
-            .select("note20, points_obtenus, points_total, details, created_at")
+            .select("note20, points_obtenus, points_total, details, date")
             .eq("projet_id", proj.id)
-            .order("created_at", { ascending: false })
+            .order("date", { ascending: false })
             .limit(1)
             .maybeSingle();
 
           if (tentative) {
             const total = tentative.points_total || 20;
-            const obtenus = tentative.points_obtenus ?? Math.round((tentative.note20 * total) / 20);
+            const note20Val = tentative.note20 ?? 0;
+            const obtenus = tentative.points_obtenus ?? Math.round((note20Val * total) / 20);
             scoreFormatif = Math.min(100, Math.round((obtenus / total) * 100));
 
             const res = tentative.details as Record<string, unknown> | null;

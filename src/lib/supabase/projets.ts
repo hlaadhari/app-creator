@@ -52,6 +52,9 @@ export async function enregistrerTentative(params: {
       points_total: params.pointsTotal,
       note20: params.note20,
       details: params.details as unknown as Json,
+      detail: params.details as unknown as Json,
+      max: params.pointsTotal,
+      score: params.pointsObtenus,
     });
   } catch (err) {
     console.warn("[Tentatives] Erreur lors de l'enregistrement distant :", err);
@@ -89,7 +92,7 @@ export async function getOrCreateProjet(sujetId: string): Promise<string | null>
     if (proj) return proj.id;
 
     // Initialiser le projet via RPC sécurisée
-    const { data: newId, error } = await supabase.rpc("initialiser_projet", {
+    const { data: newId, error } = await supabase.rpc("initialiser_projet" as any, {
       _version_id: v.id,
     });
 
@@ -98,7 +101,6 @@ export async function getOrCreateProjet(sujetId: string): Promise<string | null>
       const { data: directInsert, error: directErr } = await supabase
         .from("projets")
         .insert({
-          titre: `Travail ${sujetId}`,
           eleve_id: user.id,
           version_id: v.id,
           statut: "en_cours",
@@ -150,7 +152,7 @@ export async function sauvegarderFichierDistant(
 ): Promise<SyncResult> {
   try {
     // 1. Tenter via la RPC sécurisée
-    const { data, error } = await supabase.rpc("sauvegarder_fichier", {
+    const { data, error } = await supabase.rpc("sauvegarder_fichier" as any, {
       _projet_id: projetId,
       _chemin: chemin,
       _contenu: contenu,

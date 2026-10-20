@@ -174,6 +174,9 @@ export async function enregistrerNouvelleTentative(params: {
         points_obtenus: params.pointsObtenus,
         points_total: params.pointsTotal,
         details: params.criteres as unknown as Json,
+        detail: params.criteres as unknown as Json,
+        max: params.pointsTotal,
+        score: params.pointsObtenus,
       });
     }
   } catch (err) {
