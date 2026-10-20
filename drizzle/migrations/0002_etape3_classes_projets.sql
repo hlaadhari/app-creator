@@ -23,15 +23,6 @@ create policy "Enseignant gere ses classes"
   using (auth.uid() = enseignant_id)
   with check (auth.uid() = enseignant_id);
 
--- L'élève peut lire les classes dont il est membre
-create policy "Eleve lit ses classes"
-  on public.classes for select to authenticated
-  using (
-    exists (
-      select 1 from public.class_members m
-      where m.class_id = id and m.eleve_id = auth.uid() and m.left_at is null
-    )
-  );
 
 -- 2. Membres de classes
 create table public.class_members (
@@ -46,6 +37,25 @@ grant select, insert, update on public.class_members to authenticated;
 grant all on public.class_members to service_role;
 alter table public.class_members enable row level security;
 
+create or replace function public.est_enseignant_classe(_class_id uuid)
+returns boolean language sql stable security definer set search_path = public as $$
+  select exists (select 1 from public.classes where id = _class_id and enseignant_id = auth.uid())
+$$;
+create or replace function public.est_membre_classe(_class_id uuid)
+returns boolean language sql stable security definer set search_path = public as $$
+  select exists (select 1 from public.class_members where class_id = _class_id and eleve_id = auth.uid() and left_at is null)
+$$;
+create or replace function public.est_eleve_de_enseignant(_eleve_id uuid)
+returns boolean language sql stable security definer set search_path = public as $$
+  select exists (select 1 from public.class_members m join public.classes c on c.id = m.class_id
+    where m.eleve_id = _eleve_id and c.enseignant_id = auth.uid() and m.left_at is null)
+$$;
+revoke execute on function public.est_enseignant_classe(uuid), public.est_membre_classe(uuid), public.est_eleve_de_enseignant(uuid) from public, anon;
+grant execute on function public.est_enseignant_classe(uuid), public.est_membre_classe(uuid), public.est_eleve_de_enseignant(uuid) to authenticated;
+
+create policy "Eleve lit ses classes" on public.classes for select to authenticated
+  using (public.est_membre_classe(id));
+
 -- Un élève lit ses propres adhésions
 create policy "Eleve lit ses adhésions"
   on public.class_members for select to authenticated
@@ -55,10 +65,7 @@ create policy "Eleve lit ses adhésions"
 create policy "Enseignant lit les membres de ses classes"
   on public.class_members for select to authenticated
   using (
-    exists (
-      select 1 from public.classes c
-      where c.id = class_id and c.enseignant_id = auth.uid()
-    )
+    public.est_enseignant_classe(class_id)
   );
 
 -- 3. Codes d'invitation
@@ -81,16 +88,10 @@ alter table public.class_invitations enable row level security;
 create policy "Enseignant gere invitations"
   on public.class_invitations for all to authenticated
   using (
-    exists (
-      select 1 from public.classes c
-      where c.id = class_id and c.enseignant_id = auth.uid()
-    )
+    public.est_enseignant_classe(class_id)
   )
   with check (
-    exists (
-      select 1 from public.classes c
-      where c.id = class_id and c.enseignant_id = auth.uid()
-    )
+    public.est_enseignant_classe(class_id)
   );
 
 -- 4. Affectation de sujets aux classes
@@ -113,20 +114,14 @@ alter table public.class_sujets enable row level security;
 create policy "Enseignant gere sujets de sa classe"
   on public.class_sujets for all to authenticated
   using (
-    exists (
-      select 1 from public.classes c
-      where c.id = class_id and c.enseignant_id = auth.uid()
-    )
+    public.est_enseignant_classe(class_id)
   );
 
 -- L'élève lit les sujets ouverts de ses classes
 create policy "Eleve lit les sujets de sa classe"
   on public.class_sujets for select to authenticated
   using (
-    ouvert and exists (
-      select 1 from public.class_members m
-      where m.class_id = class_id and m.eleve_id = auth.uid() and m.left_at is null
-    )
+    ouvert and public.est_membre_classe(class_id)
   );
 
 -- 5. Projets élèves
@@ -154,13 +149,7 @@ create policy "Eleve gere ses projets"
 create policy "Enseignant lit projets de ses eleves"
   on public.projets for select to authenticated
   using (
-    exists (
-      select 1 from public.class_members m
-      join public.classes c on c.id = m.class_id
-      where m.eleve_id = projets.eleve_id
-        and c.enseignant_id = auth.uid()
-        and m.left_at is null
-    )
+    public.est_eleve_de_enseignant(projets.eleve_id)
   );
 
 -- 6. Fichiers de projet
@@ -194,14 +183,7 @@ create policy "Eleve gere ses fichiers"
 create policy "Enseignant lit fichiers de ses eleves"
   on public.projet_fichiers for select to authenticated
   using (
-    exists (
-      select 1 from public.projets p
-      join public.class_members m on m.eleve_id = p.eleve_id
-      join public.classes c on c.id = m.class_id
-      where p.id = projet_id
-        and c.enseignant_id = auth.uid()
-        and m.left_at is null
-    )
+    exists (select 1 from public.projets p where p.id = projet_id and public.est_eleve_de_enseignant(p.eleve_id))
   );
 
 -- 7. Tentatives de validation
@@ -237,14 +219,7 @@ create policy "Eleve lit ses tentatives"
 create policy "Enseignant lit tentatives de ses eleves"
   on public.tentatives for select to authenticated
   using (
-    exists (
-      select 1 from public.projets p
-      join public.class_members m on m.eleve_id = p.eleve_id
-      join public.classes c on c.id = m.class_id
-      where p.id = projet_id
-        and c.enseignant_id = auth.uid()
-        and m.left_at is null
-    )
+    exists (select 1 from public.projets p where p.id = projet_id and public.est_eleve_de_enseignant(p.eleve_id))
   );
 
 -- ==============================================================================
