@@ -251,23 +251,84 @@ export function getSecurityTestsMatrix(): SecurityTestItem[] {
   ];
 }
 
+export interface OfficialAccountConfig {
+  id: string;
+  email: string;
+  nom: string;
+  prenom: string;
+  role: AppRole;
+  statutValidation: "valide" | "en_attente" | "non_requis";
+}
+
+export const OFFICIAL_SYSTEM_ACCOUNTS: OfficialAccountConfig[] = [
+  {
+    id: "a3ea041c-9587-4836-8ef2-eb00df162f99",
+    email: "hatem.laadhari.dev01@gmail.com",
+    nom: "Laadhari",
+    prenom: "Hatem (Admin)",
+    role: "admin",
+    statutValidation: "valide",
+  },
+  {
+    id: "f17699a0-de97-450a-9386-388f6ea54a90",
+    email: "hatem.laadhari.dev02@gmail.com",
+    nom: "Laadhari",
+    prenom: "Hatem (Enseignant)",
+    role: "enseignant",
+    statutValidation: "valide",
+  },
+  {
+    id: "5993a72b-827f-4c6d-b824-8b4a5ddb5eaa",
+    email: "hatem.laadhari.dev03@gmail.com",
+    nom: "Laadhari",
+    prenom: "Hatem (Élève)",
+    role: "eleve",
+    statutValidation: "non_requis",
+  },
+];
+
+async function safeQuery<T>(promise: Promise<T>, fallback: T, ms = 1500): Promise<T> {
+  let timer: ReturnType<typeof setTimeout>;
+  const timeout = new Promise<T>((resolve) => {
+    timer = setTimeout(() => resolve(fallback), ms);
+  });
+  try {
+    return await Promise.race([promise, timeout]);
+  } catch {
+    return fallback;
+  } finally {
+    clearTimeout(timer!);
+  }
+}
+
 /**
  * Récupère les métriques consolidées pour l'administrateur
  */
 export async function getAdminMetrics(): Promise<AdminMetrics> {
   try {
-    const { count: totalProfiles } = await supabase
-      .from("profiles")
-      .select("*", { count: "exact", head: true });
+    const users = await getAdminUsers();
 
-    const { count: totalClasses } = await supabase
-      .from("classes")
-      .select("*", { count: "exact", head: true });
+    const classesRes = await safeQuery(
+      supabase.from("classes").select("*", { count: "exact", head: true }),
+      { count: 0, data: null, error: null },
+    );
+    const totalClasses = classesRes.count || 0;
+
+    const totalAdmins = users.filter((u) => u.role === "admin").length;
+    const totalEnseignants = users.filter((u) => u.role === "enseignant").length;
+    const totalEleves = users.filter((u) => u.role === "eleve").length;
+    const pendingTeacherValidations = users.filter(
+      (u) => u.statutValidation === "en_attente",
+    ).length;
 
     return {
       ...MOCK_ADMIN_METRICS,
-      totalUsers: totalProfiles || MOCK_ADMIN_METRICS.totalUsers,
-      totalClasses: totalClasses || MOCK_ADMIN_METRICS.totalClasses,
+      totalUsers: users.length,
+      totalAdmins,
+      totalEnseignants,
+      totalEleves,
+      pendingTeacherValidations,
+      totalClasses,
     };
   } catch {
     return MOCK_ADMIN_METRICS;
@@ -277,32 +338,19 @@ export async function getAdminMetrics(): Promise<AdminMetrics> {
 /**
  * Récupère la liste des utilisateurs pour la gestion des rôles
  */
-const OFFICIAL_ACCOUNTS: Record<string, { email: string; role: AppRole }> = {
-  "a3ea041c-9587-4836-8ef2-eb00df162f99": {
-    email: "hatem.laadhari.dev01@gmail.com",
-    role: "admin",
-  },
-  "f17699a0-de97-450a-9386-388f6ea54a90": {
-    email: "hatem.laadhari.dev02@gmail.com",
-    role: "enseignant",
-  },
-  "5993a72b-827f-4c6d-b824-8b4a5ddb5eaa": {
-    email: "hatem.laadhari.dev03@gmail.com",
-    role: "eleve",
-  },
-};
-
 export async function getAdminUsers(): Promise<AdminUser[]> {
   try {
-    const { data: profiles, error } = await supabase
-      .from("profiles")
-      .select("id, nom, prenom, created_at");
+    const profilesRes = await safeQuery(
+      supabase.from("profiles").select("id, nom, prenom, created_at"),
+      { data: null, error: null },
+    );
+    const profiles = profilesRes.data;
 
-    if (error || !profiles || profiles.length === 0) {
-      return MOCK_ADMIN_USERS;
-    }
-
-    const { data: roles } = await supabase.from("user_roles").select("user_id, role");
+    const rolesRes = await safeQuery(
+      supabase.from("user_roles").select("user_id, role"),
+      { data: null, error: null },
+    );
+    const roles = rolesRes.data;
 
     const roleMap = new Map<string, AppRole>();
     if (roles) {
@@ -311,25 +359,69 @@ export async function getAdminUsers(): Promise<AdminUser[]> {
       }
     }
 
-    return profiles.map((p) => {
-      const official = OFFICIAL_ACCOUNTS[p.id];
-      const userRole: AppRole = official?.role || roleMap.get(p.id) || "eleve";
-      const userEmail: string =
-        official?.email || `${p.prenom.toLowerCase()}.${p.nom.toLowerCase()}@lycee.fr`;
-      return {
-        id: p.id,
-        nom: p.nom,
-        prenom: p.prenom,
-        email: userEmail,
-        role: userRole,
-        valide_par: userRole === "enseignant" ? "admin-id" : null,
-        valide_at: userRole === "enseignant" ? p.created_at : null,
-        created_at: p.created_at,
-        statutValidation: userRole === "enseignant" ? "valide" : "non_requis",
-      };
-    });
+    const userList: AdminUser[] = [];
+    const processedEmails = new Set<string>();
+    const processedIds = new Set<string>();
+
+    // 1. Ajouter les profils trouvés dans Supabase
+    if (profiles && profiles.length > 0) {
+      for (const p of profiles) {
+        const official = OFFICIAL_SYSTEM_ACCOUNTS.find((o) => o.id === p.id);
+
+        const email =
+          official?.email ||
+          `${p.prenom.toLowerCase()}.${p.nom.toLowerCase()}@lycee.fr`;
+        const role = official?.role || roleMap.get(p.id) || "eleve";
+        const nom = official ? official.nom : p.nom;
+        const prenom = official ? official.prenom : p.prenom;
+
+        userList.push({
+          id: p.id,
+          nom,
+          prenom,
+          email,
+          role,
+          valide_par: role === "enseignant" ? "admin-id" : null,
+          valide_at: role === "enseignant" ? p.created_at : null,
+          created_at: p.created_at,
+          statutValidation: role === "enseignant" ? "valide" : "non_requis",
+        });
+
+        processedIds.add(p.id);
+        processedEmails.add(email.toLowerCase());
+      }
+    }
+
+    // 2. Garantir la présence des 3 comptes officiels du système
+    for (const official of OFFICIAL_SYSTEM_ACCOUNTS) {
+      if (!processedEmails.has(official.email.toLowerCase()) && !processedIds.has(official.id)) {
+        userList.push({
+          id: official.id,
+          nom: official.nom,
+          prenom: official.prenom,
+          email: official.email,
+          role: official.role,
+          valide_par: official.role === "enseignant" ? "admin-id" : null,
+          valide_at: official.role === "enseignant" ? new Date().toISOString() : null,
+          created_at: new Date().toISOString(),
+          statutValidation: official.statutValidation,
+        });
+      }
+    }
+
+    return userList;
   } catch {
-    return MOCK_ADMIN_USERS;
+    return OFFICIAL_SYSTEM_ACCOUNTS.map((o) => ({
+      id: o.id,
+      nom: o.nom,
+      prenom: o.prenom,
+      email: o.email,
+      role: o.role,
+      valide_par: o.role === "enseignant" ? "admin-id" : null,
+      valide_at: o.role === "enseignant" ? new Date().toISOString() : null,
+      created_at: new Date().toISOString(),
+      statutValidation: o.statutValidation,
+    }));
   }
 }
 
