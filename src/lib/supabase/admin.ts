@@ -287,13 +287,13 @@ export const OFFICIAL_SYSTEM_ACCOUNTS: OfficialAccountConfig[] = [
   },
 ];
 
-async function safeQuery<T>(promise: Promise<T>, fallback: T, ms = 1500): Promise<T> {
+async function safeQuery<T>(promise: PromiseLike<T>, fallback: T, ms = 1500): Promise<T> {
   let timer: ReturnType<typeof setTimeout>;
   const timeout = new Promise<T>((resolve) => {
     timer = setTimeout(() => resolve(fallback), ms);
   });
   try {
-    return await Promise.race([promise, timeout]);
+    return await Promise.race([Promise.resolve(promise), timeout]);
   } catch {
     return fallback;
   } finally {
@@ -310,7 +310,7 @@ export async function getAdminMetrics(): Promise<AdminMetrics> {
 
     const classesRes = await safeQuery(
       supabase.from("classes").select("*", { count: "exact", head: true }),
-      { count: 0, data: null, error: null },
+      { count: 0, data: null, error: null } as { count: number | null; data: unknown; error: unknown },
     );
     const totalClasses = classesRes.count || 0;
 
@@ -342,13 +342,13 @@ export async function getAdminUsers(): Promise<AdminUser[]> {
   try {
     const profilesRes = await safeQuery(
       supabase.from("profiles").select("id, nom, prenom, created_at"),
-      { data: null, error: null },
+      { data: null, error: null } as { data: Array<{ id: string; nom: string; prenom: string; created_at: string }> | null; error: unknown },
     );
     const profiles = profilesRes.data;
 
     const rolesRes = await safeQuery(
       supabase.from("user_roles").select("user_id, role"),
-      { data: null, error: null },
+      { data: null, error: null } as { data: Array<{ user_id: string; role: AppRole }> | null; error: unknown },
     );
     const roles = rolesRes.data;
 

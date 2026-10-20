@@ -142,7 +142,7 @@ export async function listerContestationsEleve(
         classe_id: "classe-defaut",
         classe_nom: "Classe STI",
         texte: d.texte,
-        statut: d.statut,
+        statut: (d.statut as "en_attente" | "acceptee" | "rejetee") || "en_attente",
         created_at: d.created_at,
         traitee_le: d.traitee_le,
         motif_rejet: d.motif_rejet,

@@ -173,27 +173,17 @@ async function initialiserSujetsClasse(classId: string): Promise<void> {
     // Récupérer les sujets assignés
     const { data: assignations } = await supabase
       .from("class_sujets")
-      .select("sujet_id")
+      .select("version_id")
       .eq("class_id", classId)
-      .eq("actif", true);
+      .eq("ouvert", true);
 
     if (!assignations || assignations.length === 0) return;
 
     for (const assign of assignations) {
-      // Récupérer la version active du sujet
-      const { data: v } = await supabase
-        .from("sujet_versions")
-        .select("id")
-        .eq("sujet_id", assign.sujet_id)
-        .eq("publiee", true)
-        .limit(1)
-        .maybeSingle();
-
-      if (v) {
+      if (assign.version_id) {
         // Appeler la RPC initialiser_projet (idempotente)
-        await supabase.rpc("initialiser_projet", {
-          _version_id: v.id,
-          _titre: `Travail ${assign.sujet_id}`,
+        await supabase.rpc("initialiser_projet" as any, {
+          _version_id: assign.version_id,
         });
       }
     }
