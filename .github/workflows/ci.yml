@@ -40,8 +40,8 @@ jobs:
           echo "Verifying Vercel Nitro build..."
           NITRO_PRESET=vercel bun run build
         env:
-          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL || 'https://dxanlvsonydghkmycexq.supabase.co' }}
-          VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.VITE_SUPABASE_PUBLISHABLE_KEY || 'sb_publishable_6oy2IYNYBkyKr0umKULwVw_vy7bVVIZ' }}
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL || 'https://placeholder.supabase.co' }}
+          VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.VITE_SUPABASE_PUBLISHABLE_KEY || 'placeholder-publishable-key' }}
 
       - name: Security Check T-12 (No Secrets in Client Bundle)
         run: |

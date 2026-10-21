@@ -53,6 +53,17 @@ jobs:
             vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
           fi
 
+      - name: Verify Supabase secrets
+        if: steps.check_token.outputs.configured == 'true'
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.VITE_SUPABASE_PUBLISHABLE_KEY }}
+        run: |
+          if [ -z "$VITE_SUPABASE_URL" ] || [ -z "$VITE_SUPABASE_PUBLISHABLE_KEY" ]; then
+            echo "::error::Secrets GitHub VITE_SUPABASE_URL et VITE_SUPABASE_PUBLISHABLE_KEY requis pour déployer."
+            exit 1
+          fi
+
       - name: Build Project Artifacts
         if: steps.check_token.outputs.configured == 'true'
         run: |
@@ -62,8 +73,8 @@ jobs:
             vercel build --token=${{ secrets.VERCEL_TOKEN }}
           fi
         env:
-          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL || 'https://dxanlvsonydghkmycexq.supabase.co' }}
-          VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.VITE_SUPABASE_PUBLISHABLE_KEY || 'sb_publishable_6oy2IYNYBkyKr0umKULwVw_vy7bVVIZ' }}
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.VITE_SUPABASE_PUBLISHABLE_KEY }}
           NITRO_PRESET: vercel
 
       - name: Deploy Project Artifacts to Vercel
