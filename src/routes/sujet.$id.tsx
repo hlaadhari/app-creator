@@ -7,6 +7,7 @@ import { deleteFromBuffer } from "@/lib/storage/indexeddb";
 import { SyncStatusBar } from "@/components/workspace/SyncStatusBar";
 import { ConflictModal } from "@/components/workspace/ConflictModal";
 import { EvaluationResultsPane } from "@/components/workspace/EvaluationResultsPane";
+import { SubjectStatement } from "@/components/workspace/SubjectStatement";
 import { debloquerNiveauIndice, type UnlockedHint } from "@/lib/evaluation/hints-service";
 import { calculerCompteARebours, getTempsServeurSynchronise } from "@/lib/exam/server-clock";
 import type { EvaluationSummary } from "@/lib/evaluation/probe-runner";
@@ -495,16 +496,11 @@ function Workspace() {
                   </div>
                 </div>
 
-                <div className="border-t pt-3">
-                  <h3 className="text-xs font-mono uppercase tracking-wider text-muted-foreground mb-2">
-                    Instructions
-                  </h3>
-                  <ol className="list-decimal space-y-2 pl-4 text-xs leading-relaxed text-foreground/90">
-                    {ex.statement.map((item, i) => (
-                      <li key={i}>{item}</li>
-                    ))}
-                  </ol>
-                </div>
+                <SubjectStatement
+                  title={ex.title}
+                  statement={ex.statement}
+                  enonceMarkdown={ex.enonceMarkdown}
+                />
 
                 <div className="border-t pt-3">
                   <div className="flex items-center justify-between mb-2">
