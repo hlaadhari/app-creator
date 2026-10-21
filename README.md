@@ -84,9 +84,11 @@ cd app-creator
 npm install
 
 # 3. Configurer les variables d'environnement
-# Créer un fichier .env avec les clés Supabase :
-# VITE_SUPABASE_URL=...
-# VITE_SUPABASE_PUBLISHABLE_KEY=...
+# Copier .env.example vers .env.local et renseigner les clés publiques Supabase.
+# Sur Vercel, définir aussi les variables serveur (mêmes valeurs) :
+# VITE_SUPABASE_URL / SUPABASE_URL
+# VITE_SUPABASE_PUBLISHABLE_KEY / SUPABASE_PUBLISHABLE_KEY
+# Secrets GitHub Actions requis pour le déploiement : VITE_SUPABASE_URL, VITE_SUPABASE_PUBLISHABLE_KEY.
 
 # 4. Lancer le serveur de développement
 npm run dev
