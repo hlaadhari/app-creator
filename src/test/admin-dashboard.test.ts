@@ -38,10 +38,10 @@ describe("Espace d'Administration Centrale & Sécurité (Issue #30 - PRD §4.1, 
       }
     });
 
-    it("valide que tous les tests sont au statut PASSED avec des métadonnées complètes", () => {
+    it("décrit chaque test avec des métadonnées complètes, sans statut de réussite écrit en dur", () => {
       const matrix = getSecurityTestsMatrix();
       for (const item of matrix) {
-        expect(item.statut).toBe("PASSED");
+        expect(item).not.toHaveProperty("statut");
         expect(item.code).toMatch(/^T-\d{2}$/);
         expect(item.titre.length).toBeGreaterThan(5);
         expect(item.categorie.length).toBeGreaterThan(2);
