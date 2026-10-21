@@ -408,15 +408,28 @@ export async function getClassContestations(
     // 2. Récupérer les contestations des élèves de la classe
     const { data: contestationsData, error: contError } = await supabase
       .from("contestations")
-      .select("*, criteres(id, code, label)")
+      .select("*")
       .in("eleve_id", memberIds)
       .order("created_at", { ascending: false });
 
     if (contError) throw erreurChargement("Chargement des contestations impossible", contError);
     if (!contestationsData) return [];
 
+    // Libellés des critères : la table criteres (correction) n'est jamais lue directement.
+    const libelles = new Map<string, { code: string; label: string }>();
+    const critereIds = [...new Set(contestationsData.map((c) => c.critere_id))];
+    if (critereIds.length > 0) {
+      const { data: crits, error: critError } = await supabase.rpc("critere_libelles", {
+        _ids: critereIds,
+      });
+      if (critError) {
+        console.warn("[Teacher] Libellés de critères indisponibles :", critError);
+      }
+      (crits ?? []).forEach((cr) => libelles.set(cr.id, { code: cr.code, label: cr.label }));
+    }
+
     return contestationsData.map((c) => {
-      const crit = c.criteres as unknown as { id: string; code: string; label: string } | null;
+      const crit = libelles.get(c.critere_id) ?? null;
       const prof = profileMap.get(c.eleve_id);
       const studentName = prof ? `${prof.prenom} ${prof.nom}`.trim() : "Élève STI";
 
