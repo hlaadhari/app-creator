@@ -1,7 +1,7 @@
 # Feuille de Route & Avancement — Labo STI (Bac STI)
 
 > **Source officielle** : PRD v3.1 (§6, §7, §22)  
-> **Dernière mise à jour** : 18 octobre 2026
+> **Dernière mise à jour** : 21 octobre 2026
 
 ---
 
@@ -14,9 +14,9 @@
 | **M2** | **Phase 1 : MVP Parcours Élève**         | Parcours complet HTML/CSS/JS               | Critères d'acceptation Phase 1 validés                    | **Validé**                   |
 | **M3** | **Pilote Court HTML/CSS/JS**             | Retour terrain sur 1 classe (4-6 sem.)     | 0 perte de données, satisfaction ≥ 4/5                    | Planifié                     |
 | **M4** | **Phase 2 : PHP & SQL Local**            | Exécution WASM, panneau SQL, dialecte      | Scénarios essentiels du Bac conformes                     | **Validé**                   |
-| **M5** | **Phase 3 : Correction Étendue & Aides** | Indices 3 niveaux, corrigés, contestations | Faux négatifs < 3%, faux positifs < 1%                    | Planifié                     |
+| **M5** | **Phase 3 : Correction Étendue & Aides** | Indices 3 niveaux, corrigés, contestations | Faux négatifs < 3%, faux positifs < 1%                    | **Validé**                   |
 | **M6** | **Phase 4 : Mode Examen & Snapshots**    | Sessions synchronisées, grille notation    | Écritures refusées après temps serveur, snapshots scellés | **Validé**                   |
-| **M7** | **Phase 5 : Pilotage & Compétences**     | Référentiel, points faibles, tuteur IA     | Formule de maîtrise testée, tuteur coupé en examen        | Planifié                     |
+| **M7** | **Phase 5 : Pilotage & Compétences**     | Référentiel, points faibles, tuteur IA     | Formule de maîtrise testée, tuteur coupé en examen        | **Validé**                   |
 | **M8** | **Version 1.0 & Déploiement**            | Déploiement étendu lycée                   | KPIs globaux au vert (§3)                                 | Planifié                     |
 
 ---
@@ -108,12 +108,12 @@
 
 - [x] [Issue #33](https://github.com/hlaadhari/app-creator/issues/33) : Référentiel de compétences du Bac STI, calcul de maîtrise et progression élève.
   - [x] Migration SQL Domaine 6 (`competences`, `critere_competences`, `maitrise`, `badges_definition`, `badges`, RLS complètes T-01/T-02).
-  - [x] Référentiel officiel des 25 compétences Bac STI couvrant HTML, CSS, JavaScript, PHP, SQL et Algorithmique/Architecture.
+  - [x] Référentiel officiel des 26 compétences Bac STI couvrant HTML, CSS, JavaScript, PHP, SQL et Algorithmique/Architecture (chargé en base le 21/10/2026, avec les 8 badges).
   - [x] Moteur déterministe de calcul de maîtrise v1.0 avec taux de succès brut, bonus de premier essai (+0.15), régularité et pondération de récence.
   - [x] Identification didactique des points forts (score >= 75%) et des axes prioritaires de révision (< 50%).
   - [x] Système de badges pédagogiques (8 distinctions) avec attribution automatique au fil des tentatives.
   - [x] Visualisation interactive élève : graphique radar 5 axes, barres de progression avec seuils didactiques et modale complète `ProgressionModal`.
-- [ ] [Issue #34](https://github.com/hlaadhari/app-creator/issues/34) : Tableau de bord statistique de classe et détection des décrochages.
-- [ ] [Issue #35](https://github.com/hlaadhari/app-creator/issues/35) : Tuteur IA pédagogique (sans révélation de la solution, coupé en examen).
-- [ ] [Issue #36](https://github.com/hlaadhari/app-creator/issues/36) : Détection indicative de similarité entre rendus de classe (anti-plagiat).
+- [x] [Issue #34](https://github.com/hlaadhari/app-creator/issues/34) : Tableau de bord statistique de classe et détection des décrochages (`ClassAnalyticsDashboard`, tests `teacher-analytics.test.ts`).
+- [x] [Issue #35](https://github.com/hlaadhari/app-creator/issues/35) : Tuteur IA pédagogique (sans révélation de la solution, coupé en examen) (`PedagogicalTutorPane`, tests `pedagogical-tutor.test.ts`).
+- [x] [Issue #36](https://github.com/hlaadhari/app-creator/issues/36) : Détection indicative de similarité entre rendus de classe (anti-plagiat) (`SimilarityAnalysisTab`, tests `similarity-detection.test.ts`).
 - [ ] Audit d'accessibilité (contrastes, navigation clavier) et audit légal des licences de dépendances WASM.
