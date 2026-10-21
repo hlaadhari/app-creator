@@ -1243,6 +1243,7 @@ export type Database = {
     }
     Functions: {
       admin_anonymiser_eleve: { Args: { _user_id: string }; Returns: undefined }
+      admin_etat_systeme: { Args: never; Returns: Json }
       admin_lister_demandes_enseignant: {
         Args: never
         Returns: {

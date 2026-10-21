@@ -17,6 +17,15 @@ import {
 import { exercises } from "@/lib/exercises";
 import { estModeDemo } from "@/lib/demo-mode";
 import {
+  controlesEnDirect,
+  getEtatSysteme,
+  mesurerLatenceEtHorloge,
+  TOLERANCE_HORLOGE_SECONDES,
+  type EtatSysteme,
+  type MesureLatence,
+} from "@/lib/supabase/system-health";
+import { MAX_EXECUTION_TIME_MS, MAX_MEMORY_LIMIT_BYTES } from "@/lib/php/php-worker-core";
+import {
   adminListerDemandesEnseignant,
   type DemandeEnseignant,
 } from "@/lib/supabase/teacher-requests";
@@ -79,6 +88,9 @@ function AdminDashboardPage() {
   const [actionMessage, setActionMessage] = useState<string | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [demandes, setDemandes] = useState<DemandeEnseignant[]>([]);
+  const [etatSysteme, setEtatSysteme] = useState<EtatSysteme | null>(null);
+  const [mesure, setMesure] = useState<MesureLatence | null>(null);
+  const [etatErreur, setEtatErreur] = useState<string | null>(null);
   const [confirmation, setConfirmation] = useState<{
     titre: string;
     description: string;
@@ -109,6 +121,21 @@ function AdminDashboardPage() {
       setLoadError(e instanceof Error ? e.message : "Impossible de charger les comptes.");
     } finally {
       setLoadingData(false);
+    }
+    void chargerEtatSysteme();
+  };
+
+  // État réel de la base et latence : mesurés à chaque chargement, jamais écrits en dur.
+  const chargerEtatSysteme = async () => {
+    setEtatErreur(null);
+    try {
+      const [etat, latence] = await Promise.all([getEtatSysteme(), mesurerLatenceEtHorloge()]);
+      setEtatSysteme(etat);
+      setMesure(latence);
+    } catch (e) {
+      setEtatSysteme(null);
+      setMesure(null);
+      setEtatErreur(e instanceof Error ? e.message : "État du système indisponible.");
     }
   };
 
@@ -196,6 +223,18 @@ function AdminDashboardPage() {
       setActionMessage(res.error || "Erreur lors de l'anonymisation.");
     }
     setTimeout(() => setActionMessage(null), 3500);
+  };
+
+  // Contrôles de sécurité vérifiés en direct dans la base (les autres tests relèvent de la CI)
+  const controles = useMemo(
+    () => (etatSysteme ? controlesEnDirect(etatSysteme) : []),
+    [etatSysteme],
+  );
+  const controlesOk = controles.filter((c) => c.ok).length;
+  const statutDirect = (code: string): "ok" | "echec" | "ci" => {
+    const concernes = controles.filter((c) => c.codes.includes(code));
+    if (concernes.length === 0) return "ci";
+    return concernes.every((c) => c.ok) ? "ok" : "echec";
   };
 
   // Filtrage des utilisateurs
@@ -385,8 +424,10 @@ function AdminDashboardPage() {
                 <ShieldCheck className="w-5 h-5" />
               </div>
               <div>
-                <div className="text-2xl font-bold font-mono">14 / 14</div>
-                <div className="text-xs text-muted-foreground">Tests sécurité T-01..T-14</div>
+                <div className="text-2xl font-bold font-mono">
+                  {etatSysteme ? `${controlesOk} / ${controles.length}` : "—"}
+                </div>
+                <div className="text-xs text-muted-foreground">Contrôles de sécurité en direct</div>
               </div>
             </CardContent>
           </Card>
@@ -577,11 +618,22 @@ function AdminDashboardPage() {
                       </span>
                     </CardTitle>
                     <p className="text-xs text-muted-foreground mt-0.5">
-                      Conformité stricte avec le modèle de menace défini dans docs/SECURITY.md
+                      Modèle de menace de docs/SECURITY.md. Les contrôles « direct » sont vérifiés
+                      dans la base à l'affichage ; les autres tests sont exécutés par la CI.
                     </p>
                   </div>
-                  <Badge className="bg-emerald-500/10 text-emerald-500 border-emerald-500/20 font-mono text-xs">
-                    100% Validé (14/14)
+                  <Badge
+                    className={`font-mono text-xs ${
+                      !etatSysteme
+                        ? "bg-muted text-muted-foreground"
+                        : controlesOk === controles.length
+                          ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/20"
+                          : "bg-rose-500/10 text-rose-500 border-rose-500/20"
+                    }`}
+                  >
+                    {etatSysteme
+                      ? `${controlesOk} / ${controles.length} contrôles en direct OK`
+                      : "Contrôles en direct indisponibles"}
                   </Badge>
                 </div>
               </CardHeader>
@@ -593,8 +645,8 @@ function AdminDashboardPage() {
                       <th className="p-3">Intitulé du Test & Scénario d'Attaque</th>
                       <th className="p-3">Catégorie</th>
                       <th className="p-3">Criticité</th>
-                      <th className="p-3">Mécanisme de Protection Validé</th>
-                      <th className="p-3 text-right">Statut CI</th>
+                      <th className="p-3">Mécanisme de Protection</th>
+                      <th className="p-3 text-right">Vérification</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y font-mono">
@@ -616,15 +668,50 @@ function AdminDashboardPage() {
                         </td>
                         <td className="p-3 font-sans text-xs text-muted-foreground">{t.detail}</td>
                         <td className="p-3 text-right">
-                          <span className="inline-flex items-center gap-1 text-emerald-500 font-bold text-[11px] bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded">
-                            <CheckCircle2 className="w-3 h-3" />
-                            {t.statut}
-                          </span>
+                          {statutDirect(t.code) === "ci" ? (
+                            <span
+                              title="Couvert par la suite de tests automatisés (GitHub Actions) ; non vérifiable en direct depuis cette page."
+                              className="inline-flex items-center gap-1 text-muted-foreground font-bold text-[11px] bg-muted border px-2 py-0.5 rounded"
+                            >
+                              CI
+                            </span>
+                          ) : statutDirect(t.code) === "ok" ? (
+                            <span className="inline-flex items-center gap-1 text-emerald-500 font-bold text-[11px] bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded">
+                              <CheckCircle2 className="w-3 h-3" />
+                              OK en direct
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center gap-1 text-rose-500 font-bold text-[11px] bg-rose-500/10 border border-rose-500/20 px-2 py-0.5 rounded">
+                              <ShieldAlert className="w-3 h-3" />
+                              ÉCHEC
+                            </span>
+                          )}
                         </td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
+                <div className="border-t p-4 space-y-1.5 text-xs">
+                  <div className="font-mono uppercase text-[10px] text-muted-foreground">
+                    Contrôles en direct
+                  </div>
+                  {etatErreur && (
+                    <p role="alert" className="text-destructive">
+                      Contrôles indisponibles : {etatErreur}
+                    </p>
+                  )}
+                  {controles.map((c) => (
+                    <div key={c.libelle} className="flex items-start gap-2">
+                      <span
+                        className={`mt-1 h-2 w-2 rounded-full shrink-0 ${c.ok ? "bg-emerald-500" : "bg-rose-500"}`}
+                      />
+                      <span>
+                        <strong>{c.libelle}</strong> ({c.codes.join(", ")}) :{" "}
+                        <span className="text-muted-foreground">{c.detail}</span>
+                      </span>
+                    </div>
+                  ))}
+                </div>
               </CardContent>
             </Card>
           </TabsContent>
@@ -639,21 +726,44 @@ function AdminDashboardPage() {
                       <Database className="w-4 h-4 text-primary" />
                       Base de Données Supabase
                     </span>
-                    <span className="h-2 w-2 rounded-full bg-emerald-500" />
+                    <span
+                      className={`h-2 w-2 rounded-full ${
+                        !etatSysteme
+                          ? "bg-muted-foreground/40"
+                          : controlesOk === controles.length
+                            ? "bg-emerald-500"
+                            : "bg-rose-500"
+                      }`}
+                    />
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="text-xs space-y-1">
+                  {etatErreur && (
+                    <p role="alert" className="text-destructive">
+                      Mesures indisponibles : {etatErreur}
+                    </p>
+                  )}
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">RLS actives :</span>
-                    <strong className="text-foreground">26 tables isolées</strong>
+                    <span className="text-muted-foreground">Tables avec RLS :</span>
+                    <strong className="text-foreground font-mono">
+                      {etatSysteme
+                        ? `${etatSysteme.tables - etatSysteme.tablesSansRls.length} / ${etatSysteme.tables}`
+                        : "—"}
+                    </strong>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">Solutions & Corrigés :</span>
-                    <strong className="text-emerald-500 font-mono">0 fuite client (T-04)</strong>
+                    <span className="text-muted-foreground">Droits clients sur solutions :</span>
+                    <strong
+                      className={`font-mono ${etatSysteme && etatSysteme.droitsClientsCorriges > 0 ? "text-rose-500" : "text-foreground"}`}
+                    >
+                      {etatSysteme ? `${etatSysteme.droitsClientsCorriges} (T-04)` : "—"}
+                    </strong>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">Latence moyenne :</span>
-                    <strong className="text-foreground font-mono">24 ms</strong>
+                    <span className="text-muted-foreground">Latence (médiane de 3) :</span>
+                    <strong className="text-foreground font-mono">
+                      {mesure ? `${mesure.latenceMs} ms` : "—"}
+                    </strong>
                   </div>
                 </CardContent>
               </Card>
@@ -665,21 +775,27 @@ function AdminDashboardPage() {
                       <FileCode className="w-4 h-4 text-indigo-500" />
                       Moteur PHP 8.2 WASM
                     </span>
-                    <span className="h-2 w-2 rounded-full bg-emerald-500" />
+                    <span className="text-[10px] normal-case text-muted-foreground">
+                      configuration
+                    </span>
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="text-xs space-y-1">
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Watchdog d'exécution :</span>
-                    <strong className="text-foreground font-mono">3000 ms max (T-10)</strong>
+                    <strong className="text-foreground font-mono">
+                      {MAX_EXECUTION_TIME_MS} ms max (T-10)
+                    </strong>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Plafond mémoire :</span>
-                    <strong className="text-foreground font-mono">64 Mo / élève</strong>
+                    <strong className="text-foreground font-mono">
+                      {Math.round(MAX_MEMORY_LIMIT_BYTES / (1024 * 1024))} Mo / élève
+                    </strong>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Confinement réseau :</span>
-                    <strong className="text-emerald-500">Totalement étanche (T-11)</strong>
+                    <strong className="text-foreground">Bac à sable (test T-11 en CI)</strong>
                   </div>
                 </CardContent>
               </Card>
@@ -691,21 +807,37 @@ function AdminDashboardPage() {
                       <Clock className="w-4 h-4 text-amber-500" />
                       Horloge Serveur NTP (T-08)
                     </span>
-                    <span className="h-2 w-2 rounded-full bg-emerald-500" />
+                    <span
+                      className={`h-2 w-2 rounded-full ${
+                        !mesure
+                          ? "bg-muted-foreground/40"
+                          : Math.abs(mesure.ecartHorlogeSecondes) <= TOLERANCE_HORLOGE_SECONDES
+                            ? "bg-emerald-500"
+                            : "bg-rose-500"
+                      }`}
+                    />
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="text-xs space-y-1">
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">Source temporelle :</span>
-                    <strong className="text-foreground">Horloge Serveur Centrale</strong>
+                    <span className="text-muted-foreground">Heure du serveur :</span>
+                    <strong className="text-foreground font-mono">
+                      {mesure ? new Date(mesure.horlogeServeur).toLocaleTimeString() : "—"}
+                    </strong>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">Tolérance dérive :</span>
-                    <strong className="text-foreground font-mono">± 30 secondes</strong>
+                    <span className="text-muted-foreground">Écart navigateur / serveur :</span>
+                    <strong className="text-foreground font-mono">
+                      {mesure
+                        ? `${mesure.ecartHorlogeSecondes > 0 ? "+" : ""}${mesure.ecartHorlogeSecondes} s`
+                        : "—"}
+                    </strong>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">Verrouillage post-échéance :</span>
-                    <strong className="text-emerald-500">Immédiat (T-07)</strong>
+                    <span className="text-muted-foreground">Alerte au-delà de :</span>
+                    <strong className="text-foreground font-mono">
+                      ± {TOLERANCE_HORLOGE_SECONDES} secondes
+                    </strong>
                   </div>
                 </CardContent>
               </Card>

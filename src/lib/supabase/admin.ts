@@ -45,7 +45,6 @@ export interface SecurityTestItem {
   titre: string;
   categorie: string;
   criticite: "Bloquant" | "Majeur";
-  statut: "PASSED" | "FAILED";
   detail: string;
 }
 
@@ -136,7 +135,6 @@ export function getSecurityTestsMatrix(): SecurityTestItem[] {
       titre: "Isolation inter-élèves (RLS projets & fichiers)",
       categorie: "RLS & Données",
       criticite: "Bloquant",
-      statut: "PASSED",
       detail: "Interdit l'accès ou la modification des fichiers/projets d'un autre élève.",
     },
     {
@@ -144,7 +142,6 @@ export function getSecurityTestsMatrix(): SecurityTestItem[] {
       titre: "Isolation inter-enseignants (RLS classes & copies)",
       categorie: "RLS & Données",
       criticite: "Bloquant",
-      statut: "PASSED",
       detail:
         "Interdit la consultation ou modification des classes créées par un autre enseignant.",
     },
@@ -153,7 +150,6 @@ export function getSecurityTestsMatrix(): SecurityTestItem[] {
       titre: "Interdiction d'auto-attribution de rôle",
       categorie: "Contrôle d'accès",
       criticite: "Bloquant",
-      statut: "PASSED",
       detail:
         "Trigger handle_new_user force le rôle élève ; validation admin requise pour enseignant.",
     },
@@ -162,7 +158,6 @@ export function getSecurityTestsMatrix(): SecurityTestItem[] {
       titre: "Fuite d'indices non débloqués",
       categorie: "Intégrité Pédagogique",
       criticite: "Bloquant",
-      statut: "PASSED",
       detail: "La table indices n'a aucun grant client. Déblocage tracé via RPC debloquer_indice.",
     },
     {
@@ -170,7 +165,6 @@ export function getSecurityTestsMatrix(): SecurityTestItem[] {
       titre: "Usage de code d'invitation expiré ou quota dépassé",
       categorie: "Inscriptions",
       criticite: "Majeur",
-      statut: "PASSED",
       detail: "Rejet immédiat des codes obsolètes, expirés ou dont le quota est atteint.",
     },
     {
@@ -178,7 +172,6 @@ export function getSecurityTestsMatrix(): SecurityTestItem[] {
       titre: "Attaque par brute-force sur code d'invitation",
       categorie: "Anti-Brute Force",
       criticite: "Majeur",
-      statut: "PASSED",
       detail: "Rate-limiting strict (5 tentatives max par 15 minutes) avec blocage temporaire.",
     },
     {
@@ -186,7 +179,6 @@ export function getSecurityTestsMatrix(): SecurityTestItem[] {
       titre: "Écriture tardive post-échéance d'examen",
       categorie: "Mode Examen",
       criticite: "Bloquant",
-      statut: "PASSED",
       detail: "Écritures rejetées à t > echeance_serveur basée sur l'horloge NTP centrale.",
     },
     {
@@ -194,7 +186,6 @@ export function getSecurityTestsMatrix(): SecurityTestItem[] {
       titre: "Manipulation de l'horloge locale élève",
       categorie: "Mode Examen",
       criticite: "Bloquant",
-      statut: "PASSED",
       detail: "Calcul du temps restant déduit de l'horloge serveur avec rejet des dérives machine.",
     },
     {
@@ -202,7 +193,6 @@ export function getSecurityTestsMatrix(): SecurityTestItem[] {
       titre: "Mutation d'un snapshot d'examen scellé",
       categorie: "Immuabilité",
       criticite: "Bloquant",
-      statut: "PASSED",
       detail:
         "Vérification SHA-256 canonique. Toute tentative d'altération lève ImmutabilityViolationError.",
     },
@@ -211,7 +201,6 @@ export function getSecurityTestsMatrix(): SecurityTestItem[] {
       titre: "Boucle infinie ou déni de mémoire PHP WASM",
       categorie: "Bac à Sable",
       criticite: "Bloquant",
-      statut: "PASSED",
       detail: "Watchdog impitoyable à 3000 ms et isolation stricte à 64 Mo de mémoire maximale.",
     },
     {
@@ -219,7 +208,6 @@ export function getSecurityTestsMatrix(): SecurityTestItem[] {
       titre: "Appels réseau sortants dans le bac à sable",
       categorie: "Bac à Sable",
       criticite: "Bloquant",
-      statut: "PASSED",
       detail:
         "Désactivation complète de fetch, XHR, WebSocket et sendBeacon dans l'iframe sandbox.",
     },
@@ -228,7 +216,6 @@ export function getSecurityTestsMatrix(): SecurityTestItem[] {
       titre: "Fuite de secrets dans les bundles clients",
       categorie: "Secrets & CI",
       criticite: "Bloquant",
-      statut: "PASSED",
       detail:
         "Scanner de secrets vérifiant l'absence de clé service_role ou JWT privé dans le client.",
     },
@@ -237,7 +224,6 @@ export function getSecurityTestsMatrix(): SecurityTestItem[] {
       titre: "Tentative d'altération d'une version publiée",
       categorie: "Immuabilité",
       criticite: "Bloquant",
-      statut: "PASSED",
       detail:
         "Trigger protect_published_version interdisant tout UPDATE ou DELETE sur version publiée.",
     },
@@ -246,7 +232,6 @@ export function getSecurityTestsMatrix(): SecurityTestItem[] {
       titre: "Fuite de données privées dans la télémétrie",
       categorie: "Conformité RGPD",
       criticite: "Majeur",
-      statut: "PASSED",
       detail:
         "Sanitizer supprimant emails, CIN, mots de passe et noms complets des logs d'erreurs.",
     },
