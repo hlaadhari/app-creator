@@ -182,7 +182,7 @@ async function initialiserSujetsClasse(classId: string): Promise<void> {
     for (const assign of assignations) {
       if (assign.version_id) {
         // Appeler la RPC initialiser_projet (idempotente)
-        await supabase.rpc("initialiser_projet" as any, {
+        await supabase.rpc("initialiser_projet", {
           _version_id: assign.version_id,
         });
       }
