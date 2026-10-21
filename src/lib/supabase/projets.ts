@@ -2,6 +2,13 @@ import { supabase } from "@/integrations/supabase/client";
 import type { Json } from "@/integrations/supabase/types";
 import type { Files } from "@/lib/exercises";
 
+// La fonction sauvegarder_fichier n'est pas dans les types générés (repli direct si elle est absente).
+type RpcNonTypee = (
+  fonction: string,
+  args: Record<string, unknown>,
+) => PromiseLike<{ data: unknown; error: { message: string } | null }>;
+const rpcNonTypee = supabase.rpc.bind(supabase) as unknown as RpcNonTypee;
+
 export interface SyncResult {
   ok: boolean;
   conflict?: boolean;
@@ -92,7 +99,7 @@ export async function getOrCreateProjet(sujetId: string): Promise<string | null>
     if (proj) return proj.id;
 
     // Initialiser le projet via RPC sécurisée
-    const { data: newId, error } = await supabase.rpc("initialiser_projet" as any, {
+    const { data: newId, error } = await supabase.rpc("initialiser_projet", {
       _version_id: v.id,
     });
 
@@ -152,7 +159,7 @@ export async function sauvegarderFichierDistant(
 ): Promise<SyncResult> {
   try {
     // 1. Tenter via la RPC sécurisée
-    const { data, error } = await supabase.rpc("sauvegarder_fichier" as any, {
+    const { data, error } = await rpcNonTypee("sauvegarder_fichier", {
       _projet_id: projetId,
       _chemin: chemin,
       _contenu: contenu,
