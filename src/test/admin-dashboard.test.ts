@@ -1,4 +1,13 @@
-import { describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+const rpc = vi.hoisted(() => vi.fn());
+vi.mock("@/integrations/supabase/client", () => ({
+  supabase: {
+    rpc,
+    from: () => ({ select: () => Promise.resolve({ count: 2, error: null }) }),
+  },
+}));
+
 import {
   getSecurityTestsMatrix,
   MOCK_ADMIN_USERS,
@@ -8,10 +17,15 @@ import {
   validerCompteEnseignant,
   modifierRoleUtilisateur,
   anonymiserDonneesEleve,
+  messageErreurAdmin,
 } from "@/lib/supabase/admin";
 import { anonymiserProfilEleve } from "@/lib/security/rgpd";
 
 describe("Espace d'Administration Centrale & Sécurité (Issue #30 - PRD §4.1, §17, T-01..T-14)", () => {
+  beforeEach(() => {
+    rpc.mockReset();
+  });
+
   describe("Matrice des 14 Tests Négatifs de Sécurité (SECURITY.md T-01 à T-14)", () => {
     it("fournit l'intégralité des 14 tests de sécurité spécifiés", () => {
       const matrix = getSecurityTestsMatrix();
@@ -93,17 +107,97 @@ describe("Espace d'Administration Centrale & Sécurité (Issue #30 - PRD §4.1, 
       expect(MOCK_ADMIN_METRICS.servicesStatus.securityGuards).toBe("ok");
     });
 
-    it("getAdminMetrics renvoie des métriques valides même en environnement isolé", async () => {
-      const metrics = await getAdminMetrics();
-      expect(metrics).toBeDefined();
-      expect(metrics.totalUsers).toBeGreaterThan(0);
-      expect(metrics.servicesStatus).toBeDefined();
+    it("getAdminUsers renvoie les comptes réels de la fonction SQL, sans données de secours", async () => {
+      rpc.mockResolvedValueOnce({
+        data: [
+          {
+            id: "u1",
+            email: "prof@lycee.fr",
+            nom: "Durand",
+            prenom: "Paul",
+            role: "enseignant",
+            email_confirme: true,
+            created_at: "2026-10-18T10:00:00Z",
+            derniere_connexion: null,
+            valide_par: "a1",
+            valide_at: "2026-10-19T10:00:00Z",
+            anonymise_at: null,
+          },
+          {
+            id: "u2",
+            email: "attente@lycee.fr",
+            nom: "Petit",
+            prenom: "Luc",
+            role: "enseignant",
+            email_confirme: false,
+            created_at: "2026-10-20T10:00:00Z",
+            derniere_connexion: null,
+            valide_par: null,
+            valide_at: null,
+            anonymise_at: "2026-10-21T10:00:00Z",
+          },
+        ],
+        error: null,
+      });
+
+      const users = await getAdminUsers();
+
+      expect(rpc).toHaveBeenCalledWith("admin_lister_utilisateurs");
+      expect(users).toHaveLength(2);
+      expect(users[0]).toMatchObject({
+        email: "prof@lycee.fr",
+        statutValidation: "valide",
+        emailConfirme: true,
+        anonymise: false,
+      });
+      expect(users[1]).toMatchObject({ statutValidation: "en_attente", anonymise: true });
     });
 
-    it("getAdminUsers renvoie la liste d'utilisateurs par défaut en mode autonome", async () => {
-      const users = await getAdminUsers();
-      expect(users).toBeDefined();
-      expect(users.length).toBeGreaterThan(0);
+    it("getAdminUsers lève une erreur lisible plutôt que d'inventer des comptes", async () => {
+      rpc.mockResolvedValueOnce({ data: null, error: { message: "acces_refuse" } });
+      await expect(getAdminUsers()).rejects.toThrow("réservée aux administrateurs");
+    });
+
+    it("getAdminMetrics calcule les compteurs à partir des comptes réels", async () => {
+      rpc.mockResolvedValueOnce({
+        data: [
+          {
+            id: "a",
+            email: "a@x.fr",
+            nom: "N",
+            prenom: "P",
+            role: "admin",
+            email_confirme: true,
+            created_at: "2026-10-18T10:00:00Z",
+            derniere_connexion: null,
+            valide_par: null,
+            valide_at: null,
+            anonymise_at: null,
+          },
+          {
+            id: "e",
+            email: "e@x.fr",
+            nom: "N",
+            prenom: "P",
+            role: "eleve",
+            email_confirme: true,
+            created_at: "2026-10-18T10:00:00Z",
+            derniere_connexion: null,
+            valide_par: null,
+            valide_at: null,
+            anonymise_at: null,
+          },
+        ],
+        error: null,
+      });
+
+      const metrics = await getAdminMetrics();
+
+      expect(metrics.totalUsers).toBe(2);
+      expect(metrics.totalAdmins).toBe(1);
+      expect(metrics.totalEleves).toBe(1);
+      expect(metrics.totalEnseignants).toBe(0);
+      expect(metrics.totalClasses).toBe(2);
     });
   });
 
@@ -128,26 +222,54 @@ describe("Espace d'Administration Centrale & Sécurité (Issue #30 - PRD §4.1, 
       expect(result.identifiantsDetruits.length).toBe(3);
     });
 
-    it("anonymiserDonneesEleve traite la requête sans exception non gérée", async () => {
+    it("anonymiserDonneesEleve appelle la fonction SQL réservée aux administrateurs", async () => {
+      rpc.mockResolvedValueOnce({ error: null });
       const res = await anonymiserDonneesEleve("student-uuid-99");
-      expect(res).toBeDefined();
-      expect(typeof res.success).toBe("boolean");
+      expect(rpc).toHaveBeenCalledWith("admin_anonymiser_eleve", { _user_id: "student-uuid-99" });
+      expect(res).toEqual({ success: true });
+    });
+
+    it("anonymiserDonneesEleve traduit le refus d'un compte non élève", async () => {
+      rpc.mockResolvedValueOnce({ error: { message: "role_non_eleve" } });
+      const res = await anonymiserDonneesEleve("teacher-1");
+      expect(res.success).toBe(false);
+      expect(res.error).toBe("Seuls les comptes élèves peuvent être anonymisés.");
     });
   });
 
   describe("Workflow de Validation et Changement de Rôle (T-03)", () => {
-    it("validerCompteEnseignant s'exécute proprement", async () => {
-      const res = await validerCompteEnseignant("teacher-pending-id", "admin-master-id");
-      expect(res).toBeDefined();
-      expect(typeof res.success).toBe("boolean");
+    it("validerCompteEnseignant passe par la fonction de changement de rôle", async () => {
+      rpc.mockResolvedValueOnce({ error: null });
+      const res = await validerCompteEnseignant("teacher-pending-id");
+      expect(rpc).toHaveBeenCalledWith("admin_modifier_role", {
+        _user_id: "teacher-pending-id",
+        _role: "enseignant",
+      });
+      expect(res.success).toBe(true);
     });
 
-    it("modifierRoleUtilisateur gère le changement de rôle vers admin ou élève", async () => {
-      const res1 = await modifierRoleUtilisateur("user-1", "eleve");
-      expect(res1).toBeDefined();
+    it("modifierRoleUtilisateur transmet le rôle demandé par la fonction SQL", async () => {
+      rpc.mockResolvedValue({ error: null });
+      const res = await modifierRoleUtilisateur("user-2", "admin");
+      expect(rpc).toHaveBeenCalledWith("admin_modifier_role", {
+        _user_id: "user-2",
+        _role: "admin",
+      });
+      expect(res.success).toBe(true);
+    });
 
-      const res2 = await modifierRoleUtilisateur("user-2", "admin");
-      expect(res2).toBeDefined();
+    it("modifierRoleUtilisateur affiche un message clair si l'administrateur se rétrograde", async () => {
+      rpc.mockResolvedValueOnce({ error: { message: "auto_retrogradation_interdite" } });
+      const res = await modifierRoleUtilisateur("moi", "eleve");
+      expect(res).toEqual({
+        success: false,
+        error: "Vous ne pouvez pas retirer vos propres droits d'administrateur.",
+      });
+    });
+
+    it("messageErreurAdmin conserve les messages inconnus", () => {
+      expect(messageErreurAdmin("boom")).toBe("boom");
+      expect(messageErreurAdmin(undefined)).toBe("Erreur inattendue.");
     });
   });
 });

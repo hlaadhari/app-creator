@@ -66,6 +66,7 @@ function AdminDashboardPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [roleFilter, setRoleFilter] = useState<string>("all");
   const [actionMessage, setActionMessage] = useState<string | null>(null);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
   const loadData = async () => {
     if (isDemo) {
@@ -76,10 +77,16 @@ function AdminDashboardPage() {
 
     if (!user) return;
     setLoadingData(true);
-    const [uList, m] = await Promise.all([getAdminUsers(), getAdminMetrics()]);
-    setUsers(uList);
-    setMetrics(m);
-    setLoadingData(false);
+    setLoadError(null);
+    try {
+      const [uList, m] = await Promise.all([getAdminUsers(), getAdminMetrics()]);
+      setUsers(uList);
+      setMetrics(m);
+    } catch (e) {
+      setLoadError(e instanceof Error ? e.message : "Impossible de charger les comptes.");
+    } finally {
+      setLoadingData(false);
+    }
   };
 
   useEffect(() => {
@@ -110,7 +117,7 @@ function AdminDashboardPage() {
     }
 
     if (!user) return;
-    const res = await validerCompteEnseignant(userId, user.id);
+    const res = await validerCompteEnseignant(userId);
     if (res.success) {
       setActionMessage("Compte enseignant validé avec succès.");
       await loadData();
@@ -136,6 +143,14 @@ function AdminDashboardPage() {
       );
       setActionMessage(`Rôle mis à jour vers "${newRole}" (Mode Démo).`);
       setTimeout(() => setActionMessage(null), 3500);
+      return;
+    }
+
+    if (
+      newRole === "admin" &&
+      !window.confirm("Donner les droits d'administration complets à ce compte ?")
+    ) {
+      await loadData();
       return;
     }
 
@@ -303,6 +318,16 @@ function AdminDashboardPage() {
         <div className="bg-emerald-500/10 border-b border-emerald-500/20 px-6 py-2 text-xs text-emerald-600 dark:text-emerald-400 font-medium flex items-center gap-2">
           <CheckCircle2 className="w-4 h-4 shrink-0" />
           <span>{actionMessage}</span>
+        </div>
+      )}
+
+      {loadError && (
+        <div
+          role="alert"
+          className="bg-destructive/10 border-b border-destructive/20 px-6 py-2 text-xs text-destructive font-medium flex items-center gap-2"
+        >
+          <ShieldAlert className="w-4 h-4 shrink-0" />
+          <span>Chargement des comptes impossible : {loadError}</span>
         </div>
       )}
 
@@ -477,6 +502,7 @@ function AdminDashboardPage() {
                       <th className="p-3">Rôle Actuel</th>
                       <th className="p-3">Validation Enseignant</th>
                       <th className="p-3">Date d'inscription</th>
+                      <th className="p-3">Dernière connexion</th>
                       <th className="p-3 text-right">Actions Administrateur</th>
                     </tr>
                   </thead>
@@ -486,7 +512,12 @@ function AdminDashboardPage() {
                         <td className="p-3 font-medium">
                           {u.prenom} {u.nom}
                         </td>
-                        <td className="p-3 font-mono text-muted-foreground">{u.email}</td>
+                        <td className="p-3 font-mono text-muted-foreground">
+                          {u.email}
+                          {u.emailConfirme === false && (
+                            <span className="ml-2 text-[10px] text-amber-500">non confirmé</span>
+                          )}
+                        </td>
                         <td className="p-3">
                           <Badge
                             variant="outline"
@@ -521,27 +552,47 @@ function AdminDashboardPage() {
                         <td className="p-3 text-muted-foreground font-mono text-[11px]">
                           {new Date(u.created_at).toLocaleDateString()}
                         </td>
+                        <td className="p-3 text-muted-foreground font-mono text-[11px]">
+                          {u.derniereConnexion
+                            ? new Date(u.derniereConnexion).toLocaleString()
+                            : "Jamais"}
+                        </td>
                         <td className="p-3 text-right">
                           <div className="flex items-center justify-end gap-1.5">
                             <select
                               value={u.role}
                               onChange={(e) => handleRoleChange(u.id, e.target.value as AppRole)}
-                              className="h-7 rounded border bg-background px-1.5 text-[11px] font-mono"
+                              disabled={u.anonymise || u.id === user?.id}
+                              aria-label={`Rôle de ${u.prenom} ${u.nom}`}
+                              title={
+                                u.id === user?.id
+                                  ? "Vous ne pouvez pas modifier votre propre rôle"
+                                  : undefined
+                              }
+                              className="h-7 rounded border bg-background px-1.5 text-[11px] font-mono disabled:opacity-50"
                             >
                               <option value="eleve">Élève</option>
                               <option value="enseignant">Enseignant</option>
                               <option value="admin">Admin</option>
                             </select>
 
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              onClick={() => handleAnonymize(u.id)}
-                              className="h-7 px-2 text-[10px] text-destructive hover:bg-destructive/10"
-                              title="Anonymiser conformément au droit à l'effacement RGPD (§17)"
-                            >
-                              RGPD Effacer
-                            </Button>
+                            {u.anonymise ? (
+                              <span className="px-2 text-[10px] text-muted-foreground">
+                                Anonymisé
+                              </span>
+                            ) : (
+                              u.role === "eleve" && (
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
+                                  onClick={() => handleAnonymize(u.id)}
+                                  className="h-7 px-2 text-[10px] text-destructive hover:bg-destructive/10"
+                                  title="Anonymiser conformément au droit à l'effacement RGPD (§17)"
+                                >
+                                  RGPD Effacer
+                                </Button>
+                              )
+                            )}
                           </div>
                         </td>
                       </tr>

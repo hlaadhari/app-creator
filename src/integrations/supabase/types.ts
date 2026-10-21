@@ -750,22 +750,31 @@ export type Database = {
       }
       profiles: {
         Row: {
+          anonymise_at: string | null
           created_at: string
           id: string
           nom: string
           prenom: string
+          valide_at: string | null
+          valide_par: string | null
         }
         Insert: {
+          anonymise_at?: string | null
           created_at?: string
           id: string
           nom?: string
           prenom?: string
+          valide_at?: string | null
+          valide_par?: string | null
         }
         Update: {
+          anonymise_at?: string | null
           created_at?: string
           id?: string
           nom?: string
           prenom?: string
+          valide_at?: string | null
+          valide_par?: string | null
         }
         Relationships: []
       }
@@ -1197,6 +1206,30 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      admin_anonymiser_eleve: { Args: { _user_id: string }; Returns: undefined }
+      admin_lister_utilisateurs: {
+        Args: never
+        Returns: {
+          anonymise_at: string | null
+          created_at: string
+          derniere_connexion: string | null
+          email: string
+          email_confirme: boolean
+          id: string
+          nom: string
+          prenom: string
+          role: Database["public"]["Enums"]["app_role"]
+          valide_at: string | null
+          valide_par: string | null
+        }[]
+      }
+      admin_modifier_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: undefined
+      }
       calculer_score_maitrise_v1: {
         Args: {
           p_derniere_date: string
