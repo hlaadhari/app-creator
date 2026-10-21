@@ -22,6 +22,16 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import {
   Shield,
   ShieldAlert,
   ShieldCheck,
@@ -67,6 +77,12 @@ function AdminDashboardPage() {
   const [roleFilter, setRoleFilter] = useState<string>("all");
   const [actionMessage, setActionMessage] = useState<string | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
+  const [confirmation, setConfirmation] = useState<{
+    titre: string;
+    description: string;
+    libelle: string;
+    onConfirm: () => void;
+  } | null>(null);
 
   const loadData = async () => {
     if (isDemo) {
@@ -146,14 +162,21 @@ function AdminDashboardPage() {
       return;
     }
 
-    if (
-      newRole === "admin" &&
-      !window.confirm("Donner les droits d'administration complets à ce compte ?")
-    ) {
-      await loadData();
+    if (newRole === "admin") {
+      setConfirmation({
+        titre: "Donner les droits d'administration ?",
+        description:
+          "Ce compte pourra gérer tous les utilisateurs, changer les rôles et anonymiser des élèves.",
+        libelle: "Donner les droits admin",
+        onConfirm: () => void appliquerRole(userId, newRole),
+      });
       return;
     }
 
+    await appliquerRole(userId, newRole);
+  };
+
+  const appliquerRole = async (userId: string, newRole: AppRole) => {
     const res = await modifierRoleUtilisateur(userId, newRole);
     if (res.success) {
       setActionMessage(`Rôle mis à jour vers "${newRole}".`);
@@ -165,15 +188,17 @@ function AdminDashboardPage() {
   };
 
   // Anonymisation RGPD d'un élève
-  const handleAnonymize = async (userId: string) => {
-    if (
-      !window.confirm(
-        "Êtes-vous sûr de vouloir anonymiser définitivement ce profil élève (RGPD §17) ?",
-      )
-    ) {
-      return;
-    }
+  const handleAnonymize = (userId: string) => {
+    setConfirmation({
+      titre: "Anonymiser ce profil élève ?",
+      description:
+        "Le nom, l'e-mail et l'accès de l'élève seront effacés définitivement (RGPD §17). Cette action est irréversible.",
+      libelle: "Anonymiser définitivement",
+      onConfirm: () => void appliquerAnonymisation(userId),
+    });
+  };
 
+  const appliquerAnonymisation = async (userId: string) => {
     if (isDemo) {
       setUsers(
         users.map((u) =>
@@ -805,6 +830,31 @@ function AdminDashboardPage() {
           </TabsContent>
         </Tabs>
       </main>
+
+      <AlertDialog
+        open={confirmation !== null}
+        onOpenChange={(open) => {
+          if (!open) setConfirmation(null);
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{confirmation?.titre}</AlertDialogTitle>
+            <AlertDialogDescription>{confirmation?.description}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Annuler</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                confirmation?.onConfirm();
+                setConfirmation(null);
+              }}
+            >
+              {confirmation?.libelle}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
