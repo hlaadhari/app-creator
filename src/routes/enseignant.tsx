@@ -52,6 +52,7 @@ import {
 } from "@/lib/analytics/class-analytics";
 import { telechargerExportPronote } from "@/lib/export/pronote-export";
 import { SimilarityAnalysisTab } from "@/components/teacher/SimilarityAnalysisTab";
+import { TeacherAccessRequest } from "@/components/teacher/TeacherAccessRequest";
 import type { StudentCopyData } from "@/lib/similarity/types";
 
 export const Route = createFileRoute("/enseignant")({
@@ -672,8 +673,9 @@ function TeacherDashboardPage() {
           <p className="text-xs text-muted-foreground leading-relaxed">
             {user
               ? `Votre compte connecté (${user.email}) possède le rôle "${role}". L'espace de supervision de classe requiert le rôle enseignant.`
-              : "Vous devez être connecté avec le compte enseignant (hatem.laadhari.dev02@gmail.com) ou administrateur pour accéder à cette interface."}
+              : "Vous devez être connecté avec un compte enseignant ou administrateur pour accéder à cette interface."}
           </p>
+          {user && role === "eleve" && <TeacherAccessRequest />}
           <div className="pt-2 flex flex-col gap-2">
             <Link
               to="/"

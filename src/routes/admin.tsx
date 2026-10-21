@@ -8,7 +8,6 @@ import {
   type SecurityTestItem,
   getAdminUsers,
   getAdminMetrics,
-  validerCompteEnseignant,
   modifierRoleUtilisateur,
   anonymiserDonneesEleve,
   getSecurityTestsMatrix,
@@ -16,6 +15,11 @@ import {
   MOCK_ADMIN_METRICS,
 } from "@/lib/supabase/admin";
 import { exercises } from "@/lib/exercises";
+import {
+  adminListerDemandesEnseignant,
+  type DemandeEnseignant,
+} from "@/lib/supabase/teacher-requests";
+import { TeacherRequestsQueue } from "@/components/teacher/TeacherRequestsQueue";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -77,6 +81,7 @@ function AdminDashboardPage() {
   const [roleFilter, setRoleFilter] = useState<string>("all");
   const [actionMessage, setActionMessage] = useState<string | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
+  const [demandes, setDemandes] = useState<DemandeEnseignant[]>([]);
   const [confirmation, setConfirmation] = useState<{
     titre: string;
     description: string;
@@ -95,9 +100,14 @@ function AdminDashboardPage() {
     setLoadingData(true);
     setLoadError(null);
     try {
-      const [uList, m] = await Promise.all([getAdminUsers(), getAdminMetrics()]);
+      const [uList, m, dList] = await Promise.all([
+        getAdminUsers(),
+        getAdminMetrics(),
+        adminListerDemandesEnseignant(),
+      ]);
       setUsers(uList);
       setMetrics(m);
+      setDemandes(dList);
     } catch (e) {
       setLoadError(e instanceof Error ? e.message : "Impossible de charger les comptes.");
     } finally {
@@ -111,37 +121,6 @@ function AdminDashboardPage() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, role, isDemo]);
-
-  // Validation d'un enseignant
-  const handleValidateTeacher = async (userId: string) => {
-    if (isDemo) {
-      setUsers(
-        users.map((u) =>
-          u.id === userId
-            ? {
-                ...u,
-                statutValidation: "valide",
-                valide_par: "demo-admin",
-                valide_at: new Date().toISOString(),
-              }
-            : u,
-        ),
-      );
-      setActionMessage("Compte enseignant validé avec succès (Mode Démo).");
-      setTimeout(() => setActionMessage(null), 3500);
-      return;
-    }
-
-    if (!user) return;
-    const res = await validerCompteEnseignant(userId);
-    if (res.success) {
-      setActionMessage("Compte enseignant validé avec succès.");
-      await loadData();
-    } else {
-      setActionMessage(res.error || "Erreur de validation.");
-    }
-    setTimeout(() => setActionMessage(null), 3500);
-  };
 
   // Modification manuelle du rôle d'un utilisateur
   const handleRoleChange = async (userId: string, newRole: AppRole) => {
@@ -236,8 +215,8 @@ function AdminDashboardPage() {
 
   // Demandes enseignant en attente
   const pendingTeachers = useMemo(() => {
-    return users.filter((u) => u.role === "enseignant" && u.statutValidation === "en_attente");
-  }, [users]);
+    return demandes.filter((d) => d.statut === "en_attente");
+  }, [demandes]);
 
   // Écran de chargement initial
   if (authLoading && !isDemo) {
@@ -438,56 +417,14 @@ function AdminDashboardPage() {
           {/* Onglet 1 : Gestion des Utilisateurs et Validation Enseignants */}
           <TabsContent value="utilisateurs" className="space-y-4">
             {/* Alertes : Demandes Enseignant en attente */}
-            {pendingTeachers.length > 0 && (
-              <Card className="border-amber-500/30 bg-amber-500/5">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-xs font-mono uppercase tracking-wider text-amber-600 dark:text-amber-400 flex items-center gap-2">
-                    <UserCheck className="w-4 h-4" />
-                    <span>Demandes d'accès Enseignant à valider ({pendingTeachers.length})</span>
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-2">
-                  {pendingTeachers.map((teacher) => (
-                    <div
-                      key={teacher.id}
-                      className="flex items-center justify-between border rounded p-3 bg-card"
-                    >
-                      <div className="space-y-0.5">
-                        <div className="font-semibold text-sm">
-                          {teacher.prenom} {teacher.nom}
-                        </div>
-                        <div className="text-xs text-muted-foreground font-mono">
-                          {teacher.email}
-                        </div>
-                        <div className="text-[11px] text-muted-foreground">
-                          Inscrit le {new Date(teacher.created_at).toLocaleDateString()}
-                        </div>
-                      </div>
-
-                      <div className="flex items-center gap-2">
-                        <Button
-                          size="sm"
-                          onClick={() => handleValidateTeacher(teacher.id)}
-                          className="h-8 text-xs gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-medium"
-                        >
-                          <Check className="w-3.5 h-3.5" />
-                          <span>Valider Enseignant</span>
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => handleRoleChange(teacher.id, "eleve")}
-                          className="h-8 text-xs text-destructive hover:bg-destructive/10"
-                        >
-                          <X className="w-3.5 h-3.5" />
-                          <span>Rejeter (Élève)</span>
-                        </Button>
-                      </div>
-                    </div>
-                  ))}
-                </CardContent>
-              </Card>
-            )}
+            <TeacherRequestsQueue
+              demandes={demandes}
+              onProcessed={(message) => {
+                setActionMessage(message);
+                void loadData();
+                setTimeout(() => setActionMessage(null), 3500);
+              }}
+            />
 
             {/* Liste complète des utilisateurs */}
             <Card>
