@@ -6,7 +6,16 @@
   "niveau": 3,
   "exam_mode": true,
   "bareme": 20,
-  "tags": ["Bac STI", "HTML5", "CSS3", "JavaScript", "PHP", "MySQLi", "Examen Blanc", "Session 2026"],
+  "tags": [
+    "Bac STI",
+    "HTML5",
+    "CSS3",
+    "JavaScript",
+    "PHP",
+    "MySQLi",
+    "Examen Blanc",
+    "Session 2026"
+  ],
   "description": "Épreuve pratique du Bac STI, session 2026 (12h30) : site de la compagnie Marivana Voyages pour consulter les croisières disponibles et réserver des places.",
   "fichiers_attendus": [
     "index.html",

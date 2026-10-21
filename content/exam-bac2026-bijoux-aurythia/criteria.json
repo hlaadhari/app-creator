@@ -33,7 +33,12 @@
     "points": 2,
     "ordre": 3,
     "fichier": "index.html",
-    "sonde": { "type": "css_property", "selector": "h1", "property": "text-transform", "expectedValue": "capitalize" },
+    "sonde": {
+      "type": "css_property",
+      "selector": "h1",
+      "property": "text-transform",
+      "expectedValue": "capitalize"
+    },
     "fail_message": "Une des règles CSS de l'index (h1, header, footer, a, nav, section, aside, ul) est absente ou incorrecte."
   },
   {
@@ -59,7 +64,12 @@
     "points": 1,
     "ordre": 5,
     "fichier": "ajout.html",
-    "sonde": { "type": "css_property", "selector": "fieldset fieldset", "property": "border-style", "expectedValue": "double" },
+    "sonde": {
+      "type": "css_property",
+      "selector": "fieldset fieldset",
+      "property": "border-style",
+      "expectedValue": "double"
+    },
     "fail_message": "Les fieldset n'ont pas la bordure double bleue de 3px ou les boutons n'ont pas l'ombre bleue."
   },
   {
@@ -107,7 +117,12 @@
     "points": 0.5,
     "ordre": 9,
     "fichier": "evaluation.html",
-    "sonde": { "type": "css_property", "selector": "legend", "property": "font-style", "expectedValue": "italic" },
+    "sonde": {
+      "type": "css_property",
+      "selector": "legend",
+      "property": "font-style",
+      "expectedValue": "italic"
+    },
     "fail_message": "Les légendes ne sont pas en gras et italique ou les boutons n'ont pas la même mise en forme qu'à la question 2."
   },
   {

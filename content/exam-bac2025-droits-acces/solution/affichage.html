@@ -1,28 +1,32 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="fr">
-<head>
-    <meta charset="UTF-8">
+  <head>
+    <meta charset="UTF-8" />
     <title>Affichage des droits d’accès - Futura Horizon AI</title>
-    <link rel="stylesheet" href="mesStyles.css">
-</head>
-<body>
+    <link rel="stylesheet" href="mesStyles.css" />
+  </head>
+  <body>
     <form action="affichage.php" method="post">
-        <fieldset>
-          <legend>Les droits d'accès d'un document</legend>
-            <label for="doc">Nom du document :</label>
-            <select id="doc" name="doc" size="1">
-                <option value="" selected>Sélectionner un document</option>
-                <option value="D0001">Liste employés.pdf</option>
-                <option value="D0002">Demande de congés.docx</option>
-                <option value="D0003">Réclamation ouvriers.docx</option>
-                <option value="D0004">Statistiques2024.xlsx</option>
-            </select>
-            <br>
-            <br>
-            <div id="divbt">
-              <input name="bt1" type="submit" value="Afficher">&nbsp;&nbsp;<input name="bt2" type="reset" value="Annuler">
-            </div>
-        </fieldset>
+      <fieldset>
+        <legend>Les droits d'accès d'un document</legend>
+        <label for="doc">Nom du document :</label>
+        <select id="doc" name="doc" size="1">
+          <option value="" selected>Sélectionner un document</option>
+          <option value="D0001">Liste employés.pdf</option>
+          <option value="D0002">Demande de congés.docx</option>
+          <option value="D0003">Réclamation ouvriers.docx</option>
+          <option value="D0004">Statistiques2024.xlsx</option>
+        </select>
+        <br />
+        <br />
+        <div id="divbt">
+          <input name="bt1" type="submit" value="Afficher" />&nbsp;&nbsp;<input
+            name="bt2"
+            type="reset"
+            value="Annuler"
+          />
+        </div>
+      </fieldset>
     </form>
-</body>
+  </body>
 </html>

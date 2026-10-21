@@ -1,39 +1,40 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="fr">
-<head>
-    <meta charset="UTF-8">
+  <head>
+    <meta charset="UTF-8" />
     <title>Evaluation d'un bijou</title>
     <script src="mesControles.js"></script>
-    <link rel="stylesheet" href="mesStyles.css">
-</head>
-<body>
-  <form action="evaluation.php" method="post" onsubmit="return valide2()">
-    <fieldset id="principal">
-      <legend>Evaluation d'un bijou</legend>
-      <label for="idBij">Identifiant du bijou :</label>
-      <input name="idBij" type="text" id="idBij"><br><br>
-      <label for="expert">Expert :</label>
-      <select name="expert" id="expert">
-        <option value="" selected>Choisir un expert</option>
-        <option value="A22">Chokri Sfaxi</option>
-        <option value="A23">Mohamed Jerbi</option>
-        <option value="A24">Radhia Gafsi</option>
-      </select><br><br>
-      <fieldset>
-        <legend>Critères d'évaluation</legend>
-        <label for="finition">Finition :</label>
-        <input name="finition" type="number" id="finition"><br><br>
-        <label>Originalité :</label>
-        <input name="originalite" type="radio" id="oui" value="O"> OUI
-        <input name="originalite" type="radio" id="non" value="N"> NON<br><br>
-        <label for="commentaire">Commentaire :</label>
-        <textarea name="commentaire" id="commentaire" rows="3" cols="30"></textarea>
-      </fieldset><br>
-      <div class="bt">
-        <input type="reset" id="exit" value="Annuler">
-        <input type="submit" id="save" value="Enregistrer">
-      </div>
-    </fieldset>
-  </form>
-</body>
+    <link rel="stylesheet" href="mesStyles.css" />
+  </head>
+  <body>
+    <form action="evaluation.php" method="post" onsubmit="return valide2();">
+      <fieldset id="principal">
+        <legend>Evaluation d'un bijou</legend>
+        <label for="idBij">Identifiant du bijou :</label>
+        <input name="idBij" type="text" id="idBij" /><br /><br />
+        <label for="expert">Expert :</label>
+        <select name="expert" id="expert">
+          <option value="" selected>Choisir un expert</option>
+          <option value="A22">Chokri Sfaxi</option>
+          <option value="A23">Mohamed Jerbi</option>
+          <option value="A24">Radhia Gafsi</option></select
+        ><br /><br />
+        <fieldset>
+          <legend>Critères d'évaluation</legend>
+          <label for="finition">Finition :</label>
+          <input name="finition" type="number" id="finition" /><br /><br />
+          <label>Originalité :</label>
+          <input name="originalite" type="radio" id="oui" value="O" /> OUI
+          <input name="originalite" type="radio" id="non" value="N" /> NON<br /><br />
+          <label for="commentaire">Commentaire :</label>
+          <textarea name="commentaire" id="commentaire" rows="3" cols="30"></textarea>
+        </fieldset>
+        <br />
+        <div class="bt">
+          <input type="reset" id="exit" value="Annuler" />
+          <input type="submit" id="save" value="Enregistrer" />
+        </div>
+      </fieldset>
+    </form>
+  </body>
 </html>

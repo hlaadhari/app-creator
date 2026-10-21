@@ -33,7 +33,12 @@
     "points": 1.5,
     "ordre": 3,
     "fichier": "index.html",
-    "sonde": { "type": "css_property", "selector": "header img", "property": "opacity", "expectedValue": "0.5" },
+    "sonde": {
+      "type": "css_property",
+      "selector": "header img",
+      "property": "opacity",
+      "expectedValue": "0.5"
+    },
     "fail_message": "Une des règles CSS de l'en-tête (marge, police, arrondi, transparence, disposition) est absente ou incorrecte."
   },
   {
@@ -55,7 +60,12 @@
     "points": 1,
     "ordre": 5,
     "fichier": "photo.html",
-    "sonde": { "type": "css_property", "selector": "footer", "property": "text-align", "expectedValue": "center" },
+    "sonde": {
+      "type": "css_property",
+      "selector": "footer",
+      "property": "text-align",
+      "expectedValue": "center"
+    },
     "fail_message": "Le survol des images (scale 2, transition 3s) ou la mise en forme du pied de page ne respecte pas l'énoncé."
   },
   {

@@ -1,41 +1,50 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="fr">
-<head>
-    <meta charset="UTF-8">
+  <head>
+    <meta charset="UTF-8" />
     <title>Réservation d'une croisière</title>
-    <link rel="stylesheet" href="styles2.css">
+    <link rel="stylesheet" href="styles2.css" />
     <script src="controles2.js"></script>
-</head>
-<body>
-   <form action="reservation.php" method="post" onsubmit="return verif2()">
-    <fieldset>
-        <legend> Réservation d'une croisière </legend>
+  </head>
+  <body>
+    <form action="reservation.php" method="post" onsubmit="return verif2();">
+      <fieldset>
+        <legend>Réservation d'une croisière</legend>
         <label for="typeId"> Type identifiant : </label>
         <select id="typeId" name="typeId">
-            <option value="" selected> Choisir un type </option>
-            <option value="CIN">CIN</option>
-            <option value="Passeport">Passeport</option>
-        </select><br><br>
+          <option value="" selected>Choisir un type</option>
+          <option value="CIN">CIN</option>
+          <option value="Passeport">Passeport</option></select
+        ><br /><br />
         <label for="idCl"> Identifiant : </label>
-        <input type="text" id="idCl" name="idCl"><br><br>
+        <input type="text" id="idCl" name="idCl" /><br /><br />
         <label for="nomCl"> Nom &amp; prénom : </label>
-        <input type="text" id="nomCl" name="nomCl"><br><br>
+        <input type="text" id="nomCl" name="nomCl" /><br /><br />
         <label for="telCl"> Téléphone : </label>
-        <input type="tel" id="telCl" name="telCl"><br><br>
+        <input type="tel" id="telCl" name="telCl" /><br /><br />
         <label for="idCro"> Croisière : </label>
         <select id="idCro" name="idCro">
-            <option value="101">Eclat méditerranéen</option>
-            <option value="102">Perle d'Azur</option>
-            <option value="103">Riviera des Mers</option>
-        </select><br><br>
+          <option value="101">Eclat méditerranéen</option>
+          <option value="102">Perle d'Azur</option>
+          <option value="103">Riviera des Mers</option></select
+        ><br /><br />
         <label for="nbPlace"> Nombre places : </label>
-        <input type="range" id="nbPlace" name="nbPlace" min="1" max="10" value="1" oninput="nombres()" onchange="nombres()">
-        <output id="nb">1/10</output><br><br>
+        <input
+          type="range"
+          id="nbPlace"
+          name="nbPlace"
+          min="1"
+          max="10"
+          value="1"
+          oninput="nombres()"
+          onchange="nombres()"
+        />
+        <output id="nb">1/10</output><br /><br />
         <div>
-         <input type="reset"  value="Annuler">
-         <input type="submit" value="Valider">
+          <input type="reset" value="Annuler" />
+          <input type="submit" value="Valider" />
         </div>
-    </fieldset>
-   </form>
-</body>
+      </fieldset>
+    </form>
+  </body>
 </html>

@@ -1,34 +1,43 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="fr">
-<head>
-    <meta charset="UTF-8">
+  <head>
+    <meta charset="UTF-8" />
     <title>Attribution des droits d'accès - Futura Horizon AI</title>
-    <link rel="stylesheet" href="mesStyles.css">
+    <link rel="stylesheet" href="mesStyles.css" />
     <script src="mesControles.js"></script>
-</head>
-<body>
-    <form action="droit.php" method="post" onsubmit="return verif2()">
-    <fieldset>
+  </head>
+  <body>
+    <form action="droit.php" method="post" onsubmit="return verif2();">
+      <fieldset>
         <legend>Attribution des droits d'accès à un document</legend>
         <label for="idUtil">Identifiant de l'utilisateur :</label>
-        <input id="idUtil" name="idUtil" type="text" required> <br>
+        <input id="idUtil" name="idUtil" type="text" required /> <br />
         <label for="doc">Nom du document :</label>
         <select id="doc" name="doc" size="1">
-            <option value="" selected>Sélectionner un document</option>
-            <option value="D0001">Liste employés.pdf</option>
-            <option value="D0002">Demande de congés.docx</option>
-            <option value="D0003">Réclamation ouvriers.docx</option>
-            <option value="D0004">Statistiques2024.xlsx</option>
-        </select><br>
+          <option value="" selected>Sélectionner un document</option>
+          <option value="D0001">Liste employés.pdf</option>
+          <option value="D0002">Demande de congés.docx</option>
+          <option value="D0003">Réclamation ouvriers.docx</option>
+          <option value="D0004">Statistiques2024.xlsx</option></select
+        ><br />
         <label>Droit(s) accordé(s) :</label>
-        <input id="ecriture" name="ecriture" type="checkbox" value="O" onclick="choix1()">Ecriture
-        <input id="lecture" name="lecture" type="checkbox" value="O" onclick="choix2()">Lecture
-        <input id="impression" name="impression" type="checkbox" value="O" onclick="choix3()">Impression
-       <br><br>
+        <input id="ecriture" name="ecriture" type="checkbox" value="O" onclick="choix1()" />Ecriture
+        <input id="lecture" name="lecture" type="checkbox" value="O" onclick="choix2()" />Lecture
+        <input
+          id="impression"
+          name="impression"
+          type="checkbox"
+          value="O"
+          onclick="choix3()"
+        />Impression <br /><br />
         <div id="divbt">
-        <input name="bt1" type="submit" value="Enregistrer">&nbsp;&nbsp;<input name="bt2" type="reset" value="Annuler">
+          <input name="bt1" type="submit" value="Enregistrer" />&nbsp;&nbsp;<input
+            name="bt2"
+            type="reset"
+            value="Annuler"
+          />
         </div>
-    </fieldset>
+      </fieldset>
     </form>
-</body>
+  </body>
 </html>

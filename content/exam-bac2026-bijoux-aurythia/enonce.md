@@ -28,21 +28,21 @@ expert      (idExp, nomExp, mail)
 evaluation  (idExp#, idBij#, finition, originalite, commentaire, dateEv)
 ```
 
-| Champ | Type et propriété(s) |
-| --- | --- |
-| `idBij` | Chaîne de 5 caractères |
-| `description` | Chaîne de 100 caractères |
-| `prixVente` | Entier (dinars) |
-| `poids` | Entier (grammes) |
-| `idMet` | Caractère |
-| `nomMet` | Chaîne de 50 caractères, unique |
-| `idExp` | Chaîne de 3 caractères |
-| `nomExp` | Chaîne de 50 caractères, unique |
-| `mail` | Chaîne de 100 caractères, unique |
-| `finition` | Entier : note du critère « Finition » |
-| `originalite` | Caractère : `O` (oui) ou `N` (non) |
-| `commentaire` | Chaîne de 200 caractères |
-| `dateEv` | Date et heure de l'évaluation |
+| Champ         | Type et propriété(s)                  |
+| ------------- | ------------------------------------- |
+| `idBij`       | Chaîne de 5 caractères                |
+| `description` | Chaîne de 100 caractères              |
+| `prixVente`   | Entier (dinars)                       |
+| `poids`       | Entier (grammes)                      |
+| `idMet`       | Caractère                             |
+| `nomMet`      | Chaîne de 50 caractères, unique       |
+| `idExp`       | Chaîne de 3 caractères                |
+| `nomExp`      | Chaîne de 50 caractères, unique       |
+| `mail`        | Chaîne de 100 caractères, unique      |
+| `finition`    | Entier : note du critère « Finition » |
+| `originalite` | Caractère : `O` (oui) ou `N` (non)    |
+| `commentaire` | Chaîne de 200 caractères              |
+| `dateEv`      | Date et heure de l'évaluation         |
 
 ---
 
@@ -86,11 +86,11 @@ Consignes : les fonctions JavaScript vont dans `mesControles.js`, les règles CS
 
 ## Barème Officiel
 
-| Partie | Critère Évalué | Points |
-| --- | --- | --- |
-| **Étape 1** | Manipulation de la base de données | 1,75 pts |
-| **Étape 2-1** | Page `index.html` : structure (2) et mise en forme (2) | 4 pts |
-| **Étape 2-2** | Ajout d'un bijou : HTML (1,25), CSS (1), `valide1` (1,75), `ajout.php` (1,75) | 5,75 pts |
-| **Étape 2-3** | Évaluation : HTML (1,75), CSS (0,5), `valide2` (2,5), `evaluation.php` (2,5) | 7,25 pts |
-| **Étape 2-4** | Page `liste.php` | 1,25 pts |
-| **Total** | **Note Globale Bac Pratique** | **20 points** |
+| Partie        | Critère Évalué                                                                | Points        |
+| ------------- | ----------------------------------------------------------------------------- | ------------- |
+| **Étape 1**   | Manipulation de la base de données                                            | 1,75 pts      |
+| **Étape 2-1** | Page `index.html` : structure (2) et mise en forme (2)                        | 4 pts         |
+| **Étape 2-2** | Ajout d'un bijou : HTML (1,25), CSS (1), `valide1` (1,75), `ajout.php` (1,75) | 5,75 pts      |
+| **Étape 2-3** | Évaluation : HTML (1,75), CSS (0,5), `valide2` (2,5), `evaluation.php` (2,5)  | 7,25 pts      |
+| **Étape 2-4** | Page `liste.php`                                                              | 1,25 pts      |
+| **Total**     | **Note Globale Bac Pratique**                                                 | **20 points** |

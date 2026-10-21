@@ -27,23 +27,23 @@ client      (idCl, nomCl, telCl)
 reservation (idCl#, idCro#, dateRes, nbPlace)
 ```
 
-| Champ | Type et propriété(s) |
-| --- | --- |
-| `idNav` | Chaîne de 3 caractères |
-| `nomNav` | Chaîne de 100 caractères, unique |
-| `capacite` | Entier (nombre de places) |
-| `idDes` | Entier |
-| `nomDes` | Chaîne de 100 caractères, unique |
-| `idCro` | Chaîne de 5 caractères |
-| `libCro` | Chaîne de 100 caractères, unique |
-| `duree` | Entier (jours) |
-| `prix` | Entier (dinars, prix d'une place) |
-| `dateDepart` | Date |
-| `idCl` | Chaîne de 10 caractères |
-| `nomCl` | Chaîne de 100 caractères (nom et prénom) |
-| `telCl` | Entier |
-| `dateRes` | Date et heure |
-| `nbPlace` | Entier |
+| Champ        | Type et propriété(s)                     |
+| ------------ | ---------------------------------------- |
+| `idNav`      | Chaîne de 3 caractères                   |
+| `nomNav`     | Chaîne de 100 caractères, unique         |
+| `capacite`   | Entier (nombre de places)                |
+| `idDes`      | Entier                                   |
+| `nomDes`     | Chaîne de 100 caractères, unique         |
+| `idCro`      | Chaîne de 5 caractères                   |
+| `libCro`     | Chaîne de 100 caractères, unique         |
+| `duree`      | Entier (jours)                           |
+| `prix`       | Entier (dinars, prix d'une place)        |
+| `dateDepart` | Date                                     |
+| `idCl`       | Chaîne de 10 caractères                  |
+| `nomCl`      | Chaîne de 100 caractères (nom et prénom) |
+| `telCl`      | Entier                                   |
+| `dateRes`    | Date et heure                            |
+| `nbPlace`    | Entier                                   |
 
 ---
 
@@ -90,11 +90,11 @@ Consignes : les fonctions JavaScript vont dans un nouveau fichier `controles2.js
 
 ## Barème Officiel
 
-| Partie | Critère Évalué | Points |
-| --- | --- | --- |
-| **Étape 1** | Manipulation de la base de données | 1,5 pts |
-| **Étape 2-1** | Page `index.html` : structure (1,5) et mise en forme (1,5) | 3 pts |
-| **Étape 2-2** | Album photos : HTML (0,5) et CSS (1) | 1,5 pts |
-| **Étape 2-3** | Recherche : HTML (1,25), `verif1` (1,5), `connexion.php` (0,5), `croisiere.php` (2,5) | 5,75 pts |
-| **Étape 2-4** | Réservation : HTML (2), `nombres` et `verif2` (2,25), `reservation.php` (4) | 8,25 pts |
-| **Total** | **Note Globale Bac Pratique** | **20 points** |
+| Partie        | Critère Évalué                                                                        | Points        |
+| ------------- | ------------------------------------------------------------------------------------- | ------------- |
+| **Étape 1**   | Manipulation de la base de données                                                    | 1,5 pts       |
+| **Étape 2-1** | Page `index.html` : structure (1,5) et mise en forme (1,5)                            | 3 pts         |
+| **Étape 2-2** | Album photos : HTML (0,5) et CSS (1)                                                  | 1,5 pts       |
+| **Étape 2-3** | Recherche : HTML (1,25), `verif1` (1,5), `connexion.php` (0,5), `croisiere.php` (2,5) | 5,75 pts      |
+| **Étape 2-4** | Réservation : HTML (2), `nombres` et `verif2` (2,25), `reservation.php` (4)           | 8,25 pts      |
+| **Total**     | **Note Globale Bac Pratique**                                                         | **20 points** |

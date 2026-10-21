@@ -18,7 +18,10 @@
     "points": 0.5,
     "ordre": 2,
     "fichier": "index.html",
-    "sonde": { "type": "dom_selector", "selector": "link[rel=\"stylesheet\"][href=\"mesStyles.css\"]" },
+    "sonde": {
+      "type": "dom_selector",
+      "selector": "link[rel=\"stylesheet\"][href=\"mesStyles.css\"]"
+    },
     "fail_message": "Une page n'est pas reliée à mesStyles.css ou un fichier ne porte pas le nom demandé."
   },
   {
@@ -44,7 +47,12 @@
     "points": 1.25,
     "ordre": 4,
     "fichier": "index.html",
-    "sonde": { "type": "css_property", "selector": "h1", "property": "background-color", "expectedValue": "blue" },
+    "sonde": {
+      "type": "css_property",
+      "selector": "h1",
+      "property": "background-color",
+      "expectedValue": "blue"
+    },
     "fail_message": "Les règles CSS de h1, footer ou des liens ne respectent pas l'énoncé."
   },
   {
@@ -70,7 +78,12 @@
     "points": 0.75,
     "ordre": 6,
     "fichier": "utilisateur.html",
-    "sonde": { "type": "css_property", "selector": "fieldset", "property": "border-style", "expectedValue": "dotted" },
+    "sonde": {
+      "type": "css_property",
+      "selector": "fieldset",
+      "property": "border-style",
+      "expectedValue": "dotted"
+    },
     "fail_message": "La bordure du fieldset n'est pas en pointillé ou les boutons ne sont pas centrés."
   },
   {

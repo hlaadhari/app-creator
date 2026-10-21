@@ -26,13 +26,13 @@ Utilisateur (idUtil, nomPrenom)
 Droit       (idDoc#, idUtil#, ecriture, lecture, impression)
 ```
 
-| Champ | Type et contrainte |
-| --- | --- |
-| `idDoc` | Chaîne de 5 caractères |
-| `nomDoc` | Chaîne de 50 caractères |
-| `dateCreation` | Date et heure |
-| `idUtil` | Chaîne de 4 caractères |
-| `nomPrenom` | Chaîne de 50 caractères |
+| Champ                               | Type et contrainte                                          |
+| ----------------------------------- | ----------------------------------------------------------- |
+| `idDoc`                             | Chaîne de 5 caractères                                      |
+| `nomDoc`                            | Chaîne de 50 caractères                                     |
+| `dateCreation`                      | Date et heure                                               |
+| `idUtil`                            | Chaîne de 4 caractères                                      |
+| `nomPrenom`                         | Chaîne de 50 caractères                                     |
 | `ecriture`, `lecture`, `impression` | Caractère non vide : `O` si le droit est accordé, `N` sinon |
 
 ---
@@ -79,19 +79,19 @@ Consignes : les fonctions JavaScript vont dans `mesControles.js`, les règles CS
 
 ## Barème Officiel
 
-| Partie | Critère Évalué | Points |
-| --- | --- | --- |
-| **A** | Base de données (5 tâches de 0,25 pt) | 1,25 pts |
-| **A** | Respect des consignes | 0,5 pt |
-| **B-1** | Page `index.html` (structure) | 2 pts |
-| **B-1** | Mise en forme de l'index | 1,25 pts |
-| **B-2** | Formulaire `utilisateur.html` | 1,25 pts |
-| **B-2** | Mise en forme du formulaire | 0,75 pt |
-| **B-2** | Fonction `verif1` | 1 pt |
-| **B-2** | Fichier `ajout.php` | 2 pts |
-| **B-3** | Page `droit.html` | 1,75 pts |
-| **B-3** | Fonctions `verif2`, `choix1`, `choix2`, `choix3` | 2 pts |
-| **B-3** | Fichier `droit.php` | 4,25 pts |
-| **B-4** | Page `affichage.html` | 0,25 pt |
-| **B-4** | Fichier `affichage.php` | 1,75 pts |
-| **Total** | **Note Globale Bac Pratique** | **20 points** |
+| Partie    | Critère Évalué                                   | Points        |
+| --------- | ------------------------------------------------ | ------------- |
+| **A**     | Base de données (5 tâches de 0,25 pt)            | 1,25 pts      |
+| **A**     | Respect des consignes                            | 0,5 pt        |
+| **B-1**   | Page `index.html` (structure)                    | 2 pts         |
+| **B-1**   | Mise en forme de l'index                         | 1,25 pts      |
+| **B-2**   | Formulaire `utilisateur.html`                    | 1,25 pts      |
+| **B-2**   | Mise en forme du formulaire                      | 0,75 pt       |
+| **B-2**   | Fonction `verif1`                                | 1 pt          |
+| **B-2**   | Fichier `ajout.php`                              | 2 pts         |
+| **B-3**   | Page `droit.html`                                | 1,75 pts      |
+| **B-3**   | Fonctions `verif2`, `choix1`, `choix2`, `choix3` | 2 pts         |
+| **B-3**   | Fichier `droit.php`                              | 4,25 pts      |
+| **B-4**   | Page `affichage.html`                            | 0,25 pt       |
+| **B-4**   | Fichier `affichage.php`                          | 1,75 pts      |
+| **Total** | **Note Globale Bac Pratique**                    | **20 points** |
