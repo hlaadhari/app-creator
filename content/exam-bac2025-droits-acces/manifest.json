@@ -1,0 +1,23 @@
+{
+  "id": "exam-bac2025-droits-acces",
+  "titre": "Bac 2025 - Droits d'Accès aux Documents Partagés",
+  "module": "Module C",
+  "duree_minutes": 120,
+  "niveau": 3,
+  "exam_mode": true,
+  "bareme": 20,
+  "tags": ["Bac STI", "HTML5", "CSS3", "JavaScript", "PHP", "MySQLi", "Examen Blanc", "Session 2025"],
+  "description": "Épreuve pratique du Bac STI, session 2025 : gestion des droits d'accès (écriture, lecture, impression) aux documents partagés d'une société, avec ajout d'utilisateur, attribution et affichage des droits.",
+  "fichiers_attendus": [
+    "index.html",
+    "utilisateur.html",
+    "droit.html",
+    "affichage.html",
+    "mesStyles.css",
+    "mesControles.js",
+    "ajout.php",
+    "droit.php",
+    "affichage.php"
+  ],
+  "base_de_donnees": "db/init.sql"
+}

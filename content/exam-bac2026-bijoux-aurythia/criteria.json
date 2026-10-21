@@ -1,0 +1,146 @@
+[
+  {
+    "id": "EX26B-01",
+    "code": "BD-01",
+    "titre": "Base de données : clés primaires, table evaluation et relations",
+    "description": "Les clés primaires de toutes les tables sont définies, la table evaluation est créée et les relations entre les tables sont établies, puis la base est exportée.",
+    "points": 1.75,
+    "ordre": 1,
+    "fichier": "index.html",
+    "sonde": { "type": "dom_selector", "selector": "body" },
+    "fail_message": "Une clé primaire, la table evaluation ou une relation (clé étrangère) est absente ou incorrecte."
+  },
+  {
+    "id": "EX26B-02",
+    "code": "HTML-01",
+    "titre": "Page index : titre, navigation, section, aside et pied de page",
+    "description": "index.html contient le titre h1, la navigation avec trois liens, la section (ajout.html par défaut), l'aside avec bijoux.jpg et le footer avec une liste à puces de deux éléments.",
+    "points": 2,
+    "ordre": 2,
+    "fichier": "index.html",
+    "sonde": {
+      "type": "dom_selector",
+      "selector": "header h1, header nav a, main section iframe, main aside img[src=\"bijoux.jpg\"], footer ul li",
+      "minCount": 8
+    },
+    "fail_message": "La structure de index.html (h1, nav avec 3 liens, section, aside avec image, footer avec liste) est incomplète."
+  },
+  {
+    "id": "EX26B-03",
+    "code": "CSS-01",
+    "titre": "Mise en forme de l'index",
+    "description": "h1 en Arial avec majuscule à chaque mot et fond #053860 ; header et footer sur fond #053860 ; liens, header et footer en blanc ; nav avec 15px de marge intérieure ; section et aside sur la même ligne ; puces carrées.",
+    "points": 2,
+    "ordre": 3,
+    "fichier": "index.html",
+    "sonde": { "type": "css_property", "selector": "h1", "property": "text-transform", "expectedValue": "capitalize" },
+    "fail_message": "Une des règles CSS de l'index (h1, header, footer, a, nav, section, aside, ul) est absente ou incorrecte."
+  },
+  {
+    "id": "EX26B-04",
+    "code": "HTML-02",
+    "titre": "Page ajout.html : liaisons, appels et champ obligatoire",
+    "description": "La page est liée à mesControles.js et mesStyles.css, le bouton Enregistrer appelle valide1 et ajout.php, et le champ Description est obligatoire.",
+    "points": 1.25,
+    "ordre": 4,
+    "fichier": "ajout.html",
+    "sonde": {
+      "type": "dom_selector",
+      "selector": "script[src=\"mesControles.js\"], link[href=\"mesStyles.css\"], form[action=\"ajout.php\"][onsubmit*=\"valide1\"], input#desc[required]",
+      "minCount": 4
+    },
+    "fail_message": "ajout.html n'est pas liée aux fichiers demandés, n'appelle pas valide1 / ajout.php ou le champ Description n'est pas obligatoire."
+  },
+  {
+    "id": "EX26B-05",
+    "code": "CSS-02",
+    "titre": "Mise en forme du formulaire d'ajout",
+    "description": "Les fieldset Détails et Composition ont une bordure double #0000FF de 3px et les deux boutons une ombre bleue décalée de 5px.",
+    "points": 1,
+    "ordre": 5,
+    "fichier": "ajout.html",
+    "sonde": { "type": "css_property", "selector": "fieldset fieldset", "property": "border-style", "expectedValue": "double" },
+    "fail_message": "Les fieldset n'ont pas la bordure double bleue de 3px ou les boutons n'ont pas l'ombre bleue."
+  },
+  {
+    "id": "EX26B-06",
+    "code": "JS-01",
+    "titre": "Fonction valide1 : identifiant, prix et composition",
+    "description": "valide1 contrôle l'identifiant (deux lettres et trois chiffres), le prix (supérieur ou égal à 100) et la sélection d'au moins un métal, avec un arrière-plan rouge sur la composition invalide.",
+    "points": 1.75,
+    "ordre": 6,
+    "fichier": "ajout.html",
+    "sonde": { "type": "js_eval", "checkSelector": "#composition" },
+    "fail_message": "valide1 ne contrôle pas correctement l'identifiant, le prix ou la composition."
+  },
+  {
+    "id": "EX26B-07",
+    "code": "PHP-01",
+    "titre": "ajout.php : insertion dans bijou et composition",
+    "description": "Le script insère le bijou puis ses métaux, et affiche « Ajout effectué avec succès » ou « Erreur d'insertion ».",
+    "points": 1.75,
+    "ordre": 7,
+    "fichier": "index.html",
+    "sonde": { "type": "dom_selector", "selector": "body" },
+    "fail_message": "ajout.php n'insère pas le bijou et sa composition ou n'affiche pas les messages demandés."
+  },
+  {
+    "id": "EX26B-08",
+    "code": "HTML-03",
+    "titre": "Page evaluation.html : formulaire d'évaluation",
+    "description": "Le formulaire contient la liste des experts (A22, A23, A24), un champ Finition de type number, l'originalité en O / N, un commentaire, et appelle valide2 et evaluation.php.",
+    "points": 1.75,
+    "ordre": 8,
+    "fichier": "evaluation.html",
+    "sonde": {
+      "type": "dom_selector",
+      "selector": "form[action=\"evaluation.php\"][onsubmit*=\"valide2\"] select option[value=\"A22\"], option[value=\"A23\"], option[value=\"A24\"], input[type=\"number\"]#finition, input[type=\"radio\"][value=\"O\"], input[type=\"radio\"][value=\"N\"]",
+      "minCount": 6
+    },
+    "fail_message": "evaluation.html : experts, champ Finition number, choix d'originalité O / N ou appel de valide2 / evaluation.php manquant."
+  },
+  {
+    "id": "EX26B-09",
+    "code": "CSS-03",
+    "titre": "Mise en forme de la page d'évaluation",
+    "description": "Les légendes sont en gras et en italique et les boutons reprennent la mise en forme de la page d'ajout.",
+    "points": 0.5,
+    "ordre": 9,
+    "fichier": "evaluation.html",
+    "sonde": { "type": "css_property", "selector": "legend", "property": "font-style", "expectedValue": "italic" },
+    "fail_message": "Les légendes ne sont pas en gras et italique ou les boutons n'ont pas la même mise en forme qu'à la question 2."
+  },
+  {
+    "id": "EX26B-10",
+    "code": "JS-02",
+    "titre": "Fonction valide2 : contrôles de l'évaluation",
+    "description": "valide2 contrôle l'identifiant, l'expert, la finition (entier de 1 à 5), l'originalité et le commentaire (au moins deux mots composés uniquement de lettres, via nettoyage).",
+    "points": 2.5,
+    "ordre": 10,
+    "fichier": "evaluation.html",
+    "sonde": { "type": "js_eval", "checkSelector": "#commentaire" },
+    "fail_message": "valide2 ne contrôle pas correctement l'un des champs de l'évaluation."
+  },
+  {
+    "id": "EX26B-11",
+    "code": "PHP-02",
+    "titre": "evaluation.php : bijou inexistant, déjà évalué ou enregistrement",
+    "description": "Le script distingue les trois cas (bijou inexistant, bijou déjà évalué par l'expert, nouvelle évaluation avec la date et l'heure système) et affiche le message correspondant.",
+    "points": 2.5,
+    "ordre": 11,
+    "fichier": "index.html",
+    "sonde": { "type": "dom_selector", "selector": "body" },
+    "fail_message": "evaluation.php ne gère pas correctement l'existence du bijou, le doublon d'évaluation ou l'insertion avec dateEv."
+  },
+  {
+    "id": "EX26B-12",
+    "code": "PHP-03",
+    "titre": "liste.php : bijoux originaux et moyenne de la finition",
+    "description": "La page affiche, pour les bijoux originaux (originalite = 'O'), l'identifiant, la description et la moyenne de la finition.",
+    "points": 1.25,
+    "ordre": 12,
+    "fichier": "index.html",
+    "sonde": { "type": "dom_selector", "selector": "body" },
+    "fail_message": "liste.php n'affiche pas les bijoux originaux avec la moyenne de la finition (AVG avec GROUP BY)."
+  }
+]

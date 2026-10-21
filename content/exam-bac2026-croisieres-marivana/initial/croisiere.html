@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Recherche de croisières </title>
+    <link rel="stylesheet" href="styles2.css">
+    <script src="controles2.js"></script>
+</head>
+<body>
+   <form>                     <!-- appel de la fonction js et du fichier php  -->
+    <fieldset>
+        <legend> Recherche de croisières </legend>
+        <label> Destination : </label>
+        <select>
+            <option selected> Choisir une destination </option>
+                              <!-- les destinations  -->
+        </select>
+		<fieldset>
+			<legend>Date de départ entre </legend>
+            <label> Date 1 : </label>
+            <input type="date" id="DD" name="DD"><br>
+            <label> Date 2 : </label>
+            <input type="date" id="DF" name="DF"><br>
+		</fieldset> <br>
+		<fieldset>
+			<legend>Informations supplémentaires à afficher</legend>
+                              <!-- trois cases à cocher  -->
+		</fieldset><br>
+		<div>
+         <input type="reset"  value="Annuler">
+         <input type="submit" value="Chercher">
+		</div>
+    </fieldset>
+   </form>
+</body>
+</html>

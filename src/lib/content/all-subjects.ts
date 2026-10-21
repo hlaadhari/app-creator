@@ -834,6 +834,746 @@ const rawSubjects = [
       },
     ],
   },
+  {
+    id: "exam-bac2025-droits-acces",
+    title: "Bac 2025 - Droits d'Accès aux Documents Partagés",
+    level: "Difficile",
+    competence: "Bac STI • HTML5 • CSS3 • JavaScript • PHP • MySQLi • Examen Blanc • Session 2025",
+    module: "Module C",
+    dureeMinutes: 120,
+    tags: [
+      "Bac STI",
+      "HTML5",
+      "CSS3",
+      "JavaScript",
+      "PHP",
+      "MySQLi",
+      "Examen Blanc",
+      "Session 2025",
+    ],
+    examMode: true,
+    bareme: 20,
+    statement: [
+      "Épreuve pratique du Bac STI, session 2025 : gestion des droits d'accès (écriture, lecture, impression) aux documents partagés d'une société, avec ajout d'utilisateur, attribution et affichage des droits.",
+    ],
+    enonceMarkdown:
+      "# Épreuve Pratique du Baccalauréat STI — Session 2025\n\n## Sujet : Droits d'accès aux documents partagés (Futura Horizon AI)\n\n**Durée :** 2 heures (120 minutes)  \n**Coefficient :** 1.2  \n**Note Maximale :** 20 points (Mode Examen)\n\n---\n\n## Contexte\n\nLe service informatique de la société **Futura Horizon AI** souhaite un site Web pour gérer les droits d'accès aux documents partagés sur son serveur. Le site doit permettre :\n\n- d'ajouter un utilisateur ;\n- d'attribuer des droits d'accès à un utilisateur pour un document ;\n- d'afficher les droits d'accès relatifs à un document.\n\nLe dossier de travail se nomme `SW<numéro d'inscription>`. Les ressources fournies sont : `tables.sql`, `logo.png`, `mesStyles.css`, `mesControles.js`, `droit.html`, `affichage.html` et `affichage.php`.\n\nReprésentation textuelle de la base (nommée `bd2025` dans la plateforme) :\n\n```\nDocument    (idDoc, nomDoc, dateCreation)\nUtilisateur (idUtil, nomPrenom)\nDroit       (idDoc#, idUtil#, ecriture, lecture, impression)\n```\n\n| Champ | Type et contrainte |\n| --- | --- |\n| `idDoc` | Chaîne de 5 caractères |\n| `nomDoc` | Chaîne de 50 caractères |\n| `dateCreation` | Date et heure |\n| `idUtil` | Chaîne de 4 caractères |\n| `nomPrenom` | Chaîne de 50 caractères |\n| `ecriture`, `lecture`, `impression` | Caractère non vide : `O` si le droit est accordé, `N` sinon |\n\n---\n\n## Travail Demandé\n\n### Partie A : base de données\n\n1. Créer la base de données.\n2. Importer `tables.sql` (tables `document` et `utilisateur`).\n3. Créer la table `droit` conformément à la représentation textuelle.\n4. Créer les relations entre les tables.\n5. Exporter la base au format SQL dans le dossier de travail.\n\n### Partie B : documents Web\n\nConsignes : les fonctions JavaScript vont dans `mesControles.js`, les règles CSS dans `mesStyles.css`, toutes les pages sont liées à `mesStyles.css`, `utilisateur.html` et `droit.html` sont liées à `mesControles.js`, et le bouton « Annuler » de chaque formulaire réinitialise les champs.\n\n**1. Page `index.html`**\n\n- Un `<header>` avec l'image `logo.png` et le titre de niveau 1 « Les droits d'accès aux documents partagés ».\n- Un `<main>` avec une navigation `<nav>` (trois liens, chacun sur sa ligne : Ajout d'un utilisateur, Attribution des droits d'accès, Affichage des droits d'accès) et une zone d'affichage `<section>` qui contient par défaut `utilisateur.html`.\n- Un `<footer>` avec « Copyright - Futura Horizon AI - 2025 ».\n- Mise en forme : `h1` et `footer` sur fond bleu, texte blanc centré ; liens avec une ombre rouge (décalage 5px / 5px, flou 3px) et en italique lorsqu'ils sont actifs.\n\n**2. Page `utilisateur.html`** : formulaire d'ajout (identifiant, nom et prénom, boutons Ajouter et Annuler).\n\n- Le bouton « Ajouter » appelle la fonction `verif1` et le fichier `ajout.php`.\n- Boutons centrés ; `fieldset` avec bordure de 2 pixels en pointillé.\n- `verif1` : l'identifiant est une chaîne de longueur 4 qui commence par `U` suivie de 3 chiffres ; le nom et prénom ne contient que des lettres et des espaces, sur 5 à 50 caractères (utiliser la fonction `alpha` fournie).\n- `ajout.php` : insère l'utilisateur puis affiche « Utilisateur ajouté avec succès », ou « Erreur d'insertion des données » dans le cas contraire.\n\n**3. Page `droit.html`** : attribution des droits.\n\n- Champ « Identifiant de l'utilisateur » obligatoire ; le bouton « Enregistrer » appelle `verif2` et `droit.php`.\n- Les cases « Ecriture », « Lecture » et « Impression » appellent respectivement `choix1`, `choix2` et `choix3`.\n- `verif2` : sélection obligatoire d'un document et d'au moins un droit.\n- `choix1` coche « Lecture » si « Ecriture » est cochée ; `choix2` décoche « Ecriture » et « Impression » si « Lecture » est décochée ; `choix3` coche « Lecture » si « Impression » est cochée.\n- `droit.php` affiche « Erreur : Utilisateur inexistant » si l'identifiant n'existe pas ; sinon il met à jour les droits (message « Mise à jour des droits d'accès réussie ») si l'utilisateur en a déjà pour ce document, ou les insère (message « Insertion des droits d'accès réussie »).\n\n**4. Page `affichage.html`** : le bouton « Afficher » appelle `affichage.php`, qui complète l'affichage : titre « Les droits d'accès relatifs au document : <nomDoc> », puis une ligne par utilisateur (nom et prénom, écriture, lecture, impression).\n\n---\n\n## Barème Officiel\n\n| Partie | Critère Évalué | Points |\n| --- | --- | --- |\n| **A** | Base de données (5 tâches de 0,25 pt) | 1,25 pts |\n| **A** | Respect des consignes | 0,5 pt |\n| **B-1** | Page `index.html` (structure) | 2 pts |\n| **B-1** | Mise en forme de l'index | 1,25 pts |\n| **B-2** | Formulaire `utilisateur.html` | 1,25 pts |\n| **B-2** | Mise en forme du formulaire | 0,75 pt |\n| **B-2** | Fonction `verif1` | 1 pt |\n| **B-2** | Fichier `ajout.php` | 2 pts |\n| **B-3** | Page `droit.html` | 1,75 pts |\n| **B-3** | Fonctions `verif2`, `choix1`, `choix2`, `choix3` | 2 pts |\n| **B-3** | Fichier `droit.php` | 4,25 pts |\n| **B-4** | Page `affichage.html` | 0,25 pt |\n| **B-4** | Fichier `affichage.php` | 1,75 pts |\n| **Total** | **Note Globale Bac Pratique** | **20 points** |\n",
+    starter: {
+      "index.html":
+        '<!DOCTYPE html>\n<html lang="fr">\n<head>\n    <meta charset="UTF-8">\n    <title>Droits d\'accès - Futura Horizon AI</title>\n    <!-- À compléter : liaison avec mesStyles.css, header / main (nav + section) / footer -->\n</head>\n<body>\n\n</body>\n</html>\n',
+      "utilisateur.html":
+        '<!DOCTYPE html>\n<html lang="fr">\n<head>\n    <meta charset="UTF-8">\n    <title>Ajout d\'un utilisateur - Futura Horizon AI</title>\n    <!-- À compléter : liaisons avec mesStyles.css et mesControles.js, formulaire d\'ajout -->\n</head>\n<body>\n\n</body>\n</html>\n',
+      "droit.html":
+        '<!DOCTYPE HTML>\n<html>\n<head>\n    <title>Attribution des droits d\'accès - Futura Horizon AI</title>\n</head>\n<body>\n    <form action="" method="">\n    <fieldset>\n        <legend>Attribution des droits d\'accès à un document</legend>\n        <label>Identifiant de l\'utilisateur :</label>\n        <input id="" name="" type="text"> <br>\n        <label>Nom du document :</label>\n        <select id="" name="" size="1">\n            <option value="" selected>Sélectionner un document</option>\n            <option value="D0001">Liste employés.pdf</option>\n            <option value="D0002">Demande de congés.docx</option>\n            <option value="D0003">Réclamation ouvriers.docx</option>\n            <option value="D0004">Statistiques2024.xlsx</option>\n        </select><br>\n        <label>Droit(s) accordé(s) :</label>\n        <input id="" name="" type="checkbox">Ecriture\n        <input id="" name="" type="checkbox">Lecture\n        <input id="" name="" type="checkbox">Impression\n       <br><br>\n        <div id="divbt">\n        <input name="bt1" type="submit" value="Enregistrer">&nbsp;&nbsp;<input name="bt2" type="reset" value="Annuler">\n        </div>\n    </fieldset>\n    </form>\n</body>\n</html>',
+      "affichage.html":
+        '<!DOCTYPE HTML>\n<html>\n<head>\n  <title>Affichage des droits d’accès - Futura Horizon AI</title>\n</head>\n<body>\n    <form action="" method="">\n        <fieldset>\n          <legend>Les droits d\'accès d\'un document</legend>\n            <label>Nom du document :</label>\n            <select id="doc" name="doc" size="1">\n                <option value="" selected>Sélectionner un document</option>\n                <option value="D0001">Liste employés.pdf</option>\n                <option value="D0002">Demande de congés.docx</option>\n                <option value="D0003">Réclamation ouvriers.docx</option>\n                <option value="D0004">Statistiques2024.xlsx</option>\n            </select>\n    \t\t<br>\n            <br>\n            <div id="divbt">\n              <input name="" type="submit" value="Afficher">&nbsp;&nbsp;<input name="" type="reset" value="Annuler">\n            </div>\n        </fieldset>\n    </form>\n</body>\n</html>',
+      "mesStyles.css":
+        '#divbt { text-align: right }\n\nh1 {\n    position : relative;\n    left : 75px;\n    width : 95%;\n    height : 60px;\n    padding : 20px 0px 0px 0px; \n}\n\nimg {\n    width : 70px;\n    height : 80px;\n    position : fixed;\n    margin: 0px 0px 20px 0px   ;\n}\n\nnav {\n    height : 450px;\n    position : fixed;\n    width : 30%;\n}\n\nsection {\n        width : 70%;\n        height : 450px;\n        position : relative;\n        left : 25%;\n        border-radius : 3px;\n        box-shadow : 2px 5px 10px black;\n}\n\niframe {\n        width : 100%;\n        height : 100%;\n}\n\nfooter { margin : 20px 0px 0px 0px; }\n\nlabel {\n\t   width: 180px;\n       display: inline-block  ;\n       margin: 10px;\n}\n\nlegend { font-weight: bold ;}\n\ninput[type="text"] { width: 172px; }',
+      "mesControles.js":
+        'function alpha(ch)\n{\n    let cp=0;\n    ch=ch.toUpperCase();\n\tlet valid=true;\n    do{\n        if(ch[cp]>="A" && ch[cp]<="Z" ||ch[cp]==" " )\n        {\n            cp=cp+1;\n        }\n        else\n        {\n            valid=false;\n        }\n    }\n    while(valid==true && cp<ch.length);\n    return valid;\n}\n',
+      "ajout.php":
+        "<?php\n// Ajout d'un utilisateur : insertion dans la table utilisateur\n// À compléter par le candidat\n?>\n",
+      "droit.php":
+        "<?php\n// Attribution des droits d'accès : insertion ou mise à jour dans la table droit\n// À compléter par le candidat\n?>\n",
+      "affichage.php":
+        '<?php\n\n\n$doc=$_POST["doc"];\n$req="select nomdoc from document where (iddoc=\'$doc\')";\n$res=mysqli_query($con,$req)or die(mysqli_error($con));\n//Affichage du nom du document sélectionné dans la page affichage.html\nif (mysqli_num_rows($res)!=0)\n{\t$enreg=mysqli_fetch_array($res);\n\techo "<h2>Les droits d\'accès relatifs au document : ". $enreg["nomdoc"]."</h2><br>";\n}\n\n ?>',
+      "db/init.sql":
+        "-- Base bd2025 (Bac STI 2025) : droits d'accès aux documents partagés\n-- Version complète : tables fournies (document, utilisateur) + table droit et ses relations.\n\nCREATE TABLE `document` (\n  `idDoc` varchar(5) NOT NULL,\n  `nomDoc` varchar(50) NOT NULL DEFAULT '',\n  `dateCreation` datetime NOT NULL,\n  PRIMARY KEY (`idDoc`)\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;\n\nINSERT INTO `document` (`idDoc`, `nomDoc`, `dateCreation`) VALUES\n('D0001', 'Liste employés.pdf', '2025-02-15 09:14:39');\nINSERT INTO `document` (`idDoc`, `nomDoc`, `dateCreation`) VALUES\n('D0002', 'Demande de congés.docx', '2021-10-09 08:10:09');\nINSERT INTO `document` (`idDoc`, `nomDoc`, `dateCreation`) VALUES\n('D0003', 'Réclamation ouvriers.docx', '2022-02-07 11:00:29');\nINSERT INTO `document` (`idDoc`, `nomDoc`, `dateCreation`) VALUES\n('D0004', 'Statistiques2024.xlsx', '2025-01-31 07:00:20');\n\nCREATE TABLE `utilisateur` (\n  `idUtil` varchar(4) NOT NULL,\n  `nomPrenom` varchar(50) NOT NULL DEFAULT '',\n  PRIMARY KEY (`idUtil`)\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;\n\nINSERT INTO `utilisateur` (`idUtil`, `nomPrenom`) VALUES\n('U001', 'Ali GAFSI');\nINSERT INTO `utilisateur` (`idUtil`, `nomPrenom`) VALUES\n('U002', 'Mohamed SOUSSI');\nINSERT INTO `utilisateur` (`idUtil`, `nomPrenom`) VALUES\n('U003', 'Karima TOUNSI');\nINSERT INTO `utilisateur` (`idUtil`, `nomPrenom`) VALUES\n('U004', 'Kamel SFAXI');\nINSERT INTO `utilisateur` (`idUtil`, `nomPrenom`) VALUES\n('U005', 'Houda JANDOUBI');\nINSERT INTO `utilisateur` (`idUtil`, `nomPrenom`) VALUES\n('U006', 'Taoufik BEJI');\n\nCREATE TABLE `droit` (\n  `idDoc` varchar(5) NOT NULL,\n  `idUtil` varchar(4) NOT NULL,\n  `ecriture` char(1) NOT NULL,\n  `lecture` char(1) NOT NULL,\n  `impression` char(1) NOT NULL,\n  PRIMARY KEY (`idDoc`, `idUtil`),\n  CONSTRAINT `fk_droit_document` FOREIGN KEY (`idDoc`) REFERENCES `document` (`idDoc`),\n  CONSTRAINT `fk_droit_utilisateur` FOREIGN KEY (`idUtil`) REFERENCES `utilisateur` (`idUtil`),\n  CONSTRAINT `ck_droit_valeurs` CHECK (`ecriture` IN ('O','N') AND `lecture` IN ('O','N') AND `impression` IN ('O','N'))\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;\n\n-- Jeu d'essai (le droit d'écriture ou d'impression suppose le droit de lecture)\nINSERT INTO `droit` (`idDoc`, `idUtil`, `ecriture`, `lecture`, `impression`) VALUES\n('D0001', 'U001', 'O', 'O', 'O');\nINSERT INTO `droit` (`idDoc`, `idUtil`, `ecriture`, `lecture`, `impression`) VALUES\n('D0001', 'U002', 'N', 'O', 'N');\nINSERT INTO `droit` (`idDoc`, `idUtil`, `ecriture`, `lecture`, `impression`) VALUES\n('D0002', 'U003', 'N', 'O', 'O');\n",
+    },
+    hints: [
+      "Consultez l'énoncé officiel et les consignes du sujet : Bac 2025 - Droits d'Accès aux Documents Partagés.",
+      "Respectez strictement les noms de fichiers, de champs et de fonctions demandés : index.html, utilisateur.html, droit.html, affichage.html, mesStyles.css, mesControles.js, ajout.php, droit.php, affichage.php.",
+      "Vérifiez les messages affichés et les cas limites (valeurs vides, doublons, identifiants inexistants).",
+    ],
+    rawCriteria: [
+      {
+        id: "EX25-01",
+        code: "BD-01",
+        titre: "Base de données : création, import, table droit et relations",
+        description:
+          "La base bd2025 est créée, tables.sql importé, la table droit créée avec sa clé primaire composée et ses deux clés étrangères, puis la base exportée.",
+        points: 1.25,
+        ordre: 1,
+        sonde: {
+          type: "dom_selector",
+          selector: "body",
+        },
+        fail_message:
+          "La table droit, ses clés ou ses relations avec document et utilisateur sont absentes ou incorrectes.",
+      },
+      {
+        id: "EX25-02",
+        code: "CONS-01",
+        titre: "Respect des consignes (nommage et liaisons CSS)",
+        description:
+          "Les pages HTML sont reliées à mesStyles.css et les fichiers portent les noms demandés.",
+        points: 0.5,
+        ordre: 2,
+        sonde: {
+          type: "dom_selector",
+          selector: 'link[rel="stylesheet"][href="mesStyles.css"]',
+        },
+        fail_message:
+          "Une page n'est pas reliée à mesStyles.css ou un fichier ne porte pas le nom demandé.",
+      },
+      {
+        id: "EX25-03",
+        code: "HTML-01",
+        titre: "Page index : structure header, nav, section, footer",
+        description:
+          "index.html contient l'en-tête (logo et titre h1), la navigation avec trois liens, la zone d'affichage section et le pied de page.",
+        points: 2,
+        ordre: 3,
+        sonde: {
+          type: "dom_selector",
+          selector: "header img, header h1, main nav a, main section, footer",
+          minCount: 7,
+        },
+        fail_message:
+          "La structure de index.html (header avec logo et h1, nav avec 3 liens, section, footer) est incomplète.",
+      },
+      {
+        id: "EX25-04",
+        code: "CSS-01",
+        titre: "Mise en forme de l'index (titre, pied de page, liens)",
+        description:
+          "Les éléments h1 et footer ont un fond bleu, un texte blanc centré ; les liens ont une ombre rouge de 5px 5px 3px et sont en italique lorsqu'ils sont actifs.",
+        points: 1.25,
+        ordre: 4,
+        sonde: {
+          type: "css_property",
+          selector: "h1",
+          property: "background-color",
+          expectedValue: "blue",
+        },
+        fail_message: "Les règles CSS de h1, footer ou des liens ne respectent pas l'énoncé.",
+      },
+      {
+        id: "EX25-05",
+        code: "HTML-02",
+        titre: "Page utilisateur.html : formulaire d'ajout",
+        description:
+          "Le formulaire envoie en POST vers ajout.php, contient les champs idUtil et nomPrenom et les boutons Ajouter et Annuler, et appelle verif1.",
+        points: 1.25,
+        ordre: 5,
+        sonde: {
+          type: "dom_selector",
+          selector:
+            'form[action="ajout.php"][onsubmit*="verif1"] input#idUtil, form input#nomPrenom, form input[type="submit"], form input[type="reset"]',
+          minCount: 4,
+        },
+        fail_message:
+          "Le formulaire utilisateur.html n'appelle pas verif1 ou ajout.php, ou il manque un champ ou un bouton.",
+      },
+      {
+        id: "EX25-06",
+        code: "CSS-02",
+        titre: "Mise en forme du formulaire (fieldset en pointillé, boutons centrés)",
+        description: "Le fieldset a une bordure de 2px en pointillé et les boutons sont centrés.",
+        points: 0.75,
+        ordre: 6,
+        sonde: {
+          type: "css_property",
+          selector: "fieldset",
+          property: "border-style",
+          expectedValue: "dotted",
+        },
+        fail_message:
+          "La bordure du fieldset n'est pas en pointillé ou les boutons ne sont pas centrés.",
+      },
+      {
+        id: "EX25-07",
+        code: "JS-01",
+        titre: "Contrôle verif1 : identifiant et nom et prénom",
+        description:
+          "verif1 exige un identifiant U suivi de 3 chiffres et un nom et prénom alphabétique de 5 à 50 caractères, en utilisant alpha.",
+        points: 1,
+        ordre: 7,
+        sonde: {
+          type: "js_eval",
+          checkSelector: "#idUtil",
+        },
+        fail_message:
+          "verif1 ne contrôle pas correctement l'identifiant (U + 3 chiffres) ou le nom et prénom (5 à 50 lettres).",
+      },
+      {
+        id: "EX25-08",
+        code: "PHP-01",
+        titre: "ajout.php : insertion de l'utilisateur et messages",
+        description:
+          "Le script insère l'utilisateur puis affiche « Utilisateur ajouté avec succès », ou « Erreur d'insertion des données » en cas d'échec.",
+        points: 2,
+        ordre: 8,
+        sonde: {
+          type: "dom_selector",
+          selector: "body",
+        },
+        fail_message:
+          "ajout.php n'insère pas l'utilisateur ou n'affiche pas les messages demandés.",
+      },
+      {
+        id: "EX25-09",
+        code: "HTML-03",
+        titre: "Page droit.html : champs, champ obligatoire, appels de fonctions",
+        description:
+          "Le champ identifiant est obligatoire, le formulaire appelle verif2 et droit.php, et chaque case appelle choix1, choix2 ou choix3.",
+        points: 1.75,
+        ordre: 9,
+        sonde: {
+          type: "dom_selector",
+          selector:
+            'form[action="droit.php"][onsubmit*="verif2"] input[required], input[type="checkbox"][onclick*="choix1"], input[type="checkbox"][onclick*="choix2"], input[type="checkbox"][onclick*="choix3"]',
+          minCount: 4,
+        },
+        fail_message:
+          "droit.html : champ obligatoire, appel de verif2 / droit.php ou appels de choix1, choix2, choix3 manquants.",
+      },
+      {
+        id: "EX25-10",
+        code: "JS-02",
+        titre: "Fonctions verif2, choix1, choix2 et choix3",
+        description:
+          "verif2 impose un document et au moins un droit ; choix1 et choix3 cochent Lecture ; choix2 décoche Écriture et Impression quand Lecture est décochée.",
+        points: 2,
+        ordre: 10,
+        sonde: {
+          type: "js_eval",
+          checkSelector: "#lecture",
+        },
+        fail_message:
+          "verif2 ou les fonctions choix1, choix2, choix3 ne respectent pas les règles de cohérence entre les droits.",
+      },
+      {
+        id: "EX25-11",
+        code: "PHP-02",
+        titre: "droit.php : utilisateur inexistant, mise à jour ou insertion des droits",
+        description:
+          "Le script distingue trois cas : utilisateur inexistant, droits déjà attribués (UPDATE) ou nouveaux droits (INSERT), avec le message correspondant.",
+        points: 4.25,
+        ordre: 11,
+        sonde: {
+          type: "dom_selector",
+          selector: "body",
+        },
+        fail_message:
+          "droit.php ne gère pas correctement l'existence de l'utilisateur, la mise à jour ou l'insertion des droits.",
+      },
+      {
+        id: "EX25-12",
+        code: "HTML-04",
+        titre: "Page affichage.html : appel de affichage.php",
+        description: "Le bouton Afficher envoie le formulaire vers affichage.php.",
+        points: 0.25,
+        ordre: 12,
+        sonde: {
+          type: "dom_selector",
+          selector: 'form[action="affichage.php"] select#doc',
+        },
+        fail_message: "affichage.html n'appelle pas affichage.php.",
+      },
+      {
+        id: "EX25-13",
+        code: "PHP-03",
+        titre: "affichage.php : droits des utilisateurs pour le document choisi",
+        description:
+          "Le script affiche le titre avec le nom du document puis, pour chaque utilisateur, son nom et ses droits d'écriture, de lecture et d'impression.",
+        points: 1.75,
+        ordre: 13,
+        sonde: {
+          type: "dom_selector",
+          selector: "body",
+        },
+        fail_message:
+          "affichage.php n'affiche pas la liste des droits selon le format demandé (jointure droit / utilisateur).",
+      },
+    ],
+  },
+  {
+    id: "exam-bac2026-bijoux-aurythia",
+    title: "Bac 2026 - Bijoux Aurythia (Session de 8h30)",
+    level: "Difficile",
+    competence: "Bac STI • HTML5 • CSS3 • JavaScript • PHP • MySQLi • Examen Blanc • Session 2026",
+    module: "Module C",
+    dureeMinutes: 120,
+    tags: [
+      "Bac STI",
+      "HTML5",
+      "CSS3",
+      "JavaScript",
+      "PHP",
+      "MySQLi",
+      "Examen Blanc",
+      "Session 2026",
+    ],
+    examMode: true,
+    bareme: 20,
+    statement: [
+      "Épreuve pratique du Bac STI, session 2026 (8h30) : site de la société Aurythia pour ajouter un bijou et sa composition, enregistrer l'évaluation d'un expert et lister les bijoux originaux.",
+    ],
+    enonceMarkdown:
+      "# Épreuve Pratique du Baccalauréat STI — Session 2026 (8h30)\n\n## Sujet : Aurythia, l'art des bijoux\n\n**Durée :** 2 heures (120 minutes)  \n**Coefficient :** 1.2  \n**Note Maximale :** 20 points (Mode Examen)\n\n---\n\n## Contexte\n\n**Aurythia** fabrique des bijoux. Elle souhaite un site Web pour :\n\n- ajouter un bijou et sa composition ;\n- enregistrer l'évaluation d'un bijou par un expert ;\n- afficher la liste des bijoux originaux.\n\nRessources fournies : `bijoux.jpg`, `ajout.html`, `bijoux.sql`, `mesStyles.css`, `mesControles.js` (fonction `nettoyage`). Le dossier de travail se nomme `SW<numéro d'inscription>`.\n\nReprésentation textuelle de la base (nommée `bd2026_bijoux` dans la plateforme) :\n\n```\nbijou       (idBij, description, prixVente, poids)\nmetal       (idMet, nomMet)\ncomposition (idBij#, idMet#)\nexpert      (idExp, nomExp, mail)\nevaluation  (idExp#, idBij#, finition, originalite, commentaire, dateEv)\n```\n\n| Champ | Type et propriété(s) |\n| --- | --- |\n| `idBij` | Chaîne de 5 caractères |\n| `description` | Chaîne de 100 caractères |\n| `prixVente` | Entier (dinars) |\n| `poids` | Entier (grammes) |\n| `idMet` | Caractère |\n| `nomMet` | Chaîne de 50 caractères, unique |\n| `idExp` | Chaîne de 3 caractères |\n| `nomExp` | Chaîne de 50 caractères, unique |\n| `mail` | Chaîne de 100 caractères, unique |\n| `finition` | Entier : note du critère « Finition » |\n| `originalite` | Caractère : `O` (oui) ou `N` (non) |\n| `commentaire` | Chaîne de 200 caractères |\n| `dateEv` | Date et heure de l'évaluation |\n\n---\n\n## Travail Demandé\n\n### Étape 1 : base de données\n\n1. Créer la base de données.\n2. Importer `bijoux.sql`.\n3. Définir les clés primaires des différentes tables, créer la table `evaluation` et établir les relations entre les tables.\n4. Exporter la base au format SQL dans le dossier de travail.\n\n### Étape 2 : documents Web\n\nConsignes : les fonctions JavaScript vont dans `mesControles.js`, les règles CSS dans `mesStyles.css`, toutes les pages sont liées à `mesStyles.css`, `ajout.html` et `evaluation.html` sont liées à `mesControles.js`, et le bouton « Annuler » de chaque formulaire réinitialise les champs.\n\n**1. Page `index.html`**\n\n- `<header>` : un titre `<h1>` « Aurythia : l'art des bijoux » et une navigation `<nav>` sur une seule ligne avec les liens « Ajout d'un bijou » (`ajout.html`), « Evaluation d'un bijou » (`evaluation.html`) et « Liste des bijoux originaux » (`liste.php`).\n- `<main>` : une `<section>` (zone d'affichage, `ajout.html` par défaut) et un `<aside>` à droite avec l'image `bijoux.jpg`.\n- `<footer>` : liste à puces « Numéro Bleu : 82 10 00 00 » et « Email : admin@Aurythia.ai ».\n- Mise en forme : `h1` en Arial, première lettre de chaque mot en majuscule, fond `#053860` ; `header` et `footer` sur fond `#053860` ; liens, `header` et `footer` en blanc (`#FFFFFF`) ; `nav` avec 15px de marge intérieure ; `section` et `aside` sur la même ligne ; puces carrées pour les `ul`.\n\n**2. Page `ajout.html`**\n\n- Le bouton « Enregistrer » appelle `valide1` et `ajout.php` ; le champ « Description » est obligatoire.\n- Les `fieldset` « Détails » et « Composition » ont une bordure double `#0000FF` de 3px ; les deux boutons ont une ombre bleue décalée de 5px (horizontalement et verticalement).\n- `valide1` : identifiant = deux lettres alphabétiques suivies de trois chiffres ; prix de vente supérieur ou égal à 100 ; au moins un métal sélectionné (l'arrière-plan de la composition devient rouge si elle est invalide).\n- `ajout.php` : insère le bijou dans `bijou` et ses métaux dans `composition` ; affiche « Ajout effectué avec succès » ou « Erreur d'insertion ».\n\n**3. Page `evaluation.html`** : formulaire d'évaluation (identifiant du bijou, expert, finition, originalité, commentaire).\n\n- Experts (attribut `value`) : Chokri Sfaxi `A22`, Mohamed Jerbi `A23`, Radhia Gafsi `A24`. Finition de type `number`. Originalité : `O` pour OUI, `N` pour NON. Le bouton « Enregistrer » appelle `valide2` et `evaluation.php`.\n- Les légendes « Evaluation d'un bijou » et « Critères d'évaluation » sont en gras et italique ; les boutons ont la même mise en forme qu'à la question 2.\n- `valide2` : même contrôle d'identifiant qu'en 2 ; expert obligatoire ; finition = entier de 1 à 5 ; originalité obligatoire ; commentaire = au moins deux mots séparés par des espaces, chacun uniquement formé de lettres (utiliser `nettoyage`).\n- `evaluation.php` : affiche « Bijou inexistant » si l'identifiant est inconnu ; « Bijou déjà évalué par cet expert » si l'évaluation existe ; sinon enregistre l'évaluation (`dateEv` = date et heure système) et affiche « Evaluation enregistrée avec succès ».\n\n**4. Page `liste.php`** : liste des bijoux originaux (évaluations dont `originalite` vaut `O`), avec colonnes Identifiant, Description et Moyenne (Finition), la moyenne portant sur ces évaluations.\n\n---\n\n## Barème Officiel\n\n| Partie | Critère Évalué | Points |\n| --- | --- | --- |\n| **Étape 1** | Manipulation de la base de données | 1,75 pts |\n| **Étape 2-1** | Page `index.html` : structure (2) et mise en forme (2) | 4 pts |\n| **Étape 2-2** | Ajout d'un bijou : HTML (1,25), CSS (1), `valide1` (1,75), `ajout.php` (1,75) | 5,75 pts |\n| **Étape 2-3** | Évaluation : HTML (1,75), CSS (0,5), `valide2` (2,5), `evaluation.php` (2,5) | 7,25 pts |\n| **Étape 2-4** | Page `liste.php` | 1,25 pts |\n| **Total** | **Note Globale Bac Pratique** | **20 points** |\n",
+    starter: {
+      "index.html":
+        '<!DOCTYPE html>\n<html lang="fr">\n<head>\n    <meta charset="UTF-8">\n    <title>Aurythia : l\'art des bijoux</title>\n    <!-- À compléter : liaison avec mesStyles.css, header (h1 + nav), main (section + aside), footer -->\n</head>\n<body>\n\n</body>\n</html>\n',
+      "ajout.html":
+        '<!DOCTYPE html>\n<html lang = "fr">\n<head>\n    <meta content = "text/html; charset=utf-8" http-equiv = "Content-Type">\n    <title> Ajout d\'un nouveau bijou </title>\n                                              <!-- liaison avec mesControles.js -->\n                                              <!-- liaison avec mesStyles.css -->\n</head>\n<body>\n  <form>              <!-- appel de la fonction js et du fichier php  -->\n    <fieldset id ="principal">\n\t    <legend> Ajout d\'un bijou </legend>\n        <fieldset>\n          <legend> Détails </legend>\n          <label> Identifiant : </label>\n          <input name = "idBij" type="text" id = "idBij"><br><br>\n          <label> Description : </label>\n          <input name = "desc" type="text" id = "desc"  ><br><br>\n          <label> Prix de vente : </label>\n          <input name = "prix" type = "number" id = "prix">\n          <label> dinars </label><br><br>\n          <label> Poids : </label>\n          <input name = "poids" type = "number" id = "poids" value="1">\n          <label> gramme(s)</label><br>\n        </fieldset>\n        <fieldset>\n          <legend> Composition </legend>\n          <input name = "c1" type = "checkbox" id = "c1" value =\'A\'> Argent\n          <input name = "c2" type = "checkbox" id = "c2" value =\'R\'> Or\n          <input name = "c3" type = "checkbox" id = "c3" value =\'P\'> Platine\n        </fieldset><br>\n      <div class ="bt">\n        <input type = "reset"   id = "exit" value = "Annuler">\n        <input type = "submit"  id = "save" value = "Enregistrer">\n      </div>\n    </fieldset>\n  </form>\n</body>\n</html>',
+      "evaluation.html":
+        '<!DOCTYPE html>\n<html lang="fr">\n<head>\n    <meta charset="UTF-8">\n    <title>Evaluation d\'un bijou</title>\n    <!-- À compléter : liaisons avec mesStyles.css et mesControles.js, formulaire d\'évaluation -->\n</head>\n<body>\n\n</body>\n</html>\n',
+      "mesStyles.css":
+        "/* Ajouter à partir de la ligne suivante, les règles CSS demandées */\n\n\n\n\n/* Il est conseillé de ne pas modifier les règles CSS ci-après  */\nh1 { text-align: center; }\n\nnav {width  : 100%;\n\t   height : 30%;\n\t   text-align:center; }\n\nmain {  width : 100%;\n        height : 480px; }\n\nsection { width : 70%;\n          height: 100%; }\n\naside {\twidth  : 30%;\n\t\theight : 100%; }\n\nimg { width  : 100%;\n      height : 100%;}\n\n\niframe { width  : 100%;\n\t\t height : 100%;  }\n\nfooter { width : 100%;\n        height : 70px;\n        margin: -16px 0px 0px 0px; }\n\nlabel { display: inline-block;\n        width : 150px; }\n\n.bt {\n  text-align:right;\n}\n",
+      "mesControles.js":
+        '/* la fonction "nettoyage" permet d’effacer les espaces de début et de fin\nainsi que les espaces superflus de la chaîne ch */\nfunction nettoyage(ch)\n{\n  ch = ch.trim()\n  while(ch.indexOf("  ") != -1 )\n   {\n     ch = ch.replace("  ", " ")    /* remplacer deux espaces par une seule espace */\n   }\n  return ch\n}',
+      "ajout.php":
+        "<?php\n// Ajout d'un bijou et de sa composition (tables bijou et composition)\n// À compléter par le candidat\n?>\n",
+      "evaluation.php":
+        "<?php\n// Enregistrement de l'évaluation d'un bijou par un expert\n// À compléter par le candidat\n?>\n",
+      "liste.php":
+        "<?php\n// Liste des bijoux originaux avec la moyenne des notes de finition\n// À compléter par le candidat\n?>\n",
+      "db/init.sql":
+        "-- Base bd2026_bijoux (Bac STI 2026) : société de bijoux Aurythia\n-- Version complète : tables fournies + clés primaires + table evaluation et relations.\n\nCREATE TABLE `bijou` (\n  `idBij` varchar(5) NOT NULL,\n  `description` varchar(100) NOT NULL,\n  `prixVente` int NOT NULL,\n  `poids` int NOT NULL,\n  PRIMARY KEY (`idBij`)\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;\n\nCREATE TABLE `metal` (\n  `idMet` varchar(1) NOT NULL,\n  `nomMet` varchar(50) NOT NULL,\n  PRIMARY KEY (`idMet`),\n  CONSTRAINT C1 UNIQUE (`nomMet`)\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;\n\nCREATE TABLE `composition` (\n  `idBij` varchar(5) NOT NULL,\n  `idMet` varchar(1) NOT NULL,\n  PRIMARY KEY (`idBij`, `idMet`),\n  CONSTRAINT `fk_composition_bijou` FOREIGN KEY (`idBij`) REFERENCES `bijou` (`idBij`),\n  CONSTRAINT `fk_composition_metal` FOREIGN KEY (`idMet`) REFERENCES `metal` (`idMet`)\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;\n\nCREATE TABLE `expert` (\n  `idExp` varchar(3) NOT NULL,\n  `nomExp` varchar(50) NOT NULL,\n  `mail` varchar(100) NOT NULL,\n  PRIMARY KEY (`idExp`),\n  CONSTRAINT C2 UNIQUE (`nomExp`),\n  CONSTRAINT C3 UNIQUE (`mail`)\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;\n\nCREATE TABLE `evaluation` (\n  `idExp` varchar(3) NOT NULL,\n  `idBij` varchar(5) NOT NULL,\n  `finition` int NOT NULL,\n  `originalite` char(1) NOT NULL,\n  `commentaire` varchar(200) NOT NULL,\n  `dateEv` datetime NOT NULL,\n  PRIMARY KEY (`idExp`, `idBij`),\n  CONSTRAINT `fk_evaluation_expert` FOREIGN KEY (`idExp`) REFERENCES `expert` (`idExp`),\n  CONSTRAINT `fk_evaluation_bijou` FOREIGN KEY (`idBij`) REFERENCES `bijou` (`idBij`),\n  CONSTRAINT `ck_evaluation_originalite` CHECK (`originalite` IN ('O','N'))\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;\n\nINSERT INTO `expert` (`idExp`, `nomExp`, `mail`) VALUES\n('A22', 'Chokri Sfaxi', 'Chokrisfaxi@gmail.com');\nINSERT INTO `expert` (`idExp`, `nomExp`, `mail`) VALUES\n('A23', 'Mohamed Jerbi', 'MohamedJerbi@gmail.com');\nINSERT INTO `expert` (`idExp`, `nomExp`, `mail`) VALUES\n('A24', 'Radhia Gafsi', 'RadhiaGafsi@gmail.com');\n\nINSERT INTO `metal` (`idMet`, `nomMet`) VALUES\n('A', 'Argent');\nINSERT INTO `metal` (`idMet`, `nomMet`) VALUES\n('R', 'Or');\nINSERT INTO `metal` (`idMet`, `nomMet`) VALUES\n('P', 'Platine');\n\nINSERT INTO `bijou` (`idBij`, `description`, `prixVente`, `poids`) VALUES\n('bg123', 'bague', 2000, 5);\nINSERT INTO `bijou` (`idBij`, `description`, `prixVente`, `poids`) VALUES\n('co789', 'colier', 5000, 10);\nINSERT INTO `bijou` (`idBij`, `description`, `prixVente`, `poids`) VALUES\n('bg124', 'bague avec diamant', 3500, 7);\n\nINSERT INTO `composition` (`idBij`, `idMet`) VALUES\n('bg123', 'R');\nINSERT INTO `composition` (`idBij`, `idMet`) VALUES\n('bg123', 'A');\nINSERT INTO `composition` (`idBij`, `idMet`) VALUES\n('co789', 'P');\nINSERT INTO `composition` (`idBij`, `idMet`) VALUES\n('bg124', 'R');\n\n-- Jeu d'essai : évaluations d'experts\nINSERT INTO `evaluation` (`idExp`, `idBij`, `finition`, `originalite`, `commentaire`, `dateEv`) VALUES\n('A22', 'bg123', 4, 'O', 'Belle finition', '2026-05-10 10:15:00');\nINSERT INTO `evaluation` (`idExp`, `idBij`, `finition`, `originalite`, `commentaire`, `dateEv`) VALUES\n('A23', 'bg123', 5, 'O', 'Tres original', '2026-05-11 09:00:00');\nINSERT INTO `evaluation` (`idExp`, `idBij`, `finition`, `originalite`, `commentaire`, `dateEv`) VALUES\n('A22', 'co789', 3, 'N', 'Modele classique', '2026-05-12 14:30:00');\nINSERT INTO `evaluation` (`idExp`, `idBij`, `finition`, `originalite`, `commentaire`, `dateEv`) VALUES\n('A24', 'bg124', 2, 'O', 'Design audacieux', '2026-05-12 16:45:00');\n",
+    },
+    hints: [
+      "Consultez l'énoncé officiel et les consignes du sujet : Bac 2026 - Bijoux Aurythia (Session de 8h30).",
+      "Respectez strictement les noms de fichiers, de champs et de fonctions demandés : index.html, ajout.html, evaluation.html, mesStyles.css, mesControles.js, ajout.php, evaluation.php, liste.php.",
+      "Vérifiez les messages affichés et les cas limites (valeurs vides, doublons, identifiants inexistants).",
+    ],
+    rawCriteria: [
+      {
+        id: "EX26B-01",
+        code: "BD-01",
+        titre: "Base de données : clés primaires, table evaluation et relations",
+        description:
+          "Les clés primaires de toutes les tables sont définies, la table evaluation est créée et les relations entre les tables sont établies, puis la base est exportée.",
+        points: 1.75,
+        ordre: 1,
+        sonde: {
+          type: "dom_selector",
+          selector: "body",
+        },
+        fail_message:
+          "Une clé primaire, la table evaluation ou une relation (clé étrangère) est absente ou incorrecte.",
+      },
+      {
+        id: "EX26B-02",
+        code: "HTML-01",
+        titre: "Page index : titre, navigation, section, aside et pied de page",
+        description:
+          "index.html contient le titre h1, la navigation avec trois liens, la section (ajout.html par défaut), l'aside avec bijoux.jpg et le footer avec une liste à puces de deux éléments.",
+        points: 2,
+        ordre: 2,
+        sonde: {
+          type: "dom_selector",
+          selector:
+            'header h1, header nav a, main section iframe, main aside img[src="bijoux.jpg"], footer ul li',
+          minCount: 8,
+        },
+        fail_message:
+          "La structure de index.html (h1, nav avec 3 liens, section, aside avec image, footer avec liste) est incomplète.",
+      },
+      {
+        id: "EX26B-03",
+        code: "CSS-01",
+        titre: "Mise en forme de l'index",
+        description:
+          "h1 en Arial avec majuscule à chaque mot et fond #053860 ; header et footer sur fond #053860 ; liens, header et footer en blanc ; nav avec 15px de marge intérieure ; section et aside sur la même ligne ; puces carrées.",
+        points: 2,
+        ordre: 3,
+        sonde: {
+          type: "css_property",
+          selector: "h1",
+          property: "text-transform",
+          expectedValue: "capitalize",
+        },
+        fail_message:
+          "Une des règles CSS de l'index (h1, header, footer, a, nav, section, aside, ul) est absente ou incorrecte.",
+      },
+      {
+        id: "EX26B-04",
+        code: "HTML-02",
+        titre: "Page ajout.html : liaisons, appels et champ obligatoire",
+        description:
+          "La page est liée à mesControles.js et mesStyles.css, le bouton Enregistrer appelle valide1 et ajout.php, et le champ Description est obligatoire.",
+        points: 1.25,
+        ordre: 4,
+        sonde: {
+          type: "dom_selector",
+          selector:
+            'script[src="mesControles.js"], link[href="mesStyles.css"], form[action="ajout.php"][onsubmit*="valide1"], input#desc[required]',
+          minCount: 4,
+        },
+        fail_message:
+          "ajout.html n'est pas liée aux fichiers demandés, n'appelle pas valide1 / ajout.php ou le champ Description n'est pas obligatoire.",
+      },
+      {
+        id: "EX26B-05",
+        code: "CSS-02",
+        titre: "Mise en forme du formulaire d'ajout",
+        description:
+          "Les fieldset Détails et Composition ont une bordure double #0000FF de 3px et les deux boutons une ombre bleue décalée de 5px.",
+        points: 1,
+        ordre: 5,
+        sonde: {
+          type: "css_property",
+          selector: "fieldset fieldset",
+          property: "border-style",
+          expectedValue: "double",
+        },
+        fail_message:
+          "Les fieldset n'ont pas la bordure double bleue de 3px ou les boutons n'ont pas l'ombre bleue.",
+      },
+      {
+        id: "EX26B-06",
+        code: "JS-01",
+        titre: "Fonction valide1 : identifiant, prix et composition",
+        description:
+          "valide1 contrôle l'identifiant (deux lettres et trois chiffres), le prix (supérieur ou égal à 100) et la sélection d'au moins un métal, avec un arrière-plan rouge sur la composition invalide.",
+        points: 1.75,
+        ordre: 6,
+        sonde: {
+          type: "js_eval",
+          checkSelector: "#composition",
+        },
+        fail_message:
+          "valide1 ne contrôle pas correctement l'identifiant, le prix ou la composition.",
+      },
+      {
+        id: "EX26B-07",
+        code: "PHP-01",
+        titre: "ajout.php : insertion dans bijou et composition",
+        description:
+          "Le script insère le bijou puis ses métaux, et affiche « Ajout effectué avec succès » ou « Erreur d'insertion ».",
+        points: 1.75,
+        ordre: 7,
+        sonde: {
+          type: "dom_selector",
+          selector: "body",
+        },
+        fail_message:
+          "ajout.php n'insère pas le bijou et sa composition ou n'affiche pas les messages demandés.",
+      },
+      {
+        id: "EX26B-08",
+        code: "HTML-03",
+        titre: "Page evaluation.html : formulaire d'évaluation",
+        description:
+          "Le formulaire contient la liste des experts (A22, A23, A24), un champ Finition de type number, l'originalité en O / N, un commentaire, et appelle valide2 et evaluation.php.",
+        points: 1.75,
+        ordre: 8,
+        sonde: {
+          type: "dom_selector",
+          selector:
+            'form[action="evaluation.php"][onsubmit*="valide2"] select option[value="A22"], option[value="A23"], option[value="A24"], input[type="number"]#finition, input[type="radio"][value="O"], input[type="radio"][value="N"]',
+          minCount: 6,
+        },
+        fail_message:
+          "evaluation.html : experts, champ Finition number, choix d'originalité O / N ou appel de valide2 / evaluation.php manquant.",
+      },
+      {
+        id: "EX26B-09",
+        code: "CSS-03",
+        titre: "Mise en forme de la page d'évaluation",
+        description:
+          "Les légendes sont en gras et en italique et les boutons reprennent la mise en forme de la page d'ajout.",
+        points: 0.5,
+        ordre: 9,
+        sonde: {
+          type: "css_property",
+          selector: "legend",
+          property: "font-style",
+          expectedValue: "italic",
+        },
+        fail_message:
+          "Les légendes ne sont pas en gras et italique ou les boutons n'ont pas la même mise en forme qu'à la question 2.",
+      },
+      {
+        id: "EX26B-10",
+        code: "JS-02",
+        titre: "Fonction valide2 : contrôles de l'évaluation",
+        description:
+          "valide2 contrôle l'identifiant, l'expert, la finition (entier de 1 à 5), l'originalité et le commentaire (au moins deux mots composés uniquement de lettres, via nettoyage).",
+        points: 2.5,
+        ordre: 10,
+        sonde: {
+          type: "js_eval",
+          checkSelector: "#commentaire",
+        },
+        fail_message: "valide2 ne contrôle pas correctement l'un des champs de l'évaluation.",
+      },
+      {
+        id: "EX26B-11",
+        code: "PHP-02",
+        titre: "evaluation.php : bijou inexistant, déjà évalué ou enregistrement",
+        description:
+          "Le script distingue les trois cas (bijou inexistant, bijou déjà évalué par l'expert, nouvelle évaluation avec la date et l'heure système) et affiche le message correspondant.",
+        points: 2.5,
+        ordre: 11,
+        sonde: {
+          type: "dom_selector",
+          selector: "body",
+        },
+        fail_message:
+          "evaluation.php ne gère pas correctement l'existence du bijou, le doublon d'évaluation ou l'insertion avec dateEv.",
+      },
+      {
+        id: "EX26B-12",
+        code: "PHP-03",
+        titre: "liste.php : bijoux originaux et moyenne de la finition",
+        description:
+          "La page affiche, pour les bijoux originaux (originalite = 'O'), l'identifiant, la description et la moyenne de la finition.",
+        points: 1.25,
+        ordre: 12,
+        sonde: {
+          type: "dom_selector",
+          selector: "body",
+        },
+        fail_message:
+          "liste.php n'affiche pas les bijoux originaux avec la moyenne de la finition (AVG avec GROUP BY).",
+      },
+    ],
+  },
+  {
+    id: "exam-bac2026-croisieres-marivana",
+    title: "Bac 2026 - Croisières Marivana Voyages (Session de 12h30)",
+    level: "Difficile",
+    competence: "Bac STI • HTML5 • CSS3 • JavaScript • PHP • MySQLi • Examen Blanc • Session 2026",
+    module: "Module C",
+    dureeMinutes: 120,
+    tags: [
+      "Bac STI",
+      "HTML5",
+      "CSS3",
+      "JavaScript",
+      "PHP",
+      "MySQLi",
+      "Examen Blanc",
+      "Session 2026",
+    ],
+    examMode: true,
+    bareme: 20,
+    statement: [
+      "Épreuve pratique du Bac STI, session 2026 (12h30) : site de la compagnie Marivana Voyages pour consulter les croisières disponibles et réserver des places.",
+    ],
+    enonceMarkdown:
+      "# Épreuve Pratique du Baccalauréat STI — Session 2026 (12h30)\n\n## Sujet : Marivana Voyages, croisières et réservations\n\n**Durée :** 2 heures (120 minutes)  \n**Coefficient :** 1.2  \n**Note Maximale :** 20 points (Mode Examen)\n\n---\n\n## Contexte\n\n**Marivana Voyages** organise des voyages maritimes à bord de ses navires. La compagnie souhaite un site Web pour :\n\n- consulter la liste des croisières disponibles ;\n- réserver des places pour une croisière.\n\nRessources fournies : `croisiere.sql`, `photo.html`, `croisiere.html`, `styles2.css`, `connexion.php`, `navire.png` et les images `img1.png` à `img8.png`. Le dossier de travail se nomme `SW<numéro d'inscription>`.\n\nReprésentation textuelle de la base (nommée `bd2026_croisieres` dans la plateforme) :\n\n```\nnavire      (idNav, nomNav, capacite)\ndestination (idDes, nomDes)\ncroisiere   (idCro, libCro, duree, prix, dateDepart, idDes#, idNav#)\nclient      (idCl, nomCl, telCl)\nreservation (idCl#, idCro#, dateRes, nbPlace)\n```\n\n| Champ | Type et propriété(s) |\n| --- | --- |\n| `idNav` | Chaîne de 3 caractères |\n| `nomNav` | Chaîne de 100 caractères, unique |\n| `capacite` | Entier (nombre de places) |\n| `idDes` | Entier |\n| `nomDes` | Chaîne de 100 caractères, unique |\n| `idCro` | Chaîne de 5 caractères |\n| `libCro` | Chaîne de 100 caractères, unique |\n| `duree` | Entier (jours) |\n| `prix` | Entier (dinars, prix d'une place) |\n| `dateDepart` | Date |\n| `idCl` | Chaîne de 10 caractères |\n| `nomCl` | Chaîne de 100 caractères (nom et prénom) |\n| `telCl` | Entier |\n| `dateRes` | Date et heure |\n| `nbPlace` | Entier |\n\n---\n\n## Travail Demandé\n\n### Étape 1 : base de données\n\n1. Créer la base de données.\n2. Importer `croisiere.sql`.\n3. Créer la table `reservation` conformément à la description des champs.\n4. Établir les relations entre les tables.\n5. Exporter la base au format SQL dans le dossier de travail.\n\n### Étape 2 : documents Web\n\nConsignes : les fonctions JavaScript vont dans un nouveau fichier `controles2.js`, les règles CSS dans `styles2.css`, toutes les pages sont liées à `styles2.css`, `croisiere.html` et `reservation.html` sont liées à `controles2.js`, et le bouton « Annuler » de chaque formulaire réinitialise les champs.\n\n**1. Page `index.html`**\n\n- `<header>` : un `<span>` « Marivana Voyages » et une image `navire.png`.\n- `<main>` : une navigation `<nav>` (liens « Album photos » vers `photo.html`, « Nos croisières » vers `croisiere.html`, « Réservation » vers `reservation.html`) et une `<section>` affichant `photo.html` par défaut.\n- Mise en forme : le texte a une marge de 30px en haut et à gauche et une taille de police de 60px ; l'image a des coins arrondis (rayon 50%) ; le texte et l'image ont une transparence de 0.5 et se trouvent sur la même ligne, le texte à 100px du bord gauche de son conteneur et l'image à 100px du bord droit.\n\n**2. Page `photo.html`** (album publicitaire)\n\n- Ajouter à `<figure>` la légende « Avec Marivana Voyages, embarquez pour une aventure inoubliable ! » et un pied de page « Contacts : 82 200 200/ croisiere@maritime.tn ».\n- Au survol, une image est agrandie 2 fois avec une transition de 3 secondes ; le texte du pied de page et la figure sont centrés ; le texte du pied de page a une ombre `#FFFFFF` décalée de 5px.\n\n**3. Page `croisiere.html`** : recherche des croisières d'une destination sur une période.\n\n- Le bouton « Chercher » appelle `verif1` et `croisiere.php`. Destinations (attribut `value`) : Alexandrie `1`, Barcelone `2`, Beyrouth `3`. Ajouter trois cases à cocher (Durée, Prix, Capacité) au fieldset « Informations supplémentaires à afficher ».\n- `verif1` : destination obligatoire ; Date 1 strictement supérieure à la date système ; Date 2 strictement supérieure à Date 1.\n- `connexion.php` : à modifier pour établir la connexion au serveur et à la base.\n- `croisiere.php` : inclut `connexion.php` ; affiche « Aucune croisière programmée pour cette période » s'il n'y a aucun résultat, sinon un tableau (Croisière, Navire, Départ, puis Durée, Prix et Capacité seulement si cochées) trié par date de départ croissante. La mise en forme du tableau n'est pas demandée.\n\n**4. Page `reservation.html`**\n\n- Formulaire : type d'identifiant, identifiant, nom et prénom, téléphone (type `tel`), croisière (Eclat méditerranéen `101`, Perle d'Azur `102`, Riviera des Mers `103`), nombre de places de 1 à 10 avec un élément `<output id=\"nb\">` affichant « 1/10 ». Chaque changement du nombre de places appelle `nombres` ; le bouton « Valider » appelle `verif2` et `reservation.php`.\n- `nombres` : affiche dans `nb` la valeur du nombre de places suivie de `/10`.\n- `verif2` : type d'identifiant obligatoire ; identifiant = une lettre suivie de 9 chiffres pour un passeport, 8 chiffres pour un CIN ; nom et prénom = lettres et espaces uniquement, au moins 7 lettres.\n- `reservation.php` : supprime les espaces de début et de fin du nom et met en majuscule la première lettre de chaque mot ; affiche « Réservation déjà faite » si le client a déjà réservé cette croisière ; sinon crée le client s'il n'existe pas, enregistre la réservation (`dateRes` = date et heure système) et affiche « Réservation enregistrée dans l'attente de confirmation ».\n\n---\n\n## Barème Officiel\n\n| Partie | Critère Évalué | Points |\n| --- | --- | --- |\n| **Étape 1** | Manipulation de la base de données | 1,5 pts |\n| **Étape 2-1** | Page `index.html` : structure (1,5) et mise en forme (1,5) | 3 pts |\n| **Étape 2-2** | Album photos : HTML (0,5) et CSS (1) | 1,5 pts |\n| **Étape 2-3** | Recherche : HTML (1,25), `verif1` (1,5), `connexion.php` (0,5), `croisiere.php` (2,5) | 5,75 pts |\n| **Étape 2-4** | Réservation : HTML (2), `nombres` et `verif2` (2,25), `reservation.php` (4) | 8,25 pts |\n| **Total** | **Note Globale Bac Pratique** | **20 points** |\n",
+    starter: {
+      "index.html":
+        '<!DOCTYPE html>\n<html lang="fr">\n<head>\n    <meta charset="UTF-8">\n    <title>Marivana Voyages</title>\n    <!-- À compléter : liaison avec styles2.css, header (span + img), main (nav + section) -->\n</head>\n<body>\n\n</body>\n</html>\n',
+      "photo.html":
+        '<!DOCTYPE html>\n<html>\n<head>\n    <meta charset="UTF-8">\n    <title> Album photos</title>\n    <link rel="stylesheet" href="styles2.css">\n</head>\n<body>\n    <figure>\n        <img src="img1.png" class="photo">\n        <img src="img2.png" class="photo">\n        <img src="img3.png" class="photo">\n        <img src="img4.png" class="photo">\n        <br>\n        <img src="img5.png" class="photo">\n        <img src="img6.png" class="photo">\n        <img src="img7.png" class="photo">\n        <img src="img8.png" class="photo">\n    </figure>\n</body>\n</html>',
+      "croisiere.html":
+        '<!DOCTYPE html>\n<html lang="fr">\n<head>\n    <meta charset="UTF-8">\n    <title>Recherche de croisières </title>\n    <link rel="stylesheet" href="styles2.css">\n    <script src="controles2.js"></script>\n</head>\n<body>\n   <form>                     <!-- appel de la fonction js et du fichier php  -->\n    <fieldset>\n        <legend> Recherche de croisières </legend>\n        <label> Destination : </label>\n        <select>\n            <option selected> Choisir une destination </option>\n                              <!-- les destinations  -->\n        </select>\n\t\t<fieldset>\n\t\t\t<legend>Date de départ entre </legend>\n            <label> Date 1 : </label>\n            <input type="date" id="DD" name="DD"><br>\n            <label> Date 2 : </label>\n            <input type="date" id="DF" name="DF"><br>\n\t\t</fieldset> <br>\n\t\t<fieldset>\n\t\t\t<legend>Informations supplémentaires à afficher</legend>\n                              <!-- trois cases à cocher  -->\n\t\t</fieldset><br>\n\t\t<div>\n         <input type="reset"  value="Annuler">\n         <input type="submit" value="Chercher">\n\t\t</div>\n    </fieldset>\n   </form>\n</body>\n</html>',
+      "reservation.html":
+        '<!DOCTYPE html>\n<html lang="fr">\n<head>\n    <meta charset="UTF-8">\n    <title>Réservation d\'une croisière</title>\n    <!-- À compléter : liaisons avec styles2.css et controles2.js, formulaire de réservation -->\n</head>\n<body>\n\n</body>\n</html>\n',
+      "styles2.css":
+        "/* Ajouter à partir de la ligne suivante, les règles CSS demandées */\n\n\n\n\n/* Il est conseillé de ne pas modifier les règles CSS ci-après  */\nheader  { padding: 10px;\n         height: 150px; }\n\nfooter  { font-style:italic;\n         font-weight: bold; }\n\nbody    { background-color:#C6D6EB; }\n\nnav     { height:50px; }\n\n.photo  { height:140px;\n         width:200px; }\n\nsection { height: 500px; }\niframe  { width:100%;\n          height:500px; }\n\na  {  display:inline-block;\n      border: 3px solid white;\n      background-color: black;\n      width:32.5%;\n      height: 40px;\n      color:white;\n      padding: 15px 0 0 0;  }\n\nlabel { display: inline-block;\n        width: 110px; }\n\n",
+      "controles2.js":
+        "/* Fonctions JavaScript à développer par le candidat : verif1, nombres et verif2 */\n",
+      "connexion.php":
+        '<?php\n$serveur ="localhost";\n$utilisateur = "root";\n$motdepasse = "";\n$nombase = "";\n\n?>',
+      "croisiere.php":
+        "<?php\n// Recherche des croisières par destination et période\n// À compléter par le candidat (inclure connexion.php)\n?>\n",
+      "reservation.php":
+        "<?php\n// Réservation d'une croisière\n// À compléter par le candidat (inclure connexion.php)\n?>\n",
+      "db/init.sql":
+        "-- Base bd2026_croisieres (Bac STI 2026, session de 12h30) : Marivana Voyages\n-- Version complète : tables fournies + relations + table reservation.\n\nCREATE TABLE `navire` (\n  `idNav` varchar(3) NOT NULL,\n  `nomNav` varchar(100) DEFAULT NULL,\n  `capacite` int NOT NULL,\n  PRIMARY KEY (`idNav`),\n  UNIQUE KEY `nomNav` (`nomNav`)\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;\n\nINSERT INTO `navire` (`idNav`, `nomNav`, `capacite`) VALUES\n('1', 'Tanit', 3200);\nINSERT INTO `navire` (`idNav`, `nomNav`, `capacite`) VALUES\n('2', 'Carthage', 2208);\n\nCREATE TABLE `destination` (\n  `idDes` int NOT NULL,\n  `nomDes` varchar(100) NOT NULL,\n  PRIMARY KEY (`idDes`),\n  UNIQUE KEY `nomDes` (`nomDes`)\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;\n\nINSERT INTO `destination` (`idDes`, `nomDes`) VALUES\n(1, 'Alexandrie');\nINSERT INTO `destination` (`idDes`, `nomDes`) VALUES\n(2, 'Barcelone');\nINSERT INTO `destination` (`idDes`, `nomDes`) VALUES\n(3, 'Beyrouth');\n\nCREATE TABLE `croisiere` (\n  `idCro` varchar(5) NOT NULL,\n  `libCro` varchar(100) NOT NULL,\n  `duree` int NOT NULL,\n  `prix` int NOT NULL,\n  `dateDepart` date NOT NULL,\n  `idDes` int NOT NULL,\n  `idNav` varchar(3) NOT NULL,\n  PRIMARY KEY (`idCro`),\n  UNIQUE KEY `libCro` (`libCro`),\n  CONSTRAINT `fk_croisiere_destination` FOREIGN KEY (`idDes`) REFERENCES `destination` (`idDes`),\n  CONSTRAINT `fk_croisiere_navire` FOREIGN KEY (`idNav`) REFERENCES `navire` (`idNav`)\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;\n\nINSERT INTO `croisiere` (`idCro`, `libCro`, `duree`, `prix`, `dateDepart`, `idDes`, `idNav`) VALUES\n('101', 'Eclat méditerranéen', 3, 1200, '2026-05-18', 1, '1');\nINSERT INTO `croisiere` (`idCro`, `libCro`, `duree`, `prix`, `dateDepart`, `idDes`, `idNav`) VALUES\n('102', 'Perle d’Azur', 5, 2000, '2026-05-16', 3, '2');\nINSERT INTO `croisiere` (`idCro`, `libCro`, `duree`, `prix`, `dateDepart`, `idDes`, `idNav`) VALUES\n('103', 'Riviera des Mers', 5, 3000, '2026-05-17', 2, '1');\nINSERT INTO `croisiere` (`idCro`, `libCro`, `duree`, `prix`, `dateDepart`, `idDes`, `idNav`) VALUES\n('104', 'Nil et Delta', 4, 1500, '2026-06-20', 1, '2');\n\nCREATE TABLE `client` (\n  `idCl` varchar(10) NOT NULL,\n  `nomCl` varchar(100) NOT NULL,\n  `telCl` int NOT NULL,\n  PRIMARY KEY (`idCl`)\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;\n\nINSERT INTO `client` (`idCl`, `nomCl`, `telCl`) VALUES\n('01234567', 'Najla Soussi', 99998888);\nINSERT INTO `client` (`idCl`, `nomCl`, `telCl`) VALUES\n('A123456789', 'Kamel Nebli', 22111222);\n\nCREATE TABLE `reservation` (\n  `idCl` varchar(10) NOT NULL,\n  `idCro` varchar(5) NOT NULL,\n  `dateRes` datetime NOT NULL,\n  `nbPlace` int NOT NULL,\n  PRIMARY KEY (`idCl`, `idCro`),\n  CONSTRAINT `fk_reservation_client` FOREIGN KEY (`idCl`) REFERENCES `client` (`idCl`),\n  CONSTRAINT `fk_reservation_croisiere` FOREIGN KEY (`idCro`) REFERENCES `croisiere` (`idCro`)\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;\n\n-- Jeu d'essai\nINSERT INTO `reservation` (`idCl`, `idCro`, `dateRes`, `nbPlace`) VALUES\n('01234567', '101', '2026-05-10 11:00:00', 2);\n",
+    },
+    hints: [
+      "Consultez l'énoncé officiel et les consignes du sujet : Bac 2026 - Croisières Marivana Voyages (Session de 12h30).",
+      "Respectez strictement les noms de fichiers, de champs et de fonctions demandés : index.html, photo.html, croisiere.html, reservation.html, styles2.css, controles2.js, connexion.php, croisiere.php, reservation.php.",
+      "Vérifiez les messages affichés et les cas limites (valeurs vides, doublons, identifiants inexistants).",
+    ],
+    rawCriteria: [
+      {
+        id: "EX26C-01",
+        code: "BD-01",
+        titre: "Base de données : table reservation et relations",
+        description:
+          "La table reservation est créée conformément à la description (clé primaire composée) et les relations entre les tables sont établies, puis la base est exportée.",
+        points: 1.5,
+        ordre: 1,
+        sonde: {
+          type: "dom_selector",
+          selector: "body",
+        },
+        fail_message:
+          "La table reservation, sa clé primaire ou les clés étrangères entre les tables sont absentes ou incorrectes.",
+      },
+      {
+        id: "EX26C-02",
+        code: "HTML-01",
+        titre: "Page index : en-tête, navigation et zone d'affichage",
+        description:
+          "index.html contient le span « Marivana Voyages », l'image navire.png, la navigation avec trois liens et la section qui affiche photo.html par défaut.",
+        points: 1.5,
+        ordre: 2,
+        sonde: {
+          type: "dom_selector",
+          selector: 'header span, header img[src="navire.png"], main nav a, main section',
+          minCount: 6,
+        },
+        fail_message:
+          "La structure de index.html (span, image navire.png, nav avec 3 liens, section) est incomplète.",
+      },
+      {
+        id: "EX26C-03",
+        code: "CSS-01",
+        titre: "Mise en forme de l'en-tête",
+        description:
+          "Le texte a une marge de 30px en haut et à gauche et une police de 60px ; l'image a des coins arrondis à 50% ; texte et image ont une transparence de 0.5 et se trouvent sur la même ligne (texte à 100px du bord gauche, image à 100px du bord droit).",
+        points: 1.5,
+        ordre: 3,
+        sonde: {
+          type: "css_property",
+          selector: "header img",
+          property: "opacity",
+          expectedValue: "0.5",
+        },
+        fail_message:
+          "Une des règles CSS de l'en-tête (marge, police, arrondi, transparence, disposition) est absente ou incorrecte.",
+      },
+      {
+        id: "EX26C-04",
+        code: "HTML-02",
+        titre: "Page photo.html : légende et pied de page",
+        description:
+          "L'élément figure contient une légende figcaption avec le texte demandé et la page contient un pied de page avec les contacts.",
+        points: 0.5,
+        ordre: 4,
+        sonde: {
+          type: "dom_selector",
+          selector: "figure figcaption, footer",
+          minCount: 2,
+        },
+        fail_message:
+          "photo.html ne contient pas la légende de figure ou le pied de page demandés.",
+      },
+      {
+        id: "EX26C-05",
+        code: "CSS-02",
+        titre: "Effet de survol des photos et mise en forme du pied de page",
+        description:
+          "Au survol, les images sont agrandies deux fois avec une transition de 3 secondes ; le pied de page et la figure sont centrés ; le texte du pied de page a une ombre #FFFFFF de 5px.",
+        points: 1,
+        ordre: 5,
+        sonde: {
+          type: "css_property",
+          selector: "footer",
+          property: "text-align",
+          expectedValue: "center",
+        },
+        fail_message:
+          "Le survol des images (scale 2, transition 3s) ou la mise en forme du pied de page ne respecte pas l'énoncé.",
+      },
+      {
+        id: "EX26C-06",
+        code: "HTML-03",
+        titre: "Page croisiere.html : destinations, cases à cocher, appels",
+        description:
+          "Le formulaire appelle verif1 et croisiere.php, la liste contient Alexandrie (1), Barcelone (2) et Beyrouth (3) et le fieldset contient trois cases à cocher.",
+        points: 1.25,
+        ordre: 6,
+        sonde: {
+          type: "dom_selector",
+          selector:
+            'form[action="croisiere.php"][onsubmit*="verif1"] select option[value="1"], option[value="2"], option[value="3"], input[type="checkbox"]',
+          minCount: 6,
+        },
+        fail_message:
+          "croisiere.html : destinations, trois cases à cocher ou appel de verif1 / croisiere.php manquants.",
+      },
+      {
+        id: "EX26C-07",
+        code: "JS-01",
+        titre: "Fonction verif1 : destination et dates",
+        description:
+          "verif1 impose une destination, une Date 1 strictement supérieure à la date système et une Date 2 strictement supérieure à la Date 1.",
+        points: 1.5,
+        ordre: 7,
+        sonde: {
+          type: "js_eval",
+          checkSelector: "#DD",
+        },
+        fail_message:
+          "verif1 ne contrôle pas la destination ou l'ordre des dates (Date 1 > aujourd'hui, Date 2 > Date 1).",
+      },
+      {
+        id: "EX26C-08",
+        code: "PHP-01",
+        titre: "connexion.php : connexion au serveur et à la base",
+        description:
+          "Le fichier établit la connexion avec mysqli_connect en renseignant le nom de la base.",
+        points: 0.5,
+        ordre: 8,
+        sonde: {
+          type: "dom_selector",
+          selector: "body",
+        },
+        fail_message: "connexion.php n'établit pas la connexion à la base de données.",
+      },
+      {
+        id: "EX26C-09",
+        code: "PHP-02",
+        titre: "croisiere.php : recherche, tri et informations supplémentaires",
+        description:
+          "Le script inclut connexion.php, affiche le message d'absence de croisière ou un tableau trié par date de départ croissante, avec les colonnes Durée, Prix et Capacité uniquement si elles sont cochées.",
+        points: 2.5,
+        ordre: 9,
+        sonde: {
+          type: "dom_selector",
+          selector: "body",
+        },
+        fail_message:
+          "croisiere.php ne filtre pas sur la destination et la période, ne trie pas par date ou n'affiche pas les colonnes optionnelles correctement.",
+      },
+      {
+        id: "EX26C-10",
+        code: "HTML-04",
+        titre: "Page reservation.html : formulaire de réservation",
+        description:
+          "Le formulaire contient le type d'identifiant, l'identifiant, le nom, un téléphone de type tel, la liste des croisières (101, 102, 103), un nombre de places de 1 à 10, un élément output d'identifiant nb, et appelle nombres, verif2 et reservation.php.",
+        points: 2,
+        ordre: 10,
+        sonde: {
+          type: "dom_selector",
+          selector:
+            'form[action="reservation.php"][onsubmit*="verif2"] input[type="tel"], option[value="101"], option[value="102"], option[value="103"], output#nb, input[name="nbPlace"][min="1"][max="10"][onchange*="nombres"]',
+          minCount: 6,
+        },
+        fail_message:
+          "reservation.html : champ tel, croisières, nombre de places 1 à 10, output nb ou appels de nombres / verif2 / reservation.php manquants.",
+      },
+      {
+        id: "EX26C-11",
+        code: "JS-02",
+        titre: "Fonctions nombres et verif2",
+        description:
+          "nombres affiche la valeur suivie de /10 dans l'élément nb ; verif2 impose un type d'identifiant, un identifiant adapté (lettre + 9 chiffres pour un passeport, 8 chiffres pour un CIN) et un nom d'au moins 7 lettres.",
+        points: 2.25,
+        ordre: 11,
+        sonde: {
+          type: "js_eval",
+          checkSelector: "#nb",
+        },
+        fail_message:
+          "nombres n'affiche pas la valeur suivie de /10 ou verif2 ne contrôle pas correctement l'identifiant ou le nom.",
+      },
+      {
+        id: "EX26C-12",
+        code: "PHP-03",
+        titre: "reservation.php : nettoyage du nom, doublon, client, réservation",
+        description:
+          "Le script nettoie le nom (espaces et majuscules), refuse une réservation déjà faite, crée le client s'il n'existe pas, enregistre la réservation avec la date et l'heure système et affiche le message de confirmation.",
+        points: 4,
+        ordre: 12,
+        sonde: {
+          type: "dom_selector",
+          selector: "body",
+        },
+        fail_message:
+          "reservation.php ne gère pas correctement le nettoyage du nom, le doublon de réservation, la création du client ou l'insertion avec dateRes.",
+      },
+    ],
+  },
 ];
 
 export const contentSubjects: SubjectContentItem[] = rawSubjects.map((item) => ({

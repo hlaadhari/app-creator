@@ -1,0 +1,22 @@
+{
+  "id": "exam-bac2026-bijoux-aurythia",
+  "titre": "Bac 2026 - Bijoux Aurythia (Session de 8h30)",
+  "module": "Module C",
+  "duree_minutes": 120,
+  "niveau": 3,
+  "exam_mode": true,
+  "bareme": 20,
+  "tags": ["Bac STI", "HTML5", "CSS3", "JavaScript", "PHP", "MySQLi", "Examen Blanc", "Session 2026"],
+  "description": "Épreuve pratique du Bac STI, session 2026 (8h30) : site de la société Aurythia pour ajouter un bijou et sa composition, enregistrer l'évaluation d'un expert et lister les bijoux originaux.",
+  "fichiers_attendus": [
+    "index.html",
+    "ajout.html",
+    "evaluation.html",
+    "mesStyles.css",
+    "mesControles.js",
+    "ajout.php",
+    "evaluation.php",
+    "liste.php"
+  ],
+  "base_de_donnees": "db/init.sql"
+}
