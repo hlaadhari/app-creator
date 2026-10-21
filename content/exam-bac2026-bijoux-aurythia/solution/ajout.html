@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
+    <title>Ajout d'un nouveau bijou</title>
+    <script src="mesControles.js"></script>
+    <link rel="stylesheet" href="mesStyles.css" />
+  </head>
+  <body>
+    <form action="ajout.php" method="post" onsubmit="return valide1();">
+      <fieldset id="principal">
+        <legend>Ajout d'un bijou</legend>
+        <fieldset>
+          <legend>Détails</legend>
+          <label> Identifiant : </label>
+          <input name="idBij" type="text" id="idBij" /><br /><br />
+          <label> Description : </label>
+          <input name="desc" type="text" id="desc" required /><br /><br />
+          <label> Prix de vente : </label>
+          <input name="prix" type="number" id="prix" />
+          <label> dinars </label><br /><br />
+          <label> Poids : </label>
+          <input name="poids" type="number" id="poids" value="1" />
+          <label> gramme(s)</label><br />
+        </fieldset>
+        <fieldset id="composition">
+          <legend>Composition</legend>
+          <input name="c1" type="checkbox" id="c1" value="A" /> Argent
+          <input name="c2" type="checkbox" id="c2" value="R" /> Or
+          <input name="c3" type="checkbox" id="c3" value="P" /> Platine
+        </fieldset>
+        <br />
+        <div class="bt">
+          <input type="reset" id="exit" value="Annuler" />
+          <input type="submit" id="save" value="Enregistrer" />
+        </div>
+      </fieldset>
+    </form>
+  </body>
+</html>

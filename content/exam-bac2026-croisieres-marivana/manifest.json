@@ -1,0 +1,32 @@
+{
+  "id": "exam-bac2026-croisieres-marivana",
+  "titre": "Bac 2026 - Croisières Marivana Voyages (Session de 12h30)",
+  "module": "Module C",
+  "duree_minutes": 120,
+  "niveau": 3,
+  "exam_mode": true,
+  "bareme": 20,
+  "tags": [
+    "Bac STI",
+    "HTML5",
+    "CSS3",
+    "JavaScript",
+    "PHP",
+    "MySQLi",
+    "Examen Blanc",
+    "Session 2026"
+  ],
+  "description": "Épreuve pratique du Bac STI, session 2026 (12h30) : site de la compagnie Marivana Voyages pour consulter les croisières disponibles et réserver des places.",
+  "fichiers_attendus": [
+    "index.html",
+    "photo.html",
+    "croisiere.html",
+    "reservation.html",
+    "styles2.css",
+    "controles2.js",
+    "connexion.php",
+    "croisiere.php",
+    "reservation.php"
+  ],
+  "base_de_donnees": "db/init.sql"
+}

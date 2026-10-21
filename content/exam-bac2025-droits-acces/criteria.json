@@ -1,0 +1,170 @@
+[
+  {
+    "id": "EX25-01",
+    "code": "BD-01",
+    "titre": "Base de données : création, import, table droit et relations",
+    "description": "La base bd2025 est créée, tables.sql importé, la table droit créée avec sa clé primaire composée et ses deux clés étrangères, puis la base exportée.",
+    "points": 1.25,
+    "ordre": 1,
+    "fichier": "index.html",
+    "sonde": { "type": "dom_selector", "selector": "body" },
+    "fail_message": "La table droit, ses clés ou ses relations avec document et utilisateur sont absentes ou incorrectes."
+  },
+  {
+    "id": "EX25-02",
+    "code": "CONS-01",
+    "titre": "Respect des consignes (nommage et liaisons CSS)",
+    "description": "Les pages HTML sont reliées à mesStyles.css et les fichiers portent les noms demandés.",
+    "points": 0.5,
+    "ordre": 2,
+    "fichier": "index.html",
+    "sonde": {
+      "type": "dom_selector",
+      "selector": "link[rel=\"stylesheet\"][href=\"mesStyles.css\"]"
+    },
+    "fail_message": "Une page n'est pas reliée à mesStyles.css ou un fichier ne porte pas le nom demandé."
+  },
+  {
+    "id": "EX25-03",
+    "code": "HTML-01",
+    "titre": "Page index : structure header, nav, section, footer",
+    "description": "index.html contient l'en-tête (logo et titre h1), la navigation avec trois liens, la zone d'affichage section et le pied de page.",
+    "points": 2,
+    "ordre": 3,
+    "fichier": "index.html",
+    "sonde": {
+      "type": "dom_selector",
+      "selector": "header img, header h1, main nav a, main section, footer",
+      "minCount": 7
+    },
+    "fail_message": "La structure de index.html (header avec logo et h1, nav avec 3 liens, section, footer) est incomplète."
+  },
+  {
+    "id": "EX25-04",
+    "code": "CSS-01",
+    "titre": "Mise en forme de l'index (titre, pied de page, liens)",
+    "description": "Les éléments h1 et footer ont un fond bleu, un texte blanc centré ; les liens ont une ombre rouge de 5px 5px 3px et sont en italique lorsqu'ils sont actifs.",
+    "points": 1.25,
+    "ordre": 4,
+    "fichier": "index.html",
+    "sonde": {
+      "type": "css_property",
+      "selector": "h1",
+      "property": "background-color",
+      "expectedValue": "blue"
+    },
+    "fail_message": "Les règles CSS de h1, footer ou des liens ne respectent pas l'énoncé."
+  },
+  {
+    "id": "EX25-05",
+    "code": "HTML-02",
+    "titre": "Page utilisateur.html : formulaire d'ajout",
+    "description": "Le formulaire envoie en POST vers ajout.php, contient les champs idUtil et nomPrenom et les boutons Ajouter et Annuler, et appelle verif1.",
+    "points": 1.25,
+    "ordre": 5,
+    "fichier": "utilisateur.html",
+    "sonde": {
+      "type": "dom_selector",
+      "selector": "form[action=\"ajout.php\"][onsubmit*=\"verif1\"] input#idUtil, form input#nomPrenom, form input[type=\"submit\"], form input[type=\"reset\"]",
+      "minCount": 4
+    },
+    "fail_message": "Le formulaire utilisateur.html n'appelle pas verif1 ou ajout.php, ou il manque un champ ou un bouton."
+  },
+  {
+    "id": "EX25-06",
+    "code": "CSS-02",
+    "titre": "Mise en forme du formulaire (fieldset en pointillé, boutons centrés)",
+    "description": "Le fieldset a une bordure de 2px en pointillé et les boutons sont centrés.",
+    "points": 0.75,
+    "ordre": 6,
+    "fichier": "utilisateur.html",
+    "sonde": {
+      "type": "css_property",
+      "selector": "fieldset",
+      "property": "border-style",
+      "expectedValue": "dotted"
+    },
+    "fail_message": "La bordure du fieldset n'est pas en pointillé ou les boutons ne sont pas centrés."
+  },
+  {
+    "id": "EX25-07",
+    "code": "JS-01",
+    "titre": "Contrôle verif1 : identifiant et nom et prénom",
+    "description": "verif1 exige un identifiant U suivi de 3 chiffres et un nom et prénom alphabétique de 5 à 50 caractères, en utilisant alpha.",
+    "points": 1,
+    "ordre": 7,
+    "fichier": "utilisateur.html",
+    "sonde": { "type": "js_eval", "checkSelector": "#idUtil" },
+    "fail_message": "verif1 ne contrôle pas correctement l'identifiant (U + 3 chiffres) ou le nom et prénom (5 à 50 lettres)."
+  },
+  {
+    "id": "EX25-08",
+    "code": "PHP-01",
+    "titre": "ajout.php : insertion de l'utilisateur et messages",
+    "description": "Le script insère l'utilisateur puis affiche « Utilisateur ajouté avec succès », ou « Erreur d'insertion des données » en cas d'échec.",
+    "points": 2,
+    "ordre": 8,
+    "fichier": "index.html",
+    "sonde": { "type": "dom_selector", "selector": "body" },
+    "fail_message": "ajout.php n'insère pas l'utilisateur ou n'affiche pas les messages demandés."
+  },
+  {
+    "id": "EX25-09",
+    "code": "HTML-03",
+    "titre": "Page droit.html : champs, champ obligatoire, appels de fonctions",
+    "description": "Le champ identifiant est obligatoire, le formulaire appelle verif2 et droit.php, et chaque case appelle choix1, choix2 ou choix3.",
+    "points": 1.75,
+    "ordre": 9,
+    "fichier": "droit.html",
+    "sonde": {
+      "type": "dom_selector",
+      "selector": "form[action=\"droit.php\"][onsubmit*=\"verif2\"] input[required], input[type=\"checkbox\"][onclick*=\"choix1\"], input[type=\"checkbox\"][onclick*=\"choix2\"], input[type=\"checkbox\"][onclick*=\"choix3\"]",
+      "minCount": 4
+    },
+    "fail_message": "droit.html : champ obligatoire, appel de verif2 / droit.php ou appels de choix1, choix2, choix3 manquants."
+  },
+  {
+    "id": "EX25-10",
+    "code": "JS-02",
+    "titre": "Fonctions verif2, choix1, choix2 et choix3",
+    "description": "verif2 impose un document et au moins un droit ; choix1 et choix3 cochent Lecture ; choix2 décoche Écriture et Impression quand Lecture est décochée.",
+    "points": 2,
+    "ordre": 10,
+    "fichier": "droit.html",
+    "sonde": { "type": "js_eval", "checkSelector": "#lecture" },
+    "fail_message": "verif2 ou les fonctions choix1, choix2, choix3 ne respectent pas les règles de cohérence entre les droits."
+  },
+  {
+    "id": "EX25-11",
+    "code": "PHP-02",
+    "titre": "droit.php : utilisateur inexistant, mise à jour ou insertion des droits",
+    "description": "Le script distingue trois cas : utilisateur inexistant, droits déjà attribués (UPDATE) ou nouveaux droits (INSERT), avec le message correspondant.",
+    "points": 4.25,
+    "ordre": 11,
+    "fichier": "index.html",
+    "sonde": { "type": "dom_selector", "selector": "body" },
+    "fail_message": "droit.php ne gère pas correctement l'existence de l'utilisateur, la mise à jour ou l'insertion des droits."
+  },
+  {
+    "id": "EX25-12",
+    "code": "HTML-04",
+    "titre": "Page affichage.html : appel de affichage.php",
+    "description": "Le bouton Afficher envoie le formulaire vers affichage.php.",
+    "points": 0.25,
+    "ordre": 12,
+    "fichier": "affichage.html",
+    "sonde": { "type": "dom_selector", "selector": "form[action=\"affichage.php\"] select#doc" },
+    "fail_message": "affichage.html n'appelle pas affichage.php."
+  },
+  {
+    "id": "EX25-13",
+    "code": "PHP-03",
+    "titre": "affichage.php : droits des utilisateurs pour le document choisi",
+    "description": "Le script affiche le titre avec le nom du document puis, pour chaque utilisateur, son nom et ses droits d'écriture, de lecture et d'impression.",
+    "points": 1.75,
+    "ordre": 13,
+    "fichier": "index.html",
+    "sonde": { "type": "dom_selector", "selector": "body" },
+    "fail_message": "affichage.php n'affiche pas la liste des droits selon le format demandé (jointure droit / utilisateur)."
+  }
+]

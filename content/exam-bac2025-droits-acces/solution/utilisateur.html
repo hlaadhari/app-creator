@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Ajout d'un utilisateur - Futura Horizon AI</title>
+    <link rel="stylesheet" href="mesStyles.css" />
+    <script src="mesControles.js"></script>
+  </head>
+  <body>
+    <form action="ajout.php" method="post" onsubmit="return verif1();">
+      <fieldset>
+        <legend>Ajout d'un utilisateur</legend>
+        <label for="idUtil">Identifiant :</label>
+        <input id="idUtil" name="idUtil" type="text" /><br />
+        <label for="nomPrenom">Nom et prénom :</label>
+        <input id="nomPrenom" name="nomPrenom" type="text" /><br /><br />
+        <div id="divbt">
+          <input name="bt1" type="submit" value="Ajouter" />&nbsp;&nbsp;<input
+            name="bt2"
+            type="reset"
+            value="Annuler"
+          />
+        </div>
+      </fieldset>
+    </form>
+  </body>
+</html>
