@@ -436,6 +436,42 @@ export type Database = {
           },
         ]
       }
+      demandes_enseignant: {
+        Row: {
+          created_at: string
+          etablissement: string
+          id: string
+          message: string
+          motif_refus: string | null
+          statut: string
+          traitee_at: string | null
+          traitee_par: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          etablissement: string
+          id?: string
+          message?: string
+          motif_refus?: string | null
+          statut?: string
+          traitee_at?: string | null
+          traitee_par?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          etablissement?: string
+          id?: string
+          message?: string
+          motif_refus?: string | null
+          statut?: string
+          traitee_at?: string | null
+          traitee_par?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       indices: {
         Row: {
           id: string
@@ -1207,6 +1243,30 @@ export type Database = {
     }
     Functions: {
       admin_anonymiser_eleve: { Args: { _user_id: string }; Returns: undefined }
+      admin_lister_demandes_enseignant: {
+        Args: never
+        Returns: {
+          created_at: string
+          email: string
+          etablissement: string
+          id: string
+          message: string
+          motif_refus: string | null
+          nom: string
+          prenom: string
+          statut: string
+          traitee_at: string | null
+          user_id: string
+        }[]
+      }
+      admin_traiter_demande_enseignant: {
+        Args: { _accepter: boolean; _demande_id: string; _motif?: string }
+        Returns: undefined
+      }
+      demander_acces_enseignant: {
+        Args: { _etablissement: string; _message?: string }
+        Returns: string
+      }
       admin_lister_utilisateurs: {
         Args: never
         Returns: {
