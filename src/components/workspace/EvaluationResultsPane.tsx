@@ -12,6 +12,7 @@ import {
   TrendingUp,
   TrendingDown,
   Equal,
+  Info,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -139,6 +140,9 @@ export function EvaluationResultsPane({
   }
 
   const { note20, earnedPoints, totalPoints, results, totalDurationMs } = summary;
+  const pointsNonVerifiables = summary.pointsNonVerifiables ?? 0;
+  // Aucun critère vérifiable : il n'existe aucune note, on n'affiche donc pas « 0 / 20 ».
+  const aucuneVerification = results.length > 0 && results.every((r) => r.automatique === false);
 
   return (
     <div className="p-4 space-y-4 overflow-auto h-full">
@@ -179,16 +183,26 @@ export function EvaluationResultsPane({
           </span>
         </div>
 
-        <div className="flex items-baseline justify-center gap-1 my-1">
-          <span
-            className={`text-4xl font-mono font-bold ${
-              note20 >= 16 ? "text-emerald-500" : note20 >= 10 ? "text-primary" : "text-amber-500"
-            }`}
-          >
-            {note20}
-          </span>
-          <span className="text-sm font-mono text-muted-foreground">/20</span>
-        </div>
+        {aucuneVerification ? (
+          <div className="my-2 space-y-1">
+            <span className="text-4xl font-mono font-bold text-muted-foreground">—</span>
+            <p className="text-xs text-muted-foreground leading-relaxed">
+              Aucun critère de ce sujet n'est vérifiable automatiquement. Votre travail sera évalué
+              par votre enseignant ; aucune note n'est enregistrée.
+            </p>
+          </div>
+        ) : (
+          <div className="flex items-baseline justify-center gap-1 my-1">
+            <span
+              className={`text-4xl font-mono font-bold ${
+                note20 >= 16 ? "text-emerald-500" : note20 >= 10 ? "text-primary" : "text-amber-500"
+              }`}
+            >
+              {note20}
+            </span>
+            <span className="text-sm font-mono text-muted-foreground">/20</span>
+          </div>
+        )}
 
         {/* Delta didactique par rapport à la tentative précédente */}
         {latestDelta && latestDelta.formattedNoteDelta !== "1re tentative" && (
@@ -214,10 +228,19 @@ export function EvaluationResultsPane({
           </div>
         )}
 
-        <div className="text-xs text-muted-foreground font-mono">
-          {earnedPoints} / {totalPoints} points • {results.filter((r) => r.passed).length} sur{" "}
-          {results.length} critères validés
-        </div>
+        {!aucuneVerification && (
+          <div className="text-xs text-muted-foreground font-mono">
+            {earnedPoints} / {totalPoints} points • {results.filter((r) => r.passed).length} sur{" "}
+            {results.filter((r) => r.automatique !== false).length} critères vérifiables validés
+          </div>
+        )}
+        {pointsNonVerifiables > 0 && !aucuneVerification && (
+          <p className="text-[11px] leading-relaxed text-amber-700 dark:text-amber-300">
+            {pointsNonVerifiables} point{pointsNonVerifiables > 1 ? "s" : ""} sur {totalPoints} ne
+            sont pas vérifiables automatiquement : ils ne sont pas gagnés dans cette note et seront
+            évalués par votre enseignant.
+          </p>
+        )}
       </div>
 
       {/* Liste des critères */}
@@ -241,19 +264,24 @@ export function EvaluationResultsPane({
         <div className="space-y-2">
           {results.map((r, i) => {
             const contestation = getContestationPourCritere(r.id, contestations);
+            const automatique = r.automatique !== false;
 
             return (
               <div
                 key={r.id || i}
                 className={`rounded-lg border p-3 transition-colors ${
-                  r.passed
-                    ? "border-emerald-500/20 bg-emerald-500/5 dark:bg-emerald-500/10"
-                    : "border-amber-500/30 bg-amber-500/5 dark:bg-amber-500/10"
+                  !automatique
+                    ? "border-border bg-muted/30"
+                    : r.passed
+                      ? "border-emerald-500/20 bg-emerald-500/5 dark:bg-emerald-500/10"
+                      : "border-amber-500/30 bg-amber-500/5 dark:bg-amber-500/10"
                 }`}
               >
                 <div className="flex items-start justify-between gap-2">
                   <div className="flex items-start gap-2">
-                    {r.passed ? (
+                    {!automatique ? (
+                      <Info className="h-4 w-4 text-muted-foreground shrink-0 mt-0.5" />
+                    ) : r.passed ? (
                       <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0 mt-0.5" />
                     ) : (
                       <AlertCircle className="h-4 w-4 text-amber-500 shrink-0 mt-0.5" />
@@ -262,9 +290,11 @@ export function EvaluationResultsPane({
                       <div className="text-xs font-semibold text-foreground">{r.label}</div>
                       <p
                         className={`text-[11px] mt-0.5 leading-relaxed ${
-                          r.passed
-                            ? "text-emerald-700 dark:text-emerald-300"
-                            : "text-amber-700 dark:text-amber-300"
+                          !automatique
+                            ? "text-muted-foreground"
+                            : r.passed
+                              ? "text-emerald-700 dark:text-emerald-300"
+                              : "text-amber-700 dark:text-amber-300"
                         }`}
                       >
                         {r.message}
@@ -279,12 +309,12 @@ export function EvaluationResultsPane({
                         : "bg-muted text-muted-foreground border-border"
                     }`}
                   >
-                    +{r.points} / {r.maxPoints} pts
+                    {automatique ? `+${r.points} / ${r.maxPoints} pts` : `${r.maxPoints} pts`}
                   </span>
                 </div>
 
                 {/* Section Contestation pour les critères non validés */}
-                {!r.passed && (
+                {!r.passed && automatique && (
                   <div className="mt-2.5 pt-2 border-t border-border/50 flex items-center justify-between text-xs">
                     {contestation ? (
                       <div className="flex items-center gap-1.5">

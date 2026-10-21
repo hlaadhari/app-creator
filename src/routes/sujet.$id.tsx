@@ -206,7 +206,9 @@ function Workspace() {
         const duration = Math.round(performance.now() - startTime);
         const sc = score(r);
         const n = sc.note20;
-        updateBestScore(n);
+        // Sans critère vérifiable, aucune note n'existe : ni meilleur score ni tentative enregistrée.
+        const notable = sc.verifiable > 0;
+        if (notable) updateBestScore(n);
 
         const summary: EvaluationSummary = {
           results: r.map((c) => ({
@@ -218,9 +220,11 @@ function Workspace() {
             passed: c.ok,
             message: c.message,
             durationMs: 12,
+            automatique: c.automatique,
           })),
           earnedPoints: sc.got,
           totalPoints: sc.total,
+          pointsNonVerifiables: sc.nonVerifiable,
           note20: sc.note20,
           totalDurationMs: duration,
           evaluatedAt: Date.now(),
@@ -229,29 +233,31 @@ function Workspace() {
         setEvaluationSummary(summary);
         setSidebarTab("resultats");
 
-        enregistrerTentative({
-          sujetId: id,
-          pointsObtenus: sc.got,
-          pointsTotal: sc.total,
-          note20: sc.note20,
-          details: Object.fromEntries(r.map((c) => [c.id, { ok: c.ok, label: c.label }])),
-        });
+        if (notable) {
+          enregistrerTentative({
+            sujetId: id,
+            pointsObtenus: sc.got,
+            pointsTotal: sc.total,
+            note20: sc.note20,
+            details: Object.fromEntries(r.map((c) => [c.id, { ok: c.ok, label: c.label }])),
+          });
 
-        enregistrerNouvelleTentative({
-          sujetId: id,
-          note20: sc.note20,
-          pointsObtenus: sc.got,
-          pointsTotal: sc.total,
-          dureeMs: duration,
-          criteres: r.map((c) => ({
-            id: c.id,
-            label: c.label,
-            ok: c.ok,
-            points: c.ok ? c.points : 0,
-            maxPoints: c.points,
-            message: c.message,
-          })),
-        });
+          enregistrerNouvelleTentative({
+            sujetId: id,
+            note20: sc.note20,
+            pointsObtenus: sc.got,
+            pointsTotal: sc.total,
+            dureeMs: duration,
+            criteres: r.map((c) => ({
+              id: c.id,
+              label: c.label,
+              ok: c.ok,
+              points: c.ok ? c.points : 0,
+              maxPoints: c.points,
+              message: c.message,
+            })),
+          });
+        }
       } catch (err) {
         console.error("Erreur lors de l'évaluation formative :", err);
         frame.remove();
@@ -448,11 +454,12 @@ function Workspace() {
             >
               <CheckCircle2 className="h-3.5 w-3.5" />
               <span>Résultats</span>
-              {evaluationSummary && (
-                <span className="ml-1 px-1 rounded-full bg-primary/20 text-[10px] text-primary">
-                  {evaluationSummary.note20}/20
-                </span>
-              )}
+              {evaluationSummary &&
+                evaluationSummary.results.some((r) => r.automatique !== false) && (
+                  <span className="ml-1 px-1 rounded-full bg-primary/20 text-[10px] text-primary">
+                    {evaluationSummary.note20}/20
+                  </span>
+                )}
             </button>
             {!isExamMode && (
               <button

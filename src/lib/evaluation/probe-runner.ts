@@ -50,12 +50,16 @@ export interface CriterionEvaluationResult {
   passed: boolean;
   message: string;
   durationMs: number;
+  /** Faux : aucune vérification automatique réelle (critère évalué par l'enseignant). */
+  automatique?: boolean;
 }
 
 export interface EvaluationSummary {
   results: CriterionEvaluationResult[];
   earnedPoints: number;
   totalPoints: number;
+  /** Points de critères sans vérification automatique, jamais comptés dans la note. */
+  pointsNonVerifiables?: number;
   note20: number;
   totalDurationMs: number;
   evaluatedAt: number;
