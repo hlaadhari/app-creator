@@ -1299,6 +1299,10 @@ export type Database = {
         }
         Returns: number
       }
+      critere_libelles: {
+        Args: { _ids: string[] }
+        Returns: { code: string; id: string; label: string }[]
+      }
       debloquer_indice: { Args: { _version_id: string }; Returns: string }
       debloquer_solution: {
         Args: { p_motif?: string; p_version_id: string }
