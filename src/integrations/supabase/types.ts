@@ -1328,6 +1328,10 @@ export type Database = {
         Returns: boolean
       }
       initialiser_projet: { Args: { _version_id: string }; Returns: string }
+      journaliser_incident: {
+        Args: { _meta?: Json; _type: string }
+        Returns: undefined
+      }
       lancer_coup_denvoi_examen: {
         Args: { p_session_id: string }
         Returns: Json

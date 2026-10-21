@@ -322,22 +322,20 @@ fieldset { border: 2px solid #2563eb; border-radius: 8px; padding: 1.5rem; }`,
 
 /**
  * Journalise une tentative suspecte d'accès au corrigé en plein examen.
+ * Passe par la fonction SQL journaliser_incident : l'acteur et la date sont imposés par le serveur.
  */
 async function journaliserTentativeFraude(sujetId: string, motif?: string): Promise<void> {
   try {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    await supabase.from("journal_securite").insert({
-      type: "TENTATIVE_ACCES_CORRIGE_EN_EXAMEN",
-      acteur_id: user?.id ?? null,
-      meta: {
+    const { error } = await supabase.rpc("journaliser_incident", {
+      _type: "TENTATIVE_ACCES_CORRIGE_EN_EXAMEN",
+      _meta: {
         sujet_id: sujetId,
         motif: motif ?? "Tentative d'ouverture de corrigé en examen",
-        client_timestamp: new Date().toISOString(),
       },
     });
+    if (error) {
+      console.warn("[Sécurité] Incident non consigné :", error.message);
+    }
   } catch (err) {
     console.warn("[Sécurité] Échec consignation incident :", err);
   }

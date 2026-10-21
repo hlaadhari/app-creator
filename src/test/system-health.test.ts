@@ -19,6 +19,7 @@ const etatSain: EtatSysteme = {
   droitsClientsCorriges: 0,
   tablesAnonEcriture: [],
   ecritureDirecteUserRoles: false,
+  ecritureDirecteJournal: false,
   triggersImmuabiliteAttendus: 8,
   triggersImmuabilitePresents: 8,
 };
@@ -42,6 +43,7 @@ describe("État réel du système pour /admin (issue #54)", () => {
           droits_clients_corriges: 2,
           tables_anon_ecriture: ["user_roles"],
           ecriture_directe_user_roles: true,
+          ecriture_directe_journal: true,
           triggers_immuabilite_attendus: 8,
           triggers_immuabilite_presents: 7,
         },
@@ -57,6 +59,7 @@ describe("État réel du système pour /admin (issue #54)", () => {
         droitsClientsCorriges: 2,
         tablesAnonEcriture: ["user_roles"],
         ecritureDirecteUserRoles: true,
+        ecritureDirecteJournal: true,
         triggersImmuabilitePresents: 7,
       });
     });
@@ -95,6 +98,14 @@ describe("État réel du système pour /admin (issue #54)", () => {
         x.libelle.includes("Rôles"),
       );
       expect(c?.ok).toBe(false);
+    });
+
+    it("signale une écriture directe possible sur le journal de sécurité", () => {
+      const c = controlesEnDirect({ ...etatSain, ecritureDirecteJournal: true }).find((x) =>
+        x.libelle.includes("Journal"),
+      );
+      expect(c?.ok).toBe(false);
+      expect(controlesEnDirect(etatSain).find((x) => x.libelle.includes("Journal"))?.ok).toBe(true);
     });
 
     it("signale un trigger d'immuabilité manquant", () => {
