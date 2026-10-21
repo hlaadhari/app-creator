@@ -48,6 +48,24 @@ async function journaliserTentativeFraude(sujetId: string, motif?: string): Prom
 }
 
 /**
+ * Dernière version publiée d'un sujet (métadonnées uniquement, aucun corrigé).
+ */
+async function resoudreVersionPubliee(sujetId: string): Promise<string | null> {
+  const { data, error } = await supabase
+    .from("sujet_versions")
+    .select("id")
+    .eq("sujet_id", sujetId)
+    .eq("publiee", true)
+    .order("numero", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  if (error) {
+    throw new Error(error.message);
+  }
+  return data?.id ?? null;
+}
+
+/**
  * Consulte le corrigé officiel de référence d'un sujet (PRD F-44, T-04, T-06).
  * Refus par défaut : sans version publiée ou sans réponse du serveur, aucun corrigé n'est affiché.
  */
@@ -63,15 +81,18 @@ export async function consulterSolutionReference(params: {
     return { success: false, error: MESSAGE_EXAMEN };
   }
 
-  // 2. Sans version publiée en base, il n'existe aucun corrigé à servir.
-  if (!params.versionId) {
-    return { success: false, error: MESSAGE_NON_PUBLIE };
-  }
-
-  // 3. Seule source : la fonction serveur debloquer_solution (examen, journal d'accès).
+  // 2. Seule source : la fonction serveur debloquer_solution (examen, journal d'accès).
   try {
+    // Sans version transmise, on retrouve la dernière version publiée du sujet.
+    const versionId = params.versionId ?? (await resoudreVersionPubliee(params.sujetId));
+
+    // Sans version publiée en base, il n'existe aucun corrigé à servir.
+    if (!versionId) {
+      return { success: false, error: MESSAGE_NON_PUBLIE };
+    }
+
     const { data, error } = await supabase.rpc("debloquer_solution", {
-      p_version_id: params.versionId,
+      p_version_id: versionId,
       p_motif: params.motif ?? "consultation_eleve",
     });
 

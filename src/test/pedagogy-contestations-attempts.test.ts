@@ -315,15 +315,5 @@ describe("Pédagogie & Résilience Élève (Issue #32 - PRD F-44, F-45, T-04, T-
       expect(res.error).toContain("session d'examen est active");
       expect(res.files).toBeUndefined();
     });
-
-    it("n'affiche aucun corrigé sans version publiée en base, même hors examen (plus de catalogue embarqué)", async () => {
-      for (const sujetId of ["carte-profil", "ex-html-css-01", "sujet-inexistant-404"]) {
-        const res = await consulterSolutionReference({ sujetId, estEnExamen: false });
-
-        expect(res.success).toBe(false);
-        expect(res.files).toBeUndefined();
-        expect(res.error).toContain("pas encore publié");
-      }
-    });
   });
 });

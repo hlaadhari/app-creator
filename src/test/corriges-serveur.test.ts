@@ -2,7 +2,25 @@ import { readFileSync } from "node:fs";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const rpc = vi.hoisted(() => vi.fn());
-vi.mock("@/integrations/supabase/client", () => ({ supabase: { rpc } }));
+const versionPubliee = vi.hoisted(() => vi.fn());
+const ordre = vi.hoisted(() => vi.fn());
+vi.mock("@/integrations/supabase/client", () => ({
+  supabase: {
+    rpc,
+    from: (table: string) => ({
+      select: () => ({
+        eq: (colonne: string, valeur: unknown) => ({
+          eq: (colonne2: string, valeur2: unknown) => ({
+            order: (...args: unknown[]) => {
+              ordre(table, colonne, valeur, colonne2, valeur2, ...args);
+              return { limit: () => ({ maybeSingle: versionPubliee }) };
+            },
+          }),
+        }),
+      }),
+    }),
+  },
+}));
 
 import { consulterSolutionReference } from "@/lib/pedagogy/solutions-client";
 
@@ -11,6 +29,8 @@ const VERSION = "11111111-0000-0000-0000-000000000001";
 describe("Corrigés servis uniquement par le serveur (issue #75, T-04 / T-06)", () => {
   beforeEach(() => {
     rpc.mockReset();
+    versionPubliee.mockReset();
+    ordre.mockReset();
     vi.spyOn(console, "warn").mockImplementation(() => undefined);
   });
 
@@ -42,14 +62,63 @@ describe("Corrigés servis uniquement par le serveur (issue #75, T-04 / T-06)", 
     expect(res.files).toEqual([{ path: "index.html", content: "<h1>Corrigé</h1>" }]);
   });
 
-  it("n'appelle pas le serveur sans version publiée", async () => {
-    const res = await consulterSolutionReference({ sujetId: "ex-js-01", versionId: null });
+  it("retrouve la dernière version publiée du sujet quand l'écran n'en transmet pas", async () => {
+    versionPubliee.mockResolvedValue({ data: { id: VERSION }, error: null });
+    rpc.mockResolvedValue({
+      data: [{ id: "s1", chemin: "index.html", contenu: "<h1>Corrigé</h1>" }],
+      error: null,
+    });
+
+    const res = await consulterSolutionReference({ sujetId: "carte-profil" });
+
+    expect(ordre).toHaveBeenCalledWith(
+      "sujet_versions",
+      "sujet_id",
+      "carte-profil",
+      "publiee",
+      true,
+      "numero",
+      { ascending: false },
+    );
+    expect(rpc).toHaveBeenCalledWith("debloquer_solution", {
+      p_version_id: VERSION,
+      p_motif: "consultation_eleve",
+    });
+    expect(res.success).toBe(true);
+    expect(res.files).toHaveLength(1);
+  });
+
+  it("n'interroge pas la base des versions quand la version est déjà connue", async () => {
+    rpc.mockResolvedValue({
+      data: [{ id: "s1", chemin: "a.js", contenu: "x" }],
+      error: null,
+    });
+
+    await consulterSolutionReference({ sujetId: "carte-profil", versionId: VERSION });
+
+    expect(ordre).not.toHaveBeenCalled();
+  });
+
+  it("indique « pas encore publié » et n'appelle pas debloquer_solution si le sujet n'a aucune version publiée", async () => {
+    versionPubliee.mockResolvedValue({ data: null, error: null });
+
+    const res = await consulterSolutionReference({ sujetId: "ex-js-01" });
 
     expect(rpc).not.toHaveBeenCalled();
     expect(res).toEqual({
       success: false,
       error: "Le corrigé de ce sujet n'est pas encore publié.",
     });
+  });
+
+  it("refuse par défaut si la version du sujet ne peut pas être lue", async () => {
+    versionPubliee.mockResolvedValue({ data: null, error: { message: "indisponible" } });
+
+    const res = await consulterSolutionReference({ sujetId: "carte-profil" });
+
+    expect(rpc).not.toHaveBeenCalled();
+    expect(res.success).toBe(false);
+    expect(res.error).toContain("momentanément indisponible");
   });
 
   it("n'appelle pas le serveur quand le poste signale un examen, et signale l'incident", async () => {
