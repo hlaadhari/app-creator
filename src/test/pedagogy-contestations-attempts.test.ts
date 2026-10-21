@@ -316,37 +316,14 @@ describe("Pédagogie & Résilience Élève (Issue #32 - PRD F-44, F-45, T-04, T-
       expect(res.files).toBeUndefined();
     });
 
-    it("autorise l'accès aux corrigés de référence en mode entraînement normal hors examen", async () => {
-      const res = await consulterSolutionReference({
-        sujetId: "carte-profil",
-        estEnExamen: false,
-      });
+    it("n'affiche aucun corrigé sans version publiée en base, même hors examen (plus de catalogue embarqué)", async () => {
+      for (const sujetId of ["carte-profil", "ex-html-css-01", "sujet-inexistant-404"]) {
+        const res = await consulterSolutionReference({ sujetId, estEnExamen: false });
 
-      expect(res.success).toBe(true);
-      expect(res.files).toBeDefined();
-      expect(res.files?.length).toBeGreaterThan(0);
-      expect(res.files?.some((f) => f.path === "index.html")).toBe(true);
-      expect(res.dateDeblocage).toBeDefined();
-    });
-
-    it("donne accès au corrigé officiel des exercices formatifs Module A hors examen", async () => {
-      const res = await consulterSolutionReference({
-        sujetId: "ex-html-css-01",
-        estEnExamen: false,
-      });
-
-      expect(res.success).toBe(true);
-      expect(res.files?.some((f) => f.path === "style.css")).toBe(true);
-    });
-
-    it("renvoie une erreur propre si aucun corrigé n'existe pour un sujet non répertorié", async () => {
-      const res = await consulterSolutionReference({
-        sujetId: "sujet-inexistant-404",
-        estEnExamen: false,
-      });
-
-      expect(res.success).toBe(false);
-      expect(res.error).toContain("Aucun corrigé de référence officiel");
+        expect(res.success).toBe(false);
+        expect(res.files).toBeUndefined();
+        expect(res.error).toContain("pas encore publié");
+      }
     });
   });
 });
