@@ -9,6 +9,11 @@ export type Criterion = {
   points: number;
   /** Message affiché en cas d'échec */
   fail: string;
+  /**
+   * Faux quand le critère n'a aucune vérification automatique réelle (sonde absente, trop
+   * générale ou non exécutable ici). Il n'est alors jamais validé et n'entre pas dans la note.
+   */
+  automatique?: boolean;
   check: (doc: Document, win: Window) => boolean;
 };
 
@@ -268,22 +273,54 @@ export function buildDocument(files: Files): string {
   return html;
 }
 
-export type Result = { id: string; label: string; points: number; ok: boolean; message: string };
+export type Result = {
+  id: string;
+  label: string;
+  points: number;
+  ok: boolean;
+  /** Faux : aucune vérification automatique réelle n'existe pour ce critère. */
+  automatique: boolean;
+  message: string;
+};
+
+export const MESSAGE_NON_VERIFIABLE =
+  "Vérification automatique indisponible : ce critère sera évalué par votre enseignant.";
 
 export function runCriteria(criteria: Criterion[], doc: Document, win: Window): Result[] {
   return criteria.map((c) => {
+    const automatique = c.automatique !== false;
     let ok = false;
-    try {
-      ok = c.check(doc, win);
-    } catch {
-      ok = false;
+    // Échec par défaut : un critère sans vérification réelle n'est jamais validé.
+    if (automatique) {
+      try {
+        ok = c.check(doc, win);
+      } catch {
+        ok = false;
+      }
     }
-    return { id: c.id, label: c.label, points: c.points, ok, message: ok ? "Validé" : c.fail };
+    return {
+      id: c.id,
+      label: c.label,
+      points: c.points,
+      ok,
+      automatique,
+      message: !automatique ? MESSAGE_NON_VERIFIABLE : ok ? "Validé" : c.fail,
+    };
   });
 }
 
 export function score(results: Result[]) {
   const total = results.reduce((s, r) => s + r.points, 0);
   const got = results.reduce((s, r) => s + (r.ok ? r.points : 0), 0);
-  return { got, total, note20: total ? Math.round((got / total) * 200) / 10 : 0 };
+  const verifiable = results.reduce((s, r) => s + (r.automatique ? r.points : 0), 0);
+  return {
+    got,
+    total,
+    /** Points de critères vérifiables automatiquement. */
+    verifiable,
+    /** Points de critères sans vérification automatique : jamais comptés dans la note. */
+    nonVerifiable: total - verifiable,
+    // Note prudente sur le total : les points non vérifiables ne sont jamais gagnés d'office.
+    note20: total ? Math.round((got / total) * 200) / 10 : 0,
+  };
 }

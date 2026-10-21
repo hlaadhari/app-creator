@@ -11,6 +11,29 @@ interface RawProbe {
   [key: string]: unknown;
 }
 
+// Sélecteurs présents dans toute page : une sonde qui les vise est vraie même pour une page vide.
+const SELECTEURS_TOUJOURS_PRESENTS = new Set(["html", "head", "body", ":root", "*"]);
+
+/**
+ * Une sonde est vérifiable seulement si elle teste un résultat observable qu'une page vide ne
+ * satisfait pas : absence de sonde, sélecteur toujours présent, ou js_eval qui ne teste que
+ * l'existence d'un champ (sans exécuter le code de l'élève) ne vérifient rien.
+ */
+export function sondeEstVerifiable(probe: RawProbe | null | undefined): boolean {
+  if (!probe || typeof probe !== "object") return false;
+  switch (probe.type) {
+    case "dom_selector": {
+      const selecteur = probe.selector?.trim().toLowerCase();
+      return !!selecteur && !SELECTEURS_TOUJOURS_PRESENTS.has(selecteur);
+    }
+    case "css_property":
+      return !!probe.selector?.trim() && !!probe.property?.trim();
+    default:
+      // js_eval (existence seule) et types inconnus : non vérifiables automatiquement.
+      return false;
+  }
+}
+
 interface RawCriterion {
   id?: string;
   code?: string;
@@ -27,7 +50,8 @@ function makeProbeCheck(
   probe: RawProbe | null | undefined,
 ): (doc: Document, win: Window) => boolean {
   return (doc: Document, win: Window) => {
-    if (!probe) return true;
+    // Échec par défaut : sans sonde réellement vérifiable, le critère n'est jamais validé.
+    if (!sondeEstVerifiable(probe) || !probe) return false;
     try {
       if (probe.type === "dom_selector") {
         if (!probe.selector) return false;
@@ -44,14 +68,7 @@ function makeProbeCheck(
         if (probe.isGreaterThanZero) return parseFloat(val) > 0;
         return val.length > 0;
       }
-      if (probe.type === "js_eval") {
-        if (probe.checkSelector) {
-          const el = doc.querySelector(probe.checkSelector);
-          return !!el;
-        }
-        return true;
-      }
-      return true;
+      return false;
     } catch {
       return false;
     }
@@ -1595,6 +1612,7 @@ export const contentSubjects: SubjectContentItem[] = rawSubjects.map((item) => (
     label: (c.titre as string) || (c.label as string) || "Critère",
     points: c.points,
     fail: (c.fail_message as string) || (c.fail as string) || "Critère non satisfait",
-    check: makeProbeCheck(c.sonde || c),
+    automatique: sondeEstVerifiable(c.sonde),
+    check: makeProbeCheck(c.sonde),
   })),
 }));
