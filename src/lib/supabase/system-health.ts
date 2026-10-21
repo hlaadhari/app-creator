@@ -14,6 +14,7 @@ export interface EtatSysteme {
   droitsClientsCorriges: number;
   tablesAnonEcriture: string[];
   ecritureDirecteUserRoles: boolean;
+  ecritureDirecteJournal: boolean;
   triggersImmuabiliteAttendus: number;
   triggersImmuabilitePresents: number;
 }
@@ -62,6 +63,7 @@ export async function getEtatSysteme(): Promise<EtatSysteme> {
     droitsClientsCorriges: enNombre(d["droits_clients_corriges"]),
     tablesAnonEcriture: enListe(d["tables_anon_ecriture"]),
     ecritureDirecteUserRoles: d["ecriture_directe_user_roles"] === true,
+    ecritureDirecteJournal: d["ecriture_directe_journal"] === true,
     triggersImmuabiliteAttendus: enNombre(d["triggers_immuabilite_attendus"]),
     triggersImmuabilitePresents: enNombre(d["triggers_immuabilite_presents"]),
   };
@@ -99,6 +101,14 @@ export function controlesEnDirect(etat: EtatSysteme): ControleDirect[] {
         etat.droitsClientsCorriges === 0
           ? "0 droit accordé à anon ou authenticated"
           : `${etat.droitsClientsCorriges} droit(s) accordé(s) à anon ou authenticated`,
+    },
+    {
+      codes: [],
+      libelle: "Journal de sécurité non falsifiable",
+      ok: !etat.ecritureDirecteJournal,
+      detail: etat.ecritureDirecteJournal
+        ? "Un utilisateur connecté peut écrire directement dans le journal"
+        : "Alimenté uniquement par des fonctions contrôlées",
     },
     {
       codes: ["T-09", "T-13"],
