@@ -15,6 +15,7 @@ import {
   MOCK_ADMIN_METRICS,
 } from "@/lib/supabase/admin";
 import { exercises } from "@/lib/exercises";
+import { estModeDemo } from "@/lib/demo-mode";
 import {
   adminListerDemandesEnseignant,
   type DemandeEnseignant,
@@ -64,14 +65,10 @@ export const Route = createFileRoute("/admin")({
 });
 
 function AdminDashboardPage() {
-  const { user, profile, role, loading: authLoading } = useAuth();
+  const { user, profile, role, authError, loading: authLoading } = useAuth();
 
-  const [isDemo, setIsDemo] = useState(() => {
-    if (typeof window !== "undefined") {
-      return new URLSearchParams(window.location.search).get("demo") === "true";
-    }
-    return false;
-  });
+  // Mode démo réservé au développement (ignoré en production).
+  const [isDemo] = useState(estModeDemo);
 
   const [users, setUsers] = useState<AdminUser[]>([]);
   const [metrics, setMetrics] = useState<AdminMetrics>(MOCK_ADMIN_METRICS);
@@ -237,9 +234,11 @@ function AdminDashboardPage() {
           </div>
           <h1 className="text-xl font-bold text-foreground">Accès Réservé à l'Administration</h1>
           <p className="text-xs text-muted-foreground leading-relaxed">
-            {user
-              ? `Votre compte connecté (${user.email}) possède le rôle "${role}". L'espace d'administration nécessite le rôle administrateur.`
-              : "Vous devez être connecté avec le compte administrateur (hatem.laadhari.dev01@gmail.com) pour accéder à cette interface."}
+            {authError
+              ? `Impossible de vérifier vos droits d'accès : ${authError}`
+              : user
+                ? `Votre compte connecté (${user.email}) possède le rôle "${role}". L'espace d'administration nécessite le rôle administrateur.`
+                : "Vous devez être connecté avec un compte administrateur pour accéder à cette interface."}
           </p>
           <div className="pt-2 flex flex-col gap-2">
             <Link

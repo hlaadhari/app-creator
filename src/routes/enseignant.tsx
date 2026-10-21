@@ -53,6 +53,7 @@ import {
 import { telechargerExportPronote } from "@/lib/export/pronote-export";
 import { SimilarityAnalysisTab } from "@/components/teacher/SimilarityAnalysisTab";
 import { TeacherAccessRequest } from "@/components/teacher/TeacherAccessRequest";
+import { estModeDemo } from "@/lib/demo-mode";
 import type { StudentCopyData } from "@/lib/similarity/types";
 
 export const Route = createFileRoute("/enseignant")({
@@ -476,15 +477,11 @@ monFormulaire.addEventListener("submit", function(e) {
 ];
 
 function TeacherDashboardPage() {
-  const { user, profile, role, loading: authLoading } = useAuth();
+  const { user, profile, role, authError, loading: authLoading } = useAuth();
   const navigate = useNavigate();
 
-  const [isDemo, setIsDemo] = useState(() => {
-    if (typeof window !== "undefined") {
-      return new URLSearchParams(window.location.search).get("demo") === "true";
-    }
-    return false;
-  });
+  // Mode démo réservé au développement (ignoré en production).
+  const [isDemo] = useState(estModeDemo);
 
   const [classes, setClasses] = useState<TeacherClass[]>([]);
   const [selectedClassId, setSelectedClassId] = useState<string | null>(null);
@@ -495,6 +492,7 @@ function TeacherDashboardPage() {
   const [realCopies, setRealCopies] = useState<StudentCopyData[]>([]);
 
   const [loadingData, setLoadingData] = useState(false);
+  const [erreurChargement, setErreurChargement] = useState<string | null>(null);
   const [isCreatingClass, setIsCreatingClass] = useState(false);
   const [newClassName, setNewClassName] = useState("");
   const [newClassError, setNewClassError] = useState<string | null>(null);
@@ -516,13 +514,19 @@ function TeacherDashboardPage() {
 
     if (!user) return;
     setLoadingData(true);
-    const cls = await getTeacherClasses(user.id);
-    setClasses(cls);
-    if (cls.length > 0 && !selectedClassId) {
-      const firstId = cls[0]?.id;
-      if (firstId) setSelectedClassId(firstId);
+    setErreurChargement(null);
+    try {
+      const cls = await getTeacherClasses(user.id);
+      setClasses(cls);
+      if (cls.length > 0 && !selectedClassId) {
+        const firstId = cls[0]?.id;
+        if (firstId) setSelectedClassId(firstId);
+      }
+    } catch (e) {
+      setErreurChargement(e instanceof Error ? e.message : "Chargement des classes impossible.");
+    } finally {
+      setLoadingData(false);
     }
-    setLoadingData(false);
   };
 
   // Charger les données de la classe sélectionnée
@@ -537,22 +541,28 @@ function TeacherDashboardPage() {
     }
 
     setLoadingData(true);
+    setErreurChargement(null);
     const currentClass = classes.find((c) => c.id === classId);
     const className = currentClass?.nom || "Classe";
 
-    const [progress, invs, conts, attempts, copies] = await Promise.all([
-      getClassStudentsProgress(classId),
-      getClassInvitations(classId),
-      getClassContestations(classId, className),
-      getClassStudentAttempts(classId),
-      getClassStudentCopies(classId),
-    ]);
-    setStudents(progress);
-    setInvitations(invs);
-    setContestations(conts);
-    setStudentAttempts(attempts);
-    setRealCopies(copies);
-    setLoadingData(false);
+    try {
+      const [progress, invs, conts, attempts, copies] = await Promise.all([
+        getClassStudentsProgress(classId),
+        getClassInvitations(classId),
+        getClassContestations(classId, className),
+        getClassStudentAttempts(classId),
+        getClassStudentCopies(classId),
+      ]);
+      setStudents(progress);
+      setInvitations(invs);
+      setContestations(conts);
+      setStudentAttempts(attempts);
+      setRealCopies(copies);
+    } catch (e) {
+      setErreurChargement(e instanceof Error ? e.message : "Chargement de la classe impossible.");
+    } finally {
+      setLoadingData(false);
+    }
   };
 
   useEffect(() => {
@@ -671,9 +681,11 @@ function TeacherDashboardPage() {
           </div>
           <h1 className="text-xl font-bold text-foreground">Accès Réservé aux Enseignants</h1>
           <p className="text-xs text-muted-foreground leading-relaxed">
-            {user
-              ? `Votre compte connecté (${user.email}) possède le rôle "${role}". L'espace de supervision de classe requiert le rôle enseignant.`
-              : "Vous devez être connecté avec un compte enseignant ou administrateur pour accéder à cette interface."}
+            {authError
+              ? `Impossible de vérifier vos droits d'accès : ${authError}`
+              : user
+                ? `Votre compte connecté (${user.email}) possède le rôle "${role}". L'espace de supervision de classe requiert le rôle enseignant.`
+                : "Vous devez être connecté avec un compte enseignant ou administrateur pour accéder à cette interface."}
           </p>
           {user && role === "eleve" && <TeacherAccessRequest />}
           <div className="pt-2 flex flex-col gap-2">
@@ -767,6 +779,19 @@ function TeacherDashboardPage() {
           </Button>
         </div>
       </header>
+
+      {erreurChargement && (
+        <div
+          role="alert"
+          className="bg-destructive/10 border-b border-destructive/20 px-6 py-2 text-xs text-destructive font-medium flex items-center gap-2"
+        >
+          <AlertTriangle className="w-4 h-4 shrink-0" />
+          <span>
+            Données indisponibles, les chiffres affichés peuvent être incomplets :{" "}
+            {erreurChargement}
+          </span>
+        </div>
+      )}
 
       {/* Contenu principal */}
       <main className="flex-1 p-6 max-w-7xl w-full mx-auto space-y-6">
