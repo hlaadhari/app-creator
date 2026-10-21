@@ -8,6 +8,7 @@ import { SyncStatusBar } from "@/components/workspace/SyncStatusBar";
 import { ConflictModal } from "@/components/workspace/ConflictModal";
 import { EvaluationResultsPane } from "@/components/workspace/EvaluationResultsPane";
 import { SubjectStatement } from "@/components/workspace/SubjectStatement";
+import { construireDocumentEvaluation } from "@/lib/evaluation/document-evaluation";
 import { debloquerNiveauIndice, type UnlockedHint } from "@/lib/evaluation/hints-service";
 import { calculerCompteARebours, getTempsServeurSynchronise } from "@/lib/exam/server-clock";
 import type { EvaluationSummary } from "@/lib/evaluation/probe-runner";
@@ -179,22 +180,10 @@ function Workspace() {
     frame.style.cssText = "position:absolute;width:800px;height:600px;left:-9999px;";
     document.body.appendChild(frame);
 
-    // Extraction du contenu HTML pour les tests
-    const htmlKey =
-      files["index.html"] !== undefined
-        ? "index.html"
-        : (Object.keys(files).find((k) => k.endsWith(".html")) ?? "index.html");
-    const html = files[htmlKey]?.content ?? "";
-    const css = Object.entries(files)
-      .filter(([k]) => k.endsWith(".css"))
-      .map(([, f]) => f.content)
-      .join("\n");
-    const js = Object.entries(files)
-      .filter(([k]) => k.endsWith(".js"))
-      .map(([, f]) => f.content)
-      .join("\n");
-
-    const combinedDoc = `<!DOCTYPE html><html><head><style>${css}</style></head><body>${html.replace(/<!DOCTYPE.*?>/i, "")}<script>${js}</script></body></html>`;
+    // Page de l'élève assemblée comme dans les tests de notation (constructeur partagé)
+    const combinedDoc = construireDocumentEvaluation(
+      Object.fromEntries(Object.entries(files).map(([nom, f]) => [nom, f.content])),
+    );
 
     frame.onload = () => {
       try {
