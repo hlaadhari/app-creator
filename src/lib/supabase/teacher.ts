@@ -5,6 +5,28 @@ import type {
 } from "@/lib/subjects/contestations-service";
 import type { StudentCopyData } from "@/lib/similarity/types";
 
+/**
+ * Erreur de lecture des données enseignant : l'interface l'affiche au lieu de montrer
+ * une liste vide trompeuse (« 0 élève »).
+ */
+export class ErreurChargementEnseignant extends Error {}
+
+function erreurChargement(contexte: string, cause: unknown): ErreurChargementEnseignant {
+  const detail =
+    cause instanceof Error
+      ? cause.message
+      : typeof cause === "object" && cause !== null && "message" in cause
+        ? String((cause as { message: unknown }).message)
+        : String(cause);
+  console.error(`[Teacher] ${contexte}`, cause);
+  return new ErreurChargementEnseignant(`${contexte} : ${detail}`);
+}
+
+function relancer(contexte: string, err: unknown): never {
+  if (err instanceof ErreurChargementEnseignant) throw err;
+  throw erreurChargement(contexte, err);
+}
+
 export interface TeacherClass {
   id: string;
   nom: string;
@@ -59,10 +81,8 @@ export async function getTeacherClasses(teacherId: string): Promise<TeacherClass
       .eq("archivee", false)
       .order("created_at", { ascending: false });
 
-    if (classesError || !classesData) {
-      console.warn("[Teacher] Erreur lors de la récupération des classes :", classesError);
-      return [];
-    }
+    if (classesError) throw erreurChargement("Chargement des classes impossible", classesError);
+    if (!classesData) return [];
 
     // Enrichir avec le décompte des membres et des sujets
     const classesWithCounts: TeacherClass[] = await Promise.all(
@@ -93,8 +113,7 @@ export async function getTeacherClasses(teacherId: string): Promise<TeacherClass
 
     return classesWithCounts;
   } catch (err) {
-    console.error("[Teacher] Erreur inattendue :", err);
-    return [];
+    return relancer("Chargement des classes impossible", err);
   }
 }
 
@@ -143,11 +162,10 @@ export async function getClassInvitations(classId: string): Promise<ClassInvitat
       .eq("class_id", classId)
       .order("created_at", { ascending: false });
 
-    if (error || !data) return [];
-    return data as ClassInvitationRecord[];
+    if (error) throw erreurChargement("Chargement des codes d'invitation impossible", error);
+    return (data ?? []) as ClassInvitationRecord[];
   } catch (err) {
-    console.warn("[Teacher] Erreur lors de la récupération des invitations :", err);
-    return [];
+    return relancer("Chargement des codes d'invitation impossible", err);
   }
 }
 
@@ -245,7 +263,8 @@ export async function getClassStudentsProgress(classId: string): Promise<Teacher
       .eq("class_id", classId)
       .is("left_at", null);
 
-    if (membersError || !members) return [];
+    if (membersError) throw erreurChargement("Chargement des élèves impossible", membersError);
+    if (!members) return [];
 
     // 2. Pour chaque élève, calculer l'avancement et la dernière activité
     const results: TeacherClassMember[] = await Promise.all(
@@ -316,8 +335,7 @@ export async function getClassStudentsProgress(classId: string): Promise<Teacher
 
     return results;
   } catch (err) {
-    console.error("[Teacher] Erreur lors du suivi de classe :", err);
-    return [];
+    return relancer("Chargement des élèves impossible", err);
   }
 }
 
@@ -374,7 +392,9 @@ export async function getClassContestations(
       .eq("class_id", classId)
       .is("left_at", null);
 
-    if (membersError || !members || members.length === 0) return [];
+    if (membersError)
+      throw erreurChargement("Chargement des contestations impossible", membersError);
+    if (!members || members.length === 0) return [];
 
     const memberIds = members.map((m) => m.eleve_id);
     const profileMap = new Map<string, { nom: string; prenom: string }>();
@@ -392,7 +412,8 @@ export async function getClassContestations(
       .in("eleve_id", memberIds)
       .order("created_at", { ascending: false });
 
-    if (contError || !contestationsData) return [];
+    if (contError) throw erreurChargement("Chargement des contestations impossible", contError);
+    if (!contestationsData) return [];
 
     return contestationsData.map((c) => {
       const crit = c.criteres as unknown as { id: string; code: string; label: string } | null;
@@ -416,8 +437,7 @@ export async function getClassContestations(
       };
     });
   } catch (err) {
-    console.warn("[Teacher] Erreur chargement contestations :", err);
-    return [];
+    return relancer("Chargement des contestations impossible", err);
   }
 }
 
@@ -432,7 +452,8 @@ export async function getClassStudentCopies(classId: string): Promise<StudentCop
       .eq("class_id", classId)
       .is("left_at", null);
 
-    if (mError || !members || members.length === 0) return [];
+    if (mError) throw erreurChargement("Chargement des copies impossible", mError);
+    if (!members || members.length === 0) return [];
 
     const copies: StudentCopyData[] = [];
 
@@ -472,8 +493,7 @@ export async function getClassStudentCopies(classId: string): Promise<StudentCop
 
     return copies;
   } catch (err) {
-    console.warn("[Teacher] Erreur chargement copies de similarité :", err);
-    return [];
+    return relancer("Chargement des copies impossible", err);
   }
 }
 
@@ -488,7 +508,8 @@ export async function getClassStudentAttempts(classId: string): Promise<StudentA
       .eq("class_id", classId)
       .is("left_at", null);
 
-    if (mError || !members || members.length === 0) return [];
+    if (mError) throw erreurChargement("Chargement des tentatives impossible", mError);
+    if (!members || members.length === 0) return [];
 
     const records: StudentAttemptRecord[] = [];
 
@@ -548,8 +569,7 @@ export async function getClassStudentAttempts(classId: string): Promise<StudentA
 
     return records;
   } catch (err) {
-    console.warn("[Teacher] Erreur chargement tentatives élèves :", err);
-    return [];
+    return relancer("Chargement des tentatives impossible", err);
   }
 }
 
