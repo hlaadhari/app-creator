@@ -4,8 +4,10 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { critereDepuisJson, type RawCriterion } from "@/lib/evaluation/critere-json";
+import { evaluerDansFrame } from "@/lib/evaluation/iframe-evaluation";
+import { validerBancDidactiqueReel } from "@/lib/subjects/banc-didactique";
 import {
-  validerBancDidactique,
   publierVersionSujet,
   creerNouvelleVersion,
   type SubjectVersionRecord,
@@ -24,7 +26,7 @@ import {
   AlertTriangle,
 } from "lucide-react";
 
-const INITIAL_SUBJECT_VERSION: SubjectVersionRecord = {
+const INITIAL_SUBJECT_VERSION: SubjectVersionRecord<RawCriterion> = {
   id: "v-carte-profil-1",
   sujet_id: "carte-profil",
   numero: 1,
@@ -63,42 +65,34 @@ Créez une carte d'identité sémantique en HTML5 et CSS3.
     {
       id: "c1",
       code: "DOM-01",
-      label: "Élément <article class='carte'> présent",
+      titre: "Élément <article class='carte'> présent",
       points: 4,
-      ordre: 1,
       sonde: { type: "dom_selector", selector: "article.carte" },
-      message_echec: "L'article avec la classe 'carte' est absent.",
+      fail_message: "L'article avec la classe 'carte' est absent.",
     },
     {
       id: "c2",
       code: "DOM-02",
-      label: "Titre <h1> non vide",
+      titre: "Titre <h1> dans l'article",
       points: 5,
-      ordre: 2,
-      sonde: { type: "dom_selector", selector: "article.carte h1", textNotEmpty: true },
-      message_echec: "Le titre h1 est vide ou absent dans l'article.",
+      sonde: { type: "dom_selector", selector: "article.carte h1" },
+      fail_message: "Le titre h1 est absent de l'article.",
     },
     {
       id: "c3",
       code: "DOM-03",
-      label: "Liste de 3 centres d'intérêt minimum",
+      titre: "Liste de 3 centres d'intérêt minimum",
       points: 6,
-      ordre: 3,
       sonde: { type: "dom_selector", selector: "article.carte ul > li", minCount: 3 },
-      message_echec: "La liste doit comporter au moins 3 éléments <li>.",
+      fail_message: "La liste doit comporter au moins 3 éléments <li>.",
     },
     {
       id: "c4",
       code: "DOM-04",
-      label: "Lien email mailto:",
+      titre: "Lien email mailto:",
       points: 5,
-      ordre: 4,
-      sonde: {
-        type: "dom_selector",
-        selector: "article.carte a",
-        attributeStartsWith: { name: "href", prefix: "mailto:" },
-      },
-      message_echec: "Le lien mailto: est manquant.",
+      sonde: { type: "dom_selector", selector: 'article.carte a[href^="mailto:"]' },
+      fail_message: "Le lien mailto: est manquant.",
     },
   ],
   solutions_test: [
@@ -174,17 +168,25 @@ Créez une carte d'identité sémantique en HTML5 et CSS3.
 };
 
 export function SubjectStudioTab() {
-  const [version, setVersion] = useState<SubjectVersionRecord>(INITIAL_SUBJECT_VERSION);
+  const [version, setVersion] = useState<SubjectVersionRecord<RawCriterion>>(INITIAL_SUBJECT_VERSION);
   const [report, setReport] = useState<PreValidationReport | null>(null);
   const [isValidating, setIsValidating] = useState(false);
   const [publishMessage, setPublishMessage] = useState<string | null>(null);
 
   // Exécution du banc didactique
-  const handleRunValidation = () => {
+  const handleRunValidation = async () => {
     setIsValidating(true);
-    const rep = validerBancDidactique(version.criteres, version.solutions_test);
-    setReport(rep);
-    setIsValidating(false);
+    try {
+      // Même moteur que pour les élèves : scripts exécutés, chaque critère évalué sur sa page.
+      const rep = await validerBancDidactiqueReel(
+        version.criteres.map(critereDepuisJson),
+        version.solutions_test,
+        (fichiers) => (page, criteres) => evaluerDansFrame(fichiers, page, criteres),
+      );
+      setReport(rep);
+    } finally {
+      setIsValidating(false);
+    }
   };
 
   // Publication immuable
@@ -193,7 +195,9 @@ export function SubjectStudioTab() {
     const res = publierVersionSujet(version, report);
     if (res.success && res.version) {
       setVersion(res.version);
-      setPublishMessage("Version publiée avec succès ! Le sujet est désormais immuable (T-09).");
+      setPublishMessage(
+        "Banc didactique validé. Brouillon local : l'enregistrement en base du sujet n'est pas encore branché.",
+      );
     } else {
       setPublishMessage(res.error || "Erreur de publication.");
     }
@@ -334,8 +338,8 @@ export function SubjectStudioTab() {
                     className="p-2.5 border rounded-lg bg-card/50 flex items-center justify-between text-xs"
                   >
                     <div>
-                      <span className="font-semibold text-primary mr-2">[{c.code}]</span>
-                      <span className="text-foreground">{c.label}</span>
+                      <span className="font-semibold text-primary mr-2">[{String(c.code ?? c.id)}]</span>
+                      <span className="text-foreground">{c.titre ?? c.label}</span>
                     </div>
                     <Badge variant="outline" className="text-[10px]">
                       {c.points} pts
