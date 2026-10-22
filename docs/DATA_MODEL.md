@@ -331,3 +331,12 @@ Ces triggers sont reliés aux tables `sujet_version_fichiers`, `criteres`, `solu
 - `solutions_banc` (aucun GRANT, immuable une fois la version publiée) contient les 3 variantes du banc didactique (`canonique`, `alternative`, `invalide`), multi-fichiers. La variante canonique est aussi copiée dans `solutions` (corrigé élève) : une variante invalide n'est jamais servie par `debloquer_solution`.
 - `criteres.sonde` contient le critère JSON complet (format des `content/<sujet>/criteria.json`), `criteres.attendu` vaut `{"format":"json-v1"}`.
 - Fonctions `studio_lister_sujets`, `studio_charger_version`, `studio_enregistrer_brouillon`, `studio_supprimer_brouillon` : SECURITY DEFINER, réservées aux enseignants et administrateurs, écriture limitée à l'auteur (ou à un administrateur) et refusée sur une version publiée.
+
+## Publication des sujets du Studio (migration 0015, issue #94)
+
+- `sujet_versions` gagne `banc_rapport` et `banc_valide_at` : rapport du banc didactique fourni par le navigateur de l'enseignant (le moteur d'évaluation tourne côté client) au moment de la publication.
+- `studio_publier_version(version, rapport)` : auteur ou admin ; refuse sans rapport `ready`, sans critère, sans point, sans fichier, sans énoncé ou sans les 3 variantes du banc. La version devient définitivement immuable (triggers existants).
+- `studio_nouvelle_version(sujet)` : copie la dernière version publiée (fichiers, critères, indices, solutions, banc) en brouillon numéro + 1 ; renvoie le brouillon existant s'il y en a déjà un.
+- `sujet_publie_pour_eleve(sujet)` (anon et authenticated) : dernière version publiée, énoncé, fichiers de départ et critères au format `json-v1` ; jamais les solutions ni les indices. Les critères sont évalués dans le navigateur de l'élève, comme ceux du catalogue embarqué.
+- Limite connue : la validité du banc est attestée par le navigateur de l'enseignant ; le serveur ne ré-exécute pas les solutions.
+- Les métadonnées d'un sujet (`sujets.titre`, `niveau`, `duree_min`, `competence`) ne sont pas versionnées : les modifier depuis un brouillon v2 les change aussi pour la version publiée v1.

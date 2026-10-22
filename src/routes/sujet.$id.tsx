@@ -1,6 +1,14 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useEffect, useRef, useState, useMemo, useCallback } from "react";
-import { getExercise, runCriteria, score, type FileName, type Result } from "@/lib/exercises";
+import {
+  getExercise,
+  runCriteria,
+  score,
+  type Exercise,
+  type FileName,
+  type Result,
+} from "@/lib/exercises";
+import { chargerSujetPublie } from "@/lib/supabase/sujets-publies";
 import { clear } from "@/lib/progress";
 import { useBufferSync } from "@/lib/storage/useBufferSync";
 import { deleteFromBuffer } from "@/lib/storage/indexeddb";
@@ -43,8 +51,9 @@ import { PedagogicalTutorPane } from "@/components/workspace/PedagogicalTutorPan
 import { CourseDrawer } from "@/components/course/CourseDrawer";
 
 export const Route = createFileRoute("/sujet/$id")({
-  loader: ({ params }) => {
-    const ex = getExercise(params.id);
+  loader: async ({ params }) => {
+    // Catalogue embarqué d'abord, puis sujets publiés depuis le Studio.
+    const ex = getExercise(params.id) ?? (await chargerSujetPublie(params.id));
     if (!ex) throw notFound();
     return { title: ex.title, competence: ex.competence };
   },
@@ -66,7 +75,49 @@ export const Route = createFileRoute("/sujet/$id")({
 
 function Workspace() {
   const { id } = Route.useParams();
-  const ex = getExercise(id)!;
+  const local = getExercise(id);
+  const [distant, setDistant] = useState<Exercise | null>(null);
+  const [erreur, setErreur] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (local) return;
+    let actif = true;
+    chargerSujetPublie(id)
+      .then((e) => {
+        if (!actif) return;
+        if (e) setDistant(e);
+        else setErreur("Ce sujet n'existe pas ou n'est pas publié.");
+      })
+      .catch((e: unknown) => {
+        if (actif) setErreur(e instanceof Error ? e.message : "Chargement du sujet impossible.");
+      });
+    return () => {
+      actif = false;
+    };
+  }, [id, local]);
+
+  const ex = local ?? distant;
+  if (!ex) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-sm text-muted-foreground p-6">
+        {erreur ? (
+          <div role="alert" className="text-center space-y-3">
+            <p>{erreur}</p>
+            <Link to="/" className="underline">
+              Retour aux sujets
+            </Link>
+          </div>
+        ) : (
+          <p>Chargement du sujet…</p>
+        )}
+      </div>
+    );
+  }
+  return <WorkspaceView key={ex.id} ex={ex} />;
+}
+
+function WorkspaceView({ ex }: { ex: Exercise }) {
+  const id = ex.id;
 
   // Normalisation du dossier : Travail_Eleve/SW_<id> (F-16)
   const folderName = `Travail_Eleve/SW_${id.replace(/[^a-zA-Z0-9_-]/g, "")}`;
