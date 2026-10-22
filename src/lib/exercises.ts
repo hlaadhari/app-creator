@@ -14,6 +14,11 @@ export type Criterion = {
    * générale ou non exécutable ici). Il n'est alors jamais validé et n'entre pas dans la note.
    */
   automatique?: boolean;
+  /**
+   * Critère déclaré « corrigé par l'enseignant » : jamais noté automatiquement, il est annoncé
+   * comme tel à l'élève et ne bloque pas la publication du sujet.
+   */
+  manuel?: boolean;
   /** Page du projet sur laquelle le critère est évalué (la page principale par défaut). */
   fichier?: string;
   check: (doc: Document, win: Window) => boolean;
@@ -282,11 +287,16 @@ export type Result = {
   ok: boolean;
   /** Faux : aucune vérification automatique réelle n'existe pour ce critère. */
   automatique: boolean;
+  /** Vrai : critère déclaré corrigé par l'enseignant. */
+  manuel?: boolean;
   message: string;
 };
 
 export const MESSAGE_NON_VERIFIABLE =
   "Vérification automatique indisponible : ce critère sera évalué par votre enseignant.";
+
+export const MESSAGE_CORRECTION_ENSEIGNANT =
+  "Ce critère est corrigé par votre enseignant : il n'est pas noté automatiquement.";
 
 export function runCriteria(criteria: Criterion[], doc: Document, win: Window): Result[] {
   return criteria.map((c) => {
@@ -306,7 +316,14 @@ export function runCriteria(criteria: Criterion[], doc: Document, win: Window): 
       points: c.points,
       ok,
       automatique,
-      message: !automatique ? MESSAGE_NON_VERIFIABLE : ok ? "Validé" : c.fail,
+      ...(c.manuel ? { manuel: true } : {}),
+      message: c.manuel
+        ? MESSAGE_CORRECTION_ENSEIGNANT
+        : !automatique
+          ? MESSAGE_NON_VERIFIABLE
+          : ok
+            ? "Validé"
+            : c.fail,
     };
   });
 }

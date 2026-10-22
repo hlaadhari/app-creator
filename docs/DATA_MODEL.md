@@ -340,3 +340,7 @@ Ces triggers sont reliés aux tables `sujet_version_fichiers`, `criteres`, `solu
 - `sujet_publie_pour_eleve(sujet)` (anon et authenticated) : dernière version publiée, énoncé, fichiers de départ et critères au format `json-v1` ; jamais les solutions ni les indices. Les critères sont évalués dans le navigateur de l'élève, comme ceux du catalogue embarqué.
 - Limite connue : la validité du banc est attestée par le navigateur de l'enseignant ; le serveur ne ré-exécute pas les solutions.
 - Les métadonnées d'un sujet (`sujets.titre`, `niveau`, `duree_min`, `competence`) ne sont pas versionnées : les modifier depuis un brouillon v2 les change aussi pour la version publiée v1.
+
+## Critères « corrigés par l'enseignant » (issue #98)
+
+Un critère JSON (`criteres.sonde`) peut porter `"correction": "enseignant"` : il n'est jamais noté automatiquement (même s'il a une sonde), l'élève le voit annoncé comme corrigé par son enseignant, et ses points sont comptés comme « non vérifiables » (jamais gagnés d'office). Le banc didactique accepte ces critères mais exige qu'au moins un critère ait une vérification automatique ; un critère sans vérification qui n'est pas déclaré ainsi continue de bloquer la publication. Aucune migration : la valeur est stockée dans le JSON du critère. La saisie de la note de ces critères par l'enseignant n'est pas couverte par ce changement.

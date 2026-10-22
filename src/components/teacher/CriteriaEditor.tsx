@@ -1,8 +1,12 @@
 import { useMemo, useState } from "react";
-import { AlertTriangle, CheckCircle2 } from "lucide-react";
+import { AlertTriangle, CheckCircle2, UserCheck } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
-import { critereDepuisJson, type RawCriterion } from "@/lib/evaluation/critere-json";
+import {
+  CORRECTION_ENSEIGNANT,
+  critereDepuisJson,
+  type RawCriterion,
+} from "@/lib/evaluation/critere-json";
 
 interface Props {
   criteres: RawCriterion[];
@@ -25,6 +29,9 @@ export function erreurCriteres(valeur: unknown): string | null {
     if (typeof r["points"] !== "number" || !Number.isInteger(r["points"]) || r["points"] < 0) {
       return `Critère ${i + 1} : « points » doit être un entier positif.`;
     }
+    if (r["correction"] !== undefined && r["correction"] !== CORRECTION_ENSEIGNANT) {
+      return `Critère ${i + 1} : « correction » ne peut valoir que « ${CORRECTION_ENSEIGNANT} ».`;
+    }
   }
   const ids = valeur.map((c) => (c as { id: string }).id);
   const doublon = ids.find((id, i) => ids.indexOf(id) !== i);
@@ -33,15 +40,21 @@ export function erreurCriteres(valeur: unknown): string | null {
 
 /**
  * Critères au format des sujets du catalogue (content/<sujet>/criteria.json) : sonde « dom_selector »
- * ou « css_property », ou vérification déclarée (js_function_exists, js_test_execution…). Un aperçu
- * indique pour chacun s'il a une vraie vérification automatique.
+ * ou « css_property », ou vérification déclarée (js_function_exists, js_test_execution…). Un critère
+ * qui ne peut pas être vérifié automatiquement (PHP, SQL…) se déclare avec "correction": "enseignant".
+ * Un aperçu indique pour chacun s'il a une vraie vérification automatique.
  */
 export function CriteriaEditor({ criteres, onChange, disabled }: Props) {
   const [texte, setTexte] = useState(() => JSON.stringify(criteres, null, 2));
   const [erreur, setErreur] = useState<string | null>(null);
 
   const apercu = useMemo(
-    () => criteres.map((c) => ({ c, automatique: critereDepuisJson(c).automatique !== false })),
+    () =>
+      criteres.map((c) => {
+        const critere = critereDepuisJson(c);
+        const etat = critere.manuel ? "manuel" : critere.automatique !== false ? "auto" : "non";
+        return { c, etat };
+      }),
     [criteres],
   );
 
@@ -76,7 +89,7 @@ export function CriteriaEditor({ criteres, onChange, disabled }: Props) {
         </p>
       )}
       <div className="space-y-1.5">
-        {apercu.map(({ c, automatique }) => (
+        {apercu.map(({ c, etat }) => (
           <div
             key={String(c.id)}
             className="p-2 border rounded-lg bg-card/50 flex items-center justify-between gap-2 text-xs"
@@ -91,10 +104,15 @@ export function CriteriaEditor({ criteres, onChange, disabled }: Props) {
               )}
             </div>
             <div className="flex items-center gap-1.5 shrink-0">
-              {automatique ? (
+              {etat === "auto" ? (
                 <Badge className="gap-1 text-[10px] bg-emerald-500/10 text-emerald-600 border-emerald-500/20">
                   <CheckCircle2 className="w-3 h-3" />
                   Vérifiable
+                </Badge>
+              ) : etat === "manuel" ? (
+                <Badge variant="outline" className="gap-1 text-[10px]">
+                  <UserCheck className="w-3 h-3" />
+                  Corrigé par l'enseignant
                 </Badge>
               ) : (
                 <Badge variant="destructive" className="gap-1 text-[10px]">
