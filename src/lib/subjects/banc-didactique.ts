@@ -70,11 +70,17 @@ export async function validerBancDidactiqueReel(
     errors.push("Le sujet doit comporter au moins un critère d'évaluation.");
   }
   for (const c of criteres) {
-    if (c.automatique === false) {
+    // Un critère sans vérification réelle doit être déclaré « corrigé par l'enseignant ».
+    if (c.automatique === false && !c.manuel) {
       errors.push(
-        `Le critère « ${c.label} » n'a pas de vérification automatique réelle : il ne pourrait jamais être validé pour un élève.`,
+        `Le critère « ${c.label} » n'a pas de vérification automatique réelle : il ne pourrait jamais être validé pour un élève. Écrivez une vérification, ou déclarez-le « correction »: « enseignant ».`,
       );
     }
+  }
+  if (criteres.length > 0 && !criteres.some((c) => c.automatique !== false)) {
+    errors.push(
+      "Au moins un critère doit avoir une vérification automatique : le banc ne peut rien tester sinon.",
+    );
   }
 
   const results: DidacticValidationResult[] = [];

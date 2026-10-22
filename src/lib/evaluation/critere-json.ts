@@ -82,15 +82,21 @@ export function makeProbeCheck(
   };
 }
 
+/** Valeur de « correction » qui réserve un critère à la correction de l'enseignant. */
+export const CORRECTION_ENSEIGNANT = "enseignant";
+
 export function critereDepuisJson(c: RawCriterion): Criterion {
+  // Critère déclaré « corrigé par l'enseignant » : jamais évalué automatiquement.
+  const manuel = c["correction"] === CORRECTION_ENSEIGNANT;
   // Vérification déclarée dans le critère (CSS calculé, fonction JS…), sinon sonde explicite.
-  const declaree = construireVerificationDeclaree(c);
+  const declaree = manuel ? null : construireVerificationDeclaree(c);
   return {
     id: (c.id as string) || (c.code as string) || "crit",
     label: (c.titre as string) || (c.label as string) || "Critère",
     points: c.points,
     fail: (c.fail_message as string) || (c.fail as string) || "Critère non satisfait",
-    automatique: declaree !== null || sondeEstVerifiable(c.sonde),
+    automatique: !manuel && (declaree !== null || sondeEstVerifiable(c.sonde)),
+    ...(manuel ? { manuel: true } : {}),
     ...(typeof c["fichier"] === "string" ? { fichier: c["fichier"] } : {}),
     check: declaree ?? makeProbeCheck(c.sonde),
   };

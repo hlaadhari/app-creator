@@ -620,7 +620,10 @@ export function SubjectStudioTab() {
                 <li>la solution canonique obtient tous les points</li>
                 <li>la solution alternative obtient tous les points</li>
                 <li>la solution invalide perd au moins un critère</li>
-                <li>chaque critère a une vérification automatique réelle</li>
+                <li>
+                  chaque critère a une vérification automatique réelle, ou est déclaré « corrigé par
+                  l'enseignant »
+                </li>
               </ul>
               <Button
                 size="sm"
