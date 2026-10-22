@@ -7,6 +7,7 @@
     "points": 1.5,
     "ordre": 1,
     "fichier": "index.html",
+    "correction": "enseignant",
     "sonde": { "type": "dom_selector", "selector": "body" },
     "fail_message": "La table reservation, sa clé primaire ou les clés étrangères entre les tables sont absentes ou incorrectes."
   },
@@ -91,7 +92,74 @@
     "points": 1.5,
     "ordre": 7,
     "fichier": "croisiere.html",
-    "sonde": { "type": "js_eval", "checkSelector": "#DD" },
+    "type": "js_test_cas",
+    "function_name": "verif1",
+    "cas": [
+      {
+        "saisies": {
+          "dest": "1",
+          "DD": "+10j",
+          "DF": "+20j"
+        },
+        "attendu": true
+      },
+      {
+        "saisies": {
+          "dest": "",
+          "DD": "+10j",
+          "DF": "+20j"
+        },
+        "attendu": false
+      },
+      {
+        "saisies": {
+          "dest": "1",
+          "DD": "",
+          "DF": "+20j"
+        },
+        "attendu": false
+      },
+      {
+        "saisies": {
+          "dest": "1",
+          "DD": "+0j",
+          "DF": "+20j"
+        },
+        "attendu": false
+      },
+      {
+        "saisies": {
+          "dest": "1",
+          "DD": "-1j",
+          "DF": "+20j"
+        },
+        "attendu": false
+      },
+      {
+        "saisies": {
+          "dest": "1",
+          "DD": "+10j",
+          "DF": "+10j"
+        },
+        "attendu": false
+      },
+      {
+        "saisies": {
+          "dest": "1",
+          "DD": "+10j",
+          "DF": "+5j"
+        },
+        "attendu": false
+      },
+      {
+        "saisies": {
+          "dest": "1",
+          "DD": "+10j",
+          "DF": ""
+        },
+        "attendu": false
+      }
+    ],
     "fail_message": "verif1 ne contrôle pas la destination ou l'ordre des dates (Date 1 > aujourd'hui, Date 2 > Date 1)."
   },
   {
@@ -102,6 +170,7 @@
     "points": 0.5,
     "ordre": 8,
     "fichier": "index.html",
+    "correction": "enseignant",
     "sonde": { "type": "dom_selector", "selector": "body" },
     "fail_message": "connexion.php n'établit pas la connexion à la base de données."
   },
@@ -113,6 +182,7 @@
     "points": 2.5,
     "ordre": 9,
     "fichier": "index.html",
+    "correction": "enseignant",
     "sonde": { "type": "dom_selector", "selector": "body" },
     "fail_message": "croisiere.php ne filtre pas sur la destination et la période, ne trie pas par date ou n'affiche pas les colonnes optionnelles correctement."
   },
@@ -139,7 +209,100 @@
     "points": 2.25,
     "ordre": 11,
     "fichier": "reservation.html",
-    "sonde": { "type": "js_eval", "checkSelector": "#nb" },
+    "type": "js_test_cas",
+    "function_name": "verif2",
+    "cas": [
+      {
+        "saisies": {
+          "nbPlace": "7"
+        },
+        "appel": "nombres",
+        "texte": {
+          "nb": "7/10"
+        }
+      },
+      {
+        "saisies": {
+          "nbPlace": "3"
+        },
+        "appel": "nombres",
+        "texte": {
+          "nb": "3/10"
+        }
+      },
+      {
+        "saisies": {
+          "typeId": "CIN",
+          "idCl": "12345678",
+          "nomCl": "Jean Dupont"
+        },
+        "attendu": true
+      },
+      {
+        "saisies": {
+          "typeId": "Passeport",
+          "idCl": "A123456789",
+          "nomCl": "Jean Dupont"
+        },
+        "attendu": true
+      },
+      {
+        "saisies": {
+          "typeId": "",
+          "idCl": "12345678",
+          "nomCl": "Jean Dupont"
+        },
+        "attendu": false
+      },
+      {
+        "saisies": {
+          "typeId": "CIN",
+          "idCl": "1234567",
+          "nomCl": "Jean Dupont"
+        },
+        "attendu": false
+      },
+      {
+        "saisies": {
+          "typeId": "CIN",
+          "idCl": "1234567A",
+          "nomCl": "Jean Dupont"
+        },
+        "attendu": false
+      },
+      {
+        "saisies": {
+          "typeId": "Passeport",
+          "idCl": "123456789",
+          "nomCl": "Jean Dupont"
+        },
+        "attendu": false
+      },
+      {
+        "saisies": {
+          "typeId": "Passeport",
+          "idCl": "A12345678",
+          "nomCl": "Jean Dupont"
+        },
+        "attendu": false
+      },
+      {
+        "saisies": {
+          "typeId": "CIN",
+          "idCl": "12345678",
+          "nomCl": "Jean 1 Dupont"
+        },
+        "attendu": false
+      },
+      {
+        "saisies": {
+          "typeId": "CIN",
+          "idCl": "12345678",
+          "nomCl": "Al Bo"
+        },
+        "attendu": false
+      }
+    ],
     "fail_message": "nombres n'affiche pas la valeur suivie de /10 ou verif2 ne contrôle pas correctement l'identifiant ou le nom."
   },
   {
@@ -150,6 +313,7 @@
     "points": 4,
     "ordre": 12,
     "fichier": "index.html",
+    "correction": "enseignant",
     "sonde": { "type": "dom_selector", "selector": "body" },
     "fail_message": "reservation.php ne gère pas correctement le nettoyage du nom, le doublon de réservation, la création du client ou l'insertion avec dateRes."
   }
