@@ -8,7 +8,8 @@ import { SyncStatusBar } from "@/components/workspace/SyncStatusBar";
 import { ConflictModal } from "@/components/workspace/ConflictModal";
 import { EvaluationResultsPane } from "@/components/workspace/EvaluationResultsPane";
 import { SubjectStatement } from "@/components/workspace/SubjectStatement";
-import { construireDocumentEvaluation } from "@/lib/evaluation/document-evaluation";
+import { evaluerParPage } from "@/lib/evaluation/evaluation-par-page";
+import { evaluerDansFrame } from "@/lib/evaluation/iframe-evaluation";
 import { debloquerNiveauIndice, type UnlockedHint } from "@/lib/evaluation/hints-service";
 import { calculerCompteARebours, getTempsServeurSynchronise } from "@/lib/exam/server-clock";
 import type { EvaluationSummary } from "@/lib/evaluation/probe-runner";
@@ -169,92 +170,82 @@ function Workspace() {
   );
   const [rightPanelTab, setRightPanelTab] = useState<"preview" | "sql" | "php">("preview");
 
-  const handleVerify = () => {
+  const handleVerify = async () => {
     if (isExamExpired) return;
     setVerifying(true);
     const startTime = performance.now();
 
-    // Évaluation sécurisée dans une frame masquée
-    const frame = document.createElement("iframe");
-    frame.setAttribute("sandbox", "allow-scripts allow-same-origin");
-    frame.style.cssText = "position:absolute;width:800px;height:600px;left:-9999px;";
-    document.body.appendChild(frame);
-
-    // Page de l'élève assemblée comme dans les tests de notation (constructeur partagé)
-    const combinedDoc = construireDocumentEvaluation(
-      Object.fromEntries(Object.entries(files).map(([nom, f]) => [nom, f.content])),
+    // Fichiers de l'élève assemblés comme dans les tests de notation (constructeur partagé)
+    const fichiersTexte = Object.fromEntries(
+      Object.entries(files).map(([nom, f]) => [nom, f.content]),
     );
 
-    frame.onload = () => {
-      try {
-        const doc = frame.contentDocument!;
-        const win = frame.contentWindow!;
-        const r = runCriteria(ex.criteria, doc, win);
-        frame.remove();
+    try {
+      // Chaque critère est évalué sur la page qu'il vise (frame masquée par page)
+      const r = await evaluerParPage(ex.criteria, fichiersTexte, (page, criteres) =>
+        evaluerDansFrame(fichiersTexte, page, criteres),
+      );
 
-        const duration = Math.round(performance.now() - startTime);
-        const sc = score(r);
-        const n = sc.note20;
-        // Sans critère vérifiable, aucune note n'existe : ni meilleur score ni tentative enregistrée.
-        const notable = sc.verifiable > 0;
-        if (notable) updateBestScore(n);
+      const duration = Math.round(performance.now() - startTime);
+      const sc = score(r);
+      const n = sc.note20;
+      // Sans critère vérifiable, aucune note n'existe : ni meilleur score ni tentative enregistrée.
+      const notable = sc.verifiable > 0;
+      if (notable) updateBestScore(n);
 
-        const summary: EvaluationSummary = {
-          results: r.map((c) => ({
+      const summary: EvaluationSummary = {
+        results: r.map((c) => ({
+          id: c.id,
+          code: c.id.toUpperCase(),
+          label: c.label,
+          points: c.ok ? c.points : 0,
+          maxPoints: c.points,
+          passed: c.ok,
+          message: c.message,
+          durationMs: 12,
+          automatique: c.automatique,
+        })),
+        earnedPoints: sc.got,
+        totalPoints: sc.total,
+        pointsNonVerifiables: sc.nonVerifiable,
+        note20: sc.note20,
+        totalDurationMs: duration,
+        evaluatedAt: Date.now(),
+      };
+
+      setEvaluationSummary(summary);
+      setSidebarTab("resultats");
+
+      if (notable) {
+        enregistrerTentative({
+          sujetId: id,
+          pointsObtenus: sc.got,
+          pointsTotal: sc.total,
+          note20: sc.note20,
+          details: Object.fromEntries(r.map((c) => [c.id, { ok: c.ok, label: c.label }])),
+        });
+
+        enregistrerNouvelleTentative({
+          sujetId: id,
+          note20: sc.note20,
+          pointsObtenus: sc.got,
+          pointsTotal: sc.total,
+          dureeMs: duration,
+          criteres: r.map((c) => ({
             id: c.id,
-            code: c.id.toUpperCase(),
             label: c.label,
+            ok: c.ok,
             points: c.ok ? c.points : 0,
             maxPoints: c.points,
-            passed: c.ok,
             message: c.message,
-            durationMs: 12,
-            automatique: c.automatique,
           })),
-          earnedPoints: sc.got,
-          totalPoints: sc.total,
-          pointsNonVerifiables: sc.nonVerifiable,
-          note20: sc.note20,
-          totalDurationMs: duration,
-          evaluatedAt: Date.now(),
-        };
-
-        setEvaluationSummary(summary);
-        setSidebarTab("resultats");
-
-        if (notable) {
-          enregistrerTentative({
-            sujetId: id,
-            pointsObtenus: sc.got,
-            pointsTotal: sc.total,
-            note20: sc.note20,
-            details: Object.fromEntries(r.map((c) => [c.id, { ok: c.ok, label: c.label }])),
-          });
-
-          enregistrerNouvelleTentative({
-            sujetId: id,
-            note20: sc.note20,
-            pointsObtenus: sc.got,
-            pointsTotal: sc.total,
-            dureeMs: duration,
-            criteres: r.map((c) => ({
-              id: c.id,
-              label: c.label,
-              ok: c.ok,
-              points: c.ok ? c.points : 0,
-              maxPoints: c.points,
-              message: c.message,
-            })),
-          });
-        }
-      } catch (err) {
-        console.error("Erreur lors de l'évaluation formative :", err);
-        frame.remove();
-      } finally {
-        setVerifying(false);
+        });
       }
-    };
-    frame.srcdoc = combinedDoc;
+    } catch (err) {
+      console.error("Erreur lors de l'évaluation formative :", err);
+    } finally {
+      setVerifying(false);
+    }
   };
 
   const handleUnlockHint = async () => {
