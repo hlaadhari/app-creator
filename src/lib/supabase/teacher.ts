@@ -1,3 +1,4 @@
+import { analyserDetailsTentative } from "@/lib/supabase/tentative-details";
 import { supabase } from "@/integrations/supabase/client";
 import type {
   ContestationRecord,
@@ -287,35 +288,26 @@ export async function getClassStudentsProgress(classId: string): Promise<Teacher
         let totalCriteres = 0;
         const pointsFaibles: string[] = [];
 
-        if (proj) {
-          const { data: tentative } = await supabase
-            .from("tentatives")
-            .select("note20, points_obtenus, points_total, details, date")
-            .eq("projet_id", proj.id)
-            .order("date", { ascending: false })
-            .limit(1)
-            .maybeSingle();
+        // Les tentatives sont rattachées à l'élève : toutes celles de l'élève comptent,
+        // qu'elles aient ou non un projet associé.
+        const { data: tentative } = await supabase
+          .from("tentatives")
+          .select("note20, points_obtenus, points_total, details, date")
+          .eq("eleve_id", eleveId)
+          .order("date", { ascending: false })
+          .limit(1)
+          .maybeSingle();
 
-          if (tentative) {
-            const total = tentative.points_total || 20;
-            const note20Val = tentative.note20 ?? 0;
-            const obtenus = tentative.points_obtenus ?? Math.round((note20Val * total) / 20);
-            scoreFormatif = Math.min(100, Math.round((obtenus / total) * 100));
+        if (tentative) {
+          const total = tentative.points_total || 20;
+          const note20Val = tentative.note20 ?? 0;
+          const obtenus = tentative.points_obtenus ?? Math.round((note20Val * total) / 20);
+          scoreFormatif = Math.min(100, Math.round((obtenus / total) * 100));
 
-            const res = tentative.details as Record<string, unknown> | null;
-            if (res && Array.isArray(res["criteres"])) {
-              totalCriteres = res["criteres"].length;
-              criteresReussis = res["criteres"].filter(
-                (c: { valide?: boolean }) => c.valide === true,
-              ).length;
-
-              res["criteres"].forEach((c: { valide?: boolean; code?: string; titre?: string }) => {
-                if (!c.valide) {
-                  pointsFaibles.push(c.titre || c.code || "Critère non validé");
-                }
-              });
-            }
-          }
+          const bilan = analyserDetailsTentative(tentative.details);
+          totalCriteres = bilan.total;
+          criteresReussis = bilan.reussis;
+          pointsFaibles.push(...bilan.pointsFaibles);
         }
 
         return {
@@ -323,11 +315,16 @@ export async function getClassStudentsProgress(classId: string): Promise<Teacher
           nom: prof?.nom || "Élève",
           prenom: prof?.prenom || "Inconnu",
           joined_at: m.joined_at,
-          projet_statut: (proj?.statut as "non_commence" | "en_cours" | "rendu") || "non_commence",
+          projet_statut:
+            (proj?.statut as "non_commence" | "en_cours" | "rendu") ||
+            (tentative ? "en_cours" : "non_commence"),
           score_formatif: scoreFormatif,
           total_criteres: totalCriteres,
           criteres_reussis: criteresReussis,
-          derniere_activite: proj?.updated_at || m.joined_at,
+          derniere_activite: [proj?.updated_at, tentative?.date, m.joined_at]
+            .filter((d): d is string => !!d)
+            .sort()
+            .at(-1)!,
           points_faibles: pointsFaibles.slice(0, 3), // Top 3 points bloquants
         };
       }),
