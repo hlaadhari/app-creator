@@ -14,6 +14,8 @@ export type Criterion = {
    * générale ou non exécutable ici). Il n'est alors jamais validé et n'entre pas dans la note.
    */
   automatique?: boolean;
+  /** Page du projet sur laquelle le critère est évalué (la page principale par défaut). */
+  fichier?: string;
   check: (doc: Document, win: Window) => boolean;
 };
 

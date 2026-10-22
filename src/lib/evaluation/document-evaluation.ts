@@ -5,16 +5,19 @@
 
 export type FichiersEvaluation = Record<string, string>;
 
+/** Page HTML principale : index.html, à défaut le premier fichier .html. */
+export function pageParDefaut(fichiers: FichiersEvaluation): string {
+  return fichiers["index.html"] !== undefined
+    ? "index.html"
+    : (Object.keys(fichiers).find((k) => k.endsWith(".html")) ?? "index.html");
+}
+
 /**
- * Assemble la page de l'élève : le HTML principal (index.html ou, à défaut, le premier .html),
- * avec tous les .css dans <style> et tous les .js dans <script>.
+ * Assemble la page de l'élève : la page demandée (par défaut la page principale), avec tous les
+ * .css dans <style> et tous les .js dans <script>.
  */
-export function construireDocumentEvaluation(fichiers: FichiersEvaluation): string {
-  const cleHtml =
-    fichiers["index.html"] !== undefined
-      ? "index.html"
-      : (Object.keys(fichiers).find((k) => k.endsWith(".html")) ?? "index.html");
-  const html = fichiers[cleHtml] ?? "";
+export function construireDocumentEvaluation(fichiers: FichiersEvaluation, page?: string): string {
+  const html = fichiers[page ?? pageParDefaut(fichiers)] ?? "";
   const css = Object.entries(fichiers)
     .filter(([k]) => k.endsWith(".css"))
     .map(([, contenu]) => contenu)
