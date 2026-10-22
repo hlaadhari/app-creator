@@ -8,6 +8,7 @@ import {
   Lock,
   Plus,
   Save,
+  Send,
   ShieldCheck,
   Trash2,
   XCircle,
@@ -15,6 +16,16 @@ import {
 
 import { CriteriaEditor } from "@/components/teacher/CriteriaEditor";
 import { FilesEditor } from "@/components/teacher/FilesEditor";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -26,8 +37,10 @@ import { validerBancDidactiqueReel } from "@/lib/subjects/banc-didactique";
 import type { PreValidationReport, ValidationSolution } from "@/lib/subjects/subject-studio";
 import {
   chargerVersionStudio,
+  creerNouvelleVersionStudio,
   enregistrerBrouillon,
   listerSujetsStudio,
+  publierVersionStudio,
   supprimerBrouillon,
   type SujetStudioResume,
   type VersionStudio,
@@ -92,6 +105,8 @@ export function SubjectStudioTab() {
   const [isValidating, setIsValidating] = useState(false);
   const [enregistrement, setEnregistrement] = useState(false);
   const [message, setMessage] = useState<{ ok: boolean; texte: string } | null>(null);
+  const [confirmerPublication, setConfirmerPublication] = useState(false);
+  const [publication, setPublication] = useState(false);
 
   const charger = useCallback(async () => {
     setErreurListe(null);
@@ -174,6 +189,49 @@ export function SubjectStudioTab() {
       setMessage({ ok: false, texte: messageDe(e, "Enregistrement impossible.") });
     } finally {
       setEnregistrement(false);
+    }
+  };
+
+  const publier = async () => {
+    if (!version || !report?.readyToPublish) return;
+    setConfirmerPublication(false);
+    setPublication(true);
+    setMessage(null);
+    try {
+      await publierVersionStudio(version.id, {
+        ready: true,
+        validated_at: new Date(report.validatedAt).toISOString(),
+        results: report.results.map((r) => ({
+          type: r.type,
+          success: r.success,
+          passes: r.criteresPasses,
+          total: r.totalCriteres,
+        })),
+      });
+      // Relecture depuis le serveur : l'écran reflète l'état réellement publié.
+      setVersion(await chargerVersionStudio(version.id));
+      setMessage({
+        ok: true,
+        texte: `Version ${version.numero} publiée : elle est désormais immuable et disponible pour les élèves.`,
+      });
+    } catch (e) {
+      setMessage({ ok: false, texte: messageDe(e, "Publication impossible.") });
+    } finally {
+      setPublication(false);
+    }
+  };
+
+  const nouvelleVersion = async () => {
+    if (!version) return;
+    setMessage(null);
+    try {
+      const res = await creerNouvelleVersionStudio(version.sujet_id);
+      setVersion(await chargerVersionStudio(res.version_id));
+      setModifie(false);
+      setReport(null);
+      setMessage({ ok: true, texte: `Brouillon de la version ${res.numero} créé à partir de la version publiée.` });
+    } catch (e) {
+      setMessage({ ok: false, texte: messageDe(e, "Création de la version impossible.") });
     }
   };
 
@@ -309,18 +367,64 @@ export function SubjectStudioTab() {
             </Badge>
           )}
         </div>
-        {!verrouille && (
+        {!verrouille ? (
+          <div className="flex items-center gap-2">
+            <Button
+              size="sm"
+              variant="outline"
+              className="text-xs gap-1.5"
+              disabled={enregistrement || (!modifie && !estNouveau)}
+              onClick={() => void enregistrer()}
+            >
+              <Save className="w-3.5 h-3.5" />
+              {enregistrement ? "Enregistrement…" : "Enregistrer le brouillon"}
+            </Button>
+            <Button
+              size="sm"
+              className="text-xs gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white"
+              disabled={!report?.readyToPublish || modifie || estNouveau || publication}
+              title={
+                !report?.readyToPublish
+                  ? "Lancez d'abord le banc didactique : il doit être validé."
+                  : modifie || estNouveau
+                    ? "Enregistrez le brouillon avant de publier."
+                    : undefined
+              }
+              onClick={() => setConfirmerPublication(true)}
+            >
+              <Send className="w-3.5 h-3.5" />
+              {publication ? "Publication…" : `Publier la version ${version.numero}`}
+            </Button>
+          </div>
+        ) : (
           <Button
             size="sm"
+            variant="outline"
             className="text-xs gap-1.5"
-            disabled={enregistrement || (!modifie && !estNouveau)}
-            onClick={() => void enregistrer()}
+            onClick={() => void nouvelleVersion()}
           >
-            <Save className="w-3.5 h-3.5" />
-            {enregistrement ? "Enregistrement…" : "Enregistrer le brouillon"}
+            <Plus className="w-3.5 h-3.5" />
+            Créer la version {version.numero + 1}
           </Button>
         )}
       </div>
+
+      <AlertDialog open={confirmerPublication} onOpenChange={setConfirmerPublication}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Publier la version {version.numero} ?</AlertDialogTitle>
+            <AlertDialogDescription>
+              La version sera immédiatement disponible pour les élèves et ne pourra plus jamais
+              être modifiée (énoncé, fichiers, critères, solutions). Pour la corriger, vous
+              créerez une nouvelle version.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Annuler</AlertDialogCancel>
+            <AlertDialogAction onClick={() => void publier()}>Publier définitivement</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       {message && (
         <div
@@ -592,8 +696,8 @@ export function SubjectStudioTab() {
                 </div>
               )}
               <p className="text-[10px] text-muted-foreground">
-                La publication d'une version (et sa mise à disposition des élèves) n'est pas encore
-                disponible : les sujets enregistrés ici restent des brouillons.
+                Publier est définitif : la version devient immuable. Pour corriger un énoncé, un
+                fichier ou un critère, créez la version suivante.
               </p>
             </CardContent>
           </Card>

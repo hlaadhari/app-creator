@@ -32,6 +32,14 @@ const MESSAGES: Record<string, string> = {
     "Identifiant invalide : 3 à 61 caractères, minuscules, chiffres et tirets (ex. tp-menu-01).",
   titre_obligatoire: "Le titre du sujet est obligatoire.",
   version_introuvable: "Version de sujet introuvable.",
+  banc_non_valide:
+    "Publication refusée : le banc didactique doit être validé (2 solutions valides, 1 invalide).",
+  criteres_manquants: "Publication refusée : le sujet n'a aucun critère.",
+  criteres_sans_points: "Publication refusée : aucun critère ne rapporte de point.",
+  fichiers_manquants: "Publication refusée : le sujet n'a aucun fichier de départ.",
+  enonce_manquant: "Publication refusée : l'énoncé est vide.",
+  solution_manquante:
+    "Publication refusée : il faut les 3 solutions de contrôle (canonique, alternative, invalide).",
   "Version publiee immuable":
     "Cette version est publiée : elle est immuable. Créez une nouvelle version pour la modifier.",
 };
@@ -140,3 +148,22 @@ export async function enregistrerBrouillon(
 
 export const supprimerBrouillon = (versionId: string) =>
   appeler<void>("studio_supprimer_brouillon", { _version_id: versionId });
+
+export interface RapportBanc {
+  ready: boolean;
+  validated_at: string;
+  results: { type: string; success: boolean; passes: number; total: number }[];
+}
+
+/** Publie définitivement un brouillon enregistré ; le serveur re-vérifie la structure. */
+export const publierVersionStudio = (versionId: string, rapport: RapportBanc) =>
+  appeler<{ version_id: string; numero: number; sujet_id: string }>("studio_publier_version", {
+    _version_id: versionId,
+    _rapport: rapport,
+  });
+
+/** Copie la dernière version publiée en brouillon (numéro + 1). */
+export const creerNouvelleVersionStudio = (sujetId: string) =>
+  appeler<{ version_id: string; numero: number }>("studio_nouvelle_version", {
+    _sujet_id: sujetId,
+  });
