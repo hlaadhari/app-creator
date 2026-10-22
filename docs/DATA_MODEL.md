@@ -323,3 +323,11 @@ begin
 end $$;
 ```
 Ces triggers sont reliés aux tables `sujet_version_fichiers`, `criteres`, `solutions` et `indices`.
+
+## Studio de sujets (migration 0014, issue #92)
+
+- `sujets` gagne `auteur_id` et `duree_min` ; `sujet_versions` gagne `enonce_md`, `auteur_id`, `updated_at`.
+- La politique « Catalogue public » de `sujets` ne montre que les sujets ayant au moins une version publiée : un brouillon n'apparaît jamais chez les élèves.
+- `solutions_banc` (aucun GRANT, immuable une fois la version publiée) contient les 3 variantes du banc didactique (`canonique`, `alternative`, `invalide`), multi-fichiers. La variante canonique est aussi copiée dans `solutions` (corrigé élève) : une variante invalide n'est jamais servie par `debloquer_solution`.
+- `criteres.sonde` contient le critère JSON complet (format des `content/<sujet>/criteria.json`), `criteres.attendu` vaut `{"format":"json-v1"}`.
+- Fonctions `studio_lister_sujets`, `studio_charger_version`, `studio_enregistrer_brouillon`, `studio_supprimer_brouillon` : SECURITY DEFINER, réservées aux enseignants et administrateurs, écriture limitée à l'auteur (ou à un administrateur) et refusée sur une version publiée.

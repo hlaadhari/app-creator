@@ -1,324 +1,451 @@
-import React, { useState } from "react";
-import { Button } from "@/components/ui/button";
+import { useCallback, useEffect, useState } from "react";
+import {
+  AlertTriangle,
+  ArrowLeft,
+  BookOpen,
+  CheckCircle2,
+  FileCode,
+  Lock,
+  Plus,
+  Save,
+  ShieldCheck,
+  Trash2,
+  XCircle,
+} from "lucide-react";
+
+import { CriteriaEditor } from "@/components/teacher/CriteriaEditor";
+import { FilesEditor } from "@/components/teacher/FilesEditor";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { critereDepuisJson, type RawCriterion } from "@/lib/evaluation/critere-json";
+import { critereDepuisJson } from "@/lib/evaluation/critere-json";
 import { evaluerDansFrame } from "@/lib/evaluation/iframe-evaluation";
 import { validerBancDidactiqueReel } from "@/lib/subjects/banc-didactique";
+import type { PreValidationReport, ValidationSolution } from "@/lib/subjects/subject-studio";
 import {
-  publierVersionSujet,
-  creerNouvelleVersion,
-  type SubjectVersionRecord,
-  type PreValidationReport,
-  type ValidationSolution,
-} from "@/lib/subjects/subject-studio";
-import {
-  ShieldCheck,
-  Lock,
-  Plus,
-  CheckCircle2,
-  XCircle,
-  FileCode,
-  BookOpen,
-  Send,
-  AlertTriangle,
-} from "lucide-react";
+  chargerVersionStudio,
+  enregistrerBrouillon,
+  listerSujetsStudio,
+  supprimerBrouillon,
+  type SujetStudioResume,
+  type VersionStudio,
+} from "@/lib/supabase/studio";
 
-const INITIAL_SUBJECT_VERSION: SubjectVersionRecord<RawCriterion> = {
-  id: "v-carte-profil-1",
-  sujet_id: "carte-profil",
-  numero: 1,
-  titre: "Carte de présentation personnelle",
-  niveau: "Facile",
-  duree_min: 30,
-  publiee: false,
-  published_at: null,
-  enonce_md: `# Carte de Présentation Personnelle
+const NIVEAUX = ["Facile", "Moyen", "Difficile"] as const;
 
-## Contexte
-Créez une carte d'identité sémantique en HTML5 et CSS3.
-
-## Consignes
-1. Utilisez un élément \`<article class="carte">\`.
-2. Incluez un titre \`<h1>\` avec votre prénom.
-3. Insérez une liste \`<ul>\` d'au moins 3 centres d'intérêt.
-4. Ajoutez un lien email \`mailto:\`.
-`,
-  fichiers_depart: {
-    "index.html": `<!DOCTYPE html>
-<html lang="fr">
-<head>
-  <meta charset="UTF-8">
-  <link rel="stylesheet" href="style.css">
-  <title>Profil Élève</title>
-</head>
-<body>
-  <!-- À compléter par l'élève -->
-</body>
-</html>`,
-    "style.css": `body { font-family: sans-serif; }`,
-    "script.js": `// Aucun JS requis`,
+const SOLUTIONS_VIDES: ValidationSolution[] = [
+  {
+    id: "sol-canonique",
+    nom: "Solution A (canonique)",
+    type: "canonique",
+    description: "Solution de référence respectant l'énoncé.",
+    files: { "index.html": "" },
   },
-  criteres: [
-    {
-      id: "c1",
-      code: "DOM-01",
-      titre: "Élément <article class='carte'> présent",
-      points: 4,
-      sonde: { type: "dom_selector", selector: "article.carte" },
-      fail_message: "L'article avec la classe 'carte' est absent.",
-    },
-    {
-      id: "c2",
-      code: "DOM-02",
-      titre: "Titre <h1> dans l'article",
-      points: 5,
-      sonde: { type: "dom_selector", selector: "article.carte h1" },
-      fail_message: "Le titre h1 est absent de l'article.",
-    },
-    {
-      id: "c3",
-      code: "DOM-03",
-      titre: "Liste de 3 centres d'intérêt minimum",
-      points: 6,
-      sonde: { type: "dom_selector", selector: "article.carte ul > li", minCount: 3 },
-      fail_message: "La liste doit comporter au moins 3 éléments <li>.",
-    },
-    {
-      id: "c4",
-      code: "DOM-04",
-      titre: "Lien email mailto:",
-      points: 5,
-      sonde: { type: "dom_selector", selector: 'article.carte a[href^="mailto:"]' },
-      fail_message: "Le lien mailto: est manquant.",
-    },
-  ],
-  solutions_test: [
-    {
-      id: "sol-canonique",
-      nom: "Solution A (Canonique conforme)",
-      type: "canonique",
-      description:
-        "Solution standard rédigée par l'enseignant respectant scrupuleusement l'énoncé.",
-      files: {
-        "index.html": `
-          <article class="carte">
-            <h1>Hatem</h1>
-            <p>Élève passionné de STI2D.</p>
-            <ul>
-              <li>Robotique</li>
-              <li>Programmation</li>
-              <li>Réseaux</li>
-            </ul>
-            <a href="mailto:eleve@lycee.tn">Contact</a>
-          </article>
-        `,
-        "style.css": "body { margin: 20px; }",
-        "script.js": "",
-      },
-    },
-    {
-      id: "sol-alternative",
-      nom: "Solution B (Alternative valide avec spans)",
-      type: "alternative",
-      description: "Variante valide avec balisage plus riche (spans, strong, 4 items).",
-      files: {
-        "index.html": `
-          <article class="carte">
-            <h1><span>Amira</span></h1>
-            <p>Élève de <strong>Terminale</strong>.</p>
-            <ul>
-              <li><span>Électronique</span></li>
-              <li><span>Algorithmique</span></li>
-              <li><span>Web Design</span></li>
-              <li><span>Musique</span></li>
-            </ul>
-            <a href="mailto:amira@ecole.org">Envoyer un mail</a>
-          </article>
-        `,
-        "style.css": "",
-        "script.js": "",
-      },
-    },
-    {
-      id: "sol-invalide",
-      nom: "Solution C (Invalide didactique - 2 items seulement)",
-      type: "invalide",
-      description:
-        "Solution contenant une erreur courante (liste de seulement 2 items au lieu de 3).",
-      files: {
-        "index.html": `
-          <article class="carte">
-            <h1>Karim</h1>
-            <p>Passionné d'informatique.</p>
-            <ul>
-              <li>Jeux</li>
-              <li>Musique</li>
-            </ul>
-            <a href="mailto:karim@lycee.tn">Contact</a>
-          </article>
-        `,
-        "style.css": "",
-        "script.js": "",
-      },
-    },
-  ],
-};
+  {
+    id: "sol-alternative",
+    nom: "Solution B (alternative valide)",
+    type: "alternative",
+    description: "Autre solution correcte, rédigée différemment.",
+    files: { "index.html": "" },
+  },
+  {
+    id: "sol-invalide",
+    nom: "Solution C (invalide)",
+    type: "invalide",
+    description: "Solution contenant une erreur courante : elle doit perdre des points.",
+    files: { "index.html": "" },
+  },
+];
+
+const PAGE_DE_DEPART =
+  '<!DOCTYPE html>\n<html lang="fr">\n<head>\n  <meta charset="UTF-8">\n  <title>Sujet</title>\n</head>\n<body>\n  <!-- À compléter par l\'élève -->\n</body>\n</html>\n';
+
+function nouveauSujet(): VersionStudio {
+  return {
+    id: "",
+    sujet_id: "",
+    numero: 1,
+    titre: "",
+    niveau: "Facile",
+    duree_min: 30,
+    competence: "",
+    enonce_md: "",
+    publiee: false,
+    criteres: [],
+    indices: [],
+    fichiers_depart: { "index.html": PAGE_DE_DEPART },
+    solutions_test: SOLUTIONS_VIDES.map((s) => ({ ...s, files: { ...s.files } })),
+  };
+}
+
+const messageDe = (e: unknown, defaut: string) => (e instanceof Error ? e.message : defaut);
 
 export function SubjectStudioTab() {
-  const [version, setVersion] = useState<SubjectVersionRecord<RawCriterion>>(INITIAL_SUBJECT_VERSION);
+  const [sujets, setSujets] = useState<SujetStudioResume[] | null>(null);
+  const [erreurListe, setErreurListe] = useState<string | null>(null);
+  const [version, setVersion] = useState<VersionStudio | null>(null);
+  const [estNouveau, setEstNouveau] = useState(false);
+  const [modifie, setModifie] = useState(false);
   const [report, setReport] = useState<PreValidationReport | null>(null);
   const [isValidating, setIsValidating] = useState(false);
-  const [publishMessage, setPublishMessage] = useState<string | null>(null);
+  const [enregistrement, setEnregistrement] = useState(false);
+  const [message, setMessage] = useState<{ ok: boolean; texte: string } | null>(null);
 
-  // Exécution du banc didactique
-  const handleRunValidation = async () => {
+  const charger = useCallback(async () => {
+    setErreurListe(null);
+    try {
+      setSujets(await listerSujetsStudio());
+    } catch (e) {
+      setSujets([]);
+      setErreurListe(messageDe(e, "Chargement impossible."));
+    }
+  }, []);
+
+  useEffect(() => {
+    void charger();
+  }, [charger]);
+
+  const modifier = (changements: Partial<VersionStudio>) => {
+    setVersion((v) => (v ? { ...v, ...changements } : v));
+    setModifie(true);
+    setReport(null);
+    setMessage(null);
+  };
+
+  const ouvrir = async (versionId: string) => {
+    setMessage(null);
+    try {
+      setVersion(await chargerVersionStudio(versionId));
+      setEstNouveau(false);
+      setModifie(false);
+      setReport(null);
+    } catch (e) {
+      setMessage({ ok: false, texte: messageDe(e, "Ouverture impossible.") });
+    }
+  };
+
+  const fermer = () => {
+    setVersion(null);
+    setMessage(null);
+    void charger();
+  };
+
+  const supprimer = async (s: SujetStudioResume) => {
+    try {
+      await supprimerBrouillon(s.version_id);
+      await charger();
+    } catch (e) {
+      setErreurListe(messageDe(e, "Suppression impossible."));
+    }
+  };
+
+  const lancerBanc = async () => {
+    if (!version) return;
     setIsValidating(true);
     try {
       // Même moteur que pour les élèves : scripts exécutés, chaque critère évalué sur sa page.
-      const rep = await validerBancDidactiqueReel(
-        version.criteres.map(critereDepuisJson),
-        version.solutions_test,
-        (fichiers) => (page, criteres) => evaluerDansFrame(fichiers, page, criteres),
+      setReport(
+        await validerBancDidactiqueReel(
+          version.criteres.map(critereDepuisJson),
+          version.solutions_test,
+          (fichiers) => (page, criteres) => evaluerDansFrame(fichiers, page, criteres),
+        ),
       );
-      setReport(rep);
+    } catch (e) {
+      setMessage({ ok: false, texte: messageDe(e, "Banc interrompu.") });
     } finally {
       setIsValidating(false);
     }
   };
 
-  // Publication immuable
-  const handlePublish = () => {
-    if (!report) return;
-    const res = publierVersionSujet(version, report);
-    if (res.success && res.version) {
-      setVersion(res.version);
-      setPublishMessage(
-        "Banc didactique validé. Brouillon local : l'enregistrement en base du sujet n'est pas encore branché.",
-      );
-    } else {
-      setPublishMessage(res.error || "Erreur de publication.");
+  const enregistrer = async () => {
+    if (!version) return;
+    setEnregistrement(true);
+    setMessage(null);
+    try {
+      const res = await enregistrerBrouillon(version, estNouveau);
+      setVersion({ ...version, id: res.version_id, numero: res.numero });
+      setEstNouveau(false);
+      setModifie(false);
+      setMessage({ ok: true, texte: "Brouillon enregistré." });
+    } catch (e) {
+      setMessage({ ok: false, texte: messageDe(e, "Enregistrement impossible.") });
+    } finally {
+      setEnregistrement(false);
     }
   };
 
-  // Création d'une nouvelle version incrémentale
-  const handleCreateNewVersion = () => {
-    const next = creerNouvelleVersion(version, {
-      titre: `${version.titre} (Révision)`,
-    });
-    setVersion(next);
-    setReport(null);
-    setPublishMessage(`Nouvelle version de travail v${next.numero} initialisée.`);
-  };
-
-  return (
-    <div className="space-y-6">
-      {/* En-tête du Studio */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b pb-4">
-        <div>
-          <div className="flex items-center gap-2">
-            <h2 className="text-base font-bold tracking-tight">
-              Studio de Conception & Immuabilité
-            </h2>
-            {version.publiee ? (
-              <Badge className="bg-emerald-600/10 text-emerald-600 border-emerald-600/20 gap-1">
-                <Lock className="w-3 h-3" />
-                Version {version.numero} Publiée (Immuable)
-              </Badge>
-            ) : (
-              <Badge
-                variant="outline"
-                className="border-amber-500/30 text-amber-600 bg-amber-500/10"
-              >
-                Brouillon v{version.numero}
-              </Badge>
-            )}
+  // ---------------------------------------------------------------- Liste des sujets
+  if (!version) {
+    return (
+      <div className="space-y-4">
+        <div className="flex items-center justify-between border-b pb-3">
+          <div>
+            <h2 className="text-base font-bold tracking-tight">Studio de conception</h2>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              Créez un TP ou un examen : énoncé, fichiers de départ, critères et 3 solutions de
+              contrôle (2 valides, 1 invalide).
+            </p>
           </div>
-          <p className="text-xs text-muted-foreground mt-0.5">
-            Règle didactique PRD §10.4 : 2 solutions valides et 1 invalide requises avant
-            publication.
-          </p>
+          <Button
+            size="sm"
+            className="text-xs gap-1.5"
+            onClick={() => {
+              setVersion(nouveauSujet());
+              setEstNouveau(true);
+              setModifie(false);
+              setReport(null);
+              setMessage(null);
+            }}
+          >
+            <Plus className="w-3.5 h-3.5" />
+            Nouveau sujet
+          </Button>
         </div>
 
-        <div className="flex items-center gap-2">
-          {version.publiee ? (
+        {message && !message.ok && (
+          <p role="alert" className="text-xs text-destructive">
+            {message.texte}
+          </p>
+        )}
+        {erreurListe && (
+          <div
+            role="alert"
+            className="p-3 rounded-lg text-xs border border-destructive/30 text-destructive"
+          >
+            {erreurListe}{" "}
             <Button
               size="sm"
               variant="outline"
-              onClick={handleCreateNewVersion}
-              className="text-xs gap-1.5"
+              className="h-6 ml-2 text-xs"
+              onClick={() => void charger()}
             >
-              <Plus className="w-3.5 h-3.5" />
-              Créer la version {version.numero + 1}
+              Réessayer
             </Button>
-          ) : (
-            <Button
-              size="sm"
-              onClick={handlePublish}
-              disabled={!report?.readyToPublish}
-              className="text-xs gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white"
-            >
-              <Send className="w-3.5 h-3.5" />
-              Publier la version {version.numero}
-            </Button>
-          )}
+          </div>
+        )}
+        {sujets === null && <p className="text-xs text-muted-foreground">Chargement…</p>}
+        {sujets && sujets.length === 0 && !erreurListe && (
+          <p className="text-xs text-muted-foreground">
+            Aucun sujet pour le moment. Cliquez sur « Nouveau sujet » pour commencer.
+          </p>
+        )}
+        <div className="space-y-2">
+          {sujets?.map((s) => (
+            <Card key={s.version_id}>
+              <CardContent className="p-3 flex items-center justify-between gap-3">
+                <div className="min-w-0">
+                  <div className="text-sm font-semibold truncate">{s.titre}</div>
+                  <div className="text-[11px] text-muted-foreground font-mono">
+                    {s.sujet_id} · v{s.numero} · {s.niveau}
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 shrink-0">
+                  {s.publiee ? (
+                    <Badge className="gap-1 text-[10px] bg-emerald-600/10 text-emerald-600 border-emerald-600/20">
+                      <Lock className="w-3 h-3" />
+                      Publiée
+                    </Badge>
+                  ) : (
+                    <Badge
+                      variant="outline"
+                      className="text-[10px] border-amber-500/30 text-amber-600"
+                    >
+                      Brouillon
+                    </Badge>
+                  )}
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="h-7 text-xs"
+                    onClick={() => void ouvrir(s.version_id)}
+                  >
+                    {s.publiee ? "Consulter" : "Modifier"}
+                  </Button>
+                  {!s.publiee && (
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="h-7 text-xs text-destructive"
+                      aria-label={`Supprimer le brouillon ${s.titre}`}
+                      onClick={() => void supprimer(s)}
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </Button>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          ))}
         </div>
       </div>
+    );
+  }
 
-      {publishMessage && (
+  // ---------------------------------------------------------------- Édition
+  const verrouille = version.publiee;
+  const total = version.criteres.reduce((s, c) => s + (Number(c.points) || 0), 0);
+
+  return (
+    <div className="space-y-6">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b pb-3">
+        <div className="flex items-center gap-2">
+          <Button size="sm" variant="ghost" className="h-7 text-xs gap-1" onClick={fermer}>
+            <ArrowLeft className="w-3.5 h-3.5" />
+            Mes sujets
+          </Button>
+          <h2 className="text-base font-bold tracking-tight">{version.titre || "Nouveau sujet"}</h2>
+          {verrouille ? (
+            <Badge className="gap-1 text-[10px] bg-emerald-600/10 text-emerald-600 border-emerald-600/20">
+              <Lock className="w-3 h-3" />
+              Version {version.numero} publiée (immuable)
+            </Badge>
+          ) : (
+            <Badge variant="outline" className="text-[10px] border-amber-500/30 text-amber-600">
+              Brouillon v{version.numero}
+              {modifie ? " · non enregistré" : ""}
+            </Badge>
+          )}
+        </div>
+        {!verrouille && (
+          <Button
+            size="sm"
+            className="text-xs gap-1.5"
+            disabled={enregistrement || (!modifie && !estNouveau)}
+            onClick={() => void enregistrer()}
+          >
+            <Save className="w-3.5 h-3.5" />
+            {enregistrement ? "Enregistrement…" : "Enregistrer le brouillon"}
+          </Button>
+        )}
+      </div>
+
+      {message && (
         <div
-          className={`p-3 rounded-lg text-xs flex items-center gap-2 ${
-            version.publiee
-              ? "bg-emerald-500/10 text-emerald-600 border border-emerald-500/20"
-              : "bg-blue-500/10 text-blue-600 border border-blue-500/20"
+          role={message.ok ? "status" : "alert"}
+          className={`p-3 rounded-lg text-xs border ${
+            message.ok
+              ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20"
+              : "bg-destructive/10 text-destructive border-destructive/20"
           }`}
         >
-          <ShieldCheck className="w-4 h-4 flex-shrink-0" />
-          <span>{publishMessage}</span>
+          {message.texte}
         </div>
       )}
 
-      {/* Métadonnées & Énoncé Markdown */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-4">
           <Card>
             <CardContent className="p-4 space-y-3">
-              <div className="flex items-center gap-2 text-xs font-semibold text-foreground">
+              <div className="flex items-center gap-2 text-xs font-semibold">
                 <BookOpen className="w-4 h-4 text-primary" />
-                <span>Énoncé Pédagogique (Markdown)</span>
+                <span>Sujet et énoncé (Markdown)</span>
               </div>
-              <div>
-                <Label htmlFor="titre-sujet" className="text-xs">
-                  Titre du sujet
-                </Label>
-                <Input
-                  id="titre-sujet"
-                  value={version.titre}
-                  disabled={version.publiee}
-                  onChange={(e) => setVersion({ ...version, titre: e.target.value })}
-                  className="text-xs mt-1"
-                />
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <Label htmlFor="sujet-id" className="text-xs">
+                    Identifiant
+                  </Label>
+                  <Input
+                    id="sujet-id"
+                    value={version.sujet_id}
+                    disabled={!estNouveau}
+                    placeholder="tp-menu-01"
+                    onChange={(e) => modifier({ sujet_id: e.target.value.trim() })}
+                    className="text-xs mt-1 font-mono"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="titre-sujet" className="text-xs">
+                    Titre du sujet
+                  </Label>
+                  <Input
+                    id="titre-sujet"
+                    value={version.titre}
+                    disabled={verrouille}
+                    onChange={(e) => modifier({ titre: e.target.value })}
+                    className="text-xs mt-1"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="sujet-niveau" className="text-xs">
+                    Niveau
+                  </Label>
+                  <select
+                    id="sujet-niveau"
+                    value={version.niveau}
+                    disabled={verrouille}
+                    onChange={(e) =>
+                      modifier({ niveau: e.target.value as VersionStudio["niveau"] })
+                    }
+                    className="w-full mt-1 h-9 px-2 text-xs border rounded-md bg-background"
+                  >
+                    {NIVEAUX.map((n) => (
+                      <option key={n} value={n}>
+                        {n}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <Label htmlFor="sujet-duree" className="text-xs">
+                    Durée (minutes)
+                  </Label>
+                  <Input
+                    id="sujet-duree"
+                    type="number"
+                    min={5}
+                    max={600}
+                    value={version.duree_min}
+                    disabled={verrouille}
+                    onChange={(e) => modifier({ duree_min: Number(e.target.value) || 30 })}
+                    className="text-xs mt-1"
+                  />
+                </div>
+                <div className="sm:col-span-2">
+                  <Label htmlFor="sujet-competence" className="text-xs">
+                    Compétence visée
+                  </Label>
+                  <Input
+                    id="sujet-competence"
+                    value={version.competence ?? ""}
+                    disabled={verrouille}
+                    placeholder="HTML – structure sémantique"
+                    onChange={(e) => modifier({ competence: e.target.value })}
+                    className="text-xs mt-1"
+                  />
+                </div>
               </div>
-
               <div>
                 <Label htmlFor="enonce-md" className="text-xs">
-                  Consignes & Directives
+                  Consignes et directives
                 </Label>
                 <textarea
                   id="enonce-md"
-                  rows={8}
-                  disabled={version.publiee}
+                  rows={9}
+                  disabled={verrouille}
                   value={version.enonce_md}
-                  onChange={(e) => setVersion({ ...version, enonce_md: e.target.value })}
+                  onChange={(e) => modifier({ enonce_md: e.target.value })}
                   className="w-full mt-1 p-2 text-xs font-mono border rounded-md bg-background"
                 />
               </div>
             </CardContent>
           </Card>
 
-          {/* Critères d'évaluation */}
+          <Card>
+            <CardContent className="p-4 space-y-3">
+              <div className="text-xs font-semibold">Fichiers de départ fournis à l'élève</div>
+              <FilesEditor
+                idPrefix="depart"
+                files={version.fichiers_depart}
+                disabled={verrouille}
+                onChange={(fichiers_depart) => modifier({ fichiers_depart })}
+              />
+            </CardContent>
+          </Card>
+
           <Card>
             <CardContent className="p-4 space-y-3">
               <div className="flex items-center justify-between">
@@ -326,98 +453,114 @@ export function SubjectStudioTab() {
                   <FileCode className="w-4 h-4 text-primary" />
                   <span>Critères de correction ({version.criteres.length})</span>
                 </div>
-                <span className="text-xs font-semibold text-primary">
-                  Total : {version.criteres.reduce((s, c) => s + c.points, 0)} points
-                </span>
+                <span className="text-xs font-semibold text-primary">Total : {total} points</span>
               </div>
-
-              <div className="space-y-2">
-                {version.criteres.map((c) => (
-                  <div
-                    key={c.id}
-                    className="p-2.5 border rounded-lg bg-card/50 flex items-center justify-between text-xs"
-                  >
-                    <div>
-                      <span className="font-semibold text-primary mr-2">[{String(c.code ?? c.id)}]</span>
-                      <span className="text-foreground">{c.titre ?? c.label}</span>
-                    </div>
-                    <Badge variant="outline" className="text-[10px]">
-                      {c.points} pts
-                    </Badge>
-                  </div>
-                ))}
-              </div>
+              <CriteriaEditor
+                key={version.id || "nouveau"}
+                criteres={version.criteres}
+                disabled={verrouille}
+                onChange={(criteres) => modifier({ criteres })}
+              />
             </CardContent>
           </Card>
+
+          <Card>
+            <CardContent className="p-4 space-y-3">
+              <Label htmlFor="indices-sujet" className="text-xs font-semibold">
+                Indices (un par ligne, du plus discret au plus explicite)
+              </Label>
+              <textarea
+                id="indices-sujet"
+                rows={4}
+                disabled={verrouille}
+                value={(version.indices ?? []).join("\n")}
+                onChange={(e) =>
+                  modifier({ indices: e.target.value.split("\n").filter((l) => l.trim() !== "") })
+                }
+                className="w-full p-2 text-xs border rounded-md bg-background"
+              />
+            </CardContent>
+          </Card>
+
+          {version.solutions_test.map((sol, i) => (
+            <Card key={sol.id}>
+              <CardContent className="p-4 space-y-3">
+                <div className="text-xs font-semibold">{sol.nom}</div>
+                <p className="text-[11px] text-muted-foreground">{sol.description}</p>
+                <FilesEditor
+                  idPrefix={sol.id}
+                  files={sol.files}
+                  disabled={verrouille}
+                  onChange={(files) =>
+                    modifier({
+                      solutions_test: version.solutions_test.map((s, j) =>
+                        j === i ? { ...s, files } : s,
+                      ),
+                    })
+                  }
+                />
+              </CardContent>
+            </Card>
+          ))}
         </div>
 
-        {/* Panneau de Pré-validation Didactique (Bouton publier verrouillé tant que non validé) */}
         <div className="space-y-4">
           <Card className="border-primary/20">
             <CardContent className="p-4 space-y-4">
               <div className="flex items-center gap-2">
                 <ShieldCheck className="w-4 h-4 text-primary" />
-                <h3 className="text-xs font-bold uppercase tracking-wider">
-                  Banc Didactique Pré-Publication
-                </h3>
+                <h3 className="text-xs font-bold uppercase tracking-wider">Banc didactique</h3>
               </div>
-
-              <p className="text-xs text-muted-foreground">
-                Conformément au PRD §10.4, le bouton « Publier » reste verrouillé tant que :
-              </p>
+              <p className="text-xs text-muted-foreground">Avant toute publication (PRD §10.4) :</p>
               <ul className="text-[11px] space-y-1 text-muted-foreground list-disc list-inside">
-                <li>La solution canonique valide obtient 100%</li>
-                <li>La solution alternative valide obtient 100%</li>
-                <li>La solution invalide échoue à au moins un critère</li>
+                <li>la solution canonique obtient tous les points</li>
+                <li>la solution alternative obtient tous les points</li>
+                <li>la solution invalide perd au moins un critère</li>
+                <li>chaque critère a une vérification automatique réelle</li>
               </ul>
-
               <Button
                 size="sm"
-                onClick={handleRunValidation}
-                disabled={isValidating || version.publiee}
+                onClick={() => void lancerBanc()}
+                disabled={isValidating}
                 className="w-full text-xs gap-1.5"
               >
                 <ShieldCheck className="w-3.5 h-3.5" />
-                {isValidating ? "Exécution du banc..." : "Lancer le banc didactique"}
+                {isValidating ? "Exécution du banc…" : "Lancer le banc didactique"}
               </Button>
 
-              {/* État des 3 solutions */}
               <div className="space-y-2 pt-2 border-t">
                 {version.solutions_test.map((sol) => {
-                  const solRes = report?.results.find((r) => r.type === sol.type);
-
+                  const res = report?.results.find((r) => r.type === sol.type);
                   return (
                     <div
                       key={sol.id}
                       className="p-2.5 border rounded-lg text-xs space-y-1 bg-card/60"
                     >
                       <div className="flex items-center justify-between">
-                        <span className="font-medium text-foreground text-[11px]">{sol.nom}</span>
-                        {solRes ? (
-                          solRes.success ? (
+                        <span className="font-medium text-[11px]">{sol.nom}</span>
+                        {res ? (
+                          res.success ? (
                             <Badge className="bg-emerald-500/10 text-emerald-600 border-emerald-500/20 gap-1 text-[10px]">
                               <CheckCircle2 className="w-3 h-3" />
-                              Succès ({solRes.criteresPasses}/{solRes.totalCriteres})
+                              Conforme ({res.criteresPasses}/{res.totalCriteres})
                             </Badge>
                           ) : (
                             <Badge variant="destructive" className="gap-1 text-[10px]">
                               <XCircle className="w-3 h-3" />
-                              Échec
+                              Non conforme
                             </Badge>
                           )
                         ) : (
                           <Badge variant="outline" className="text-[10px] text-muted-foreground">
-                            En attente de test
+                            Non testée
                           </Badge>
                         )}
                       </div>
-                      <p className="text-[10px] text-muted-foreground">{sol.description}</p>
                     </div>
                   );
                 })}
               </div>
 
-              {/* Résumé de conformité */}
               {report && (
                 <div
                   className={`p-3 rounded-lg text-xs border ${
@@ -430,7 +573,7 @@ export function SubjectStudioTab() {
                     {report.readyToPublish ? (
                       <>
                         <CheckCircle2 className="w-4 h-4" />
-                        <span>Sujet certifié prêt à la publication !</span>
+                        <span>Banc validé : le sujet est prêt pour la publication.</span>
                       </>
                     ) : (
                       <>
@@ -448,6 +591,10 @@ export function SubjectStudioTab() {
                   )}
                 </div>
               )}
+              <p className="text-[10px] text-muted-foreground">
+                La publication d'une version (et sa mise à disposition des élèves) n'est pas encore
+                disponible : les sujets enregistrés ici restent des brouillons.
+              </p>
             </CardContent>
           </Card>
         </div>
