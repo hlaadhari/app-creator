@@ -40,7 +40,7 @@ export interface PreValidationReport {
   validatedAt: number;
 }
 
-export interface SubjectVersionRecord {
+export interface SubjectVersionRecord<C = CriterionDefinition> {
   id: string;
   sujet_id: string;
   numero: number;
@@ -50,7 +50,7 @@ export interface SubjectVersionRecord {
   duree_min: number;
   publiee: boolean;
   published_at?: string | null;
-  criteres: CriterionDefinition[];
+  criteres: C[];
   fichiers_depart: Record<string, string>;
   solutions_test: ValidationSolution[];
 }
@@ -228,10 +228,10 @@ export function validerBancDidactique(
  * Tente de publier une version de sujet
  * Condition sine qua non : le banc didactique doit être validé !
  */
-export function publierVersionSujet(
-  version: SubjectVersionRecord,
+export function publierVersionSujet<C = CriterionDefinition>(
+  version: SubjectVersionRecord<C>,
   preValidationReport: PreValidationReport,
-): { success: boolean; version?: SubjectVersionRecord; error?: string } {
+): { success: boolean; version?: SubjectVersionRecord<C>; error?: string } {
   if (version.publiee) {
     return {
       success: false,
@@ -246,7 +246,7 @@ export function publierVersionSujet(
     };
   }
 
-  const updatedVersion: SubjectVersionRecord = {
+  const updatedVersion: SubjectVersionRecord<C> = {
     ...version,
     publiee: true,
     published_at: new Date().toISOString(),
@@ -262,12 +262,12 @@ export function publierVersionSujet(
  * Crée une nouvelle version incrémentale à partir d'une version publiée (PRD F-36, T-09)
  * Garantit que la version publiée reste inchangée et que les projets en cours ne sont pas corrompus.
  */
-export function creerNouvelleVersion(
-  currentVersion: SubjectVersionRecord,
+export function creerNouvelleVersion<C = CriterionDefinition>(
+  currentVersion: SubjectVersionRecord<C>,
   modifications: Partial<
-    Omit<SubjectVersionRecord, "id" | "sujet_id" | "numero" | "publiee" | "published_at">
+    Omit<SubjectVersionRecord<C>, "id" | "sujet_id" | "numero" | "publiee" | "published_at">
   >,
-): SubjectVersionRecord {
+): SubjectVersionRecord<C> {
   if (!currentVersion.publiee) {
     throw new Error("Impossible d'incrémenter une version qui n'est pas encore publiée.");
   }
