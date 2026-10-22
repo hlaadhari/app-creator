@@ -118,7 +118,7 @@ describe("Critères sans vérification réelle (issue #82)", () => {
     });
 
     it("un sujet sans critère vérifiable obtient 0 point vérifiable, pas 20/20", () => {
-      for (const id of ["ex-html-css-01", "ex-js-01", "ex-sql-01", "tp-fs-01", "tp-fs-02"]) {
+      for (const id of ["ex-sql-01", "tp-fs-02"]) {
         const sujet = contentSubjects.find((s) => s.id === id)!;
         const { doc, win } = documentVide();
         const sc = score(runCriteria(sujet.criteria, doc, win));
@@ -126,6 +126,16 @@ describe("Critères sans vérification réelle (issue #82)", () => {
         expect(sc.verifiable, id).toBe(0);
         expect(sc.got, id).toBe(0);
         expect(sc.nonVerifiable, id).toBe(sc.total);
+      }
+    });
+
+    it("ex-html-css-01 et ex-js-01 ont désormais tous leurs critères vérifiables", () => {
+      for (const id of ["ex-html-css-01", "ex-js-01"]) {
+        const sujet = contentSubjects.find((s) => s.id === id)!;
+        expect(
+          sujet.criteria.every((c) => c.automatique !== false),
+          id,
+        ).toBe(true);
       }
     });
 

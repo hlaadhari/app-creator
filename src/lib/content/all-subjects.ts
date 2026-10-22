@@ -1,4 +1,5 @@
 import type { Exercise, Criterion } from "../exercises";
+import { construireVerificationDeclaree } from "../evaluation/declared-criteria";
 
 interface RawProbe {
   type?: string;
@@ -228,32 +229,36 @@ const rawSubjects = [
       },
       {
         id: "c2_length_control",
-        titre: "Contrôle de la longueur (.length === 8)",
+        titre: "Rejet des saisies trop longues",
         points: 4,
         fail_message:
-          "Le code doit utiliser la propriété .length pour contrôler que le CIN comporte 8 caractères.",
-        type: "code_contains",
-        patterns: [".length", "8"],
+          "La fonction verif() doit retourner false si le CIN comporte plus de 8 caractères (ex: '123456789'), tout en acceptant un CIN valide.",
+        type: "js_test_execution",
+        input_cin: "123456789",
+        expected_return: false,
+        controle_positif: { cin: "09876543" },
       },
       {
         id: "c3_reject_short",
         titre: "Rejet des saisies trop courtes",
         points: 4,
         fail_message:
-          "La fonction verif() doit retourner false si le CIN comporte moins de 8 caractères (ex: '12345').",
+          "La fonction verif() doit retourner false si le CIN comporte moins de 8 caractères (ex: '12345'), tout en acceptant un CIN valide.",
         type: "js_test_execution",
         input_cin: "12345",
         expected_return: false,
+        controle_positif: { cin: "09876543" },
       },
       {
         id: "c4_reject_alpha",
         titre: "Rejet des caractères non numériques",
         points: 4,
         fail_message:
-          "La fonction verif() doit retourner false si le CIN contient des lettres ou symboles (ex: '1234567A').",
+          "La fonction verif() doit retourner false si le CIN contient des lettres ou symboles (ex: '1234567A'), tout en acceptant un CIN valide.",
         type: "js_test_execution",
         input_cin: "1234567A",
         expected_return: false,
+        controle_positif: { cin: "09876543" },
       },
       {
         id: "c5_accept_valid",
@@ -1607,12 +1612,16 @@ export const contentSubjects: SubjectContentItem[] = rawSubjects.map((item) => (
   enonceMarkdown: item.enonceMarkdown,
   starter: item.starter,
   hints: item.hints,
-  criteria: item.rawCriteria.map((c: RawCriterion) => ({
-    id: (c.id as string) || (c.code as string) || "crit",
-    label: (c.titre as string) || (c.label as string) || "Critère",
-    points: c.points,
-    fail: (c.fail_message as string) || (c.fail as string) || "Critère non satisfait",
-    automatique: sondeEstVerifiable(c.sonde),
-    check: makeProbeCheck(c.sonde),
-  })),
+  criteria: item.rawCriteria.map((c: RawCriterion) => {
+    // Vérification déclarée dans le critère (CSS calculé, fonction JS…), sinon sonde explicite.
+    const declaree = construireVerificationDeclaree(c);
+    return {
+      id: (c.id as string) || (c.code as string) || "crit",
+      label: (c.titre as string) || (c.label as string) || "Critère",
+      points: c.points,
+      fail: (c.fail_message as string) || (c.fail as string) || "Critère non satisfait",
+      automatique: declaree !== null || sondeEstVerifiable(c.sonde),
+      check: declaree ?? makeProbeCheck(c.sonde),
+    };
+  }),
 }));
