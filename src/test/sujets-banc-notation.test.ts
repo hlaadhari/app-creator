@@ -317,6 +317,192 @@ describe("Banc de test de la notation : examens à plusieurs pages", () => {
   });
 });
 
+describe("Banc de test de la notation : JavaScript des examens (js_test_cas)", () => {
+  const ID25 = "exam-bac2025-droits-acces";
+  const ID26B = "exam-bac2026-bijoux-aurythia";
+  const ID26C = "exam-bac2026-croisieres-marivana";
+
+  const lireJs = (id: string, fichier: string) => lireVariante(id, "solution")[fichier] as string;
+  /** Remplace une fonction (de `function nom` jusqu'à son accolade fermante de tête de ligne). */
+  const remplacerFonction = (code: string, nom: string, nouvelle: string) => {
+    const debut = code.indexOf(`function ${nom}(`);
+    expect(debut, `fonction ${nom}`).toBeGreaterThanOrEqual(0);
+    const fin = code.indexOf("\n}\n", debut) + 3;
+    return code.slice(0, debut) + nouvelle + "\n" + code.slice(fin);
+  };
+
+  describe("Bac 2025 – verif1, verif2, choix1-3", () => {
+    const js = () => lireJs(ID25, "mesControles.js");
+
+    it("le corrigé gagne les critères JavaScript, le code de départ aucun", async () => {
+      const sol = await evaluer(ID25, lireVariante(ID25, "solution"));
+      expect(sol.reussis).toEqual(expect.arrayContaining(["EX25-07", "EX25-10"]));
+      const dep = await evaluer(ID25, lireVariante(ID25, "initial"));
+      expect(dep.echoues).toEqual(expect.arrayContaining(["EX25-07", "EX25-10"]));
+    });
+
+    it("une réécriture valide (expressions régulières, autre logique) gagne les mêmes points", async () => {
+      let code = remplacerFonction(
+        js(),
+        "verif1",
+        `function verif1() {
+  var id = document.getElementById("idUtil").value;
+  var nom = document.getElementById("nomPrenom").value;
+  if (!/^U\\d{3}$/.test(id) || !/^[A-Za-z ]{5,50}$/.test(nom)) {
+    alert("Saisie invalide");
+    return false;
+  }
+  return true;
+}`,
+      );
+      code = remplacerFonction(
+        code,
+        "choix2",
+        `function choix2() {
+  var lecture = document.getElementById("lecture");
+  if (lecture.checked === false) {
+    document.getElementById("ecriture").checked = lecture.checked;
+    document.getElementById("impression").checked = lecture.checked;
+  }
+}`,
+      );
+      const r = await evaluer(ID25, avec(ID25, { "mesControles.js": code }));
+      expect(r.reussis).toEqual(expect.arrayContaining(["EX25-07", "EX25-10"]));
+    });
+
+    it("verif1 qui accepte tout, ou qui refuse tout, ne gagne rien", async () => {
+      for (const corps of ["return true;", "return false;"]) {
+        const code = remplacerFonction(js(), "verif1", `function verif1() { ${corps} }`);
+        const r = await evaluer(ID25, avec(ID25, { "mesControles.js": code }));
+        expect(r.echoues, corps).toContain("EX25-07");
+      }
+    });
+
+    it("un choix2 qui décoche toujours, ou un verif2 qui ignore les droits, fait perdre EX25-10", async () => {
+      const toujoursDecoche = remplacerFonction(
+        js(),
+        "choix2",
+        `function choix2() {
+  document.getElementById("ecriture").checked = false;
+  document.getElementById("impression").checked = false;
+}`,
+      );
+      const r1 = await evaluer(ID25, avec(ID25, { "mesControles.js": toujoursDecoche }));
+      expect(r1.echoues).toContain("EX25-10");
+
+      const sansDroits = remplacerFonction(
+        js(),
+        "verif2",
+        `function verif2() { return document.getElementById("doc").value !== ""; }`,
+      );
+      const r2 = await evaluer(ID25, avec(ID25, { "mesControles.js": sansDroits }));
+      expect(r2.echoues).toContain("EX25-10");
+    });
+  });
+
+  describe("Bac 2026 Bijoux – valide1, valide2", () => {
+    const js = () => lireJs(ID26B, "mesControles.js");
+
+    it("le corrigé gagne les critères JavaScript, le code de départ aucun", async () => {
+      const sol = await evaluer(ID26B, lireVariante(ID26B, "solution"));
+      expect(sol.reussis).toEqual(expect.arrayContaining(["EX26B-06", "EX26B-10"]));
+      const dep = await evaluer(ID26B, lireVariante(ID26B, "initial"));
+      expect(dep.echoues).toEqual(expect.arrayContaining(["EX26B-06", "EX26B-10"]));
+    });
+
+    it("une réécriture valide de valide1 gagne EX26B-06", async () => {
+      const code = remplacerFonction(
+        js(),
+        "valide1",
+        `function valide1() {
+  var id = document.getElementById("idBij").value;
+  var prix = parseFloat(document.getElementById("prix").value);
+  var metaux = ["c1", "c2", "c3"].filter(function (c) {
+    return document.getElementById(c).checked;
+  });
+  if (!/^[a-z]{2}[0-9]{3}$/i.test(id)) return false;
+  if (isNaN(prix) || prix < 100) return false;
+  return metaux.length > 0;
+}`,
+      );
+      const r = await evaluer(ID26B, avec(ID26B, { "mesControles.js": code }));
+      expect(r.reussis).toContain("EX26B-06");
+    });
+
+    it("valide1 sans contrôle du prix ou valide2 qui accepte une finition de 6 perdent leurs critères", async () => {
+      const sansPrix = remplacerFonction(
+        js(),
+        "valide1",
+        `function valide1() {
+  var id = document.getElementById("idBij").value;
+  var coche = ["c1", "c2", "c3"].some(function (c) { return document.getElementById(c).checked; });
+  return /^[A-Za-z]{2}[0-9]{3}$/.test(id) && coche;
+}`,
+      );
+      const r1 = await evaluer(ID26B, avec(ID26B, { "mesControles.js": sansPrix }));
+      expect(r1.echoues).toContain("EX26B-06");
+
+      const finitionLarge = js().replace("Number(finition) > 5", "Number(finition) > 6");
+      expect(finitionLarge).not.toBe(js());
+      const r2 = await evaluer(ID26B, avec(ID26B, { "mesControles.js": finitionLarge }));
+      expect(r2.echoues).toContain("EX26B-10");
+    });
+  });
+
+  describe("Bac 2026 Croisières – verif1, nombres, verif2", () => {
+    const js = () => lireJs(ID26C, "controles2.js");
+
+    it("le corrigé gagne les critères JavaScript, le code de départ aucun", async () => {
+      const sol = await evaluer(ID26C, lireVariante(ID26C, "solution"));
+      expect(sol.reussis).toEqual(expect.arrayContaining(["EX26C-07", "EX26C-11"]));
+      const dep = await evaluer(ID26C, lireVariante(ID26C, "initial"));
+      expect(dep.echoues).toEqual(expect.arrayContaining(["EX26C-07", "EX26C-11"]));
+    });
+
+    it("une comparaison de dates écrite autrement (chaînes ISO) gagne EX26C-07", async () => {
+      const code = remplacerFonction(
+        js(),
+        "verif1",
+        `function verif1() {
+  var dest = document.getElementById("dest").value;
+  var d1 = document.getElementById("DD").value;
+  var d2 = document.getElementById("DF").value;
+  var aujourdhui = new Date().toLocaleDateString("sv-SE");
+  if (dest === "" || d1 === "" || d2 === "") return false;
+  if (d1 <= aujourdhui) return false;
+  return d2 > d1;
+}`,
+      );
+      const r = await evaluer(ID26C, avec(ID26C, { "controles2.js": code }));
+      expect(r.reussis).toContain("EX26C-07");
+    });
+
+    it("accepter la date du jour, ou afficher un mauvais total, fait perdre les critères", async () => {
+      const accepteAujourdhui = js().replace("<= aujourdhui", "< aujourdhui");
+      expect(accepteAujourdhui).not.toBe(js());
+      const r1 = await evaluer(ID26C, avec(ID26C, { "controles2.js": accepteAujourdhui }));
+      expect(r1.echoues).toContain("EX26C-07");
+
+      const mauvaisTotal = js().replace('.value + "/10"', '.value + "/20"');
+      expect(mauvaisTotal).not.toBe(js());
+      const r2 = await evaluer(ID26C, avec(ID26C, { "controles2.js": mauvaisTotal }));
+      expect(r2.echoues).toContain("EX26C-11");
+    });
+  });
+
+  it("les critères PHP/SQL des 3 examens sont déclarés « corrigés par l'enseignant », jamais gagnés", async () => {
+    for (const id of [ID25, ID26B, ID26C]) {
+      const sujet = contentSubjects.find((c) => c.id === id)!;
+      const manuels = sujet.criteria.filter((c) => c.manuel);
+      expect(manuels.length, id).toBe(4);
+      const sol = await evaluer(id, lireVariante(id, "solution"));
+      for (const c of manuels) expect(sol.reussis, `${id} ${c.id}`).not.toContain(c.id);
+      // Tout critère non vérifiable est explicitement déclaré : rien d'implicite.
+      expect(sujet.criteria.filter((c) => c.automatique === false && !c.manuel), id).toEqual([]);
+    }
+  });
+});
+
 describe("Banc de test de la notation : sujets pas encore vérifiables", () => {
   // Ces sujets contiennent encore des critères sans vérification réelle (PHP, SQL, JavaScript des
   // examens). Cette liste doit rétrécir : un sujet y entre tant que son banc n'est pas écrit.

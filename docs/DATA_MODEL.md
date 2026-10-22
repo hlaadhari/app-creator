@@ -344,3 +344,7 @@ Ces triggers sont reliés aux tables `sujet_version_fichiers`, `criteres`, `solu
 ## Critères « corrigés par l'enseignant » (issue #98)
 
 Un critère JSON (`criteres.sonde`) peut porter `"correction": "enseignant"` : il n'est jamais noté automatiquement (même s'il a une sonde), l'élève le voit annoncé comme corrigé par son enseignant, et ses points sont comptés comme « non vérifiables » (jamais gagnés d'office). Le banc didactique accepte ces critères mais exige qu'au moins un critère ait une vérification automatique ; un critère sans vérification qui n'est pas déclaré ainsi continue de bloquer la publication. Aucune migration : la valeur est stockée dans le JSON du critère. La saisie de la note de ces critères par l'enseignant n'est pas couverte par ce changement.
+
+## Vérification par cas « js_test_cas » (issue #102)
+
+Critère JSON `{"type": "js_test_cas", "function_name": "verif1", "cas": [...]}`. Chaque cas : `saisies` (id de champ → texte, booléen pour une case, ou date relative `+10j` / `-1j`), `appel` (fonction, sinon `function_name`), puis `attendu` (retour true/false), `etat` (état de champs après l'appel) ou `texte` (texte affiché). Tous les cas doivent réussir ; les champs sont restaurés après chaque cas ; un champ ou une fonction absents font échouer le cas. Si tous les cas attendent « false », la vérification est refusée (le code de départ la satisferait).

@@ -7,6 +7,7 @@
     "points": 1.75,
     "ordre": 1,
     "fichier": "index.html",
+    "correction": "enseignant",
     "sonde": { "type": "dom_selector", "selector": "body" },
     "fail_message": "Une clé primaire, la table evaluation ou une relation (clé étrangère) est absente ou incorrecte."
   },
@@ -80,7 +81,90 @@
     "points": 1.75,
     "ordre": 6,
     "fichier": "ajout.html",
-    "sonde": { "type": "js_eval", "checkSelector": "#composition" },
+    "type": "js_test_cas",
+    "function_name": "valide1",
+    "cas": [
+      {
+        "saisies": {
+          "idBij": "AB123",
+          "prix": "150",
+          "c1": true,
+          "c2": false,
+          "c3": false
+        },
+        "attendu": true
+      },
+      {
+        "saisies": {
+          "idBij": "ab123",
+          "prix": "100",
+          "c1": false,
+          "c2": true,
+          "c3": true
+        },
+        "attendu": true
+      },
+      {
+        "saisies": {
+          "idBij": "A1234",
+          "prix": "150",
+          "c1": true,
+          "c2": false,
+          "c3": false
+        },
+        "attendu": false
+      },
+      {
+        "saisies": {
+          "idBij": "ABC12",
+          "prix": "150",
+          "c1": true,
+          "c2": false,
+          "c3": false
+        },
+        "attendu": false
+      },
+      {
+        "saisies": {
+          "idBij": "AB12",
+          "prix": "150",
+          "c1": true,
+          "c2": false,
+          "c3": false
+        },
+        "attendu": false
+      },
+      {
+        "saisies": {
+          "idBij": "AB123",
+          "prix": "99",
+          "c1": true,
+          "c2": false,
+          "c3": false
+        },
+        "attendu": false
+      },
+      {
+        "saisies": {
+          "idBij": "AB123",
+          "prix": "",
+          "c1": true,
+          "c2": false,
+          "c3": false
+        },
+        "attendu": false
+      },
+      {
+        "saisies": {
+          "idBij": "AB123",
+          "prix": "150",
+          "c1": false,
+          "c2": false,
+          "c3": false
+        },
+        "attendu": false
+      }
+    ],
     "fail_message": "valide1 ne contrôle pas correctement l'identifiant, le prix ou la composition."
   },
   {
@@ -91,6 +175,7 @@
     "points": 1.75,
     "ordre": 7,
     "fichier": "index.html",
+    "correction": "enseignant",
     "sonde": { "type": "dom_selector", "selector": "body" },
     "fail_message": "ajout.php n'insère pas le bijou et sa composition ou n'affiche pas les messages demandés."
   },
@@ -133,7 +218,109 @@
     "points": 2.5,
     "ordre": 10,
     "fichier": "evaluation.html",
-    "sonde": { "type": "js_eval", "checkSelector": "#commentaire" },
+    "type": "js_test_cas",
+    "function_name": "valide2",
+    "cas": [
+      {
+        "saisies": {
+          "idBij": "AB123",
+          "expert": "A22",
+          "finition": "3",
+          "oui": true,
+          "non": false,
+          "commentaire": "Superbe bijou"
+        },
+        "attendu": true
+      },
+      {
+        "saisies": {
+          "idBij": "AB123",
+          "expert": "A24",
+          "finition": "5",
+          "oui": false,
+          "non": true,
+          "commentaire": "  Tres   beau bijou  "
+        },
+        "attendu": true
+      },
+      {
+        "saisies": {
+          "idBij": "A123",
+          "expert": "A22",
+          "finition": "3",
+          "oui": true,
+          "non": false,
+          "commentaire": "Superbe bijou"
+        },
+        "attendu": false
+      },
+      {
+        "saisies": {
+          "idBij": "AB123",
+          "expert": "",
+          "finition": "3",
+          "oui": true,
+          "non": false,
+          "commentaire": "Superbe bijou"
+        },
+        "attendu": false
+      },
+      {
+        "saisies": {
+          "idBij": "AB123",
+          "expert": "A22",
+          "finition": "0",
+          "oui": true,
+          "non": false,
+          "commentaire": "Superbe bijou"
+        },
+        "attendu": false
+      },
+      {
+        "saisies": {
+          "idBij": "AB123",
+          "expert": "A22",
+          "finition": "6",
+          "oui": true,
+          "non": false,
+          "commentaire": "Superbe bijou"
+        },
+        "attendu": false
+      },
+      {
+        "saisies": {
+          "idBij": "AB123",
+          "expert": "A22",
+          "finition": "3",
+          "oui": false,
+          "non": false,
+          "commentaire": "Superbe bijou"
+        },
+        "attendu": false
+      },
+      {
+        "saisies": {
+          "idBij": "AB123",
+          "expert": "A22",
+          "finition": "3",
+          "oui": true,
+          "non": false,
+          "commentaire": "Superbe"
+        },
+        "attendu": false
+      },
+      {
+        "saisies": {
+          "idBij": "AB123",
+          "expert": "A22",
+          "finition": "3",
+          "oui": true,
+          "non": false,
+          "commentaire": "Superbe bijou2"
+        },
+        "attendu": false
+      }
+    ],
     "fail_message": "valide2 ne contrôle pas correctement l'un des champs de l'évaluation."
   },
   {
@@ -144,6 +331,7 @@
     "points": 2.5,
     "ordre": 11,
     "fichier": "index.html",
+    "correction": "enseignant",
     "sonde": { "type": "dom_selector", "selector": "body" },
     "fail_message": "evaluation.php ne gère pas correctement l'existence du bijou, le doublon d'évaluation ou l'insertion avec dateEv."
   },
@@ -155,6 +343,7 @@
     "points": 1.25,
     "ordre": 12,
     "fichier": "index.html",
+    "correction": "enseignant",
     "sonde": { "type": "dom_selector", "selector": "body" },
     "fail_message": "liste.php n'affiche pas les bijoux originaux avec la moyenne de la finition (AVG avec GROUP BY)."
   }

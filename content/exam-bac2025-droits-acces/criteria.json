@@ -7,6 +7,7 @@
     "points": 1.25,
     "ordre": 1,
     "fichier": "index.html",
+    "correction": "enseignant",
     "sonde": { "type": "dom_selector", "selector": "body" },
     "fail_message": "La table droit, ses clés ou ses relations avec document et utilisateur sont absentes ou incorrectes."
   },
@@ -94,7 +95,80 @@
     "points": 1,
     "ordre": 7,
     "fichier": "utilisateur.html",
-    "sonde": { "type": "js_eval", "checkSelector": "#idUtil" },
+    "type": "js_test_cas",
+    "function_name": "verif1",
+    "cas": [
+      {
+        "saisies": {
+          "idUtil": "U123",
+          "nomPrenom": "Jean Dupont"
+        },
+        "attendu": true
+      },
+      {
+        "saisies": {
+          "idUtil": "U123",
+          "nomPrenom": "Alice"
+        },
+        "attendu": true
+      },
+      {
+        "saisies": {
+          "idUtil": "U123",
+          "nomPrenom": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+        },
+        "attendu": true
+      },
+      {
+        "saisies": {
+          "idUtil": "123",
+          "nomPrenom": "Jean Dupont"
+        },
+        "attendu": false
+      },
+      {
+        "saisies": {
+          "idUtil": "U12",
+          "nomPrenom": "Jean Dupont"
+        },
+        "attendu": false
+      },
+      {
+        "saisies": {
+          "idUtil": "A123",
+          "nomPrenom": "Jean Dupont"
+        },
+        "attendu": false
+      },
+      {
+        "saisies": {
+          "idUtil": "U1234",
+          "nomPrenom": "Jean Dupont"
+        },
+        "attendu": false
+      },
+      {
+        "saisies": {
+          "idUtil": "U123",
+          "nomPrenom": "Jean"
+        },
+        "attendu": false
+      },
+      {
+        "saisies": {
+          "idUtil": "U123",
+          "nomPrenom": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+        },
+        "attendu": false
+      },
+      {
+        "saisies": {
+          "idUtil": "U123",
+          "nomPrenom": "Jean Dupont2"
+        },
+        "attendu": false
+      }
+    ],
     "fail_message": "verif1 ne contrôle pas correctement l'identifiant (U + 3 chiffres) ou le nom et prénom (5 à 50 lettres)."
   },
   {
@@ -105,6 +179,7 @@
     "points": 2,
     "ordre": 8,
     "fichier": "index.html",
+    "correction": "enseignant",
     "sonde": { "type": "dom_selector", "selector": "body" },
     "fail_message": "ajout.php n'insère pas l'utilisateur ou n'affiche pas les messages demandés."
   },
@@ -131,7 +206,95 @@
     "points": 2,
     "ordre": 10,
     "fichier": "droit.html",
-    "sonde": { "type": "js_eval", "checkSelector": "#lecture" },
+    "type": "js_test_cas",
+    "function_name": "verif2",
+    "cas": [
+      {
+        "saisies": {
+          "doc": "D0001",
+          "ecriture": false,
+          "lecture": true,
+          "impression": false
+        },
+        "attendu": true
+      },
+      {
+        "saisies": {
+          "doc": "D0001",
+          "ecriture": false,
+          "lecture": false,
+          "impression": false
+        },
+        "attendu": false
+      },
+      {
+        "saisies": {
+          "doc": "",
+          "ecriture": false,
+          "lecture": true,
+          "impression": false
+        },
+        "attendu": false
+      },
+      {
+        "saisies": {
+          "ecriture": true,
+          "lecture": false,
+          "impression": false
+        },
+        "appel": "choix1",
+        "etat": {
+          "lecture": true
+        }
+      },
+      {
+        "saisies": {
+          "ecriture": true,
+          "lecture": true,
+          "impression": true
+        },
+        "appel": "choix1",
+        "etat": {
+          "lecture": true,
+          "impression": true
+        }
+      },
+      {
+        "saisies": {
+          "ecriture": true,
+          "lecture": false,
+          "impression": true
+        },
+        "appel": "choix2",
+        "etat": {
+          "ecriture": false,
+          "impression": false
+        }
+      },
+      {
+        "saisies": {
+          "ecriture": true,
+          "lecture": true,
+          "impression": false
+        },
+        "appel": "choix2",
+        "etat": {
+          "ecriture": true,
+          "lecture": true
+        }
+      },
+      {
+        "saisies": {
+          "ecriture": false,
+          "lecture": false,
+          "impression": true
+        },
+        "appel": "choix3",
+        "etat": {
+          "lecture": true
+        }
+      }
+    ],
     "fail_message": "verif2 ou les fonctions choix1, choix2, choix3 ne respectent pas les règles de cohérence entre les droits."
   },
   {
@@ -142,6 +305,7 @@
     "points": 4.25,
     "ordre": 11,
     "fichier": "index.html",
+    "correction": "enseignant",
     "sonde": { "type": "dom_selector", "selector": "body" },
     "fail_message": "droit.php ne gère pas correctement l'existence de l'utilisateur, la mise à jour ou l'insertion des droits."
   },
@@ -164,6 +328,7 @@
     "points": 1.75,
     "ordre": 13,
     "fichier": "index.html",
+    "correction": "enseignant",
     "sonde": { "type": "dom_selector", "selector": "body" },
     "fail_message": "affichage.php n'affiche pas la liste des droits selon le format demandé (jointure droit / utilisateur)."
   }

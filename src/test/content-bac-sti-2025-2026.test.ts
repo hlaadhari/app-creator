@@ -27,7 +27,8 @@ interface Criterion {
   points: number;
   fail_message: string;
   fichier: string;
-  sonde: { type: string; selector?: string };
+  /** Absente pour les critères à vérification déclarée (js_test_cas…) : voir le banc de notation. */
+  sonde?: { type: string; selector?: string };
   [key: string]: unknown;
 }
 
@@ -125,7 +126,9 @@ function loadPageWithScript(id: string, variant: "initial" | "solution", page: s
 }
 
 const isPlaceholder = (c: Criterion) =>
-  c.sonde.type === "dom_selector" && c.sonde.selector === "body";
+  !c.sonde ||
+  c["correction"] === "enseignant" ||
+  (c.sonde.type === "dom_selector" && c.sonde.selector === "body");
 
 function earnedPoints(id: string, variant: "initial" | "solution") {
   let earned = 0;

@@ -112,6 +112,136 @@ function verificationComportement(critere: CritereBrut): VerificationCritere | n
 }
 
 /**
+ * Vérification par cas (type « js_test_cas ») : chaque cas remplit des champs (texte → valeur,
+ * booléen → case cochée ; « +10j » / « -1j » → date relative à aujourd'hui), appelle une fonction
+ * de l'élève puis contrôle le retour (« attendu »), l'état de champs (« etat ») ou un texte
+ * affiché (« texte »). Tous les cas doivent réussir ; les champs sont restaurés après chaque cas.
+ */
+interface CasBrut {
+  saisies?: unknown;
+  appel?: unknown;
+  attendu?: unknown;
+  etat?: unknown;
+  texte?: unknown;
+}
+
+const dictionnaire = (valeur: unknown): Record<string, unknown> | null =>
+  valeur && typeof valeur === "object" && !Array.isArray(valeur)
+    ? (valeur as Record<string, unknown>)
+    : null;
+
+const JOUR_RELATIF = /^([+-])(\d{1,4})j$/;
+
+function dateRelative(signe: string, jours: number): string {
+  const date = new Date();
+  date.setHours(0, 0, 0, 0);
+  date.setDate(date.getDate() + (signe === "-" ? -jours : jours));
+  const deux = (n: number) => String(n).padStart(2, "0");
+  return `${date.getFullYear()}-${deux(date.getMonth() + 1)}-${deux(date.getDate())}`;
+}
+
+/** Valeur à écrire dans un champ : booléen (case) ou texte (date relative résolue). */
+function valeurDeChamp(valeur: unknown): string | boolean {
+  if (typeof valeur === "boolean") return valeur;
+  const texteBrut = String(valeur);
+  const relatif = JOUR_RELATIF.exec(texteBrut);
+  return relatif ? dateRelative(relatif[1] as string, Number(relatif[2])) : texteBrut;
+}
+
+type EtatChamp = { champ: HTMLInputElement; valeur: string; coche: boolean; texte: string };
+
+function executerCas(doc: Document, win: Window, cas: CasBrut, defaut: string | undefined): boolean {
+  const saisies = dictionnaire(cas.saisies) ?? {};
+  const etat = dictionnaire(cas.etat);
+  const texte = dictionnaire(cas.texte);
+  const nomFonction = typeof cas.appel === "string" ? cas.appel : defaut;
+  const fn = nomFonction ? fonctionGlobale(win, nomFonction) : null;
+  if (!fn) return false;
+
+  const touches = new Map<string, EtatChamp>();
+  const retenir = (nom: string): HTMLInputElement | null => {
+    const champ = trouverChamp(doc, nom);
+    if (champ && !touches.has(nom)) {
+      touches.set(nom, {
+        champ,
+        valeur: champ.value,
+        coche: champ.checked,
+        texte: champ.textContent ?? "",
+      });
+    }
+    return champ;
+  };
+
+  const dialogues = win as unknown as Record<"alert" | "confirm" | "prompt", unknown>;
+  const sauvegardes = { alert: dialogues.alert, confirm: dialogues.confirm, prompt: dialogues.prompt };
+
+  try {
+    for (const [nom, valeur] of Object.entries(saisies)) {
+      const champ = retenir(nom);
+      if (!champ) return false;
+      const v = valeurDeChamp(valeur);
+      if (typeof v === "boolean") champ.checked = v;
+      else champ.value = v;
+    }
+    for (const nom of [...Object.keys(etat ?? {}), ...Object.keys(texte ?? {})]) {
+      if (!retenir(nom)) return false;
+    }
+
+    dialogues.alert = () => undefined;
+    dialogues.confirm = () => false;
+    dialogues.prompt = () => null;
+    const retour = Boolean(fn.call(win));
+
+    if (typeof cas.attendu === "boolean" && retour !== cas.attendu) return false;
+    for (const [nom, attendu] of Object.entries(etat ?? {})) {
+      const champ = touches.get(nom)?.champ;
+      if (!champ) return false;
+      if (typeof attendu === "boolean" ? champ.checked !== attendu : champ.value !== String(attendu)) {
+        return false;
+      }
+    }
+    for (const [nom, attendu] of Object.entries(texte ?? {})) {
+      if ((touches.get(nom)?.champ.textContent ?? "").trim() !== String(attendu)) return false;
+    }
+    return true;
+  } catch {
+    return false;
+  } finally {
+    dialogues.alert = sauvegardes.alert;
+    dialogues.confirm = sauvegardes.confirm;
+    dialogues.prompt = sauvegardes.prompt;
+    for (const { champ, valeur, coche, texte: contenu } of touches.values()) {
+      champ.value = valeur;
+      champ.checked = coche;
+      if (champ.textContent !== contenu) champ.textContent = contenu;
+    }
+  }
+}
+
+function verificationParCas(critere: CritereBrut): VerificationCritere | null {
+  const cas = critere["cas"];
+  if (!Array.isArray(cas) || cas.length === 0) return null;
+  const liste = cas.map((c) => dictionnaire(c) as CasBrut | null);
+  if (liste.some((c) => c === null)) return null;
+  const cases = liste as CasBrut[];
+
+  const defaut = texte(critere["function_name"]);
+  for (const c of cases) {
+    const aUneAttente =
+      typeof c.attendu === "boolean" || dictionnaire(c.etat) !== null || dictionnaire(c.texte) !== null;
+    if (!aUneAttente || (typeof c.appel !== "string" && !defaut)) return null;
+  }
+
+  // Une fonction qui répond toujours « false » (code de départ) satisferait des cas qui n'attendent
+  // que « false » : il faut aussi qu'un cas valide soit accepté.
+  const attendFaux = cases.some((c) => c.attendu === false);
+  const attendVrai = cases.some((c) => c.attendu === true || c.etat !== undefined || c.texte !== undefined);
+  if (attendFaux && !attendVrai) return null;
+
+  return (doc, win) => cases.every((c) => executerCas(doc, win, c, defaut));
+}
+
+/**
  * Écritures abrégées qui portent une propriété détaillée. Un navigateur renseigne toujours la
  * propriété détaillée ; certains moteurs plus simples ne la déduisent pas de l'écriture abrégée.
  */
@@ -192,6 +322,8 @@ export function construireVerificationDeclaree(critere: CritereBrut): Verificati
     }
     case "js_test_execution":
       return verificationComportement(critere);
+    case "js_test_cas":
+      return verificationParCas(critere);
     case undefined:
       return verificationCssCalcule(critere) ?? verificationRegleCss(critere) ?? null;
     default:
