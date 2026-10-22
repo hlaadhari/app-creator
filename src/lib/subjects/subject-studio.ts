@@ -50,6 +50,8 @@ export interface SubjectVersionRecord<C = CriterionDefinition> {
   duree_min: number;
   publiee: boolean;
   published_at?: string | null;
+  competence?: string;
+  indices?: string[];
   criteres: C[];
   fichiers_depart: Record<string, string>;
   solutions_test: ValidationSolution[];
