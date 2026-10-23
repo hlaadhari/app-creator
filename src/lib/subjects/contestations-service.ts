@@ -34,7 +34,17 @@ export interface StudentAttemptRecord {
   note20: number;
   points_obtenus: number;
   points_total: number;
+  source?: "client" | "serveur" | "enseignant";
   criteres: StudentAttemptCriterion[];
+}
+
+/**
+ * Exclut les tentatives déclaratives (`source = 'client'`) des agrégats et notes d'examen officielles (SEC-02 / T-15).
+ */
+export function filtrerTentativesOfficielles(
+  tentatives: StudentAttemptRecord[],
+): StudentAttemptRecord[] {
+  return tentatives.filter((t) => t.source === "serveur" || t.source === "enseignant");
 }
 
 export interface RecalculationResult {

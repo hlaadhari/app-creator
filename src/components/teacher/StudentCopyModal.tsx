@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { FileCode, Shield, CheckCircle2, XCircle, Clock } from "lucide-react";
 import type { TeacherClassMember, StudentFile } from "@/lib/supabase/teacher";
+import { getLibelleSourceTentative } from "@/lib/supabase/tentative-details";
 
 interface StudentCopyModalProps {
   isOpen: boolean;
@@ -70,7 +71,7 @@ export function StudentCopyModal({
               </span>
               <span>
                 Score formatif : {eleve.score_formatif ?? 0}% ({eleve.criteres_reussis}/
-                {eleve.total_criteres} validés)
+                {eleve.total_criteres} validés) — {getLibelleSourceTentative(eleve.score_source)}
               </span>
             </DialogDescription>
           </div>

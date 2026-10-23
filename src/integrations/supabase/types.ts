@@ -1153,6 +1153,7 @@ export type Database = {
           points_total: number | null;
           projet_id: string | null;
           score: number;
+          source: "client" | "serveur" | "enseignant";
           sujet_version_id: string | null;
           version_criteres: number;
           version_moteur: string;
@@ -1169,6 +1170,7 @@ export type Database = {
           points_total?: number | null;
           projet_id?: string | null;
           score: number;
+          source?: "client" | "serveur" | "enseignant";
           sujet_version_id?: string | null;
           version_criteres?: number;
           version_moteur?: string;
@@ -1185,6 +1187,7 @@ export type Database = {
           points_total?: number | null;
           projet_id?: string | null;
           score?: number;
+          source?: "client" | "serveur" | "enseignant";
           sujet_version_id?: string | null;
           version_criteres?: number;
           version_moteur?: string;

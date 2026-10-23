@@ -4,11 +4,31 @@
  *  - ancien/atelier     : `{ criteres: [{ valide, code, titre }] }`
  */
 
+export type TentativeSource = "client" | "serveur" | "enseignant";
+
 export type BilanCriteres = {
   total: number;
   reussis: number;
   pointsFaibles: string[];
 };
+
+/**
+ * Retourne le libellé explicite de provenance d'une tentative (SEC-02 / Issue #116).
+ */
+export function getLibelleSourceTentative(source?: TentativeSource | null): string {
+  if (source === "serveur" || source === "enseignant") {
+    return "Vérifié / Enseignant";
+  }
+  return "Déclaratif (poste élève)";
+}
+
+/**
+ * Indique si une tentative est d'origine officielle (serveur ou enseignant) et peut
+ * être prise en compte dans les notes d'examen officielles (SEC-02 / T-15).
+ */
+export function estTentativeOfficielle(source?: TentativeSource | null): boolean {
+  return source === "serveur" || source === "enseignant";
+}
 
 const VIDE: BilanCriteres = { total: 0, reussis: 0, pointsFaibles: [] };
 

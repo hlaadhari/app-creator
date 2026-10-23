@@ -45,6 +45,8 @@ export interface TeacherClassMember {
   joined_at: string;
   projet_statut?: "non_commence" | "en_cours" | "rendu";
   score_formatif?: number;
+  score_source?: "client" | "serveur" | "enseignant";
+  note_officielle?: number | null;
   total_criteres?: number;
   criteres_reussis?: number;
   derniere_activite?: string;
@@ -292,17 +294,24 @@ export async function getClassStudentsProgress(classId: string): Promise<Teacher
         // qu'elles aient ou non un projet associé.
         const { data: tentative } = await supabase
           .from("tentatives")
-          .select("note20, points_obtenus, points_total, details, date")
+          .select("note20, points_obtenus, points_total, details, date, source")
           .eq("eleve_id", eleveId)
           .order("date", { ascending: false })
           .limit(1)
           .maybeSingle();
+
+        let scoreSource: "client" | "serveur" | "enseignant" = "client";
+        let noteOfficielle: number | null = null;
 
         if (tentative) {
           const total = tentative.points_total || 20;
           const note20Val = tentative.note20 ?? 0;
           const obtenus = tentative.points_obtenus ?? Math.round((note20Val * total) / 20);
           scoreFormatif = Math.min(100, Math.round((obtenus / total) * 100));
+          scoreSource = tentative.source ?? "client";
+          if (scoreSource === "serveur" || scoreSource === "enseignant") {
+            noteOfficielle = note20Val;
+          }
 
           const bilan = analyserDetailsTentative(tentative.details);
           totalCriteres = bilan.total;
@@ -319,6 +328,8 @@ export async function getClassStudentsProgress(classId: string): Promise<Teacher
             (proj?.statut as "non_commence" | "en_cours" | "rendu") ||
             (tentative ? "en_cours" : "non_commence"),
           score_formatif: scoreFormatif,
+          score_source: scoreSource,
+          note_officielle: noteOfficielle,
           total_criteres: totalCriteres,
           criteres_reussis: criteresReussis,
           derniere_activite: [proj?.updated_at, tentative?.date, m.joined_at]
@@ -510,7 +521,10 @@ export async function getClassStudentCopies(classId: string): Promise<StudentCop
 /**
  * Récupère les tentatives d'évaluation récentes pour l'arbitrage des contestations de classe
  */
-export async function getClassStudentAttempts(classId: string): Promise<StudentAttemptRecord[]> {
+export async function getClassStudentAttempts(
+  classId: string,
+  options: { uniquementOfficielles?: boolean } = {},
+): Promise<StudentAttemptRecord[]> {
   try {
     const { data: members, error: mError } = await supabase
       .from("class_members")
@@ -540,13 +554,17 @@ export async function getClassStudentAttempts(classId: string): Promise<StudentA
 
       const { data: tentative } = await supabase
         .from("tentatives")
-        .select("id, note20, points_obtenus, points_total, details, date")
+        .select("id, note20, points_obtenus, points_total, details, date, source")
         .eq("projet_id", proj.id)
         .order("date", { ascending: false })
         .limit(1)
         .maybeSingle();
 
       if (tentative) {
+        const source = tentative.source ?? "client";
+        if (options.uniquementOfficielles && source === "client") {
+          continue;
+        }
         const rawDetails = tentative.details as {
           criteres?: Array<{
             id?: string;
@@ -572,6 +590,7 @@ export async function getClassStudentAttempts(classId: string): Promise<StudentA
           note20: tentative.note20 ?? 0,
           points_obtenus: tentative.points_obtenus ?? 0,
           points_total: tentative.points_total ?? 20,
+          source,
           criteres: criteresList,
         });
       }
