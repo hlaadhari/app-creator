@@ -9,8 +9,9 @@
     "build:dev": "vite build --mode development",
     "build:vercel": "NITRO_PRESET=vercel vite build",
     "preview": "vite preview",
-    "lint": "eslint .",
+    "lint": "eslint . --max-warnings=0",
     "format": "prettier --write .",
+    "format:check": "prettier --check .",
     "test": "vitest run",
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit"

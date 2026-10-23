@@ -7,12 +7,14 @@ En tant que contributeurs et mainteneurs du projet **Labo STI**, nous nous engag
 ## Nos Standards
 
 Exemples de comportements favorisant un environnement positif :
+
 - Faire preuve d'empathie et de bienveillance envers les autres membres.
 - Respecter les points de vue et expériences divers.
 - Donner et accepter gracieusement les retours constructifs.
 - Se concentrer sur ce qui est le plus bénéfique pour la communauté éducative (élèves et enseignants).
 
 Exemples de comportements inacceptables :
+
 - Utilisation de langage ou d'images à caractère sexuel.
 - Attaques personnelles, commentaires désobligeants ou harcèlement.
 - Divulgation d'informations privées d'autrui sans consentement explicite.

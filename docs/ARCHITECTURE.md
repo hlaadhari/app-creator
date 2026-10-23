@@ -72,6 +72,7 @@ L'architecture de **Labo STI** repose sur un principe d'exécution locale dans l
 ## 2. Environnements d'Exécution Client
 
 ### 2.1 Bac à Sable HTML / CSS / JavaScript
+
 - **Mécanisme** : `iframe` avec attributs stricts : `sandbox="allow-scripts"`.
 - **Confinement** :
   - L'attribut `allow-same-origin` est **exclu** pendant l'exécution du code élève pour interdire tout accès au `localStorage`, aux cookies de session ou au DOM de l'application hôte.
@@ -80,6 +81,7 @@ L'architecture de **Labo STI** repose sur un principe d'exécution locale dans l
 - **Ressources statiques** : Les images importées par l'élève dans `Travail_Eleve/` sont converties en `Blob URLs` ou `Data URIs` injectées localement dans l'iframe.
 
 ### 2.2 Exécution PHP en WebAssembly (Phase 2)
+
 - **Mécanisme** : Runtime PHP compilé en WebAssembly (ex: `@php-wasm/web` ou équivalent standard), exécuté au sein d'un **Web Worker dédié**.
 - **Avantages** : L'exécution s'effectue hors du fil d'exécution principal de l'UI (pas de freeze en cas de boucle infinie).
 - **Contrôles de ressources** :
@@ -89,6 +91,7 @@ L'architecture de **Labo STI** repose sur un principe d'exécution locale dans l
 - **Support des fonctionnalités clés** : `GET`/`POST`, variables superglobales `$_SESSION`, parsing de requêtes HTTP simulées, fonctions de hachage et chaînes.
 
 ### 2.3 Moteur SQL Local & Contrôleur de Dialecte (Phase 2)
+
 - **Moteur embarqué** : SQLite compilé en WebAssembly.
 - **Problématique d'écart de dialecte** :
   Le programme du Bac STI évalue les élèves sur **MySQL / MariaDB**. Or, SQLite possède des comportements permissifs :
@@ -99,7 +102,7 @@ L'architecture de **Labo STI** repose sur un principe d'exécution locale dans l
   Avant exécution sur SQLite, la requête élève est analysée par un parser SQL (AST) :
   - Détection des constructions non portables MySQL.
   - Émission d'un avertissement pédagogique non bloquant à l'élève :  
-    *« Attention : cette requête fonctionne dans votre navigateur mais échouerait sur le serveur d'examen MySQL (ex: fonction CONCAT attendue au lieu de ||). »*
+    _« Attention : cette requête fonctionne dans votre navigateur mais échouerait sur le serveur d'examen MySQL (ex: fonction CONCAT attendue au lieu de ||). »_
 
 ---
 
@@ -107,14 +110,14 @@ L'architecture de **Labo STI** repose sur un principe d'exécution locale dans l
 
 Si la Phase 0 aboutit à un **No-Go** (faisabilité PHP WASM insuffisante, instabilité mémoire ou incompatibilité critique des extensions requises) :
 
-| Dimension | Architecture Standard (Client WASM) | Plan B (Architecture Hybride Isolée) |
-|---|---|---|
-| **Exécution HTML/CSS/JS** | Navigateur (iframe) | Navigateur (iframe) |
-| **Exécution PHP & MySQL** | Client Web Worker WASM + SQLite | Serveur dédié (Conteneurs Docker éphémères) |
-| **Fidélité au Bac STI** | Émulation navigateur | 100 % native (vrai PHP 8.2 + MariaDB 10.11) |
+| Dimension                  | Architecture Standard (Client WASM) | Plan B (Architecture Hybride Isolée)                          |
+| -------------------------- | ----------------------------------- | ------------------------------------------------------------- |
+| **Exécution HTML/CSS/JS**  | Navigateur (iframe)                 | Navigateur (iframe)                                           |
+| **Exécution PHP & MySQL**  | Client Web Worker WASM + SQLite     | Serveur dédié (Conteneurs Docker éphémères)                   |
+| **Fidélité au Bac STI**    | Émulation navigateur                | 100 % native (vrai PHP 8.2 + MariaDB 10.11)                   |
 | **Infrastructure requise** | Vercel (statique / edge) + Supabase | Cluster de runners conteneurisés (Hetzner / Fly.io / AWS ECS) |
-| **Coût par élève** | Négligeable (calcul déporté) | ~0,02 € à 0,05 € par élève/heure |
-| **Isolation** | Bac à sable navigateur | Conteneur sans réseau sortant détruit après session |
+| **Coût par élève**         | Négligeable (calcul déporté)        | ~0,02 € à 0,05 € par élève/heure                              |
+| **Isolation**              | Bac à sable navigateur              | Conteneur sans réseau sortant détruit après session           |
 
 ---
 
@@ -131,7 +134,7 @@ Pour garantir l'intégrité absolue du travail de l'élève (principe : **0 pert
 3. **Résolution des Conflits de Révision** :
    - Si `serveur.rev > local.rev` lors d'une tentative de push (ex: projet ouvert simultanément dans deux onglets) :
      - L'application bloque l'écrasement automatique.
-     - Une modale comparative affiche le diff et propose : *Conserver ma version locale*, *Remplacer par la version distante*, ou *Sauvegarder une copie de secours*.
+     - Une modale comparative affiche le diff et propose : _Conserver ma version locale_, _Remplacer par la version distante_, ou _Sauvegarder une copie de secours_.
 
 ---
 

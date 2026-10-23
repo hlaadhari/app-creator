@@ -125,6 +125,7 @@ export function useBufferSync({ exerciseId, starterFiles }: UseBufferSyncOptions
     return () => {
       isCancelled = true;
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [exerciseId]);
 
   // 2. Gestion de l'état réseau (en ligne / hors-ligne)
@@ -148,6 +149,7 @@ export function useBufferSync({ exerciseId, starterFiles }: UseBufferSyncOptions
       window.removeEventListener("online", handleOnline);
       window.removeEventListener("offline", handleOffline);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [syncStatus]);
 
   // 3. Vérification distante lors de la connexion
@@ -198,6 +200,7 @@ export function useBufferSync({ exerciseId, starterFiles }: UseBufferSyncOptions
     pendingSyncTimer.current = setTimeout(() => {
       triggerSync();
     }, 1000);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [files]);
 
   // Synchronisation effective

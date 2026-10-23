@@ -580,6 +580,7 @@ function TeacherDashboardPage() {
     if (selectedClassId) {
       loadClassDetails(selectedClassId);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedClassId, isDemo]);
 
   // Création d'une nouvelle classe

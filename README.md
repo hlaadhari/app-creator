@@ -23,6 +23,7 @@
 ## 🎯 Présentation
 
 Labo STI répond aux défis majeurs de l'apprentissage du développement web au lycée :
+
 1. **Zéro Installation** : l'élève code directement dans son navigateur (aucune configuration de serveur Apache, PHP ou MySQL requise sur les postes du lycée).
 2. **Correction Immédiate** : évaluation en direct critère par critère (DOM, styles calculés, scripts, logique serveur et bases de données).
 3. **Pédagogie Bienveillante** : indices progressifs sur 3 niveaux pour débloquer l'élève sans lui donner la solution brute.
@@ -70,6 +71,7 @@ L'ensemble du cadrage et des spécifications est organisé dans le dossier `docs
 ## 🚀 Démarrage Rapide
 
 ### Prérequis
+
 - [Node.js](https://nodejs.org/) v20+ ou v22+
 - Gestionnaire de paquets `npm` ou `bun`
 
@@ -111,6 +113,7 @@ Ce projet est connecté à la plateforme [Lovable](https://lovable.dev).
 ## 🗺 Feuille de Route
 
 Le projet se déploie selon 6 phases strictes :
+
 - **Phase 0** : Jalon de validation technique (PHP WASM + SQLite sur poste 4 Go RAM).
 - **Phase 1 (MVP)** : Parcours complet élève HTML/CSS/JS (Authentification, Monaco, Tampon local, Critères DOM).
 - **Phase 2** : PHP & SQL local (Panneau DB, lint MySQL, réinitialisation).

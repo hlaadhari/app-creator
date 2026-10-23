@@ -150,7 +150,12 @@ function valeurDeChamp(valeur: unknown): string | boolean {
 
 type EtatChamp = { champ: HTMLInputElement; valeur: string; coche: boolean; texte: string };
 
-function executerCas(doc: Document, win: Window, cas: CasBrut, defaut: string | undefined): boolean {
+function executerCas(
+  doc: Document,
+  win: Window,
+  cas: CasBrut,
+  defaut: string | undefined,
+): boolean {
   const saisies = dictionnaire(cas.saisies) ?? {};
   const etat = dictionnaire(cas.etat);
   const texte = dictionnaire(cas.texte);
@@ -173,7 +178,11 @@ function executerCas(doc: Document, win: Window, cas: CasBrut, defaut: string | 
   };
 
   const dialogues = win as unknown as Record<"alert" | "confirm" | "prompt", unknown>;
-  const sauvegardes = { alert: dialogues.alert, confirm: dialogues.confirm, prompt: dialogues.prompt };
+  const sauvegardes = {
+    alert: dialogues.alert,
+    confirm: dialogues.confirm,
+    prompt: dialogues.prompt,
+  };
 
   try {
     for (const [nom, valeur] of Object.entries(saisies)) {
@@ -196,7 +205,9 @@ function executerCas(doc: Document, win: Window, cas: CasBrut, defaut: string | 
     for (const [nom, attendu] of Object.entries(etat ?? {})) {
       const champ = touches.get(nom)?.champ;
       if (!champ) return false;
-      if (typeof attendu === "boolean" ? champ.checked !== attendu : champ.value !== String(attendu)) {
+      if (
+        typeof attendu === "boolean" ? champ.checked !== attendu : champ.value !== String(attendu)
+      ) {
         return false;
       }
     }
@@ -228,14 +239,18 @@ function verificationParCas(critere: CritereBrut): VerificationCritere | null {
   const defaut = texte(critere["function_name"]);
   for (const c of cases) {
     const aUneAttente =
-      typeof c.attendu === "boolean" || dictionnaire(c.etat) !== null || dictionnaire(c.texte) !== null;
+      typeof c.attendu === "boolean" ||
+      dictionnaire(c.etat) !== null ||
+      dictionnaire(c.texte) !== null;
     if (!aUneAttente || (typeof c.appel !== "string" && !defaut)) return null;
   }
 
   // Une fonction qui répond toujours « false » (code de départ) satisferait des cas qui n'attendent
   // que « false » : il faut aussi qu'un cas valide soit accepté.
   const attendFaux = cases.some((c) => c.attendu === false);
-  const attendVrai = cases.some((c) => c.attendu === true || c.etat !== undefined || c.texte !== undefined);
+  const attendVrai = cases.some(
+    (c) => c.attendu === true || c.etat !== undefined || c.texte !== undefined,
+  );
   if (attendFaux && !attendVrai) return null;
 
   return (doc, win) => cases.every((c) => executerCas(doc, win, c, defaut));

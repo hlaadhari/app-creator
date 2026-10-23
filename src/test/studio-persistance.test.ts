@@ -32,9 +32,27 @@ const version: VersionStudio = {
   indices: ["Utilisez <nav>"],
   fichiers_depart: { "index.html": "<body></body>" },
   solutions_test: [
-    { id: "sol-canonique", nom: "A", type: "canonique", description: "", files: { "index.html": "<nav></nav>" } },
-    { id: "sol-alternative", nom: "B", type: "alternative", description: "", files: { "index.html": "<nav/>" } },
-    { id: "sol-invalide", nom: "C", type: "invalide", description: "", files: { "index.html": "" } },
+    {
+      id: "sol-canonique",
+      nom: "A",
+      type: "canonique",
+      description: "",
+      files: { "index.html": "<nav></nav>" },
+    },
+    {
+      id: "sol-alternative",
+      nom: "B",
+      type: "alternative",
+      description: "",
+      files: { "index.html": "<nav/>" },
+    },
+    {
+      id: "sol-invalide",
+      nom: "C",
+      type: "invalide",
+      description: "",
+      files: { "index.html": "" },
+    },
   ],
 };
 

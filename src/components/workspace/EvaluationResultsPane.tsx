@@ -75,6 +75,7 @@ export function EvaluationResultsPane({
   // Récupération de l'historique et du delta de la dernière tentative
   const latestAttempts = useMemo<AttemptWithDelta[]>(() => {
     if (!sujetId) return [];
+    void summary;
     return listerHistoriqueAvecDeltas(sujetId);
   }, [sujetId, summary]);
 

@@ -50,7 +50,9 @@ describe("Écran du Studio (issue #92)", () => {
   });
 
   it("affiche l'erreur du serveur sans perdre la saisie", async () => {
-    studio.enregistrerBrouillon.mockRejectedValue(new Error("Cet identifiant de sujet est déjà utilisé."));
+    studio.enregistrerBrouillon.mockRejectedValue(
+      new Error("Cet identifiant de sujet est déjà utilisé."),
+    );
     render(<SubjectStudioTab />);
     fireEvent.click(await screen.findByRole("button", { name: /Nouveau sujet/ }));
     fireEvent.change(screen.getByLabelText("Titre du sujet"), { target: { value: "Menu" } });
@@ -62,11 +64,29 @@ describe("Écran du Studio (issue #92)", () => {
 
   it("verrouille une version publiée : aucun bouton d'enregistrement", async () => {
     studio.listerSujetsStudio.mockResolvedValue([
-      { sujet_id: "s", titre: "Publié", niveau: "Facile", version_id: "v", numero: 2, publiee: true, updated_at: "" },
+      {
+        sujet_id: "s",
+        titre: "Publié",
+        niveau: "Facile",
+        version_id: "v",
+        numero: 2,
+        publiee: true,
+        updated_at: "",
+      },
     ]);
     studio.chargerVersionStudio.mockResolvedValue({
-      id: "v", sujet_id: "s", numero: 2, titre: "Publié", niveau: "Facile", duree_min: 30,
-      enonce_md: "", publiee: true, criteres: [], indices: [], fichiers_depart: {}, solutions_test: [],
+      id: "v",
+      sujet_id: "s",
+      numero: 2,
+      titre: "Publié",
+      niveau: "Facile",
+      duree_min: 30,
+      enonce_md: "",
+      publiee: true,
+      criteres: [],
+      indices: [],
+      fichiers_depart: {},
+      solutions_test: [],
     });
     render(<SubjectStudioTab />);
     fireEvent.click(await screen.findByRole("button", { name: "Consulter" }));
@@ -84,8 +104,11 @@ describe("Validation des critères saisis en JSON", () => {
     expect(erreurCriteres([{ titre: "A", points: 1 }])).toMatch(/id/);
     expect(erreurCriteres([{ id: "a", points: 1 }])).toMatch(/titre/);
     expect(erreurCriteres([{ id: "a", titre: "A", points: -1 }])).toMatch(/points/);
-    expect(erreurCriteres([{ id: "a", titre: "A", points: 1 }, { id: "a", titre: "B", points: 1 }])).toMatch(
-      /deux fois/,
-    );
+    expect(
+      erreurCriteres([
+        { id: "a", titre: "A", points: 1 },
+        { id: "a", titre: "B", points: 1 },
+      ]),
+    ).toMatch(/deux fois/);
   });
 });
