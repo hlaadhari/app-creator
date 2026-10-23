@@ -11,13 +11,17 @@
 Vous avez le choix entre **deux approches** complémentaires :
 
 ### Méthode A : Intégration Native Vercel (Recommandée)
+
 L'intégration directe via le tableau de bord Vercel est la plus simple et la plus robuste :
+
 - Chaque `git push` sur `main` déclenche un déploiement en **Production**.
 - Chaque **Pull Request** génère automatiquement une URL de **Preview** éphémère avec commentaires automatiques.
 - Prise en charge native du fichier [`vercel.json`](file:///d:/My%20Projects/lab-analysis/app-creator/vercel.json).
 
 ### Méthode B : Déploiement Automatisé via GitHub Actions
+
 Le workflow [`.github/workflows/deploy-vercel.yml`](file:///d:/My%20Projects/lab-analysis/app-creator/.github/workflows/deploy-vercel.yml) permet de gérer le déploiement directement depuis vos pipelines GitHub Actions.
+
 - Le workflow est sécurisé et conditionné par le secret `VERCEL_TOKEN` (il n'échoue pas si le secret n'est pas encore renseigné).
 
 ---
@@ -28,18 +32,18 @@ Le workflow [`.github/workflows/deploy-vercel.yml`](file:///d:/My%20Projects/lab
 2. Importez le dépôt GitHub : **`hlaadhari/app-creator`**.
 3. Définissez les paramètres de build :
 
-| Paramètre | Valeur | Explication |
-| :--- | :--- | :--- |
-| **Framework Preset** | `Other` | TanStack Start s'appuie sur Nitro et le Build Output API v3. |
-| **Build Command** | `NITRO_PRESET=vercel bun run build` | Compile l'application avec le preset Nitro Vercel optimisé. |
-| **Install Command** | `bun install` | Installation rapide via Bun respectant le fichier `bun.lock`. |
-| **Output Directory** | `.vercel/output` | Géré automatiquement via l'API v3 Vercel. |
+| Paramètre            | Valeur                              | Explication                                                   |
+| :------------------- | :---------------------------------- | :------------------------------------------------------------ |
+| **Framework Preset** | `Other`                             | TanStack Start s'appuie sur Nitro et le Build Output API v3.  |
+| **Build Command**    | `NITRO_PRESET=vercel bun run build` | Compile l'application avec le preset Nitro Vercel optimisé.   |
+| **Install Command**  | `bun install`                       | Installation rapide via Bun respectant le fichier `bun.lock`. |
+| **Output Directory** | `.vercel/output`                    | Géré automatiquement via l'API v3 Vercel.                     |
 
 ---
 
 ## 3. Variables d'Environnement sur Vercel
 
-Dans **Project Settings > Environment Variables**, ajoutez les clés suivantes pour les environnements *Production*, *Preview* et *Development* :
+Dans **Project Settings > Environment Variables**, ajoutez les clés suivantes pour les environnements _Production_, _Preview_ et _Development_ :
 
 ```env
 # URL et clé publique Supabase (obligatoires pour le fonctionnement du client)
@@ -62,6 +66,7 @@ NITRO_PRESET = "vercel"
 ## 4. Configuration GitHub Actions (Si Méthode B choisie)
 
 Si vous souhaitez utiliser le workflow GitHub Actions [`.github/workflows/deploy-vercel.yml`](file:///d:/My%20Projects/lab-analysis/app-creator/.github/workflows/deploy-vercel.yml) :
+
 1. Créez un token d'accès personnel sur Vercel : **Settings > Tokens > Create Token**.
 2. Dans votre dépôt GitHub : **Settings > Secrets and variables > Actions**.
 3. Ajoutez le secret :
@@ -74,6 +79,7 @@ Si vous souhaitez utiliser le workflow GitHub Actions [`.github/workflows/deploy
 ## 5. En-têtes de Sécurité & Performance ([`vercel.json`](file:///d:/My%20Projects/lab-analysis/app-creator/vercel.json))
 
 Le fichier [`vercel.json`](file:///d:/My%20Projects/lab-analysis/app-creator/vercel.json) injecte automatiquement les en-têtes conformes aux exigences de sécurité du PRD v3.1 :
+
 - **Anti-Clickjacking** : `X-Frame-Options: SAMEORIGIN` sur l'application hôte.
 - **MIME Sniffing Protection** : `X-Content-Type-Options: nosniff`.
 - **Politique de Référent** : `Referrer-Policy: strict-origin-when-cross-origin`.

@@ -10,9 +10,10 @@
 Rédiger un critère d'évaluation automatique fiable est un nouveau métier pour l'enseignant. Un critère mal conçu peut générer de la frustration (**faux négatifs** : code juste rejeté) ou une complaisance trompeuse (**faux positifs** : code faux accepté).
 
 ### Les 5 Règles d'Or
+
 1. **Tester le résultat observable, pas la syntaxe** :
-   - ✅ *Vérifier que le texte de l'élément `#total` vaut "5" après 5 clics.*
-   - ❌ *Rechercher la chaîne exacte `for (let i = 0; i < 5; i++)` dans le fichier JavaScript.*
+   - ✅ _Vérifier que le texte de l'élément `#total` vaut "5" après 5 clics._
+   - ❌ _Rechercher la chaîne exacte `for (let i = 0; i < 5; i++)` dans le fichier JavaScript._
 2. **Tolérer les variantes valides** :
    - Accepter les couleurs équivalentes (`#0066cc`, `rgb(0, 102, 204)`, `hsl(...)`).
    - Tolérer les espaces insécables ou les différences de casse non sémantiques.
@@ -93,6 +94,7 @@ Les critères sont définis sous forme d'objets JSON déclaratifs stockés dans 
 ```
 
 ### 2.4 Critères PHP (Phase 2)
+
 ```json
 {
   "code": "php-post-insert",
@@ -101,8 +103,15 @@ Les critères sont définis sous forme d'objets JSON déclaratifs stockés dans 
   "points": 4,
   "message_echec": "L'envoi du formulaire d'inscription n'a inséré aucune nouvelle ligne dans la table `utilisateurs`.",
   "sonde": {
-    "req": { "method": "POST", "url": "inscription.php", "body": { "nom": "Dupont", "email": "d@test.fr" } },
-    "obs": { "k": "sql_count", "query": "SELECT COUNT(*) FROM utilisateurs WHERE email = 'd@test.fr'" }
+    "req": {
+      "method": "POST",
+      "url": "inscription.php",
+      "body": { "nom": "Dupont", "email": "d@test.fr" }
+    },
+    "obs": {
+      "k": "sql_count",
+      "query": "SELECT COUNT(*) FROM utilisateurs WHERE email = 'd@test.fr'"
+    }
   },
   "attendu": {
     "op": "eq",
@@ -117,6 +126,7 @@ Les critères sont définis sous forme d'objets JSON déclaratifs stockés dans 
 
 > [!IMPORTANT]
 > Avant de publier une version de sujet (`publiee = true`), la plateforme et la CI imposent l'exécution de la suite de validation pédagogique :
+>
 > 1. **Solution Valide A** (approche canonique standard) -> doit obtenir **100 % des points**.
 > 2. **Solution Valide B** (approche alternative valide : ex. boucle différente, sélecteurs distincts, flexbox vs grid) -> doit obtenir **100 % des points**.
 > 3. **Solution Invalide C** (erreur courante d'élève : oubli d'attribut, faute de frappe, logique incomplète) -> doit échouer sur le critère ciblé sans valider les points indûment.
@@ -127,7 +137,7 @@ Si une solution valide échoue, la publication de la version est **bloquée**.
 
 ## 4. Gestion des Contestations d'Élèves
 
-1. L'élève dispose d'un bouton discret : *« Ce critère me semble injuste »*.
+1. L'élève dispose d'un bouton discret : _« Ce critère me semble injuste »_.
 2. Sa contestation est enregistrée dans la table `contestations` avec le code exact du fichier au moment du clic.
 3. L'enseignant consulte la file de contestations :
    - Si le critère est effectivement ambigu ou trop rigide, l'enseignant peut **désactiver le critère** (`criteres.actif = false`).

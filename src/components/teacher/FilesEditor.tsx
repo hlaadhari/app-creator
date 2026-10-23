@@ -110,7 +110,13 @@ export function FilesEditor({ idPrefix, files, onChange, disabled }: Props) {
             }}
             className="h-7 text-xs max-w-56"
           />
-          <Button type="button" size="sm" variant="outline" onClick={ajouter} className="h-7 text-xs gap-1">
+          <Button
+            type="button"
+            size="sm"
+            variant="outline"
+            onClick={ajouter}
+            className="h-7 text-xs gap-1"
+          >
             <Plus className="w-3 h-3" />
             Ajouter un fichier
           </Button>

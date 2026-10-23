@@ -1,4 +1,5 @@
 <!-- LOVABLE:BEGIN -->
+
 > [!IMPORTANT]
 > This project is connected to [Lovable](https://lovable.dev). Avoid rewriting
 > published git history — force pushing, or rebasing/amending/squashing commits
@@ -7,6 +8,7 @@
 >
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
+
 <!-- LOVABLE:END -->
 
 # Consignes pour Agents IA & Développeurs — Labo STI
@@ -18,6 +20,7 @@ Bienvenue sur le projet **Labo STI**. En tant qu'agent ou développeur travailla
 ## 1. Documentation de Référence Obligatoire
 
 Avant toute modification structurelle ou ajout de fonctionnalité, consultez les documents de cadrage :
+
 - [`CONTEXT.md`](file:///d:/My%20Projects/lab-analysis/app-creator/CONTEXT.md) : Synthèse centrale du projet, vision, stack et gap analysis.
 - [`docs/PRD.md`](file:///d:/My%20Projects/lab-analysis/app-creator/docs/PRD.md) : Spécification fonctionnelle et technique complète (v3.1).
 - [`docs/ARCHITECTURE.md`](file:///d:/My%20Projects/lab-analysis/app-creator/docs/ARCHITECTURE.md) : Détail de l'architecture (bac à sable iframe, WASM, Plan B, résilience).

@@ -4,17 +4,14 @@ import { describe, expect, it } from "vitest";
 import { erreurCriteres } from "@/components/teacher/CriteriaEditor";
 import { critereDepuisJson } from "@/lib/evaluation/critere-json";
 import { construireDocumentEvaluation } from "@/lib/evaluation/document-evaluation";
-import {
-  MESSAGE_CORRECTION_ENSEIGNANT,
-  runCriteria,
-  score,
-  type Criterion,
-} from "@/lib/exercises";
+import { MESSAGE_CORRECTION_ENSEIGNANT, runCriteria, score, type Criterion } from "@/lib/exercises";
 import { validerBancDidactiqueReel, type FabriqueEvaluateur } from "@/lib/subjects/banc-didactique";
 import type { ValidationSolution } from "@/lib/subjects/subject-studio";
 
 const evaluateurPour: FabriqueEvaluateur = (fichiers) => async (page, criteres) => {
-  const dom = new JSDOM(construireDocumentEvaluation(fichiers, page), { runScripts: "dangerously" });
+  const dom = new JSDOM(construireDocumentEvaluation(fichiers, page), {
+    runScripts: "dangerously",
+  });
   try {
     return runCriteria(criteres, dom.window.document, dom.window as never);
   } finally {
@@ -22,7 +19,12 @@ const evaluateurPour: FabriqueEvaluateur = (fichiers) => async (page, criteres) 
   }
 };
 
-const titre = { id: "c1", titre: "Un titre", points: 4, sonde: { type: "dom_selector", selector: "h1" } };
+const titre = {
+  id: "c1",
+  titre: "Un titre",
+  points: 4,
+  sonde: { type: "dom_selector", selector: "h1" },
+};
 const php = { id: "c2", titre: "Insertion PHP", points: 6, correction: "enseignant" };
 const libre = { id: "c3", titre: "Sans vérification", points: 6 };
 

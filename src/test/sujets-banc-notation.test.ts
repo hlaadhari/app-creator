@@ -498,7 +498,10 @@ describe("Banc de test de la notation : JavaScript des examens (js_test_cas)", (
       const sol = await evaluer(id, lireVariante(id, "solution"));
       for (const c of manuels) expect(sol.reussis, `${id} ${c.id}`).not.toContain(c.id);
       // Tout critère non vérifiable est explicitement déclaré : rien d'implicite.
-      expect(sujet.criteria.filter((c) => c.automatique === false && !c.manuel), id).toEqual([]);
+      expect(
+        sujet.criteria.filter((c) => c.automatique === false && !c.manuel),
+        id,
+      ).toEqual([]);
     }
   });
 });

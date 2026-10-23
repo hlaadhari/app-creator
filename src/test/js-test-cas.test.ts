@@ -52,12 +52,17 @@ describe("Vérification par cas js_test_cas", () => {
   });
 
   it("n'est pas vérifiable sans cas, sans attente ou sans fonction", () => {
-    expect(construireVerificationDeclaree({ type: "js_test_cas", function_name: "verif" })).toBeNull();
+    expect(
+      construireVerificationDeclaree({ type: "js_test_cas", function_name: "verif" }),
+    ).toBeNull();
     expect(
       construireVerificationDeclaree({ ...critere, cas: [{ saisies: { code: "AB1" } }] }),
     ).toBeNull();
     expect(
-      construireVerificationDeclaree({ type: "js_test_cas", cas: [{ saisies: {}, attendu: true }] }),
+      construireVerificationDeclaree({
+        type: "js_test_cas",
+        cas: [{ saisies: {}, attendu: true }],
+      }),
     ).toBeNull();
   });
 
@@ -72,9 +77,9 @@ describe("Vérification par cas js_test_cas", () => {
     const lie = `function lie(){ if (document.getElementById("a").checked) document.getElementById("b").checked = true; }`;
     expect(evaluer(lie, c)).toBe(true);
     expect(evaluer("function lie(){}", c)).toBe(false);
-    expect(
-      evaluer(`function lie(){ document.getElementById("b").checked = true; }`, c),
-    ).toBe(false);
+    expect(evaluer(`function lie(){ document.getElementById("b").checked = true; }`, c)).toBe(
+      false,
+    );
   });
 
   it("contrôle un texte affiché (« texte ») et la valeur d'une liste", () => {

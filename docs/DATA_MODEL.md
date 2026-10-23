@@ -43,7 +43,9 @@ Le schéma de données Postgres est divisé en **6 domaines fonctionnels** :
 ### 2.1 Domaine 1 : Utilisateurs et Classes
 
 #### `profiles`
+
 Rattachée à `auth.users(id)`.
+
 - `id` (uuid, PK, references `auth.users`)
 - `nom` (text, not null)
 - `prenom` (text, not null)
@@ -52,13 +54,16 @@ Rattachée à `auth.users(id)`.
 - `created_at` (timestamptz, default `now()`)
 
 #### `user_roles`
+
 Gère les rôles applicatifs (`eleve`, `enseignant`, `admin`).
+
 - `id` (uuid, PK, default `gen_random_uuid()`)
 - `user_id` (uuid, references `auth.users`, not null)
 - `role` (enum `app_role`: `'eleve'`, `'enseignant'`, `'admin'`)
-- *Contrainte* : `UNIQUE(user_id, role)`
+- _Contrainte_ : `UNIQUE(user_id, role)`
 
 #### `classes`
+
 - `id` (uuid, PK, default `gen_random_uuid()`)
 - `nom` (text, not null - ex: "Terminale STI2D 1")
 - `enseignant_id` (uuid, references `profiles(id)`, not null)
@@ -67,6 +72,7 @@ Gère les rôles applicatifs (`eleve`, `enseignant`, `admin`).
 - `created_at` (timestamptz, default `now()`)
 
 #### `class_invitations`
+
 - `id` (uuid, PK, default `gen_random_uuid()`)
 - `class_id` (uuid, references `classes(id)` on delete cascade, not null)
 - `code` (text, unique, not null - ex: "STI-7842")
@@ -76,17 +82,19 @@ Gère les rôles applicatifs (`eleve`, `enseignant`, `admin`).
 - `nb_utilisations` (int, default 0)
 
 #### `class_members`
+
 - `class_id` (uuid, references `classes(id)` on delete cascade)
 - `eleve_id` (uuid, references `profiles(id)` on delete cascade)
 - `joined_at` (timestamptz, default `now()`)
 - `left_at` (timestamptz, nullable)
-- *PK* : `(class_id, eleve_id)`
+- _PK_ : `(class_id, eleve_id)`
 
 ---
 
 ### 2.2 Domaine 2 : Sujets et Versions Immuables
 
 #### `sujets`
+
 - `id` (text, PK - slug lisible ou uuid)
 - `auteur_id` (uuid, references `profiles(id)`, nullable)
 - `titre` (text, not null)
@@ -96,6 +104,7 @@ Gère les rôles applicatifs (`eleve`, `enseignant`, `admin`).
 - `created_at` (timestamptz, default `now()`)
 
 #### `sujet_versions` (**Immuable**)
+
 - `id` (uuid, PK, default `gen_random_uuid()`)
 - `sujet_id` (text, references `sujets(id)` on delete restrict, not null)
 - `numero` (int, not null)
@@ -106,27 +115,33 @@ Gère les rôles applicatifs (`eleve`, `enseignant`, `admin`).
 - `hash_contenu` (text, nullable)
 - `publiee` (boolean, default false)
 - `published_at` (timestamptz, nullable)
-- *Contrainte* : `UNIQUE(sujet_id, numero)`
+- _Contrainte_ : `UNIQUE(sujet_id, numero)`
 
 #### `sujet_version_fichiers` (**Immuable**)
+
 Fichiers initiaux du sujet fournis à l'élève.
+
 - `id` (uuid, PK, default `gen_random_uuid()`)
 - `version_id` (uuid, references `sujet_versions(id)` on delete restrict, not null)
 - `chemin` (text, not null - ex: 'index.html', 'style.css')
 - `contenu` (text, not null default `''`)
 - `storage_path` (text, nullable)
 - `role` (text, check `role in ('depart', 'corrige', 'ressource')`, default `'depart'`)
-- *Contrainte* : `UNIQUE(version_id, chemin)`
+- _Contrainte_ : `UNIQUE(version_id, chemin)`
 
 #### `sujet_version_bases` (**Immuable**)
+
 Scripts SQL initiaux pour la version.
+
 - `id` (uuid, PK, default `gen_random_uuid()`)
 - `version_id` (uuid, references `sujet_versions(id)` on delete restrict, not null)
 - `nom` (text, not null - ex: 'schema.sql')
 - `storage_path` (text, not null)
 
 #### `class_sujets`
+
 Association entre une classe et une version de sujet.
+
 - `id` (uuid, PK, default `gen_random_uuid()`)
 - `class_id` (uuid, references `classes(id)` on delete cascade, not null)
 - `version_id` (uuid, references `sujet_versions(id)` on delete restrict, not null)
@@ -139,7 +154,9 @@ Association entre une classe et une version de sujet.
 ### 2.3 Domaine 3 : Critères de Validation, Indices et Corrigés
 
 #### `criteres`
+
 Critères de correction automatique au format JSON déclaratif.
+
 - `id` (uuid, PK, default `gen_random_uuid()`)
 - `version_id` (uuid, references `sujet_versions(id)` on delete restrict, not null)
 - `code` (text, not null)
@@ -151,17 +168,20 @@ Critères de correction automatique au format JSON déclaratif.
 - `attendu` (jsonb, not null)
 - `masque` (boolean, default false)
 - `actif` (boolean, default true)
-- *Contrainte* : `UNIQUE(version_id, code)`
+- _Contrainte_ : `UNIQUE(version_id, code)`
 
 #### `solutions` (**Confidentiel**)
+
 Corrigé type officiel. Ne fait l'objet d'aucun `GRANT` en lecture aux élèves.
+
 - `id` (uuid, PK, default `gen_random_uuid()`)
 - `version_id` (uuid, references `sujet_versions(id)` on delete restrict, not null)
 - `chemin` (text, not null)
 - `contenu` (text, not null)
-- *Contrainte* : `UNIQUE(version_id, chemin)`
+- _Contrainte_ : `UNIQUE(version_id, chemin)`
 
 #### `indices`
+
 - `id` (uuid, PK, default `gen_random_uuid()`)
 - `version_id` (uuid, references `sujet_versions(id)` on delete restrict, not null)
 - `critere_id` (uuid, references `criteres(id)`, nullable)
@@ -170,14 +190,18 @@ Corrigé type officiel. Ne fait l'objet d'aucun `GRANT` en lecture aux élèves.
 - `texte` (text, not null)
 
 #### `indices_debloques`
+
 Historique d'accès aux indices pour traçabilité pédagogique.
+
 - `user_id` (uuid, references `auth.users(id)` on delete cascade)
 - `indice_id` (uuid, references `indices(id)` on delete cascade)
 - `unlocked_at` (timestamptz, default `now()`)
-- *PK* : `(user_id, indice_id)`
+- _PK_ : `(user_id, indice_id)`
 
 #### `contestations`
+
 Permet à un élève de signaler un critère jugé erroné ou ambigu.
+
 - `id` (uuid, PK, default `gen_random_uuid()`)
 - `critere_id` (uuid, references `criteres(id)`, not null)
 - `eleve_id` (uuid, references `profiles(id)`, not null)
@@ -190,15 +214,17 @@ Permet à un élève de signaler un critère jugé erroné ou ambigu.
 ### 2.4 Domaine 4 : Projets Élèves et Snapshots
 
 #### `projets`
+
 - `id` (uuid, PK, default `gen_random_uuid()`)
 - `eleve_id` (uuid, references `profiles(id)` on delete cascade, not null)
 - `version_id` (uuid, references `sujet_versions(id)` on delete restrict, not null)
 - `statut` (text, check `statut in ('non_commence', 'en_cours', 'rendu')`, default `'en_cours'`)
 - `created_at` (timestamptz, default `now()`)
 - `updated_at` (timestamptz, default `now()`)
-- *Contrainte* : `UNIQUE(eleve_id, version_id)`
+- _Contrainte_ : `UNIQUE(eleve_id, version_id)`
 
 #### `projet_fichiers`
+
 - `id` (uuid, PK, default `gen_random_uuid()`)
 - `projet_id` (uuid, references `projets(id)` on delete cascade, not null)
 - `chemin` (text, not null)
@@ -207,10 +233,12 @@ Permet à un élève de signaler un critère jugé erroné ou ambigu.
 - `rev` (int, not null default 1)
 - `supprime` (boolean, default false)
 - `updated_at` (timestamptz, default `now()`)
-- *Contrainte* : `UNIQUE(projet_id, chemin)`
+- _Contrainte_ : `UNIQUE(projet_id, chemin)`
 
 #### `tentatives`
+
 Consigne chaque clic sur le bouton « Vérifier ».
+
 - `id` (uuid, PK, default `gen_random_uuid()`)
 - `projet_id` (uuid, references `projets(id)` on delete cascade, not null)
 - `score` (int, not null)
@@ -222,7 +250,9 @@ Consigne chaque clic sur le bouton « Vérifier ».
 - `date` (timestamptz, default `now()`)
 
 #### `snapshots` (**Immuable**)
+
 Copie certifiée scellée lors de la fin d'un examen ou d'une remise officielle.
+
 - `id` (uuid, PK, default `gen_random_uuid()`)
 - `projet_id` (uuid, references `projets(id)` on delete restrict, not null)
 - `date` (timestamptz, default `now()`)
@@ -235,6 +265,7 @@ Copie certifiée scellée lors de la fin d'un examen ou d'une remise officielle.
 ### 2.5 Domaine 5 : Sessions d'Examen et Notations
 
 #### `sessions_examen`
+
 - `id` (uuid, PK, default `gen_random_uuid()`)
 - `class_id` (uuid, references `classes(id)`, not null)
 - `version_id` (uuid, references `sujet_versions(id)`, not null)
@@ -244,6 +275,7 @@ Copie certifiée scellée lors de la fin d'un examen ou d'une remise officielle.
 - `statut` (text, check `statut in ('planifie', 'salle_attente', 'en_cours', 'termine')`, default `'planifie'`)
 
 #### `passages_examen`
+
 - `id` (uuid, PK, default `gen_random_uuid()`)
 - `session_id` (uuid, references `sessions_examen(id)` on delete cascade, not null)
 - `eleve_id` (uuid, references `profiles(id)`, not null)
@@ -255,6 +287,7 @@ Copie certifiée scellée lors de la fin d'un examen ou d'une remise officielle.
 - `snapshot_final_id` (uuid, references `snapshots(id)`, nullable)
 
 #### `notes`
+
 - `id` (uuid, PK, default `gen_random_uuid()`)
 - `passage_id` (uuid, references `passages_examen(id)`, nullable)
 - `snapshot_id` (uuid, references `snapshots(id)`, not null)
@@ -271,6 +304,7 @@ Copie certifiée scellée lors de la fin d'un examen ou d'une remise officielle.
 ### 2.6 Domaine 6 : Compétences, Motivation et Audit
 
 #### `competences`
+
 - `id` (text, PK - ex: 'HTML.STRUCT', 'CSS.FLEX', 'JS.EVENT', 'PHP.FORM', 'SQL.SELECT')
 - `code` (text, unique, not null)
 - `libelle` (text, not null)
@@ -278,15 +312,18 @@ Copie certifiée scellée lors de la fin d'un examen ou d'une remise officielle.
 - `parent_id` (text, references `competences(id)`, nullable)
 
 #### `maitrise`
+
 - `eleve_id` (uuid, references `profiles(id)` on delete cascade)
 - `competence_id` (text, references `competences(id)` on delete cascade)
 - `niveau` (numeric(3,2), not null default 0.0)
 - `version_formule` (text, not null default 'v1.0')
 - `updated_at` (timestamptz, default `now()`)
-- *PK* : `(eleve_id, competence_id)`
+- _PK_ : `(eleve_id, competence_id)`
 
 #### `journal_securite`
+
 Journalisation minimale et anonymisée (conformité RGPD) des événements anormaux.
+
 - `id` (uuid, PK, default `gen_random_uuid()`)
 - `type` (text, not null - ex: 'TENTATIVE_ECRITURE_HORS_DELAI', 'BRUTEFORCE_INVITATION')
 - `acteur_id` (uuid, nullable)
@@ -304,8 +341,8 @@ Le fichier de migration `drizzle/migrations/0001_etape2_sujets.sql` applique d'o
 create or replace function public.protect_published_version()
 returns trigger language plpgsql set search_path = public as $$
 begin
-  if tg_op in ('DELETE', 'UPDATE') and old.publiee then 
-    raise exception 'Version publiee immuable'; 
+  if tg_op in ('DELETE', 'UPDATE') and old.publiee then
+    raise exception 'Version publiee immuable';
   end if;
   return coalesce(new, old);
 end $$;
@@ -322,6 +359,7 @@ begin
   return coalesce(new, old);
 end $$;
 ```
+
 Ces triggers sont reliés aux tables `sujet_version_fichiers`, `criteres`, `solutions` et `indices`.
 
 ## Studio de sujets (migration 0014, issue #92)

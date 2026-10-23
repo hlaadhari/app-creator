@@ -131,7 +131,9 @@ describe("Studio : publication et nouvelle version (issue #94)", () => {
     fireEvent.click(await screen.findByRole("button", { name: "Consulter" }));
     fireEvent.click(await screen.findByRole("button", { name: /Créer la version 2/ }));
 
-    await waitFor(() => expect(studio.creerNouvelleVersionStudio).toHaveBeenCalledWith("tp-menu-01"));
+    await waitFor(() =>
+      expect(studio.creerNouvelleVersionStudio).toHaveBeenCalledWith("tp-menu-01"),
+    );
     expect(await screen.findByText(/Brouillon v2/)).toBeTruthy();
   });
 });

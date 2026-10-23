@@ -229,7 +229,10 @@ export function SubjectStudioTab() {
       setVersion(await chargerVersionStudio(res.version_id));
       setModifie(false);
       setReport(null);
-      setMessage({ ok: true, texte: `Brouillon de la version ${res.numero} créé à partir de la version publiée.` });
+      setMessage({
+        ok: true,
+        texte: `Brouillon de la version ${res.numero} créé à partir de la version publiée.`,
+      });
     } catch (e) {
       setMessage({ ok: false, texte: messageDe(e, "Création de la version impossible.") });
     }
@@ -414,14 +417,16 @@ export function SubjectStudioTab() {
           <AlertDialogHeader>
             <AlertDialogTitle>Publier la version {version.numero} ?</AlertDialogTitle>
             <AlertDialogDescription>
-              La version sera immédiatement disponible pour les élèves et ne pourra plus jamais
-              être modifiée (énoncé, fichiers, critères, solutions). Pour la corriger, vous
-              créerez une nouvelle version.
+              La version sera immédiatement disponible pour les élèves et ne pourra plus jamais être
+              modifiée (énoncé, fichiers, critères, solutions). Pour la corriger, vous créerez une
+              nouvelle version.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Annuler</AlertDialogCancel>
-            <AlertDialogAction onClick={() => void publier()}>Publier définitivement</AlertDialogAction>
+            <AlertDialogAction onClick={() => void publier()}>
+              Publier définitivement
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
