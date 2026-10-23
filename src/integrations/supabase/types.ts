@@ -1330,6 +1330,18 @@ export type Database = {
         Args: { p_session_id: string };
         Returns: Json;
       };
+      demarrer_passage: {
+        Args: { _session_id: string; _projet_id?: string | null };
+        Returns: Database["public"]["Tables"]["passages_examen"]["Row"];
+      };
+      rendre_passage: {
+        Args: { _passage_id: string };
+        Returns: Database["public"]["Tables"]["passages_examen"]["Row"];
+      };
+      accorder_temps_supp_passage: {
+        Args: { _passage_id: string; _temps_supp_min: number };
+        Returns: Database["public"]["Tables"]["passages_examen"]["Row"];
+      };
       nb_indices: { Args: { _version_id: string }; Returns: number };
       obtenir_horloge_serveur: { Args: never; Returns: string };
       rejoindre_classe: { Args: { _code: string }; Returns: Json };
