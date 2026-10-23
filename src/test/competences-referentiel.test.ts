@@ -3,7 +3,19 @@
  * Calcul de Maîtrise (v1.0) et Déblocage des Badges (Issue #33, PRD F-57 à F-60, Jalon M7)
  */
 
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect, beforeEach, vi } from "vitest";
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
+
+vi.mock("@/integrations/supabase/client", () => ({
+  supabase: {
+    from: () => ({
+      select: () => ({
+        eq: () => Promise.resolve({ data: [], error: null }),
+      }),
+    }),
+  },
+}));
 import {
   OFFICIAL_COMPETENCES,
   OFFICIAL_BADGES,
@@ -338,5 +350,38 @@ describe("Cycle de Vie Complet : Tentative -> Mise à jour Maîtrise -> Badges",
     const reportReloaded = await getStudentProgressionReport("eleve-test-42");
     expect(reportReloaded.totalSucces).toBe(2);
     expect(reportReloaded.badgesObtenusCount).toBeGreaterThanOrEqual(1);
+  });
+
+  describe("SEC-06 / T-16 : Révocation de l'écriture directe élève sur maitrise et badges (Issue #117)", () => {
+    const migration0021 = readFileSync(
+      resolve(process.cwd(), "supabase/migrations/20261023170000_0021_maitrise_badges_serveur.sql"),
+      "utf-8",
+    );
+    const competencesServiceSrc = readFileSync(
+      resolve(process.cwd(), "src/lib/competences/competences-service.ts"),
+      "utf-8",
+    );
+
+    it("T-16 : révoque INSERT/UPDATE/DELETE sur maitrise et badges pour anon/authenticated et supprime les politiques élève", () => {
+      expect(migration0021).toMatch(
+        /revoke\s+insert,\s*update,\s*delete\s+on\s+public\.maitrise\s+from\s+anon,\s*authenticated/i,
+      );
+      expect(migration0021).toMatch(
+        /revoke\s+insert,\s*update,\s*delete\s+on\s+public\.badges\s+from\s+anon,\s*authenticated/i,
+      );
+      expect(migration0021).toContain(
+        'drop policy if exists "Eleve met a jour sa maitrise" on public.maitrise;',
+      );
+      expect(migration0021).toContain(
+        'drop policy if exists "Eleve insere ses badges" on public.badges;',
+      );
+      expect(migration0021).toContain("trg_verifier_ecriture_maitrise");
+      expect(migration0021).toContain("trg_verifier_ecriture_badges");
+    });
+
+    it("T-16 : le service client n'effectue plus aucun upsert/insert direct dans maitrise ou badges", () => {
+      expect(competencesServiceSrc).not.toContain('from("maitrise").upsert');
+      expect(competencesServiceSrc).not.toContain('from("badges").insert');
+    });
   });
 });
