@@ -172,4 +172,76 @@ describe("Support de Cours Interactif & Mémento Bac STI (feat/course-support-ht
       expect(allSnippets.some((sn) => sn.code.includes("CHECK"))).toBe(true);
     });
   });
+
+  describe("Intégration du Carnet STI-BAC INFO au Module /cours (feat/integrate-notebook-content-to-course-page)", () => {
+    it("expose les 10 capsules vidéo générées couvrant tous les chapitres et les annales 2025/2026", async () => {
+      const { NOTEBOOK_VIDEOS } = await import("@/content/notebook-sti");
+      expect(NOTEBOOK_VIDEOS).toHaveLength(10);
+
+      const titles = NOTEBOOK_VIDEOS.map((v) => v.title);
+      expect(titles).toContain("Maitriser HTML5 & Formulaires");
+      expect(titles).toContain("Architecte Web: CSS3 Bac");
+      expect(titles).toContain("Étude de Cas CSS3 : Mise en Forme & Animations");
+      expect(titles).toContain("JS : Gardien du Formulaire");
+      expect(titles).toContain("PHP & MYSQL : Le Voyage");
+      expect(titles).toContain("Maitriser BD & SQL");
+      expect(titles).toContain("Correction Bac 2025 - Droits d'accès");
+      expect(titles).toContain("Correction Bac 2026 - Bijoux Aurythia");
+      expect(titles).toContain("Projet Web Full-Stack");
+    });
+
+    it("associe au moins une capsule vidéo à chaque chapitre (html5, css3, js, php, sql, annales)", async () => {
+      const { NOTEBOOK_VIDEOS } = await import("@/content/notebook-sti");
+      for (const modId of ["html5", "css3", "js", "php", "sql", "annales"] as const) {
+        const caps = NOTEBOOK_VIDEOS.filter((v) => v.moduleId === modId);
+        expect(caps.length).toBeGreaterThanOrEqual(1);
+        for (const c of caps) {
+          expect(c.chapters.length).toBeGreaterThanOrEqual(1);
+          expect(c.keyTakeaways.length).toBeGreaterThanOrEqual(1);
+        }
+      }
+    });
+
+    it("fournit des Flashcards de révision et des Quiz interactifs pour chaque module", async () => {
+      const { NOTEBOOK_FLASHCARDS, NOTEBOOK_QUIZZES } = await import("@/content/notebook-sti");
+      expect(NOTEBOOK_FLASHCARDS.length).toBeGreaterThanOrEqual(15);
+
+      for (const modId of ["html5", "css3", "js", "php", "sql", "annales"] as const) {
+        const cards = NOTEBOOK_FLASHCARDS.filter((c) => c.moduleId === modId);
+        expect(cards.length).toBeGreaterThanOrEqual(1);
+
+        const quiz = NOTEBOOK_QUIZZES[modId];
+        expect(quiz).toBeDefined();
+        expect(quiz.length).toBeGreaterThanOrEqual(2);
+        for (const q of quiz) {
+          expect(q.options.length).toBe(4);
+          expect(q.correctIndex).toBeGreaterThanOrEqual(0);
+          expect(q.correctIndex).toBeLessThan(4);
+          expect(q.explanation.length).toBeGreaterThan(10);
+        }
+      }
+    });
+
+    it("connecte le Tuteur IA aux 262 sources du carnet STI-BAC INFO avec réponses alignées sur le programme", async () => {
+      const { queryNotebookKnowledgeBase } = await import("@/content/notebook-sti");
+
+      const rJs = queryNotebookKnowledgeBase(
+        "Comment contrôler un CIN de 8 chiffres en JS ?",
+        "js",
+      );
+      expect(rJs.answer).toContain("length");
+      expect(rJs.answer).toContain("isNaN");
+
+      const rPhp = queryNotebookKnowledgeBase("Syntaxe procédurale mysqli_query", "php");
+      expect(rPhp.answer).toContain("mysqli_connect");
+      expect(rPhp.answer).toContain("mysqli_num_rows");
+
+      const rAnnales = queryNotebookKnowledgeBase(
+        "Corrigé Bac 2026 Bijoux Aurythia et Bac 2025",
+        "annales",
+      );
+      expect(rAnnales.answer).toContain("Bac 2025");
+      expect(rAnnales.answer).toContain("Aurythia");
+    });
+  });
 });
