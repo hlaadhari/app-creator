@@ -1,10 +1,29 @@
-import { describe, expect, it, beforeEach } from "vitest";
-import {
-  saveToBuffer,
-  getFromBuffer,
-  deleteFromBuffer,
-  getAllBuffers,
-} from "@/lib/storage/indexeddb";
+import { describe, expect, it, beforeEach, vi } from "vitest";
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
+
+const { rpcMock, maybeSingleMock } = vi.hoisted(() => ({
+  rpcMock: vi.fn(),
+  maybeSingleMock: vi.fn(),
+}));
+
+vi.mock("@/integrations/supabase/client", () => ({
+  supabase: {
+    rpc: rpcMock,
+    from: () => ({
+      select: () => ({
+        eq: () => ({
+          eq: () => ({
+            maybeSingle: maybeSingleMock,
+          }),
+        }),
+      }),
+    }),
+  },
+}));
+
+import { saveToBuffer, getFromBuffer, deleteFromBuffer } from "@/lib/storage/indexeddb";
+import { sauvegarderFichierDistant } from "@/lib/supabase/projets";
 import type { ProjectBuffer } from "@/lib/storage/types";
 
 describe("Tampon Local Garanti (labo_sti_buffer) - Issue #6 & Principe Directeur n°4", () => {
@@ -184,5 +203,50 @@ describe("Tampon Local Garanti (labo_sti_buffer) - Issue #6 & Principe Directeur
     const loaded = await getFromBuffer(testExerciseId);
 
     expect(loaded?.isLateSync).toBe(true);
+  });
+
+  describe("RPC atomique sauvegarder_fichier et détection de CONFLIT_REVISION (Issue #119 / T-18)", () => {
+    const migration0020 = readFileSync(
+      resolve(process.cwd(), "supabase/migrations/20261023160000_0020_rpc_sauvegarder_fichier.sql"),
+      "utf-8",
+    );
+    const projetsSrc = readFileSync(resolve(process.cwd(), "src/lib/supabase/projets.ts"), "utf-8");
+
+    it("T-18 : la migration 0020 définit sauvegarder_fichier avec WHERE rev = _expected_rev et lève CONFLIT_REVISION", () => {
+      expect(migration0020).toContain("create or replace function public.sauvegarder_fichier(");
+      expect(migration0020).toContain("and rev = _expected_rev");
+      expect(migration0020).toContain("raise exception 'CONFLIT_REVISION'");
+      expect(projetsSrc).not.toContain('.from("projet_fichiers")\n        .update(');
+    });
+
+    it("T-18 : deux appels concurrents avec la même expected_rev font réussir le premier et retourner conflict:true au second", async () => {
+      rpcMock
+        .mockResolvedValueOnce({ data: 2, error: null })
+        .mockResolvedValueOnce({ data: null, error: { message: "CONFLIT_REVISION" } });
+
+      maybeSingleMock.mockResolvedValueOnce({
+        data: { rev: 2, contenu: "<h1>Version onglet 1</h1>" },
+        error: null,
+      });
+
+      const res1 = await sauvegarderFichierDistant(
+        "proj-1",
+        "index.html",
+        "<h1>Version onglet 1</h1>",
+        1,
+      );
+      const res2 = await sauvegarderFichierDistant(
+        "proj-1",
+        "index.html",
+        "<h1>Version onglet 2</h1>",
+        1,
+      );
+
+      expect(res1).toEqual({ ok: true, newRev: 2 });
+      expect(res2.ok).toBe(false);
+      expect(res2.conflict).toBe(true);
+      expect(res2.remoteRev).toBe(2);
+      expect(res2.remoteContent).toBe("<h1>Version onglet 1</h1>");
+    });
   });
 });
