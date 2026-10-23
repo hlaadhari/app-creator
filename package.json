@@ -13,6 +13,7 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "test": "vitest run",
+    "test:db": "bash scripts/run-db-tests.sh",
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit"
   },

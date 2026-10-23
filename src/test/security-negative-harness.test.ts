@@ -39,7 +39,7 @@ import {
   rejoindreClasse,
 } from "@/lib/supabase/classes";
 
-describe("Harnais de Tests Négatifs de Sécurité T-01 à T-14 (docs/SECURITY.md)", () => {
+describe("Tests Unitaires des Gardes UI & Harnais de Sécurité Client (T-01 à T-17, docs/SECURITY.md)", () => {
   beforeEach(() => {
     resetRateLimit();
   });
@@ -575,6 +575,56 @@ describe("Harnais de Tests Négatifs de Sécurité T-01 à T-14 (docs/SECURITY.m
         const bilan = score(resultatsSandbox);
         expect(bilan.got, `Score solution ${sujet.id}`).toBe(bilan.verifiable);
       }
+    });
+  });
+
+  // =========================================================================
+  // SEC-05 (Issue #113) : Infrastructure de tests SQL réels PostgreSQL 16 en CI
+  // =========================================================================
+  describe("SEC-05 : Infrastructure CI PostgreSQL 16 pour migrations et tests négatifs RLS (T-01 à T-18)", () => {
+    it("inclut le bootstrap Supabase, la suite SQL T-01 à T-18 et le job CI test-db sur postgres:16", () => {
+      const bootstrapSql = fs.readFileSync(
+        path.resolve(process.cwd(), "supabase/tests/00_bootstrap_supabase_env.sql"),
+        "utf-8",
+      );
+      const rlsTestsSql = fs.readFileSync(
+        path.resolve(process.cwd(), "supabase/tests/01_rls_negative_tests.sql"),
+        "utf-8",
+      );
+      const ciYaml = fs.readFileSync(
+        path.resolve(process.cwd(), ".github/workflows/ci.yml"),
+        "utf-8",
+      );
+
+      expect(bootstrapSql).toContain("create role anon");
+      expect(bootstrapSql).toContain("create role authenticated");
+      expect(bootstrapSql).toContain("create role service_role");
+      expect(bootstrapSql).toContain("create or replace function auth.uid()");
+
+      for (const code of [
+        "T-01",
+        "T-02",
+        "T-03",
+        "T-04",
+        "T-05",
+        "T-06a",
+        "T-06b",
+        "T-06c",
+        "T-07a",
+        "T-08a",
+        "T-08b",
+        "T-08c",
+        "T-09",
+        "T-14",
+        "T-15",
+        "T-16",
+        "T-18",
+      ]) {
+        expect(rlsTestsSql).toContain(code);
+      }
+
+      expect(ciYaml).toContain("postgres:16");
+      expect(ciYaml).toContain("bash scripts/run-db-tests.sh");
     });
   });
 });
