@@ -53,6 +53,28 @@ export interface RawCriterion {
   [key: string]: unknown;
 }
 
+/**
+ * Valeur calculée par le navigateur pour `valeur` appliquée à `propriete` sur un élément neutre
+ * (ex. « blue » → « rgb(0, 0, 255) »). `null` si la valeur est invalide ou si rien n'est calculé.
+ */
+function valeurNormalisee(
+  doc: Document,
+  win: Window,
+  propriete: string,
+  valeur: string,
+): string | null {
+  const sonde = doc.createElement("span");
+  sonde.style.setProperty(propriete, valeur);
+  if (sonde.style.getPropertyValue(propriete) === "") return null; // valeur refusée par le navigateur
+  (doc.body ?? doc.documentElement).appendChild(sonde);
+  try {
+    const calculee = win.getComputedStyle(sonde).getPropertyValue(propriete).trim();
+    return calculee === "" ? null : calculee;
+  } finally {
+    sonde.remove();
+  }
+}
+
 export function makeProbeCheck(
   probe: RawProbe | null | undefined,
 ): (doc: Document, win: Window) => boolean {
@@ -71,7 +93,13 @@ export function makeProbeCheck(
         const el = doc.querySelector(probe.selector);
         if (!el) return false;
         const val = win.getComputedStyle(el).getPropertyValue(probe.property).trim();
-        if (probe.expectedValue) return val.includes(probe.expectedValue);
+        if (probe.expectedValue) {
+          if (val.includes(probe.expectedValue)) return true;
+          // Un navigateur renvoie « rgb(0, 0, 255) » pour « blue » : on compare aussi à la valeur
+          // attendue telle que le navigateur la normalise pour cette propriété.
+          const normalisee = valeurNormalisee(doc, win, probe.property, probe.expectedValue);
+          return normalisee !== null && val.includes(normalisee);
+        }
         if (probe.isGreaterThanZero) return parseFloat(val) > 0;
         return val.length > 0;
       }
