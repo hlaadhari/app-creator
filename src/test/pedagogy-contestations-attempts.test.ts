@@ -1,4 +1,22 @@
-import { describe, expect, it, beforeEach } from "vitest";
+import { describe, expect, it, beforeEach, vi } from "vitest";
+
+// Client Supabase simulé hors-ligne : aucun appel réseau réel (évite les timeouts CI).
+// Toute chaîne de requête (from().select().eq()...) se résout en erreur réseau contrôlée.
+vi.mock("@/integrations/supabase/client", () => {
+  const offline = { data: null, error: { message: "offline (test)" } };
+  const chain: unknown = new Proxy(() => chain, {
+    get: (_target, prop) =>
+      prop === "then" ? (resolve: (v: typeof offline) => unknown) => resolve(offline) : chain,
+    apply: () => chain,
+  });
+  return {
+    supabase: {
+      auth: { getUser: () => Promise.resolve({ data: { user: null }, error: null }) },
+      from: () => chain,
+      rpc: () => chain,
+    },
+  };
+});
 import {
   soumettreContestation,
   listerContestationsEleve,
