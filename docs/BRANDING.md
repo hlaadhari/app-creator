@@ -49,14 +49,14 @@ Le nom **Sprout Workshop** symbolise :
 
 ## 4. Actifs Graphiques Disponibles dans le Dépôt
 
-| Élément                 | Format | Chemin d'Accès                                                                                                     | Rôle & Affichage                                         |
-| ----------------------- | ------ | ------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------- |
-| **Favicon Vectoriel**   | SVG    | [`public/favicon.svg`](file:///d:/My%20Projects/lab-analysis/app-creator/public/favicon.svg)                       | Onglet navigateur moderne, net à toute résolution        |
-| **Favicon App Icon**    | JPG    | [`public/branding/favicon.jpg`](file:///d:/My%20Projects/lab-analysis/app-creator/public/branding/favicon.jpg)     | Écran d'accueil iOS (`apple-touch-icon`)                 |
-| **Logo Horizontal**     | SVG    | [`public/sprout-logo.svg`](file:///d:/My%20Projects/lab-analysis/app-creator/public/sprout-logo.svg)               | Version vectorielle haute résolution du logo             |
-| **Logo Maquette**       | JPG    | [`public/branding/logo.jpg`](file:///d:/My%20Projects/lab-analysis/app-creator/public/branding/logo.jpg)           | Maquette originale fournie                               |
-| **Planche d'Icônes UI** | JPG    | [`public/branding/ui-icons.jpg`](file:///d:/My%20Projects/lab-analysis/app-creator/public/branding/ui-icons.jpg)   | Planche des 12 icônes d'interface                        |
-| **Composant React**     | TSX    | [`src/components/SproutLogo.tsx`](file:///d:/My%20Projects/lab-analysis/app-creator/src/components/SproutLogo.tsx) | Composant prêt à l'emploi (tailles sm/md/lg, sous-titre) |
+| Élément                 | Format | Chemin d'Accès                                                      | Rôle & Affichage                                         |
+| ----------------------- | ------ | ------------------------------------------------------------------- | -------------------------------------------------------- |
+| **Favicon Vectoriel**   | SVG    | [`public/favicon.svg`](../public/favicon.svg)                       | Onglet navigateur moderne, net à toute résolution        |
+| **Favicon App Icon**    | JPG    | [`public/branding/favicon.jpg`](../public/branding/favicon.jpg)     | Écran d'accueil iOS (`apple-touch-icon`)                 |
+| **Logo Horizontal**     | SVG    | [`public/sprout-logo.svg`](../public/sprout-logo.svg)               | Version vectorielle haute résolution du logo             |
+| **Logo Maquette**       | JPG    | [`public/branding/logo.jpg`](../public/branding/logo.jpg)           | Maquette originale fournie                               |
+| **Planche d'Icônes UI** | JPG    | [`public/branding/ui-icons.jpg`](../public/branding/ui-icons.jpg)   | Planche des 12 icônes d'interface                        |
+| **Composant React**     | TSX    | [`src/components/SproutLogo.tsx`](../src/components/SproutLogo.tsx) | Composant prêt à l'emploi (tailles sm/md/lg, sous-titre) |
 
 ---
 

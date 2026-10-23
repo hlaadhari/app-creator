@@ -41,24 +41,28 @@ SUPABASE_PUBLISHABLE_KEY="sb_publishable_6oy2IYNYBkyKr0umKULwVw_vy7bVVIZ"
 
 ## 3. Schéma des Migrations SQL
 
-Les migrations sont versionnées à la fois pour **Drizzle ORM** (`drizzle/migrations/`) et pour la **CLI Supabase** (`supabase/migrations/`) :
+Les migrations SQL ont pour unique source de vérité le dossier **`supabase/migrations/`** (`0000` à `0016+`) :
 
-| Fichier Drizzle                   | Fichier Supabase     | Contenu & Objectifs                                                                                                                                                                                   | Statut Cloud         |
-| :-------------------------------- | :------------------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :------------------- |
-| `0000_etape1_profiles_roles.sql`  | `20261018102600_...` | Types `app_role`, table `profiles`, table `user_roles`, trigger `on_auth_user_created`, RLS                                                                                                           | **Appliqué**         |
-| `0001_etape2_sujets.sql`          | `20261018102633_...` | Tables `sujets`, `sujet_versions`, `sujet_version_fichiers`, `criteres`, `solutions`, `indices`, données initiales (S1, S2, S3)                                                                       | **Appliqué**         |
-| `0002_etape3_classes_projets.sql` | `20261018114500_...` | Tables `classes`, `class_members`, `class_invitations`, `class_sujets`, `projets`, `projet_fichiers` (avec `rev`), `tentatives`, RPCs `rejoindre_classe`, `initialiser_projet`, `sauvegarder_fichier` | **Prêt à appliquer** |
+| Fichier Supabase                                         | Contenu & Objectifs                                                                                                                                                            |
+| :------------------------------------------------------- | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `20261018102600_0000_etape1_profiles_roles.sql`          | Types `app_role`, table `profiles`, table `user_roles`, trigger `on_auth_user_created`, RLS                                                                                    |
+| `20261018102633_0001_etape2_sujets.sql`                  | Tables `sujets`, `sujet_versions`, `sujet_version_fichiers`, `criteres`, `solutions`, `indices`, triggers d'immuabilité                                                        |
+| `20261019120001_0002_etape3_classes_projets.sql`         | Tables `classes`, `class_members`, `class_invitations`, `class_sujets`, `projets`, `projet_fichiers` (avec `rev`), `tentatives`, RPCs `rejoindre_classe`, `initialiser_projet` |
+| `20261019120002_0003_etape4_sessions_examen.sql`         | Tables `sessions_examen`, `passages_examen`, triggers `verifier_echeance_ecriture` et `verifier_transition_passage_examen`, RPC `obtenir_horloge_serveur`                      |
+| `20261019120003_0004_etape4_snapshots_rejouage.sql`      | Tables `snapshots` et `notes`, trigger `interdire_mutation_snapshot`, RPC `sceller_snapshot_examen`                                                                            |
+| `20261019120004_0005_etape3_contestations_solutions.sql` | Tables `journal_securite`, `contestations`, `journal_acces_solutions`                                                                                                          |
+| `20261019120005_0006_etape5_competences_maitrise.sql`    | Tables `competences`, `critere_competences`, `maitrise`, `badges_definition`, `badges`                                                                                         |
+| `20261020150000_0007` à `20261023120000_0016+`           | Durcissement RLS/GRANTs, administration utilisateurs, `demandes_enseignant`, `solutions_banc`, Studio de sujets et restriction `has_role`                                      |
 
-### Déploiement de la Migration 0002 :
+### Déploiement des Migrations :
 
-La migration 0002 peut être appliquée par l'une des méthodes suivantes :
+Les migrations peuvent être appliquées par l'une des méthodes suivantes :
 
-1. **Via Lovable Sync** : Le commit pushé sur `main` est synchronisé vers Lovable, qui détecte le fichier dans `drizzle/migrations/` et l'applique automatiquement via sa connexion de migration.
-2. **Via le SQL Editor Supabase** : Copier-coller le contenu de [`drizzle/migrations/0002_etape3_classes_projets.sql`](file:///d:/My%20Projects/lab-analysis/app-creator/drizzle/migrations/0002_etape3_classes_projets.sql) dans l'éditeur SQL du Dashboard Supabase (`https://supabase.com/dashboard/project/dxanlvsonydghkmycexq/sql`).
-3. **Via la CLI Supabase** :
+1. **Via la CLI Supabase** :
    ```bash
    npx supabase db push
    ```
+2. **Via le SQL Editor Supabase** : Copier-coller les scripts de [`supabase/migrations/`](../supabase/migrations) dans l'éditeur SQL du Dashboard Supabase.
 
 ---
 

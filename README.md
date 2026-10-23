@@ -36,7 +36,7 @@ Labo STI répond aux défis majeurs de l'apprentissage du développement web au 
 
 - **Éditeur type VS Code** : Monaco Editor avec coloration multi-langages, arborescence normalisée et raccourcis usuels.
 - **Bac à Sable Sécurisé** : aperçu web live dans une iframe sandbox isolée sans accès réseau ni fuite de cookies.
-- **Exécution Locale PHP & SQL (Phase 2)** : exécution in-browser via WebAssembly (PHP WASM Worker + SQLite WASM avec contrôleur de dialecte MySQL).
+- **Exécution Locale PHP & SQL (Phase 2)** : exécution in-browser via simulateur PHP procédural en Web Worker (watchdog 3s) et moteur relationnel SQLite/MySQLi en mémoire avec contrôleur de dialecte MySQL.
 - **Résilience Maximale (Offline-First)** : tampon local IndexedDB prioritaire, synchronisation asynchrone avec détection des conflits de révision (`rev`).
 - **Immuabilité des Sujets** : chaque publication crée une version figée non modifiable (`sujet_versions`), garantissant la pérennité des notes et des rendus d'examen.
 
@@ -45,9 +45,9 @@ Labo STI répond aux défis majeurs de l'apprentissage du développement web au 
 ## 🛠 Architecture & Stack Technique
 
 - **Frontend** : [TanStack Start](https://tanstack.com/start) (React 19, Vite, Nitro), [Tailwind CSS v4](https://tailwindcss.com), [Radix UI](https://www.radix-ui.com/), [Monaco Editor](https://microsoft.github.io/monaco-editor/).
-- **Backend & Données** : [Supabase](https://supabase.com) (PostgreSQL avec Row Level Security, Supabase Auth, Storage S3, Realtime).
-- **ORM & Migrations** : [Drizzle ORM](https://orm.drizzle.team/) & Migrations SQL versionnées.
-- **Tests** : [Vitest](https://vitest.dev/), Testing Library, suite de tests négatifs de sécurité (T-01 à T-14).
+- **Backend & Données** : [Supabase](https://supabase.com) (PostgreSQL avec Row Level Security sur 30 tables, Supabase Auth, Storage S3, Realtime).
+- **Migrations SQL** : `supabase/migrations/` (source unique de vérité SQL, migrations `0000` à `0016+`).
+- **Tests** : [Vitest](https://vitest.dev/), Testing Library, suite de tests négatifs de sécurité (T-01 à T-14+).
 
 ---
 
@@ -58,8 +58,8 @@ L'ensemble du cadrage et des spécifications est organisé dans le dossier `docs
 - [`CONTEXT.md`](CONTEXT.md) : **Document maître de contexte** (vision, principes directeurs, analyse d'écart et stack).
 - [`docs/PRD.md`](docs/PRD.md) : **Product Requirement Document (v3.1)** exhaustif.
 - [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) : Détail de l'architecture logicielle, sandboxing, isolation et Plan B.
-- [`docs/DATA_MODEL.md`](docs/DATA_MODEL.md) : Modèle relationnel complet des 26 tables, triggers d'immuabilité et RLS.
-- [`docs/SECURITY.md`](docs/SECURITY.md) : Modèle de menace, politique CSP et spécifications des 14 tests négatifs.
+- [`docs/DATA_MODEL.md`](docs/DATA_MODEL.md) : Modèle relationnel complet des 30 tables, triggers d'immuabilité et RLS.
+- [`docs/SECURITY.md`](docs/SECURITY.md) : Modèle de menace, politique CSP et spécifications des tests négatifs de sécurité.
 - [`docs/CRITERIA_GUIDE.md`](docs/CRITERIA_GUIDE.md) : **Guide de rédaction des critères pédagogiques** (modèles de tests, règles de tolérance, 3 niveaux d'indices).
 - [`roadmap.md`](roadmap.md) : Feuille de route détaillée jalonnée de M0 à M8.
 - [`CONTRIBUTING.md`](CONTRIBUTING.md) : Guide de contribution, conventions de commit et workflow.

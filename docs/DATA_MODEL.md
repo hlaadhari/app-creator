@@ -5,34 +5,36 @@
 
 ---
 
-## 1. Vue d'Ensemble des 26 Tables
+## 1. Vue d'Ensemble des 30 Tables
 
-Le schéma de données Postgres est divisé en **6 domaines fonctionnels** :
+Le schéma de données Postgres est divisé en **6 domaines fonctionnels** (migrations `0000` à `0016+` dans `supabase/migrations/`) :
 
 ```
 ┌──────────────────────────────────────────────────────────────────────────────────┐
 │                             DOMAINE 1 : UTILISATEURS & CLASSES                   │
-│   profiles · user_roles · classes · class_invitations · class_members            │
+│   profiles · user_roles · demandes_enseignant                                    │
+│   classes · class_invitations · class_members                                    │
 └──────────────────────────────────────────────────────────────────────────────────┘
                                         │
 ┌───────────────────────────────────────┼──────────────────────────────────────────┐
 │                                       ▼                                          │
 │   DOMAINE 2 : SUJETS & VERSIONS (IMMUABLES)       DOMAINE 3 : CRITÈRES & AIDES    │
 │   sujets · sujet_versions                         criteres · critere_competences │
-│   sujet_version_fichiers · sujet_version_bases    indices · indices_debloques    │
+│   sujet_version_fichiers · solutions_banc         indices · indices_debloques    │
 │   solutions · class_sujets                        contestations                  │
+│   journal_acces_solutions                                                        │
 └───────────────────────────────────────┬──────────────────────────────────────────┘
                                         │
 ┌───────────────────────────────────────┼──────────────────────────────────────────┐
 │                                       ▼                                          │
 │   DOMAINE 4 : PROJETS & TRAVAUX ÉLÈVES            DOMAINE 5 : EXAMENS & NOTES    │
-│   projets · projet_fichiers · projet_bases        sessions_examen                │
+│   projets · projet_fichiers                       sessions_examen                │
 │   tentatives · snapshots                          passages_examen · notes        │
 └───────────────────────────────────────┬──────────────────────────────────────────┘
                                         │
 ┌───────────────────────────────────────▼──────────────────────────────────────────┐
 │                   DOMAINE 6 : COMPÉTENCES, PILOTAGE & AUDIT                      │
-│   competences · maitrise · badges · commentaires · journal_securite              │
+│   competences · maitrise · badges_definition · badges · journal_securite         │
 └──────────────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -334,7 +336,7 @@ Journalisation minimale et anonymisée (conformité RGPD) des événements anorm
 
 ## 3. Triggers d'Immuabilité Déjà Actifs
 
-Le fichier de migration `drizzle/migrations/0001_etape2_sujets.sql` applique d'ores et déjà les triggers de protection d'intégrité :
+Le fichier de migration `supabase/migrations/20261018102633_0001_etape2_sujets.sql` applique d'ores et déjà les triggers de protection d'intégrité :
 
 ```sql
 -- Blocage strict des modifications sur sujet_versions publiées

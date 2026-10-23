@@ -1,7 +1,14 @@
 /**
- * Harnais de comparaison et banc d'essai Phase 0 (PRD §6, §7.1 à §7.5, §8.3)
- * Évalue la faisabilité de l'exécution WASM (PHP 8.2 + SQLite) vs Référence native (PHP 8.2 + MariaDB)
+ * Harnais de modélisation et protocole cible Phase 0 (PRD §6, §7.1 à §7.5, §8.3)
+ * Modélise les budgets cibles d'exécution locale (simulateurs JS/TS ou WASM futur)
+ * face à l'environnement natif de référence (PHP 8.2 + MariaDB)
  * sur le profil de poste de référence lycée (4 Go RAM, CPU double cœur).
+ *
+ * NOTE D'ARCHITECTURE (TEC-03) :
+ * Ce module définit des cibles budgétaires et un protocole de validation déterministe ;
+ * l'application embarque actuellement un simulateur PHP procédural (`php-worker-core.ts` / `php-checker.ts`)
+ * et un moteur relationnel SQLite/MySQLi en mémoire TypeScript (`sqlite-engine.ts` / `sql-checker.ts`),
+ * et non des binaires PHP 8.2 WASM ou SQLite 3.45 WASM compilés.
  */
 
 export interface ScenarioDefinition {
@@ -290,15 +297,17 @@ export function executerSimulationScenario(scenario: ScenarioDefinition): Scenar
 }
 
 /**
- * Calcule les métriques de performance globales pour un poste de référence lycée (4 Go RAM)
+ * Retourne les budgets cibles de performance pour un poste de référence lycée (4 Go RAM).
+ * Ces valeurs constituent les plafonds et objectifs cibles du protocole PRD §3 / §7,
+ * et non des mesures télémétriques d'un runtime WebAssembly en production.
  */
 export function evaluerMetriquesPosteReference(): PerformanceMetrics {
-  // Constatations mesurées pour PHP WASM (Web Worker) + SQLite WASM
-  const coldStartLoadingMs = 2850; // < 4s (PRD §3)
-  const warmStartLoadingMs = 180; // Cache API / Service Worker
-  const p75ExecutionTimeMs = 48; // Exécution instantanée du code PHP en local
-  const workerMemoryMb = 34; // Web Worker PHP 8.2 WASM
-  const sqliteMemoryMb = 14; // SQLite WASM lib
+  // Budgets cibles modélisés pour l'exécution locale (PRD §3)
+  const coldStartLoadingMs = 2850; // Budget cible < 4s (PRD §3)
+  const warmStartLoadingMs = 180; // Budget cible Cache API / Service Worker
+  const p75ExecutionTimeMs = 48; // Budget cible d'exécution locale (< 100 ms)
+  const workerMemoryMb = 34; // Budget mémoire Worker PHP (< 64 Mo)
+  const sqliteMemoryMb = 14; // Budget mémoire moteur SQL local (< 30 Mo)
   const totalMemoryMb = workerMemoryMb + sqliteMemoryMb; // 48 Mo
 
   const ramUsagePercentOn4Gb = Math.round((totalMemoryMb / 4096) * 1000) / 10; // ~1.2% de la RAM

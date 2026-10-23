@@ -1,35 +1,41 @@
-# Rapport de Validation Technique Phase 0 — Labo STI
+# Protocole d'Évaluation & Cibles d'Architecture Phase 0 — Labo STI
 
 > **Document de référence** : PRD v3.1 (§6, §7.1 à §7.5, §8.3)  
 > **Auteur** : Équipe Technique & Didactique Labo STI  
-> **Date** : 18 octobre 2026  
-> **Décision Formelle** : **GO CONDITIONNEL** (Feu vert pour l'engagement de la Phase 2)
+> **Dernière mise à jour** : 23 octobre 2026  
+> **Statut Documentaire** : **PROTOCOLE D'ARCHITECTURE & BUDGETS CIBLES** (Modélisation théorique vs implémentation courante par simulateurs JS/TS)
+
+> [!IMPORTANT]
+> **Transparence d'implémentation (`TEC-03`)** : Ce document formalise le **protocole d'évaluation cible** et les **budgets de performance attendus** définis par le PRD v3.1 (§7) ainsi que le chiffrage du Plan B (§8.3).  
+> Dans l'état actuel du dépôt :
+>
+> - L'exécution PHP et SQL côté navigateur repose sur des **simulateurs déterministes en TypeScript** (`src/lib/php/php-worker-core.ts`, `src/lib/evaluator/php-checker.ts`, `src/lib/sql/sqlite-engine.ts`, `src/lib/evaluator/sql-checker.ts`) et **non** sur des binaires WebAssembly compilés (`php-wasm` / `sqlite-wasm`).
+> - Le harnais [`src/lib/phase0/comparison-harness.ts`](../src/lib/phase0/comparison-harness.ts) modélise ces budgets cibles et vérifie le détecteur d'écarts de dialecte SQL.
+> - Le pré-chargement hors-ligne par Service Worker et l'auto-hébergement de Monaco font l'objet du jalon dédié **H2.1 (Issue #124)**.
 
 ---
 
-## 1. Synthèse Exécutive
+## 1. Synthèse du Protocole & Budgets Cibles
 
-La Phase 0 avait pour mission d'apporter la preuve de faisabilité technique de l'architecture d'exécution locale dans le navigateur : **PHP 8.2 (WebAssembly) + SQLite (WebAssembly)**, face à l'environnement natif officiel du Baccalauréat STI (**PHP 8.2 + MariaDB 10.11**).
+La Phase 0 définit les critères de viabilité d'une exécution locale dans le navigateur face à l'environnement natif officiel du Baccalauréat STI (**PHP 8.2 + MariaDB 10.11**), sur le **profil machine de référence des lycées** (poste élève équipé de **4 Go de RAM et d'un processeur double cœur**).
 
-Cette étude a été conduite sur le **profil machine de référence des lycées** (poste élève équipé de **4 Go de RAM et d'un processeur double cœur**).
+### Budgets Cibles Modélisés
 
-### Résultats Clés
-
-- **100 % des scénarios essentiels du Bac STI** (S1 formulaires/insertions, S2 requêtes SQL d'agrégation, S3 sessions et applications multi-pages) s'exécutent avec une équivalence fonctionnelle stricte.
-- **Empreinte mémoire totale du bac à sable** : **48 Mo** (soit seulement **1.2 %** de la mémoire vive totale de 4 Go disponible).
-- **Temps d'exécution médian (p75)** : **48 ms**, garantissant un retour instantané à l'élève.
-- **Chargement initial à froid** : **2.85 secondes** (seuil PRD < 4.0 s respecté), réduit à **180 ms** lors des rechargements ultérieurs grâce au cache Service Worker.
+- **Couverture des scénarios essentiels du Bac STI** (S1 formulaires/insertions, S2 requêtes SQL d'agrégation, S3 sessions et applications multi-pages) : 100 % requis.
+- **Plafond d'empreinte mémoire totale du bac à sable** : cible **48 Mo** (< 64 Mo max PRD, soit **1.2 %** de 4 Go de RAM).
+- **Budget de temps d'exécution médian (p75)** : cible **48 ms** (< 100 ms PRD).
+- **Budget de chargement initial à froid** : cible **2.85 secondes** (seuil PRD < 4.0 s), avec objectif **180 ms** à chaud une fois le Service Worker (H2.1) activé.
 
 ---
 
-## 2. Protocole d'Essai & Environnement de Référence
+## 2. Comparaison : Référence Officielle, Cible WASM & Implémentation Actuelle
 
-| Composant              | Environnement de Référence (Officiel)        | Environnement Navigateur Évalué (WASM)         | Écart / Delta                        |
-| ---------------------- | -------------------------------------------- | ---------------------------------------------- | ------------------------------------ |
-| **Interpréteur PHP**   | PHP 8.2.14 CLI / Apache mod_php              | PHP 8.2.14 WebAssembly (Worker isolé)          | Strictement identique                |
-| **Serveur BDD**        | MariaDB 10.11.6 (dialecte MySQL)             | SQLite 3.45.1 WASM (émulation relationnelle)   | Divergences de syntaxe mineures      |
-| **Extensions PHP**     | `mysqli`, `pdo_mysql`, `session`, `mbstring` | `pdo_sqlite`, `session` en mémoire, `mbstring` | Couche d'adaptation `mysqli` requise |
-| **Poste Client Cible** | Poste lycée type (4 Go RAM, CPU double cœur) | Chrome 124+, Firefox 125+, Edge Chromium       | 100% compatible                      |
+| Composant            | Environnement de Référence (Officiel)        | Cible Modélisée (WASM)                       | Implémentation Actuelle du Dépôt (Vérifiée)                                         |
+| -------------------- | -------------------------------------------- | -------------------------------------------- | ----------------------------------------------------------------------------------- |
+| **Interpréteur PHP** | PHP 8.2.14 CLI / Apache mod_php              | PHP 8.2 WebAssembly (Worker isolé)           | Simulateur procédural TS (`php-worker-core.ts` & `MySqliSimulator`)                 |
+| **Serveur BDD**      | MariaDB 10.11.6 (dialecte MySQL)             | SQLite 3.45 WASM + couche dialecte           | Moteur relationnel en mémoire TS (`sqlite-engine.ts` & `sql-checker.ts`)            |
+| **Extensions PHP**   | `mysqli`, `pdo_mysql`, `session`, `mbstring` | Polyfill `mysqli_*` procédural + `$_SESSION` | Support procédural `mysqli_*` (`php-checker.ts`, unification Worker prévue en H2.2) |
+| **Cache Hors-Ligne** | Serveur local LAN lycée                      | Service Worker + Cache API                   | Tampon IndexedDB actif (`labo_sti_buffer`) ; Service Worker planifié en H2.1        |
 
 ---
 
@@ -58,18 +64,18 @@ Cette étude a été conduite sur le **profil machine de référence des lycées
 
 ---
 
-## 4. Mesures de Performance sur Poste 4 Go RAM
+## 4. Budgets de Performance sur Poste 4 Go RAM
 
-Les métriques observées démontrent la totale viabilité du modèle sans saturer les ordinateurs de lycée :
+Les budgets cibles modélisés dans `evaluerMetriquesPosteReference()` respectent les seuils du PRD §3 :
 
-| Métrique de Performance                        | Cible PRD (§3) | Mesure Réelle (Phase 0)       | Statut       |
+| Métrique de Performance                        | Seuil PRD (§3) | Budget Cible Modélisé         | Statut Cible |
 | ---------------------------------------------- | -------------- | ----------------------------- | ------------ |
-| **Temps de chargement initial (à froid)**      | < 4.0 s        | **2.85 s** (binaires ~18 Mo)  | ✅ Conforme  |
-| **Temps de rechargement (cache chaud)**        | < 0.5 s        | **0.18 s** (Cache API / SW)   | ✅ Excellent |
+| **Temps de chargement initial (à froid)**      | < 4.0 s        | **2.85 s**                    | ✅ Conforme  |
+| **Temps de rechargement (cache chaud)**        | < 0.5 s        | **0.18 s** (cible H2.1 SW)    | ✅ Conforme  |
 | **Temps d'exécution requête (75e percentile)** | < 100 ms       | **48 ms**                     | ✅ Conforme  |
-| **Mémoire Worker PHP WASM**                    | < 64 Mo        | **34 Mo**                     | ✅ Conforme  |
-| **Mémoire SQLite WASM**                        | < 30 Mo        | **14 Mo**                     | ✅ Conforme  |
-| **Empreinte RAM Totale Bac à Sable**           | < 100 Mo       | **48 Mo** (**1.2 %** de 4 Go) | ✅ Excellent |
+| **Mémoire Worker PHP**                         | < 64 Mo        | **34 Mo**                     | ✅ Conforme  |
+| **Mémoire Moteur SQL**                         | < 30 Mo        | **14 Mo**                     | ✅ Conforme  |
+| **Empreinte RAM Totale Bac à Sable**           | < 100 Mo       | **48 Mo** (**1.2 %** de 4 Go) | ✅ Conforme  |
 
 ---
 

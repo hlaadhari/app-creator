@@ -16,11 +16,11 @@ L'intégration directe via le tableau de bord Vercel est la plus simple et la pl
 
 - Chaque `git push` sur `main` déclenche un déploiement en **Production**.
 - Chaque **Pull Request** génère automatiquement une URL de **Preview** éphémère avec commentaires automatiques.
-- Prise en charge native du fichier [`vercel.json`](file:///d:/My%20Projects/lab-analysis/app-creator/vercel.json).
+- Prise en charge native du fichier [`vercel.json`](../vercel.json).
 
 ### Méthode B : Déploiement Automatisé via GitHub Actions
 
-Le workflow [`.github/workflows/deploy-vercel.yml`](file:///d:/My%20Projects/lab-analysis/app-creator/.github/workflows/deploy-vercel.yml) permet de gérer le déploiement directement depuis vos pipelines GitHub Actions.
+Le workflow [`.github/workflows/deploy-vercel.yml`](../.github/workflows/deploy-vercel.yml) permet de gérer le déploiement directement depuis vos pipelines GitHub Actions.
 
 - Le workflow est sécurisé et conditionné par le secret `VERCEL_TOKEN` (il n'échoue pas si le secret n'est pas encore renseigné).
 
@@ -65,7 +65,7 @@ NITRO_PRESET = "vercel"
 
 ## 4. Configuration GitHub Actions (Si Méthode B choisie)
 
-Si vous souhaitez utiliser le workflow GitHub Actions [`.github/workflows/deploy-vercel.yml`](file:///d:/My%20Projects/lab-analysis/app-creator/.github/workflows/deploy-vercel.yml) :
+Si vous souhaitez utiliser le workflow GitHub Actions [`.github/workflows/deploy-vercel.yml`](../.github/workflows/deploy-vercel.yml) :
 
 1. Créez un token d'accès personnel sur Vercel : **Settings > Tokens > Create Token**.
 2. Dans votre dépôt GitHub : **Settings > Secrets and variables > Actions**.
@@ -76,9 +76,9 @@ Si vous souhaitez utiliser le workflow GitHub Actions [`.github/workflows/deploy
 
 ---
 
-## 5. En-têtes de Sécurité & Performance ([`vercel.json`](file:///d:/My%20Projects/lab-analysis/app-creator/vercel.json))
+## 5. En-têtes de Sécurité & Performance ([`vercel.json`](../vercel.json))
 
-Le fichier [`vercel.json`](file:///d:/My%20Projects/lab-analysis/app-creator/vercel.json) injecte automatiquement les en-têtes conformes aux exigences de sécurité du PRD v3.1 :
+Le fichier [`vercel.json`](../vercel.json) injecte automatiquement les en-têtes conformes aux exigences de sécurité du PRD v3.1 :
 
 - **Anti-Clickjacking** : `X-Frame-Options: SAMEORIGIN` sur l'application hôte.
 - **MIME Sniffing Protection** : `X-Content-Type-Options: nosniff`.
