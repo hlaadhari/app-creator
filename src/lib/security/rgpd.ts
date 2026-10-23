@@ -1,8 +1,10 @@
 /**
- * Labo STI - RGPD Purge & Anonymization (T-14, PRD §12, docs/SECURITY.md)
+ * Labo STI - RGPD Anonymization Helper (T-14, PRD §12, docs/SECURITY.md)
  *
- * Implémente le droit à l'effacement et à l'oubli pour les comptes élèves,
- * conformément au RGPD (Règlement Général sur la Protection des Données).
+ * ⚠️ AVERTISSEMENT D'ARCHITECTURE (TEC-11 / Principe « Zéro Confiance Côté Client ») :
+ * Utilitaire de prévisualisation et de formatage côté client. La purge et la suppression
+ * effective des comptes utilisateurs s'exécutent exclusivement en base via la RPC
+ * `admin_supprimer_utilisateur` (`security definer`).
  */
 
 export interface ProfilUtilisateur {
