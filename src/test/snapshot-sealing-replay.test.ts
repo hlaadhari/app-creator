@@ -2,12 +2,24 @@
  * Labo STI - Tests du Scellement Cryptographique et Rejouage de Référence (Issue #16, PRD F-54, F-55, T-08)
  */
 
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
+
+const rpcMock = vi.hoisted(() => vi.fn());
+
+vi.mock("@/integrations/supabase/client", () => ({
+  supabase: {
+    rpc: rpcMock,
+  },
+}));
+
 import {
   computeSha256,
   normaliserCheminFichier,
   serialiserJsonCanonique,
   scellerSnapshot,
+  scellerSnapshotExamenServeur,
   verifierIntegriteSnapshot,
   creerArchiveSnapshotZip,
 } from "@/lib/snapshot/snapshot-engine";
@@ -408,8 +420,82 @@ INSERT INTO don (nom, montant) VALUES ('Lycée Pilote', 150.00);
 
       expect(noteModifiee.grille.totalPointsAjustes).toBe(4); // 1 + 3 au lieu de 2 + 3
       expect(noteModifiee.note_finale).toBe(16); // 4/5 * 20
+      expect(noteModifiee.historique).toBeDefined();
       expect(noteModifiee.historique).toHaveLength(2);
       expect(noteModifiee.historique[1]?.justification).toContain("Pénalité sur présentation");
+    });
+  });
+
+  // =========================================================================
+  // 6. Scellement serveur exclusif par RPC et migration 0018 (SEC-03 / T-08a,b,c)
+  // =========================================================================
+  describe("6. Scellement serveur exclusif par RPC sceller_snapshot_examen (Issue #115 / SEC-03)", () => {
+    const migration0018 = readFileSync(
+      resolve(
+        process.cwd(),
+        "supabase/migrations/20261023140000_0018_sceller_snapshots_serveur.sql",
+      ),
+      "utf-8",
+    );
+
+    it("T-08a : révoque INSERT direct sur snapshots pour anon/authenticated et supprime snapshots_insertion_propre", () => {
+      expect(migration0018).toMatch(
+        /revoke\s+insert,\s*update,\s*delete\s+on\s+public\.snapshots\s+from\s+anon,\s*authenticated/i,
+      );
+      expect(migration0018).toContain(
+        'drop policy if exists "snapshots_insertion_propre" on public.snapshots;',
+      );
+      expect(migration0018).toContain("trg_verifier_insertion_snapshot_examen");
+    });
+
+    it("T-08b : vérifie l'appartenance du passage et l'échéance serveur dans sceller_snapshot_examen", () => {
+      expect(migration0018).toContain("v_passage.eleve_id <> v_uid");
+      expect(migration0018).toContain(
+        "v_echeance := coalesce(v_passage.echeance_eleve, v_passage.echeance_serveur)",
+      );
+      expect(migration0018).toContain("if v_echeance is not null and v_now > v_echeance then");
+      expect(migration0018).toContain("T-08b");
+    });
+
+    it("T-08c : calcule le hash SHA-256 côté serveur via pgcrypto à partir de public.projet_fichiers et appelle la RPC", async () => {
+      expect(migration0018).toContain("from public.projet_fichiers pf");
+      expect(migration0018).toContain("encode(digest(convert_to(");
+
+      const expectedHash = "a".repeat(64);
+      rpcMock.mockResolvedValueOnce({
+        data: {
+          id: "snap-srv-1",
+          projet_id: "proj-100",
+          passage_id: "pass-50",
+          eleve_id: "eleve-001",
+          version_id: "ver-1",
+          date: "2026-10-23T12:00:00.000Z",
+          hash: expectedHash,
+          manifeste: {
+            versionSpec: "1.0",
+            sujetId: "sujet-bac-2023",
+            versionId: "ver-1",
+            eleveId: "eleve-001",
+            projetId: "proj-100",
+            passageId: "pass-50",
+            horodatageServeur: "2026-10-23T12:00:00.000Z",
+            fichiers: [],
+            baseDonnees: null,
+            rootHash: expectedHash,
+          },
+          storage_archive_path: "",
+        },
+        error: null,
+      });
+
+      const res = await scellerSnapshotExamenServeur("pass-50");
+      expect(rpcMock).toHaveBeenCalledWith("sceller_snapshot_examen", {
+        _passage_id: "pass-50",
+        _storage_path: "",
+      });
+      expect(res.id).toBe("snap-srv-1");
+      expect(res.hash).toBe(expectedHash);
+      expect(res.manifeste.rootHash).toBe(expectedHash);
     });
   });
 });

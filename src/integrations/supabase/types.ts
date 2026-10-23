@@ -1347,12 +1347,10 @@ export type Database = {
       rejoindre_classe: { Args: { _code: string }; Returns: Json };
       sceller_snapshot_examen: {
         Args: {
-          p_hash: string;
-          p_manifeste: Json;
-          p_passage_id: string;
-          p_storage_path?: string;
+          _passage_id: string;
+          _storage_path?: string;
         };
-        Returns: string;
+        Returns: Database["public"]["Tables"]["snapshots"]["Row"];
       };
     };
     Enums: {
