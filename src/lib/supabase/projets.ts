@@ -2,13 +2,6 @@ import { supabase } from "@/integrations/supabase/client";
 import type { Json } from "@/integrations/supabase/types";
 import type { Files } from "@/lib/exercises";
 
-// La fonction sauvegarder_fichier n'est pas dans les types générés (repli direct si elle est absente).
-type RpcNonTypee = (
-  fonction: string,
-  args: Record<string, unknown>,
-) => PromiseLike<{ data: unknown; error: { message: string } | null }>;
-const rpcNonTypee = supabase.rpc.bind(supabase) as unknown as RpcNonTypee;
-
 export interface SyncResult {
   ok: boolean;
   conflict?: boolean;
@@ -149,8 +142,8 @@ export async function chargerFichiersDistants(projetId: string): Promise<RemoteF
 }
 
 /**
- * Sauvegarde synchrone d'un fichier avec vérification de révision (rev)
- * pour éviter les écrasements concurrents.
+ * Sauvegarde synchrone et atomique d'un fichier avec vérification de révision (rev)
+ * via la RPC serveur `sauvegarder_fichier` pour éviter tout écrasement concurrent (T-18).
  */
 export async function sauvegarderFichierDistant(
   projetId: string,
@@ -159,8 +152,7 @@ export async function sauvegarderFichierDistant(
   expectedRev: number,
 ): Promise<SyncResult> {
   try {
-    // 1. Tenter via la RPC sécurisée
-    const { data, error } = await rpcNonTypee("sauvegarder_fichier", {
+    const { data, error } = await supabase.rpc("sauvegarder_fichier", {
       _projet_id: projetId,
       _chemin: chemin,
       _contenu: contenu,
@@ -171,9 +163,8 @@ export async function sauvegarderFichierDistant(
       return { ok: true, newRev: data };
     }
 
-    // Détection de conflit de révision
+    // Détection atomique de conflit de révision (T-18)
     if (error?.message?.includes("CONFLIT_REVISION")) {
-      // Lire la révision serveur concurrente
       const { data: remote } = await supabase
         .from("projet_fichiers")
         .select("rev, contenu")
@@ -190,50 +181,10 @@ export async function sauvegarderFichierDistant(
       };
     }
 
-    // 2. Repli direct avec vérification manuelle optimiste si RPC absente
-    const { data: existing } = await supabase
-      .from("projet_fichiers")
-      .select("rev, contenu")
-      .eq("projet_id", projetId)
-      .eq("chemin", chemin)
-      .maybeSingle();
-
-    if (existing) {
-      if (existing.rev > expectedRev) {
-        return {
-          ok: false,
-          conflict: true,
-          remoteRev: existing.rev,
-          remoteContent: existing.contenu,
-          error: "Conflit de révision détecté.",
-        };
-      }
-
-      const nextRev = existing.rev + 1;
-      const { error: updErr } = await supabase
-        .from("projet_fichiers")
-        .update({
-          contenu,
-          rev: nextRev,
-          updated_at: new Date().toISOString(),
-        })
-        .eq("projet_id", projetId)
-        .eq("chemin", chemin);
-
-      if (updErr) return { ok: false, error: updErr.message };
-      return { ok: true, newRev: nextRev };
-    } else {
-      const { error: insErr } = await supabase.from("projet_fichiers").insert({
-        projet_id: projetId,
-        chemin,
-        contenu,
-        rev: 1,
-        updated_at: new Date().toISOString(),
-      });
-
-      if (insErr) return { ok: false, error: insErr.message };
-      return { ok: true, newRev: 1 };
-    }
+    return {
+      ok: false,
+      error: error?.message || "Erreur lors de la sauvegarde distante du fichier.",
+    };
   } catch (err) {
     return { ok: false, error: String(err) };
   }
