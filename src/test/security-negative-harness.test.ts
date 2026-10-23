@@ -1,4 +1,6 @@
 import { describe, expect, it, beforeEach } from "vitest";
+import fs from "node:fs";
+import path from "node:path";
 import {
   verifierEcheanceExamen,
   validerTransitionExamen,
@@ -321,6 +323,27 @@ describe("Harnais de Tests Négatifs de Sécurité T-01 à T-14 (docs/SECURITY.m
       const csp = getSandboxCsp();
       expect(csp).toContain("connect-src 'none'");
       expect(csp).toContain("default-src 'self'");
+    });
+
+    it("SEC-07 : vercel.json sert un en-tête Content-Security-Policy valide et exclut X-XSS-Protection", () => {
+      const vercelJsonPath = path.resolve(process.cwd(), "vercel.json");
+      const raw = fs.readFileSync(vercelJsonPath, "utf-8");
+      const parsed = JSON.parse(raw) as {
+        headers?: Array<{ source: string; headers: Array<{ key: string; value: string }> }>;
+      };
+      const globalHeaders = parsed.headers?.find((h) => h.source === "/(.*)")?.headers ?? [];
+      const keys = globalHeaders.map((h) => h.key.toLowerCase());
+
+      expect(keys).not.toContain("x-xss-protection");
+      expect(keys).toContain("content-security-policy");
+
+      const cspValue =
+        globalHeaders.find((h) => h.key.toLowerCase() === "content-security-policy")?.value ?? "";
+      expect(cspValue).toContain("default-src 'self'");
+      expect(cspValue).toContain("connect-src 'self' https://*.supabase.co wss://*.supabase.co");
+      expect(cspValue).toContain("frame-src 'self' blob: data:");
+      expect(cspValue).toContain("object-src 'none'");
+      expect(cspValue).toContain("base-uri 'self'");
     });
   });
 
