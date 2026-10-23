@@ -249,28 +249,9 @@ export async function updateMasteryFromAttempt(params: {
   const updatedRecords = Array.from(recordsMap.values());
   saveLocalRecords(updatedRecords);
 
-  // Synchronisation distante Supabase si utilisateur connecté
-  if (eleveId && eleveId !== "invite-eleve") {
-    try {
-      const rowsToUpsert = updatedRecords.map((r) => ({
-        eleve_id: r.eleveId,
-        competence_id: r.competenceId,
-        niveau: r.niveau,
-        nb_tentatives: r.nbTentatives,
-        nb_succes: r.nbSucces,
-        premier_coup_succes: r.premierCoupSucces,
-        dernier_succes: r.dernierSucces,
-        version_formule: r.versionFormule,
-        updated_at: r.updatedAt,
-      }));
-
-      await dbClient.from("maitrise").upsert(rowsToUpsert, {
-        onConflict: "eleve_id,competence_id",
-      });
-    } catch (err) {
-      console.warn("Échec synchronisation Supabase maitrise (mode local actif) :", err);
-    }
-  }
+  // SEC-06 / T-16 : Les tables distantes public.maitrise et public.badges sont désormais
+  // recalculées exclusivement côté serveur par triggers security definer lors de
+  // l'enregistrement des tentatives et des notes officielles (aucune écriture REST directe élève).
 
   // Calcul du nouveau rapport de progression
   const totalTentatives = updatedRecords.reduce((acc, r) => acc + r.nbTentatives, 0);
@@ -318,19 +299,6 @@ export async function updateMasteryFromAttempt(params: {
 
     newlyAwarded.push(newBadge);
     allBadges.push(newBadge);
-
-    // Sync Supabase badge
-    if (eleveId && eleveId !== "invite-eleve") {
-      try {
-        await dbClient.from("badges").insert({
-          eleve_id: eleveId,
-          badge_id: bId,
-          obtenu_le: newBadge.obtenuLe,
-        });
-      } catch (err) {
-        console.warn("Échec insertion Supabase badge :", err);
-      }
-    }
   }
 
   if (newlyAwarded.length > 0) {
