@@ -14,6 +14,13 @@ interface Props {
   disabled?: boolean;
 }
 
+/** Points d'un critère : nombre fini, positif ou nul, avec 2 décimales au plus (barèmes d'examen). */
+const pointsValides = (valeur: unknown): boolean =>
+  typeof valeur === "number" &&
+  Number.isFinite(valeur) &&
+  valeur >= 0 &&
+  Math.abs(valeur * 100 - Math.round(valeur * 100)) < 1e-9;
+
 /** Erreur de structure du JSON saisi, ou null s'il est exploitable. */
 export function erreurCriteres(valeur: unknown): string | null {
   if (!Array.isArray(valeur)) return "Le JSON doit être une liste de critères [ … ].";
@@ -26,8 +33,8 @@ export function erreurCriteres(valeur: unknown): string | null {
     if (typeof r["titre"] !== "string" || r["titre"].trim() === "") {
       return `Critère ${i + 1} : « titre » (texte) obligatoire.`;
     }
-    if (typeof r["points"] !== "number" || !Number.isInteger(r["points"]) || r["points"] < 0) {
-      return `Critère ${i + 1} : « points » doit être un entier positif.`;
+    if (!pointsValides(r["points"])) {
+      return `Critère ${i + 1} : « points » doit être un nombre positif, avec 2 décimales au plus (ex. 1,25 s'écrit 1.25).`;
     }
     if (r["correction"] !== undefined && r["correction"] !== CORRECTION_ENSEIGNANT) {
       return `Critère ${i + 1} : « correction » ne peut valoir que « ${CORRECTION_ENSEIGNANT} ».`;

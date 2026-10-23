@@ -99,6 +99,17 @@ describe("Validation des critères saisis en JSON", () => {
   it("accepte une liste valide", () => {
     expect(erreurCriteres([{ id: "a", titre: "A", points: 2 }])).toBeNull();
   });
+  it("accepte les points décimaux des barèmes d'examen (jusqu'à 2 décimales)", () => {
+    expect(erreurCriteres([{ id: "a", titre: "A", points: 1.25 }])).toBeNull();
+    expect(erreurCriteres([{ id: "a", titre: "A", points: 0.75 }])).toBeNull();
+    expect(erreurCriteres([{ id: "a", titre: "A", points: 0 }])).toBeNull();
+  });
+  it("refuse les points non numériques, infinis ou à plus de 2 décimales", () => {
+    expect(erreurCriteres([{ id: "a", titre: "A", points: 1.255 }])).toMatch(/points/);
+    expect(erreurCriteres([{ id: "a", titre: "A", points: "2" }])).toMatch(/points/);
+    expect(erreurCriteres([{ id: "a", titre: "A", points: Infinity }])).toMatch(/points/);
+    expect(erreurCriteres([{ id: "a", titre: "A", points: NaN }])).toMatch(/points/);
+  });
   it("refuse ce qui n'est pas une liste, un id/titre manquant, des points invalides et les doublons", () => {
     expect(erreurCriteres({})).toMatch(/liste/);
     expect(erreurCriteres([{ titre: "A", points: 1 }])).toMatch(/id/);

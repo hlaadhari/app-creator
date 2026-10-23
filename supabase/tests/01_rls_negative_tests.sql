@@ -122,6 +122,17 @@ begin
     '{"obs":{"k":"count","sel":"h1"}}'::jsonb, '{"op":"gte","v":1}'::jsonb
   );
 
+  -- Barème d'examen décimal (issue #150) : un critère à 1,25 point doit être accepté.
+  insert into public.criteres (version_id, code, ordre, label, points, message_echec, sonde, attendu)
+  values (
+    v_version_pub_id, 'HTML.P', 2, 'Présence d''un paragraphe', 1.25, 'Ajoutez un paragraphe.',
+    '{"obs":{"k":"count","sel":"p"}}'::jsonb, '{"op":"gte","v":1}'::jsonb
+  );
+  perform test_helpers.assert_true(
+    (select points from public.criteres where version_id = v_version_pub_id and code = 'HTML.P') = 1.25,
+    'issue #150 : criteres.points doit conserver les décimales (1,25)'
+  );
+
   insert into public.critere_competences (critere_id, competence_id, poids)
   values (v_critere_id, 'HTML.STRUCT', 1.00);
 
@@ -428,6 +439,14 @@ begin
   -- Insertion légitime avec source='client'
   insert into public.tentatives (projet_id, eleve_id, sujet_version_id, score, max, note20, detail, source)
   values (v_projet_a, v_eleve_a, v_version_pub_id, 15, 20, 15.0, '{}'::jsonb, 'client');
+
+  -- Issue #150 : une tentative d'examen au barème décimal (10,75 / 20) doit être enregistrée.
+  insert into public.tentatives (projet_id, eleve_id, sujet_version_id, score, max, note20, detail, source)
+  values (v_projet_a, v_eleve_a, v_version_pub_id, 10.75, 20, 10.75, '{}'::jsonb, 'client');
+  perform test_helpers.assert_true(
+    exists (select 1 from public.tentatives where eleve_id = v_eleve_a and score = 10.75 and max = 20),
+    'issue #150 : tentatives.score doit conserver les décimales (10,75)'
+  );
 
   -- ============================================================================
   -- 12. T-16 (SEC-06) : Écriture directe interdite sur maitrise et badges
