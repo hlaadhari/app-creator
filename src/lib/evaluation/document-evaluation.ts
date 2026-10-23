@@ -372,16 +372,9 @@ export function construireDocumentEvaluationSandbox(
     }, "*");
   }
 
-  if (document.readyState === "complete") {
-    runAndPost();
-  } else {
-    window.addEventListener("load", runAndPost, { once: true });
-  }
+  runAndPost();
 })();
 </script>`;
 
-  if (baseDoc.includes("</body>")) {
-    return baseDoc.replace(/<\/body>/i, `${harnessScript}</body>`);
-  }
   return `${baseDoc}${harnessScript}`;
 }
