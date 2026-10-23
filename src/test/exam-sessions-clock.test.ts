@@ -3,18 +3,27 @@
  * et le verrouillage à l'échéance (Issue #15, PRD F-49 à F-53, F-56, T-06, T-07)
  */
 
-import { beforeEach, describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import fs from "node:fs";
+import path from "node:path";
+
+const rpcMock = vi.hoisted(() => vi.fn());
+vi.mock("@/integrations/supabase/client", () => ({
+  supabase: { rpc: rpcMock },
+}));
+
 import {
   calculerCompteARebours,
   formaterDuree,
-  getTempsServeurSynchronise,
   reinitialiserHorlogeServeur,
   setServerOffsetMs,
   synchroniserHorlogeServeur,
 } from "../lib/exam/server-clock";
 import {
-  calculerEcheanceEleve,
+  accorderTempsSuppPassage,
   declencherCoupDenvoiLocal,
+  demarrerPassageExamen,
+  rendrePassageExamen,
   validerChangementStatutPassage,
   verifierRestrictionsExamen,
 } from "../lib/exam/exam-service";
@@ -204,6 +213,102 @@ describe("feat(exam): Sessions d'examen, horloge serveur stricte et verrouillage
     it("autorise la transition d'un examen 'en_cours' vers 'rendu'", () => {
       const trans = validerChangementStatutPassage("en_cours", "rendu");
       expect(trans.valide).toBe(true);
+    });
+  });
+
+  // =========================================================================
+  // 6. Verrouillage SQL & RPC serveur (Issue #114 / SEC-01 : T-06a/b/c, T-07a)
+  // =========================================================================
+  describe("6. SEC-01 (Issue #114) : RPC demarrer_passage / rendre_passage et migration 0017", () => {
+    it("vérifie que la migration 0017 supprime passages_examen_ecriture_propre et protège T-06a/b/c et T-07a", () => {
+      const migPath = path.resolve(
+        process.cwd(),
+        "supabase/migrations/20261023130000_0017_verrouiller_passages_examen.sql",
+      );
+      const sql = fs.readFileSync(migPath, "utf-8");
+
+      expect(sql).toContain('drop policy if exists "passages_examen_ecriture_propre"');
+      expect(sql).toContain('create policy "passages_examen_maj_enseignant"');
+      expect(sql).toContain("create or replace function public.demarrer_passage(");
+      expect(sql).toContain("create or replace function public.rendre_passage(");
+      expect(sql).toContain("create or replace function public.accorder_temps_supp_passage(");
+      expect(sql).toContain("T-06a");
+      expect(sql).toContain("T-06b");
+      expect(sql).toContain("T-06c");
+      expect(sql).toContain("T-07a");
+    });
+
+    it("appelle la RPC serveur demarrer_passage et mappe correctement le passage retourné", async () => {
+      rpcMock.mockReset();
+      rpcMock.mockResolvedValueOnce({
+        data: {
+          id: "pass-10",
+          session_id: "sess-1",
+          eleve_id: "eleve-1",
+          projet_id: "proj-1",
+          statut: "en_cours",
+          debut_reel: "2026-10-23T08:00:00.000Z",
+          echeance_eleve: "2026-10-23T09:30:00.000Z",
+          temps_supp_min: 0,
+          evenements: [{ type: "passage_demarre", timestamp: "2026-10-23T08:00:00.000Z" }],
+          snapshot_final_id: null,
+          created_at: "2026-10-23T07:55:00.000Z",
+        },
+        error: null,
+      });
+
+      const res = await demarrerPassageExamen("sess-1", "proj-1");
+      expect(rpcMock).toHaveBeenCalledWith("demarrer_passage", {
+        _session_id: "sess-1",
+        _projet_id: "proj-1",
+      });
+      expect(res.success).toBe(true);
+      expect(res.passage?.statut).toBe("en_cours");
+      expect(res.passage?.echeanceEleve).toBe("2026-10-23T09:30:00.000Z");
+    });
+
+    it("appelle la RPC serveur rendre_passage et propage le refus post-échéance (T-06)", async () => {
+      rpcMock.mockReset();
+      rpcMock.mockResolvedValueOnce({
+        data: null,
+        error: {
+          message: "Échéance d'examen dépassée : remise hors délai refusée par le serveur (T-06)",
+        },
+      });
+
+      const res = await rendrePassageExamen("pass-10");
+      expect(rpcMock).toHaveBeenCalledWith("rendre_passage", { _passage_id: "pass-10" });
+      expect(res.success).toBe(false);
+      expect(res.error).toContain("T-06");
+    });
+
+    it("permet à l'enseignant d'accorder un temps supplémentaire via accorder_temps_supp_passage", async () => {
+      rpcMock.mockReset();
+      rpcMock.mockResolvedValueOnce({
+        data: {
+          id: "pass-10",
+          session_id: "sess-1",
+          eleve_id: "eleve-1",
+          projet_id: "proj-1",
+          statut: "en_cours",
+          debut_reel: "2026-10-23T08:00:00.000Z",
+          echeance_eleve: "2026-10-23T10:00:00.000Z",
+          temps_supp_min: 30,
+          evenements: [],
+          snapshot_final_id: null,
+          created_at: "2026-10-23T07:55:00.000Z",
+        },
+        error: null,
+      });
+
+      const res = await accorderTempsSuppPassage("pass-10", 30);
+      expect(rpcMock).toHaveBeenCalledWith("accorder_temps_supp_passage", {
+        _passage_id: "pass-10",
+        _temps_supp_min: 30,
+      });
+      expect(res.success).toBe(true);
+      expect(res.passage?.tempsSuppMin).toBe(30);
+      expect(res.passage?.echeanceEleve).toBe("2026-10-23T10:00:00.000Z");
     });
   });
 });

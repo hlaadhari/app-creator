@@ -5,7 +5,7 @@
  * des aides pédagogiques (indices masqués, IA désactivée) et le refus d'écriture post-échéance.
  */
 
-import { validerTransitionExamen } from "../security/exam-guard";
+import { supabase } from "@/integrations/supabase/client";
 import { calculerCompteARebours, getTempsServeurSynchronise } from "./server-clock";
 import type {
   ExamPassage,
@@ -159,4 +159,111 @@ export function validerChangementStatutPassage(
   }
 
   return { valide: true };
+}
+
+function mapperPassageExamenRow(row: {
+  id: string;
+  session_id: string;
+  eleve_id: string;
+  projet_id: string | null;
+  statut: string;
+  debut_reel: string | null;
+  echeance_eleve: string | null;
+  temps_supp_min: number;
+  evenements: unknown;
+  snapshot_final_id: string | null;
+  created_at: string;
+}): ExamPassage {
+  return {
+    id: row.id,
+    sessionId: row.session_id,
+    eleveId: row.eleve_id,
+    projetId: row.projet_id,
+    statut: row.statut as StatutPassageExamen,
+    debutReel: row.debut_reel,
+    echeanceEleve: row.echeance_eleve,
+    tempsSuppMin: row.temps_supp_min,
+    evenements: Array.isArray(row.evenements)
+      ? (row.evenements as Array<{ type: string; timestamp: string; details?: unknown }>)
+      : [],
+    snapshotFinalId: row.snapshot_final_id,
+    createdAt: row.created_at,
+  };
+}
+
+/**
+ * Démarre ou rejoint un passage d'examen via la RPC serveur `demarrer_passage` (SEC-01 / T-06).
+ * L'échéance `echeance_eleve` est calculée exclusivement par PostgreSQL à partir de `echeance_serveur`.
+ */
+export async function demarrerPassageExamen(
+  sessionId: string,
+  projetId?: string | null,
+): Promise<{ success: boolean; passage?: ExamPassage; error?: string }> {
+  try {
+    const { data, error } = await supabase.rpc("demarrer_passage", {
+      _session_id: sessionId,
+      _projet_id: projetId ?? null,
+    });
+
+    if (error || !data) {
+      return {
+        success: false,
+        error: error?.message || "Impossible de démarrer le passage d'examen.",
+      };
+    }
+
+    return { success: true, passage: mapperPassageExamenRow(data) };
+  } catch (err) {
+    return { success: false, error: err instanceof Error ? err.message : String(err) };
+  }
+}
+
+/**
+ * Remet définitivement un passage d'examen via la RPC serveur `rendre_passage` (SEC-01 / T-06 / T-07).
+ */
+export async function rendrePassageExamen(
+  passageId: string,
+): Promise<{ success: boolean; passage?: ExamPassage; error?: string }> {
+  try {
+    const { data, error } = await supabase.rpc("rendre_passage", {
+      _passage_id: passageId,
+    });
+
+    if (error || !data) {
+      return {
+        success: false,
+        error: error?.message || "Impossible de rendre le passage d'examen.",
+      };
+    }
+
+    return { success: true, passage: mapperPassageExamenRow(data) };
+  } catch (err) {
+    return { success: false, error: err instanceof Error ? err.message : String(err) };
+  }
+}
+
+/**
+ * Accorde un temps supplémentaire (tiers-temps) par l'enseignant via la RPC `accorder_temps_supp_passage`.
+ */
+export async function accorderTempsSuppPassage(
+  passageId: string,
+  tempsSuppMin: number,
+): Promise<{ success: boolean; passage?: ExamPassage; error?: string }> {
+  try {
+    const { data, error } = await supabase.rpc("accorder_temps_supp_passage", {
+      _passage_id: passageId,
+      _temps_supp_min: tempsSuppMin,
+    });
+
+    if (error || !data) {
+      return {
+        success: false,
+        error: error?.message || "Impossible d'accorder le temps supplémentaire.",
+      };
+    }
+
+    return { success: true, passage: mapperPassageExamenRow(data) };
+  } catch (err) {
+    return { success: false, error: err instanceof Error ? err.message : String(err) };
+  }
 }
