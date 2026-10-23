@@ -181,6 +181,7 @@ describe("Support de Cours Interactif & Mémento Bac STI (feat/course-support-ht
       const titles = NOTEBOOK_VIDEOS.map((v) => v.title);
       expect(titles).toContain("Maitriser HTML5 & Formulaires");
       expect(titles).toContain("Architecte Web: CSS3 Bac");
+      expect(titles).toContain("Maitriser CSS3");
       expect(titles).toContain("Étude de Cas CSS3 : Mise en Forme & Animations");
       expect(titles).toContain("JS : Gardien du Formulaire");
       expect(titles).toContain("PHP & MYSQL : Le Voyage");
@@ -188,6 +189,21 @@ describe("Support de Cours Interactif & Mémento Bac STI (feat/course-support-ht
       expect(titles).toContain("Correction Bac 2025 - Droits d'accès");
       expect(titles).toContain("Correction Bac 2026 - Bijoux Aurythia");
       expect(titles).toContain("Projet Web Full-Stack");
+    });
+
+    it("expose le Guide de Révision Synthétique - 4ème Bac STI et l'injection IDE vers SW_<NCIN>", async () => {
+      const { REVISION_GUIDE_STI, injectSnippetIntoStudentIde } =
+        await import("@/content/notebook-sti");
+      expect(REVISION_GUIDE_STI.title).toBe("Guide de Révision Synthétique - 4ème Bac STI");
+      expect(REVISION_GUIDE_STI.sections).toHaveLength(5);
+
+      const res = injectSnippetIntoStudentIde(
+        "function verif() { return true; }",
+        "controle.js",
+        "07451236",
+      );
+      expect(res.projectFolder).toBe("SW_07451236");
+      expect(res.targetFile).toBe("controle.js");
     });
 
     it("associe au moins une capsule vidéo à chaque chapitre (html5, css3, js, php, sql, annales)", async () => {

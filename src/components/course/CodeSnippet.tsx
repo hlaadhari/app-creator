@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Copy, Check, Zap, FileCode2 } from "lucide-react";
 import type { MementoSnippet } from "@/content/mementos";
+import { injectSnippetIntoStudentIde } from "@/content/notebook-sti";
 
 interface CodeSnippetProps {
   snippet: MementoSnippet;
@@ -23,10 +24,22 @@ export function CodeSnippet({ snippet, onInsertCode, className = "" }: CodeSnipp
   };
 
   const handleInject = () => {
-    if (!onInsertCode) return;
-    onInsertCode(snippet.code, snippet.targetFile);
+    const defaultFile =
+      snippet.targetFile ??
+      (snippet.language === "html"
+        ? "index.html"
+        : snippet.language === "css"
+          ? "mesStyles.css"
+          : snippet.language === "javascript"
+            ? "controle.js"
+            : snippet.language === "php"
+              ? "traitement.php"
+              : "init.sql");
+
+    injectSnippetIntoStudentIde(snippet.code, defaultFile);
+    onInsertCode?.(snippet.code, defaultFile);
     setInjected(true);
-    setTimeout(() => setInjected(false), 2000);
+    setTimeout(() => setInjected(false), 2200);
   };
 
   const getLanguageTagColor = (lang: MementoSnippet["language"]) => {
@@ -97,30 +110,28 @@ export function CodeSnippet({ snippet, onInsertCode, className = "" }: CodeSnipp
             )}
           </button>
 
-          {onInsertCode && (
-            <button
-              type="button"
-              onClick={handleInject}
-              className={`flex items-center gap-1.5 px-2.5 py-1 rounded text-[11px] font-medium border transition-colors cursor-pointer ${
-                injected
-                  ? "bg-primary text-primary-foreground border-primary"
-                  : "bg-primary/15 hover:bg-primary/25 text-primary border-primary/30"
-              }`}
-              title={`Injecter ce bloc dans l'éditeur (${snippet.targetFile ?? "fichier actif"})`}
-            >
-              {injected ? (
-                <>
-                  <Check className="h-3.5 w-3.5" />
-                  <span>Injecté !</span>
-                </>
-              ) : (
-                <>
-                  <Zap className="h-3.5 w-3.5" />
-                  <span>Injecter</span>
-                </>
-              )}
-            </button>
-          )}
+          <button
+            type="button"
+            onClick={handleInject}
+            className={`flex items-center gap-1.5 px-2.5 py-1 rounded text-[11px] font-medium border transition-colors cursor-pointer ${
+              injected
+                ? "bg-primary text-primary-foreground border-primary"
+                : "bg-primary/15 hover:bg-primary/25 text-primary border-primary/30"
+            }`}
+            title={`Injecter cet exemple dans le projet élève SW_<NCIN> (${snippet.targetFile ?? "fichier actif"})`}
+          >
+            {injected ? (
+              <>
+                <Check className="h-3.5 w-3.5" />
+                <span>Injecté dans SW_&lt;NCIN&gt; !</span>
+              </>
+            ) : (
+              <>
+                <Zap className="h-3.5 w-3.5" />
+                <span>⚡ Injecter dans l'IDE</span>
+              </>
+            )}
+          </button>
         </div>
       </div>
 

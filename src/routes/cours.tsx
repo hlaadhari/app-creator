@@ -10,7 +10,11 @@ import {
 import { CourseSidebar } from "@/components/course/CourseSidebar";
 import { CodeSnippet } from "@/components/course/CodeSnippet";
 import { CourseSearch } from "@/components/course/CourseSearch";
-import { CourseModuleView, CourseNotebookTutor } from "@/components/course/CourseModule";
+import {
+  CourseModuleView,
+  CourseNotebookTutor,
+  RevisionGuideModal,
+} from "@/components/course/CourseModule";
 import { VideoPlayerModal } from "@/components/course/VideoPlayerModal";
 import { SproutLogo } from "@/components/SproutLogo";
 import { AuthModal } from "@/components/AuthModal";
@@ -31,6 +35,7 @@ import {
   Film,
   Bot,
   GraduationCap,
+  FileDown,
 } from "lucide-react";
 
 export const Route = createFileRoute("/cours")({
@@ -40,7 +45,7 @@ export const Route = createFileRoute("/cours")({
       {
         name: "description",
         content:
-          "Support de cours officiel, capsules vidéo du carnet STI-BAC INFO, flashcards, quiz et annales corrigées Bac STI (2025/2026).",
+          "Support de cours officiel, 10 capsules vidéo du carnet STI-BAC INFO, guide de révision synthétique, flashcards, quiz et annales corrigées Bac STI (2025/2026).",
       },
       { property: "og:title", content: "Mémento & Carnet STI-BAC INFO – Labo STI" },
       {
@@ -54,6 +59,21 @@ export const Route = createFileRoute("/cours")({
   component: CoursPage,
 });
 
+const STICKY_MODULES: {
+  id: NotebookCategoryId;
+  label: string;
+  badge: string;
+}[] = [
+  { id: "html5", label: "HTML5", badge: "M1" },
+  { id: "css3", label: "CSS3", badge: "M2" },
+  { id: "js", label: "JavaScript", badge: "M3" },
+  { id: "php", label: "PHP / MySQLi", badge: "M4" },
+  { id: "sql", label: "BD & SQL", badge: "M5" },
+  { id: "annales", label: "Annales Bac", badge: "M6" },
+];
+
+const QUICK_SEARCH_KEYWORDS = ["mysqli_query", "box-model", "onsubmit", "CREATE TABLE"];
+
 function CoursPage() {
   const [viewMode, setViewMode] = useState<"memento" | "manuel" | "annales">("memento");
   const [activeFicheId, setActiveFicheId] = useState<MementoCard["id"]>("html5");
@@ -62,6 +82,7 @@ function CoursPage() {
   const [targetSectionId, setTargetSectionId] = useState<string | null>(null);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [activeVideoCapsule, setActiveVideoCapsule] = useState<NotebookVideoCapsule | null>(null);
+  const [revisionGuideOpen, setRevisionGuideOpen] = useState(false);
   const [tutorOpen, setTutorOpen] = useState(true);
 
   const activeModule = useMemo<CourseModule>(() => {
@@ -102,6 +123,19 @@ function CoursPage() {
     setActiveFicheId(id);
     setTargetSectionId(null);
     setMobileSidebarOpen(false);
+  };
+
+  const handleSelectStickyModule = (catId: NotebookCategoryId) => {
+    setSearchQuery("");
+    if (catId === "annales") {
+      setViewMode("annales");
+    } else {
+      if (viewMode === "annales") {
+        setViewMode("memento");
+      }
+      setActiveFicheId(catId);
+      setActiveModuleId(catId);
+    }
   };
 
   // Moteur de recherche global pour les fiches mémento et capsules vidéo
@@ -215,6 +249,19 @@ function CoursPage() {
         <div className="flex items-center gap-1.5 shrink-0">
           <Button
             type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => setRevisionGuideOpen(true)}
+            className="gap-1.5 text-xs h-8 cursor-pointer hidden sm:inline-flex"
+            title="Consulter ou télécharger le Guide de Révision Synthétique - 4ème Bac STI"
+          >
+            <FileDown className="h-3.5 w-3.5 text-primary" />
+            <span className="hidden xl:inline">Guide de Révision Synthétique</span>
+            <span className="xl:hidden">Guide STI</span>
+          </Button>
+
+          <Button
+            type="button"
             variant={tutorOpen ? "default" : "outline"}
             size="sm"
             onClick={() => setTutorOpen((o) => !o)}
@@ -238,6 +285,55 @@ function CoursPage() {
           <AuthModal />
         </div>
       </header>
+
+      {/* Sommaire Flottant / Sticky Navigation : accès direct aux 6 modules + filtres rapides */}
+      <nav
+        aria-label="Sommaire flottant des 6 modules"
+        className="border-b bg-panel/60 px-4 py-1.5 flex items-center justify-between gap-3 overflow-x-auto shrink-0 z-10"
+        data-testid="sticky-module-nav"
+      >
+        <div className="flex items-center gap-1.5 shrink-0">
+          {STICKY_MODULES.map((m) => {
+            const isActive = activeCategoryId === m.id && searchQuery.trim() === "";
+            return (
+              <button
+                key={m.id}
+                type="button"
+                onClick={() => handleSelectStickyModule(m.id)}
+                className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium transition-all cursor-pointer whitespace-nowrap border ${
+                  isActive
+                    ? "bg-primary/20 text-primary border-primary/40 font-semibold shadow-2xs"
+                    : "bg-background/60 hover:bg-accent text-muted-foreground hover:text-foreground border-border/60"
+                }`}
+              >
+                <span className="text-[10px] font-mono opacity-75">{m.badge}</span>
+                <span>{m.label}</span>
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Mots-clés de filtrage instantané */}
+        <div className="hidden lg:flex items-center gap-1.5 shrink-0">
+          <span className="text-[10px] font-mono text-muted-foreground uppercase">
+            Accès rapide :
+          </span>
+          {QUICK_SEARCH_KEYWORDS.map((kw) => (
+            <button
+              key={kw}
+              type="button"
+              onClick={() => setSearchQuery((prev) => (prev === kw ? "" : kw))}
+              className={`text-[10px] font-mono px-2 py-0.5 rounded border transition-colors cursor-pointer ${
+                searchQuery === kw
+                  ? "bg-amber-500/20 text-amber-300 border-amber-500/40"
+                  : "bg-background/50 hover:bg-accent text-muted-foreground hover:text-foreground border-border/50"
+              }`}
+            >
+              {kw}
+            </button>
+          ))}
+        </div>
+      </nav>
 
       {/* Volet Latéral Mobile Escamotable */}
       {mobileSidebarOpen && (
@@ -294,7 +390,7 @@ function CoursPage() {
                     );
                   })}
 
-                  {/* Entrée Annales & Examens Pratiques */}
+                  {/* Entrée Module 6 : Annales & Examens Pratiques */}
                   <button
                     type="button"
                     onClick={() => {
@@ -311,10 +407,10 @@ function CoursPage() {
                     <GraduationCap className="h-4 w-4 text-purple-400 shrink-0" />
                     <div className="flex-1 min-w-0">
                       <div className="text-[10px] font-mono opacity-80 uppercase tracking-wide">
-                        Sessions 2025 & 2026
+                        Module 6 • Sessions 2025 & 2026
                       </div>
                       <div className="text-xs font-semibold truncate text-foreground">
-                        Annales & Examens Pratiques
+                        Annales & Projets Full-Stack
                       </div>
                     </div>
                   </button>
@@ -363,16 +459,17 @@ function CoursPage() {
                 searchQuery={searchQuery}
                 targetSectionId={targetSectionId}
                 onPlayCapsule={setActiveVideoCapsule}
+                onOpenRevisionGuide={() => setRevisionGuideOpen(true)}
               />
             </main>
           </>
         ) : (
           <>
-            {/* Sommaire des 5 Fiches Mémento + Section Annales */}
+            {/* Sommaire des 6 Modules (5 Fiches Mémento + Module 6 Annales) */}
             <aside className="hidden md:flex w-72 lg:w-80 shrink-0 h-full border-r bg-panel/70 flex-col p-3 space-y-3">
               <div>
                 <span className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground block mb-1">
-                  Carnet STI-BAC INFO • Chapitres
+                  Carnet STI-BAC INFO • 6 Modules
                 </span>
                 <CourseSearch value={searchQuery} onChange={setSearchQuery} />
               </div>
@@ -414,7 +511,7 @@ function CoursPage() {
                   );
                 })}
 
-                {/* Section 6 : Annales & Examens Pratiques */}
+                {/* Module 6 : Annales Pratiques & Projets Full-Stack */}
                 <button
                   type="button"
                   onClick={() => {
@@ -431,26 +528,37 @@ function CoursPage() {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between gap-1">
                       <span className="text-[10px] font-mono opacity-80 uppercase tracking-wide">
-                        Annales 2025/2026
+                        Module 6 • Annales
                       </span>
                       <span className="text-[9px] font-mono px-1.5 py-0.2 rounded bg-purple-500/15 text-purple-300">
-                        4 vidéos
+                        3 vidéos
                       </span>
                     </div>
                     <div className="text-xs font-semibold truncate text-foreground">
-                      Annales & Examens Pratiques
+                      Annales Pratiques & Full-Stack
                     </div>
                   </div>
                 </button>
               </div>
 
-              <div className="p-2.5 border-t text-[11px] text-muted-foreground bg-panel/30 rounded space-y-1">
+              <div className="p-2.5 border-t text-[11px] text-muted-foreground bg-panel/30 rounded space-y-1.5">
                 <span className="text-amber-400 font-bold block">
                   🎓 Carnet STI-BAC INFO Connecté :
                 </span>
                 <p className="leading-snug">
-                  10 capsules vidéo, Flashcards, Quiz de fin de chapitre et Tuteur IA (262 sources).
+                  10 capsules vidéo, Guide de Révision, Flashcards, Quiz et injection directe vers{" "}
+                  <code>SW_&lt;NCIN&gt;</code>.
                 </p>
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="outline"
+                  onClick={() => setRevisionGuideOpen(true)}
+                  className="w-full h-7 text-[11px] gap-1.5 cursor-pointer"
+                >
+                  <FileDown className="w-3 h-3 text-primary" />
+                  <span>Guide de Révision Synthétique</span>
+                </Button>
               </div>
             </aside>
 
@@ -473,8 +581,8 @@ function CoursPage() {
                         <Search className="h-8 w-8 mx-auto text-muted-foreground/40 mb-2" />
                         <p>Aucun extrait trouvé pour ce mot-clé.</p>
                         <p className="mt-1">
-                          Essayez <code>mysqli_fetch_array</code>, <code>box-model</code>,{" "}
-                          <code>length</code> ou <code>CHECK</code>.
+                          Essayez <code>mysqli_query</code>, <code>box-model</code>,{" "}
+                          <code>onsubmit</code> ou <code>CREATE TABLE</code>.
                         </p>
                       </div>
                     ) : (
@@ -496,6 +604,7 @@ function CoursPage() {
                     viewMode={viewMode}
                     activeFiche={activeFiche}
                     onPlayCapsule={setActiveVideoCapsule}
+                    onOpenRevisionGuide={() => setRevisionGuideOpen(true)}
                   />
                 )}
               </div>
@@ -513,6 +622,9 @@ function CoursPage() {
 
       {/* Modale de Lecture Vidéo / Audio Interactive */}
       <VideoPlayerModal capsule={activeVideoCapsule} onClose={() => setActiveVideoCapsule(null)} />
+
+      {/* Modale Guide de Révision Synthétique - 4ème Bac STI */}
+      <RevisionGuideModal isOpen={revisionGuideOpen} onClose={() => setRevisionGuideOpen(false)} />
     </div>
   );
 }
