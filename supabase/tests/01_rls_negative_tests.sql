@@ -54,7 +54,7 @@ declare
   v_eleve_b uuid := '00000000-0000-0000-0000-000000000022';
   v_eleve_rgpd uuid := '00000000-0000-0000-0000-000000000023';
 
-  v_sujet_id uuid := '00000000-0000-0000-0000-000000000101';
+  v_sujet_id text := 'sujet-test-ci';
   v_version_pub_id uuid := '00000000-0000-0000-0000-000000000201';
   v_version_draft_id uuid := '00000000-0000-0000-0000-000000000202';
   v_critere_id uuid := '00000000-0000-0000-0000-000000000301';
@@ -105,19 +105,22 @@ begin
   update public.user_roles set role = 'enseignant' where user_id in (v_prof_a, v_prof_b);
 
   -- Création d'un sujet, d'une version brouillon puis publiée, d'un critère et d'une solution
-  insert into public.sujets (id, code, titre, type, niveau)
-  values (v_sujet_id, 'sujet-test-ci', 'Sujet Test CI', 'exercice', 'Terminale STI');
+  insert into public.sujets (id, titre, niveau, competence)
+  values (v_sujet_id, 'Sujet Test CI', 'Facile', 'HTML – structure sémantique');
 
   insert into public.sujet_versions (id, sujet_id, numero, enonce_md, publiee)
   values
     (v_version_pub_id, v_sujet_id, 1, '# Énoncé v1', false),
     (v_version_draft_id, v_sujet_id, 2, '# Énoncé v2', false);
 
-  insert into public.sujet_version_fichiers (version_id, chemin, contenu, role)
-  values (v_version_pub_id, 'index.html', '<h1>Starter</h1>', 'depart');
+  insert into public.sujet_version_fichiers (version_id, chemin, contenu)
+  values (v_version_pub_id, 'index.html', '<h1>Starter</h1>');
 
-  insert into public.criteres (id, version_id, code, label, points, sonde)
-  values (v_critere_id, v_version_pub_id, 'HTML.H1', 'Présence H1', 5, '{"type":"dom_selector","selector":"h1"}'::jsonb);
+  insert into public.criteres (id, version_id, code, ordre, label, points, message_echec, sonde, attendu)
+  values (
+    v_critere_id, v_version_pub_id, 'HTML.H1', 1, 'Présence H1', 5, 'Ajoutez un titre h1.',
+    '{"obs":{"k":"count","sel":"h1"}}'::jsonb, '{"op":"gte","v":1}'::jsonb
+  );
 
   insert into public.critere_competences (critere_id, competence_id, poids)
   values (v_critere_id, 'HTML.STRUCT', 1.00);
@@ -258,9 +261,17 @@ begin
   values (v_class_b, 'STI-REVO', true, now() + interval '7 days');
 
   perform test_helpers.switch_to_user('authenticated', v_eleve_a);
+  -- rejoindre_classe lève une exception pour un code invalide, révoqué, expiré ou complet.
+  v_caught := false;
+  begin
+    perform public.rejoindre_classe('STI-REVO');
+  exception when others then
+    v_caught := sqlerrm like '%invalide%';
+  end;
+  perform test_helpers.assert_true(v_caught, 'T-05 : rejoindre_classe doit rejeter un code révoqué');
   perform test_helpers.assert_true(
-    ((public.rejoindre_classe('STI-REVO')) ->> 'ok')::boolean = false,
-    'T-05 : rejoindre_classe doit rejeter un code révoqué'
+    not exists (select 1 from public.class_members where class_id = v_class_b and eleve_id = v_eleve_a),
+    'T-05 : le code révoqué ne doit pas inscrire l élève'
   );
 
   -- ============================================================================
@@ -287,11 +298,11 @@ begin
   -- 9. T-06a, T-06b, T-06c, T-07a (SEC-01) : Verrouillage de passages_examen
   -- ============================================================================
   reset role;
-  insert into public.sessions_examen (id, class_id, version_id, titre, duree_min, statut, debut_serveur, echeance_serveur)
+  insert into public.sessions_examen (id, class_id, version_id, titre, debut_prevu, duree_min, statut, debut_serveur, echeance_serveur)
   values
-    (v_session_active, v_class_a, v_version_pub_id, 'Examen Blanc 1', 120, 'en_cours', now() - interval '10 minutes', now() + interval '110 minutes'),
-    (v_session_active_2, v_class_a, v_version_pub_id, 'Examen Blanc 2', 120, 'en_cours', now() - interval '10 minutes', now() + interval '110 minutes'),
-    (v_session_expiree, v_class_a, v_version_pub_id, 'Examen Expiré', 60, 'en_cours', now() - interval '120 minutes', now() - interval '60 minutes');
+    (v_session_active, v_class_a, v_version_pub_id, 'Examen Blanc 1', now() - interval '10 minutes', 120, 'en_cours', now() - interval '10 minutes', now() + interval '110 minutes'),
+    (v_session_active_2, v_class_a, v_version_pub_id, 'Examen Blanc 2', now() - interval '10 minutes', 120, 'en_cours', now() - interval '10 minutes', now() + interval '110 minutes'),
+    (v_session_expiree, v_class_a, v_version_pub_id, 'Examen Expiré', now() - interval '120 minutes', 60, 'en_cours', now() - interval '120 minutes', now() - interval '60 minutes');
 
   -- Test T-06b sur un passage expiré lié à v_projet_a
   insert into public.passages_examen (id, session_id, eleve_id, projet_id, statut, debut_reel, echeance_eleve)
