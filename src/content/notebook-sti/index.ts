@@ -219,13 +219,76 @@ label {
     ],
   },
   {
+    id: "vid-css3-maitriser",
+    moduleId: "css3",
+    title: "Maitriser CSS3",
+    subtitle: "Hiérarchie des sélecteurs, propriétés d'affichage et pièges d'examen Bac STI",
+    duration: "06:15",
+    durationSeconds: 375,
+    badge: "Capsule #3 • CSS3",
+    notebookRef: "Carnet STI-BAC INFO • Sources #60 à #78",
+    summary:
+      "Approfondissement des règles de priorité des sélecteurs (#id > .classe > balise), gestion fine de l'affichage (inline, block, inline-block), mise en forme des tableaux (border-collapse) et pièges classiques de mesStyles.css.",
+    keyTakeaways: [
+      "Un sélecteur d'identifiant (#titre) est prioritaire sur un sélecteur de classe (.L1), lui-même prioritaire sur un sélecteur de balise.",
+      "Pour fusionner les bordures d'un tableau HTML <table>, utilisez border-collapse: collapse;.",
+      "Ne confondez pas padding (marge intérieure entre le texte et la bordure) et margin (espace extérieur autour de la boîte).",
+    ],
+    chapters: [
+      {
+        timestamp: "00:00",
+        seconds: 0,
+        title: "1. Hiérarchie des Sélecteurs & Spécificité",
+        narration:
+          "En CSS3, l'ordre de priorité va de la balise simple (poids 1), à la classe .L1 (poids 10), jusqu'à l'identifiant #titre (poids 100).",
+        codeSlide: {
+          language: "css",
+          caption: "Combinaison de sélecteurs et mise en forme des tableaux",
+          code: `table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th, td {
+  border: 1px solid #334155;
+  padding: 8px 12px;
+  text-align: center;
+}`,
+        },
+      },
+      {
+        timestamp: "03:10",
+        seconds: 190,
+        title: "2. Alignement .L1 / .b1 et Propriétés d'Affichage",
+        narration:
+          "Les classes .L1 et .b1 utilisées dans les sujets du Bac STI servent à aligner les lignes de formulaire et styliser les boutons d'envoi et d'annulation.",
+        codeSlide: {
+          language: "css",
+          caption: "Classes canoniques .L1 et .b1 d'examen",
+          code: `.L1 {
+  display: inline-block;
+  width: 180px;
+  font-weight: bold;
+}
+
+.b1 {
+  width: 120px;
+  padding: 8px;
+  border-radius: 6px;
+  font-weight: bold;
+}`,
+        },
+      },
+    ],
+  },
+  {
     id: "vid-css3-animations",
     moduleId: "css3",
     title: "Étude de Cas CSS3 : Mise en Forme & Animations",
-    subtitle: "Pseudo-classe :hover, transformations 2D (scale, rotate) et transitions fluides",
+    subtitle: "Alignement .L1/.b1, effets :hover et transitions transform/opacity",
     duration: "04:40",
     durationSeconds: 280,
-    badge: "Capsule #3 • Démo CSS3",
+    badge: "Capsule #4 • Démo CSS3",
     notebookRef: "Carnet STI-BAC INFO • Sources #79 à #96",
     summary:
       "Démonstration pratique des effets visuels demandés dans les sujets récents (2023–2026) : ombres portées (box-shadow, text-shadow), dégradés linéaires, zoom au survol avec transform: scale() et animation fluide via transition.",
@@ -673,55 +736,150 @@ while ($lig = mysqli_fetch_array($res)) {
       },
     ],
   },
-  {
-    id: "vid-annales-bac2026-marivana",
-    moduleId: "annales",
-    title: "Correction Bac 2026 - Croisières Marivana",
-    subtitle:
-      "Corrigé guidé Session 2026 (12h30) : recherche de croisières et réservation avec décrémentation du quota",
-    duration: "08:55",
-    durationSeconds: 535,
-    badge: "Capsule #10 • Annales 2026",
-    notebookRef: "Carnet STI-BAC INFO • Sources #261 à #262 (Session 2026 - 12h30)",
-    relatedSubjectId: "exam-bac2026-croisieres-marivana",
-    summary:
-      "Étude complète du second sujet Bac 2026 (Croisières Marivana Voyages) : vérification du nombre de places disponibles avant réservation, enregistrement dans la table reservation et décrémentation automatique du quota de places.",
-    keyTakeaways: [
-      "Avant d'insérer une réservation, vérifier que nbPlacesDispo >= $nbPlacesDemande.",
-      "Après l'insertion dans reservation, exécuter UPDATE croisiere SET nbplaces = nbplaces - $nb WHERE numcrois = '$num'.",
-    ],
-    chapters: [
-      {
-        timestamp: "00:00",
-        seconds: 0,
-        title: "1. Vérification du Quota de Places (reservation.php)",
-        narration:
-          "Dans reservation.php, on interroge d'abord la table croisiere pour comparer le nombre de places restantes au nombre de places demandées par le client.",
-        codeSlide: {
-          language: "php",
-          caption: "Contrôle du quota et mise à jour atomique",
-          code: `<?php
-require("connexion.php");
-$numCrois = $_POST["numcrois"];
-$cin      = $_POST["cin"];
-$nbPlaces = (int) $_POST["nbplaces"];
-
-$res = mysqli_query($cnx, "SELECT nbplaces FROM croisiere WHERE numcrois = '$numCrois'");
-$lig = mysqli_fetch_array($res);
-
-if ($lig["nbplaces"] < $nbPlaces) {
-    echo "Nombre de places insuffisant !";
-} else {
-    mysqli_query($cnx, "INSERT INTO reservation VALUES ('$numCrois', '$cin', $nbPlaces, CURDATE())");
-    mysqli_query($cnx, "UPDATE croisiere SET nbplaces = nbplaces - $nbPlaces WHERE numcrois = '$numCrois'");
-    echo "Réservation confirmée !";
-}
-?>`,
-        },
-      },
-    ],
-  },
 ];
+
+/**
+ * GUIDE DE RÉVISION SYNTHÉTIQUE - 4ème BAC STI (Carnet STI-BAC INFO)
+ */
+export interface RevisionGuideSection {
+  id: string;
+  title: string;
+  badge: string;
+  goldenRules: string[];
+  essentialSyntax: string;
+}
+
+export const REVISION_GUIDE_STI: {
+  title: string;
+  subtitle: string;
+  version: string;
+  sections: RevisionGuideSection[];
+} = {
+  title: "Guide de Révision Synthétique - 4ème Bac STI",
+  subtitle: "Récapitulatif officiel issu du Carnet de connaissances STI-BAC INFO (262 sources)",
+  version: "Édition Examen Pratique 2025–2026",
+  sections: [
+    {
+      id: "guide-html",
+      title: "1. HTML5 & Formulaires Interactifs",
+      badge: "Module 1 • HTML5",
+      goldenRules: [
+        'Toujours relier la feuille de style (<link rel="stylesheet" href="mesStyles.css">) et le script (<script src="controle.js"></script>).',
+        'Toujours écrire onsubmit="return verif();" sur la balise <form action="...php" method="post">.',
+        'Doubler systématiquement id="..." (pour JS) et name="..." (pour $_POST en PHP) sur chaque contrôle.',
+      ],
+      essentialSyntax: `<form action="traitement.php" method="post" onsubmit="return verif();">
+  <label for="cin" class="L1">N° CIN :</label>
+  <input type="text" id="cin" name="cin" maxlength="8">
+  <input type="submit" value="Valider" class="b1">
+</form>`,
+    },
+    {
+      id: "guide-css",
+      title: "2. CSS3, Box Model & Animations",
+      badge: "Module 2 • CSS3",
+      goldenRules: [
+        "Appliquer display: inline-block; sur les <label> ou la classe .L1 pour que width fonctionne.",
+        "Centrer un formulaire ou un tableau de largeur fixe avec margin: 0 auto;.",
+        "Placer transition: transform 0.3s ease; sur l'élément normal et transform: scale(1.05); sur :hover.",
+      ],
+      essentialSyntax: `.L1 { display: inline-block; width: 180px; font-weight: bold; }
+form { width: 550px; margin: 20px auto; padding: 15px; border-radius: 10px; }
+.b1 { transition: transform 0.3s ease, opacity 0.3s ease; }
+.b1:hover { transform: scale(1.05); opacity: 0.95; }`,
+    },
+    {
+      id: "guide-js",
+      title: "3. JavaScript Client & Contrôle DOM (controle.js)",
+      badge: "Module 3 • JavaScript",
+      goldenRules: [
+        "Extraire avec document.getElementById('id').value, .selectedIndex (liste) et .checked (radio/checkbox).",
+        "Contrôler un CIN de 8 chiffres avec : if (cin.length !== 8 || isNaN(cin)).",
+        "Chaque erreur doit déclencher alert('...') suivi immédiatement de return false;.",
+      ],
+      essentialSyntax: `function verif() {
+  var cin = document.getElementById("cin").value;
+  var cat = document.getElementById("cat").selectedIndex;
+  if (cin.length !== 8 || isNaN(cin)) { alert("CIN invalide"); return false; }
+  if (cat === 0) { alert("Choisir une catégorie"); return false; }
+  return true;
+}`,
+    },
+    {
+      id: "guide-php",
+      title: "4. PHP 8.2 & Interfaçage MySQLi Procédural",
+      badge: "Module 4 • PHP / MySQLi",
+      goldenRules: [
+        "Utiliser exclusivement les fonctions procédurales : mysqli_connect, mysqli_query, mysqli_num_rows, mysqli_fetch_array, mysqli_affected_rows, mysqli_close.",
+        "Entourer les chaînes et dates d'apostrophes simples dans la requête SQL : '$cin', '$date'.",
+        "Pour une checkbox : $lec = isset($_POST['lec']) ? 1 : 0;.",
+      ],
+      essentialSyntax: `<?php
+$cnx = mysqli_connect("localhost", "root", "", "bd_examen");
+$cin = $_POST["cin"];
+$res = mysqli_query($cnx, "SELECT * FROM client WHERE cin = '$cin'");
+if (mysqli_num_rows($res) == 0) {
+    echo "Client inexistant !";
+}
+mysqli_close($cnx);
+?>`,
+    },
+    {
+      id: "guide-sql",
+      title: "5. Bases de Données Relationnelles & SQL (MySQL)",
+      badge: "Module 5 • BD & SQL",
+      goldenRules: [
+        "Utiliser CHAR(8) pour le CIN ou le téléphone afin de conserver le 0 initial.",
+        "Déclarer une clé primaire composée en fin de table : PRIMARY KEY (col1, col2).",
+        "Utiliser WHERE avant GROUP BY, et HAVING après GROUP BY pour filtrer sur COUNT(), SUM() ou AVG().",
+      ],
+      essentialSyntax: `CREATE TABLE location (
+  dateloc DATE NOT NULL,
+  numloc INT AUTO_INCREMENT,
+  codehab INT NOT NULL,
+  cin CHAR(8) NOT NULL,
+  PRIMARY KEY (dateloc, numloc),
+  FOREIGN KEY (codehab) REFERENCES habit(codehab) ON DELETE CASCADE
+);`,
+    },
+  ],
+};
+
+/**
+ * Injecte un extrait de code dans le tampon du projet élève SW_<NCIN> (localStorage + presse-papiers)
+ */
+export function injectSnippetIntoStudentIde(
+  code: string,
+  targetFile: string = "index.html",
+  ncin: string = "NCIN",
+): { projectFolder: string; targetFile: string; timestamp: string } {
+  const projectFolder = `SW_${ncin}`;
+  const payload = {
+    projectFolder,
+    targetFile,
+    code,
+    timestamp: new Date().toISOString(),
+  };
+
+  if (typeof window !== "undefined") {
+    try {
+      window.localStorage.setItem("labo_sti_ide_inject", JSON.stringify(payload));
+    } catch {
+      // Ignore storage quota errors
+    }
+    try {
+      void navigator.clipboard?.writeText(code);
+    } catch {
+      // Ignore clipboard errors in non-secure context
+    }
+  }
+
+  return {
+    projectFolder,
+    targetFile,
+    timestamp: payload.timestamp,
+  };
+}
 
 /**
  * 2. CARTES DE RÉVISION RAPIDE (FLASHCARDS DU CARNET "STI-BAC INFO")
