@@ -98,6 +98,7 @@ export function critereDepuisJson(c: RawCriterion): Criterion {
     automatique: !manuel && (declaree !== null || sondeEstVerifiable(c.sonde)),
     ...(manuel ? { manuel: true } : {}),
     ...(typeof c["fichier"] === "string" ? { fichier: c["fichier"] } : {}),
+    raw: c as Record<string, unknown>,
     check: declaree ?? makeProbeCheck(c.sonde),
   };
 }

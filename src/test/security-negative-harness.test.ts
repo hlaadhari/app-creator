@@ -1,6 +1,15 @@
 import { describe, expect, it, beforeEach } from "vitest";
 import fs from "node:fs";
 import path from "node:path";
+import { JSDOM } from "jsdom";
+import { contentSubjects } from "@/lib/content/all-subjects";
+import {
+  construireDocumentEvaluationSandbox,
+  type FichiersEvaluation,
+} from "@/lib/evaluation/document-evaluation";
+import { EVALUATION_IFRAME_SANDBOX } from "@/lib/evaluation/iframe-evaluation";
+import { evaluerParPage } from "@/lib/evaluation/evaluation-par-page";
+import { score, type Criterion, type Result } from "@/lib/exercises";
 import {
   verifierEcheanceExamen,
   validerTransitionExamen,
@@ -437,6 +446,135 @@ describe("Harnais de Tests Négatifs de Sécurité T-01 à T-14 (docs/SECURITY.m
           expect.stringContaining("samir.benali@lycee-sti.fr"),
         ]),
       );
+    });
+  });
+
+  // =========================================================================
+  // T-17 (SEC-04) : Isolation stricte de l'iframe d'évaluation (sans allow-same-origin)
+  // =========================================================================
+  describe("T-17 (SEC-04) : Isolation de l'iframe d'évaluation par postMessage sans allow-same-origin", () => {
+    const executerHarnaisSandboxDansJsdom = async (
+      fichiers: FichiersEvaluation,
+      page: string,
+      criteres: Criterion[],
+    ): Promise<Result[]> => {
+      const requestId = "req-t17-test";
+      const srcdoc = construireDocumentEvaluationSandbox(fichiers, page, criteres, requestId);
+
+      return new Promise<Result[]>((resolve, reject) => {
+        const state: {
+          messageCapture: { type?: string; requestId?: string; results?: Result[] } | null;
+        } = { messageCapture: null };
+        const dom = new JSDOM(srcdoc, {
+          runScripts: "dangerously",
+          beforeParse(win) {
+            // Simule l'origine opaque d'une iframe sandbox="allow-scripts" (sans allow-same-origin)
+            Object.defineProperty(win, "localStorage", {
+              configurable: true,
+              get() {
+                const err = new Error(
+                  "Failed to read the 'localStorage' property from 'Window': Sandbox access violation",
+                );
+                err.name = "SecurityError";
+                throw err;
+              },
+            });
+            Object.defineProperty(win, "parent", {
+              configurable: true,
+              value: {
+                get document() {
+                  const err = new Error(
+                    'Blocked a frame with origin "null" from accessing a cross-origin frame.',
+                  );
+                  err.name = "SecurityError";
+                  throw err;
+                },
+                postMessage(payload: { type?: string; requestId?: string; results?: Result[] }) {
+                  state.messageCapture = payload;
+                },
+              },
+            });
+          },
+        });
+
+        try {
+          if (!state.messageCapture || state.messageCapture.requestId !== requestId) {
+            reject(new Error("Aucun message postMessage valide reçu du harnais sandbox"));
+            return;
+          }
+          resolve(state.messageCapture.results ?? []);
+        } finally {
+          dom.window.close();
+        }
+      });
+    };
+
+    it("configure EVALUATION_IFRAME_SANDBOX strictement à 'allow-scripts' sans 'allow-same-origin'", () => {
+      expect(EVALUATION_IFRAME_SANDBOX).toBe("allow-scripts");
+      expect(EVALUATION_IFRAME_SANDBOX).not.toContain("allow-same-origin");
+      expect(validerIframeSandbox(EVALUATION_IFRAME_SANDBOX).securise).toBe(true);
+    });
+
+    it("bloque l'accès à window.localStorage et parent.document par SecurityError dans le contexte sandboxé", async () => {
+      const fichiers: FichiersEvaluation = {
+        "index.html": `<div id="probe">initial</div>`,
+        "voleur.js": `
+          var volLocalStorage = "non_bloque";
+          var volParentDoc = "non_bloque";
+          try {
+            void window.localStorage.getItem("sb-auth-token");
+          } catch (e) {
+            volLocalStorage = e.name;
+          }
+          try {
+            void parent.document.cookie;
+          } catch (e) {
+            volParentDoc = e.name;
+          }
+          document.getElementById("probe").setAttribute("data-ls", volLocalStorage);
+          document.getElementById("probe").setAttribute("data-parent", volParentDoc);
+        `,
+      };
+      const criteres: Criterion[] = [
+        {
+          id: "sec-ls",
+          label: "localStorage lève SecurityError",
+          points: 1,
+          fail: "localStorage accessible",
+          automatique: true,
+          raw: {
+            sonde: {
+              type: "dom_selector",
+              selector: '#probe[data-ls="SecurityError"][data-parent="SecurityError"]',
+            },
+          },
+          check: () => false,
+        },
+      ];
+
+      const resultats = await executerHarnaisSandboxDansJsdom(fichiers, "index.html", criteres);
+      expect(resultats).toHaveLength(1);
+      expect(resultats[0]?.ok).toBe(true);
+    });
+
+    it("évalue les solutions de référence des 10 sujets via postMessage avec un score strictement identique", async () => {
+      const contentDir = path.resolve(process.cwd(), "content");
+      for (const sujet of contentSubjects) {
+        const solDir = path.join(contentDir, sujet.id, "solution");
+        const fichiers: FichiersEvaluation = {};
+        for (const nom of fs.readdirSync(solDir)) {
+          const p = path.join(solDir, nom);
+          if (fs.statSync(p).isFile()) {
+            fichiers[nom] = fs.readFileSync(p, "utf-8");
+          }
+        }
+
+        const resultatsSandbox = await evaluerParPage(sujet.criteria, fichiers, (page, groupe) =>
+          executerHarnaisSandboxDansJsdom(fichiers, page, groupe),
+        );
+        const bilan = score(resultatsSandbox);
+        expect(bilan.got, `Score solution ${sujet.id}`).toBe(bilan.verifiable);
+      }
     });
   });
 });

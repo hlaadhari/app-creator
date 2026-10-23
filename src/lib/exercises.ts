@@ -21,6 +21,8 @@ export type Criterion = {
   manuel?: boolean;
   /** Page du projet sur laquelle le critère est évalué (la page principale par défaut). */
   fichier?: string;
+  /** Définition JSON sérialisable d'origine (utilisée pour l'évaluation dans l'iframe sandboxée). */
+  raw?: Record<string, unknown>;
   check: (doc: Document, win: Window) => boolean;
 };
 
