@@ -31,11 +31,8 @@ if (strlen($cin) !== 8 || !is_numeric($cin) || $id_habit <= 0 || empty($date_loc
 }
 
 // 3. Vérification de l'existence du client
-$sqlClient = "SELECT cin, nom, prenom FROM client WHERE cin = ?";
-$stmtClient = mysqli_prepare($conn, $sqlClient);
-mysqli_stmt_bind_param($stmtClient, "s", $cin);
-mysqli_stmt_execute($stmtClient);
-$resClient = mysqli_stmt_get_result($stmtClient);
+$sqlClient = "SELECT cin, nom, prenom FROM client WHERE cin = '$cin'";
+$resClient = mysqli_query($conn, $sqlClient);
 
 if (mysqli_num_rows($resClient) === 0) {
     echo "<p style='color: orange;'>Client avec CIN <strong>" . htmlspecialchars($cin) . "</strong> introuvable. Veuillez d'abord enregistrer le client.</p>";
@@ -43,14 +40,11 @@ if (mysqli_num_rows($resClient) === 0) {
     exit;
 }
 
-$clientData = mysqli_fetch_assoc($resClient);
+$clientData = mysqli_fetch_array($resClient);
 
 // 4. Vérification de la disponibilité de l'habit
-$sqlHabit = "SELECT id_habit, description, taille, prix_jour, disponible FROM habit WHERE id_habit = ?";
-$stmtHabit = mysqli_prepare($conn, $sqlHabit);
-mysqli_stmt_bind_param($stmtHabit, "i", $id_habit);
-mysqli_stmt_execute($stmtHabit);
-$resHabit = mysqli_stmt_get_result($stmtHabit);
+$sqlHabit = "SELECT id_habit, description, taille, prix_jour, disponible FROM habit WHERE id_habit = $id_habit";
+$resHabit = mysqli_query($conn, $sqlHabit);
 
 if (mysqli_num_rows($resHabit) === 0) {
     echo "<p style='color: red;'>Habit sélectionné introuvable dans la base.</p>";
@@ -58,7 +52,7 @@ if (mysqli_num_rows($resHabit) === 0) {
     exit;
 }
 
-$habitData = mysqli_fetch_assoc($resHabit);
+$habitData = mysqli_fetch_array($resHabit);
 
 if ($habitData["disponible"] !== "O") {
     echo "<p style='color: red;'>L'habit <em>" . htmlspecialchars($habitData["description"]) . "</em> est actuellement indisponible (déjà loué).</p>";
@@ -67,21 +61,18 @@ if ($habitData["disponible"] !== "O") {
 }
 
 // 5. Enregistrement de la location
-$sqlInsert = "INSERT INTO location (cin, id_habit, date_loc, duree) VALUES (?, ?, ?, ?)";
-$stmtInsert = mysqli_prepare($conn, $sqlInsert);
-mysqli_stmt_bind_param($stmtInsert, "sisi", $cin, $id_habit, $date_loc, $duree);
+$sqlInsert = "INSERT INTO location (cin, id_habit, date_loc, duree) VALUES ('$cin', $id_habit, '$date_loc', $duree)";
+$resInsert = mysqli_query($conn, $sqlInsert);
 
-if (!mysqli_stmt_execute($stmtInsert)) {
+if (!$resInsert || mysqli_affected_rows($conn) <= 0) {
     echo "<p style='color: red;'>Erreur lors de l'enregistrement de la location : " . mysqli_error($conn) . "</p>";
     mysqli_close($conn);
     exit;
 }
 
 // 6. Mise à jour de la disponibilité de l'habit (disponible = 'N')
-$sqlUpdate = "UPDATE habit SET disponible = 'N' WHERE id_habit = ?";
-$stmtUpdate = mysqli_prepare($conn, $sqlUpdate);
-mysqli_stmt_bind_param($stmtUpdate, "i", $id_habit);
-mysqli_stmt_execute($stmtUpdate);
+$sqlUpdate = "UPDATE habit SET disponible = 'N' WHERE id_habit = $id_habit";
+mysqli_query($conn, $sqlUpdate);
 
 $montantTotal = $habitData["prix_jour"] * $duree;
 
