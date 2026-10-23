@@ -80,8 +80,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Sprout Workshop – Labo STI" },
-      { name: "description", content: "Plateforme d'entraînement au Bac STI – Sprout Workshop" },
+      { title: "Labo STI – Plateforme d'entraînement au Bac STI" },
+      {
+        name: "description",
+        content: "Plateforme d'entraînement et d'examen pratique au Baccalauréat STI2D – Labo STI",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],

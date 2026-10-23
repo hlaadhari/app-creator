@@ -435,24 +435,26 @@ function AdminDashboardPage() {
 
         {/* Système d'onglets de gestion */}
         <Tabs defaultValue="utilisateurs" className="space-y-4">
-          <TabsList className="bg-muted p-1">
-            <TabsTrigger value="utilisateurs" className="gap-1.5 text-xs">
-              <Users className="w-3.5 h-3.5" />
-              <span>Utilisateurs & Rôles ({users.length})</span>
-            </TabsTrigger>
-            <TabsTrigger value="securite" className="gap-1.5 text-xs">
-              <ShieldCheck className="w-3.5 h-3.5" />
-              <span>Audit Sécurité & RGPD (14 tests)</span>
-            </TabsTrigger>
-            <TabsTrigger value="supervision" className="gap-1.5 text-xs">
-              <Activity className="w-3.5 h-3.5" />
-              <span>Santé Système & Services</span>
-            </TabsTrigger>
-            <TabsTrigger value="sujets" className="gap-1.5 text-xs">
-              <Award className="w-3.5 h-3.5" />
-              <span>Catalogue & Immuabilité ({exercises.length})</span>
-            </TabsTrigger>
-          </TabsList>
+          <div className="overflow-x-auto pb-1 -mb-1">
+            <TabsList className="bg-muted p-1 inline-flex w-max min-w-full justify-start gap-1">
+              <TabsTrigger value="utilisateurs" className="gap-1.5 text-xs shrink-0 px-3 py-1.5">
+                <Users className="w-3.5 h-3.5" />
+                <span>Utilisateurs & Rôles ({users.length})</span>
+              </TabsTrigger>
+              <TabsTrigger value="securite" className="gap-1.5 text-xs shrink-0 px-3 py-1.5">
+                <ShieldCheck className="w-3.5 h-3.5" />
+                <span>Audit Sécurité & RGPD (14 tests)</span>
+              </TabsTrigger>
+              <TabsTrigger value="supervision" className="gap-1.5 text-xs shrink-0 px-3 py-1.5">
+                <Activity className="w-3.5 h-3.5" />
+                <span>Santé Système & Services</span>
+              </TabsTrigger>
+              <TabsTrigger value="sujets" className="gap-1.5 text-xs shrink-0 px-3 py-1.5">
+                <Award className="w-3.5 h-3.5" />
+                <span>Catalogue & Immuabilité ({exercises.length})</span>
+              </TabsTrigger>
+            </TabsList>
+          </div>
 
           {/* Onglet 1 : Gestion des Utilisateurs et Validation Enseignants */}
           <TabsContent value="utilisateurs" className="space-y-4">

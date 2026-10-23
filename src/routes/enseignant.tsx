@@ -45,6 +45,10 @@ import {
   BarChart3,
   Download,
   Scale,
+  Activity,
+  KeyRound,
+  MessageSquareWarning,
+  PenTool,
 } from "lucide-react";
 import {
   detecterBlocagesEtAlertes,
@@ -946,33 +950,68 @@ function TeacherDashboardPage() {
 
             {/* Onglets : Suivi en direct, Analytics & Pilotage, Invitations, Studio */}
             <Tabs defaultValue="progression" className="space-y-4">
-              <TabsList className="bg-muted/40 p-1 flex-wrap">
-                <TabsTrigger value="progression" className="text-xs">
-                  Suivi de progression en temps réel
-                </TabsTrigger>
-                <TabsTrigger value="analytics" className="text-xs flex items-center gap-1.5">
-                  <BarChart3 className="w-3.5 h-3.5" />
-                  <span>Analytics & Alertes de Classe</span>
-                  {alerts.length > 0 && (
-                    <Badge variant="destructive" className="text-[10px] h-4 px-1.5 py-0 font-bold">
-                      {alerts.length}
+              <div className="overflow-x-auto pb-1 -mb-1">
+                <TabsList className="bg-muted/40 p-1 inline-flex w-max min-w-full justify-start gap-1">
+                  <TabsTrigger
+                    value="progression"
+                    className="text-xs flex items-center gap-1.5 shrink-0 px-3 py-1.5"
+                  >
+                    <Activity className="w-3.5 h-3.5" />
+                    <span>Progression</span>
+                    <span className="hidden md:inline">en temps réel</span>
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="analytics"
+                    className="text-xs flex items-center gap-1.5 shrink-0 px-3 py-1.5"
+                  >
+                    <BarChart3 className="w-3.5 h-3.5" />
+                    <span>Analytics</span>
+                    <span className="hidden md:inline">& Alertes</span>
+                    {alerts.length > 0 && (
+                      <Badge
+                        variant="destructive"
+                        className="text-[10px] h-4 px-1.5 py-0 font-bold"
+                      >
+                        {alerts.length}
+                      </Badge>
+                    )}
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="invitations"
+                    className="text-xs flex items-center gap-1.5 shrink-0 px-3 py-1.5"
+                  >
+                    <KeyRound className="w-3.5 h-3.5" />
+                    <span>Invitations</span>
+                    <Badge variant="outline" className="text-[10px] h-4 px-1.5 py-0">
+                      {invitations.length}
                     </Badge>
-                  )}
-                </TabsTrigger>
-                <TabsTrigger value="invitations" className="text-xs">
-                  Codes d'invitation ({invitations.length})
-                </TabsTrigger>
-                <TabsTrigger value="contestations" className="text-xs">
-                  Contestations d'élèves (F-44)
-                </TabsTrigger>
-                <TabsTrigger value="similarity" className="text-xs flex items-center gap-1.5">
-                  <Scale className="w-3.5 h-3.5" />
-                  <span>Similarité & Anti-Plagiat</span>
-                </TabsTrigger>
-                <TabsTrigger value="studio" className="text-xs">
-                  Studio de Sujets & Immuabilité
-                </TabsTrigger>
-              </TabsList>
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="contestations"
+                    className="text-xs flex items-center gap-1.5 shrink-0 px-3 py-1.5"
+                  >
+                    <MessageSquareWarning className="w-3.5 h-3.5" />
+                    <span>Contestations</span>
+                    <span className="hidden md:inline text-muted-foreground/70">(F-44)</span>
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="similarity"
+                    className="text-xs flex items-center gap-1.5 shrink-0 px-3 py-1.5"
+                  >
+                    <Scale className="w-3.5 h-3.5" />
+                    <span>Similarité</span>
+                    <span className="hidden md:inline">& Plagiat</span>
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="studio"
+                    className="text-xs flex items-center gap-1.5 shrink-0 px-3 py-1.5"
+                  >
+                    <PenTool className="w-3.5 h-3.5" />
+                    <span>Studio Sujets</span>
+                    <span className="hidden md:inline">& Immuabilité</span>
+                  </TabsTrigger>
+                </TabsList>
+              </div>
 
               <TabsContent value="progression">
                 <StudentProgressTable

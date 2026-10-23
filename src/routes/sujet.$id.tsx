@@ -370,7 +370,7 @@ function WorkspaceView({ ex }: { ex: Exercise }) {
         <div className="flex items-center gap-2">
           <Link to="/" className="flex items-center gap-2 hover:opacity-85 transition-opacity">
             <SproutLogo size="sm" showText={false} />
-            <span className="font-semibold text-xs tracking-tight">Sprout Workshop</span>
+            <span className="font-semibold text-xs tracking-tight">Labo STI</span>
           </Link>
           <span className="text-muted-foreground/60">/</span>
           <span className="text-muted-foreground">Sujets</span>
