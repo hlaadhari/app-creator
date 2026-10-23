@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import Editor, { type OnMount } from "@monaco-editor/react";
+import { ensureMonacoConfigured } from "@/lib/editor/monaco-setup";
 
 interface MonacoEditorPaneProps {
   value: string;
@@ -26,7 +27,13 @@ export function MonacoEditorPane({
   const editorRef = useRef<unknown>(null);
 
   useEffect(() => {
-    setIsMounted(true);
+    let active = true;
+    void ensureMonacoConfigured().finally(() => {
+      if (active) setIsMounted(true);
+    });
+    return () => {
+      active = false;
+    };
   }, []);
 
   const handleEditorDidMount: OnMount = (editor, monaco) => {

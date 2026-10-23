@@ -5,8 +5,11 @@
 
 begin;
 
+create schema if not exists test_helpers;
+grant usage on schema test_helpers to public, anon, authenticated, service_role;
+
 -- Fonction utilitaire d'assertion SQL
-create or replace function pg_temp.assert_true(p_cond boolean, p_msg text)
+create or replace function test_helpers.assert_true(p_cond boolean, p_msg text)
 returns void
 language plpgsql
 as $$
@@ -18,7 +21,7 @@ end;
 $$;
 
 -- Fonction utilitaire simulant le contexte JWT Supabase d'un utilisateur
-create or replace function pg_temp.switch_to_user(p_role text, p_uid uuid)
+create or replace function test_helpers.switch_to_user(p_role text, p_uid uuid)
 returns void
 language plpgsql
 as $$
@@ -39,9 +42,8 @@ begin
 end;
 $$;
 
-grant usage on schema pg_temp to public, anon, authenticated, service_role;
-grant execute on function pg_temp.assert_true(boolean, text) to public, anon, authenticated, service_role;
-grant execute on function pg_temp.switch_to_user(text, uuid) to public, anon, authenticated, service_role;
+grant execute on function test_helpers.assert_true(boolean, text) to public, anon, authenticated, service_role;
+grant execute on function test_helpers.switch_to_user(text, uuid) to public, anon, authenticated, service_role;
 
 do $$
 declare
@@ -92,7 +94,7 @@ begin
     (v_eleve_rgpd, 'rgpd@labosti.tn', '{"nom":"Secret","prenom":"Eleve"}'::jsonb);
 
   -- Vérification T-03 : le trigger handle_new_user() force exclusivement le rôle 'eleve'
-  perform pg_temp.assert_true(
+  perform test_helpers.assert_true(
     (select count(*) from public.user_roles where user_id = v_eleve_a and role = 'eleve') = 1
     and (select count(*) from public.user_roles where user_id = v_eleve_a and role <> 'eleve') = 0,
     'T-03 : handle_new_user doit attribuer uniquement le rôle eleve'
@@ -155,7 +157,7 @@ begin
   exception when others then
     v_caught := true;
   end;
-  perform pg_temp.assert_true(v_caught, 'T-09 : modification d une sujet_version publiée doit échouer');
+  perform test_helpers.assert_true(v_caught, 'T-09 : modification d une sujet_version publiée doit échouer');
 
   v_caught := false;
   begin
@@ -163,38 +165,38 @@ begin
   exception when others then
     v_caught := true;
   end;
-  perform pg_temp.assert_true(v_caught, 'T-09 : modification d un critère publié doit échouer');
+  perform test_helpers.assert_true(v_caught, 'T-09 : modification d un critère publié doit échouer');
 
   -- ============================================================================
   -- 3. T-01 : Isolation inter-élèves (eleve_a ne voit ni ne modifie eleve_b)
   -- ============================================================================
-  perform pg_temp.switch_to_user('authenticated', v_eleve_a);
+  perform test_helpers.switch_to_user('authenticated', v_eleve_a);
 
   select count(*) into v_count from public.projets where id = v_projet_b;
-  perform pg_temp.assert_true(v_count = 0, 'T-01 : eleve_a ne doit pas lire le projet de eleve_b');
+  perform test_helpers.assert_true(v_count = 0, 'T-01 : eleve_a ne doit pas lire le projet de eleve_b');
 
   select count(*) into v_count from public.projet_fichiers where projet_id = v_projet_b;
-  perform pg_temp.assert_true(v_count = 0, 'T-01 : eleve_a ne doit pas lire les fichiers de eleve_b');
+  perform test_helpers.assert_true(v_count = 0, 'T-01 : eleve_a ne doit pas lire les fichiers de eleve_b');
 
   update public.projet_fichiers set contenu = 'Piraté' where projet_id = v_projet_b;
   get diagnostics v_count = row_count;
-  perform pg_temp.assert_true(v_count = 0, 'T-01 : eleve_a ne doit pas modifier les fichiers de eleve_b');
+  perform test_helpers.assert_true(v_count = 0, 'T-01 : eleve_a ne doit pas modifier les fichiers de eleve_b');
 
   -- ============================================================================
   -- 4. T-02 : Isolation inter-enseignants (prof_a ne voit ni class_b ni projet_b)
   -- ============================================================================
-  perform pg_temp.switch_to_user('authenticated', v_prof_a);
+  perform test_helpers.switch_to_user('authenticated', v_prof_a);
 
   select count(*) into v_count from public.classes where id = v_class_b;
-  perform pg_temp.assert_true(v_count = 0, 'T-02 : prof_a ne doit pas voir la classe de prof_b');
+  perform test_helpers.assert_true(v_count = 0, 'T-02 : prof_a ne doit pas voir la classe de prof_b');
 
   select count(*) into v_count from public.projets where id = v_projet_b;
-  perform pg_temp.assert_true(v_count = 0, 'T-02 : prof_a ne doit pas voir le projet d un élève hors de ses classes');
+  perform test_helpers.assert_true(v_count = 0, 'T-02 : prof_a ne doit pas voir le projet d un élève hors de ses classes');
 
   -- ============================================================================
   -- 5. T-03 & SEC-11 : Escalade de privilèges et restriction de has_role
   -- ============================================================================
-  perform pg_temp.switch_to_user('authenticated', v_eleve_a);
+  perform test_helpers.switch_to_user('authenticated', v_eleve_a);
 
   v_caught := false;
   begin
@@ -202,7 +204,7 @@ begin
   exception when insufficient_privilege then
     v_caught := true;
   end;
-  perform pg_temp.assert_true(v_caught, 'T-03 : insertion directe dans user_roles par authenticated doit être refusée');
+  perform test_helpers.assert_true(v_caught, 'T-03 : insertion directe dans user_roles par authenticated doit être refusée');
 
   v_caught := false;
   begin
@@ -210,27 +212,27 @@ begin
   exception when insufficient_privilege then
     v_caught := true;
   end;
-  perform pg_temp.assert_true(v_caught, 'T-03 : modification de valide_par sur profiles par authenticated doit être refusée');
+  perform test_helpers.assert_true(v_caught, 'T-03 : modification de valide_par sur profiles par authenticated doit être refusée');
 
   -- SEC-11 : un élève ne peut pas énumérer le rôle d'un autre utilisateur via has_role
-  perform pg_temp.assert_true(
+  perform test_helpers.assert_true(
     public.has_role(v_prof_a, 'enseignant') = false,
     'SEC-11 : has_role doit retourner false quand un élève interroge l identifiant d un tiers'
   );
 
-  perform pg_temp.switch_to_user('anon', null);
+  perform test_helpers.switch_to_user('anon', null);
   v_caught := false;
   begin
     perform public.has_role(v_prof_a, 'enseignant');
   exception when insufficient_privilege then
     v_caught := true;
   end;
-  perform pg_temp.assert_true(v_caught, 'SEC-11 : anon ne doit pas pouvoir exécuter has_role');
+  perform test_helpers.assert_true(v_caught, 'SEC-11 : anon ne doit pas pouvoir exécuter has_role');
 
   -- ============================================================================
   -- 6. T-04 : Confidentialité absolue de solutions et criteres
   -- ============================================================================
-  perform pg_temp.switch_to_user('authenticated', v_eleve_a);
+  perform test_helpers.switch_to_user('authenticated', v_eleve_a);
 
   v_caught := false;
   begin
@@ -238,7 +240,7 @@ begin
   exception when insufficient_privilege then
     v_caught := true;
   end;
-  perform pg_temp.assert_true(v_caught, 'T-04 : SELECT direct sur public.solutions doit être refusé à authenticated');
+  perform test_helpers.assert_true(v_caught, 'T-04 : SELECT direct sur public.solutions doit être refusé à authenticated');
 
   v_caught := false;
   begin
@@ -246,7 +248,7 @@ begin
   exception when insufficient_privilege then
     v_caught := true;
   end;
-  perform pg_temp.assert_true(v_caught, 'T-04 : SELECT direct sur public.criteres doit être refusé à authenticated');
+  perform test_helpers.assert_true(v_caught, 'T-04 : SELECT direct sur public.criteres doit être refusé à authenticated');
 
   -- ============================================================================
   -- 7. T-05 : Codes d'invitation révoqués ou expirés
@@ -255,8 +257,8 @@ begin
   insert into public.class_invitations (class_id, code, revoque, expire_le)
   values (v_class_b, 'STI-REVO', true, now() + interval '7 days');
 
-  perform pg_temp.switch_to_user('authenticated', v_eleve_a);
-  perform pg_temp.assert_true(
+  perform test_helpers.switch_to_user('authenticated', v_eleve_a);
+  perform test_helpers.assert_true(
     ((public.rejoindre_classe('STI-REVO')) ->> 'ok')::boolean = false,
     'T-05 : rejoindre_classe doit rejeter un code révoqué'
   );
@@ -264,11 +266,11 @@ begin
   -- ============================================================================
   -- 8. T-18 (TEC-04 / SEC-09) : RPC atomique sauvegarder_fichier & CONFLIT_REVISION
   -- ============================================================================
-  perform pg_temp.switch_to_user('authenticated', v_eleve_a);
+  perform test_helpers.switch_to_user('authenticated', v_eleve_a);
 
   -- 1er appel avec _expected_rev = 1 -> passe à rev = 2
   v_rev := public.sauvegarder_fichier(v_projet_a, 'index.html', '<h1>Copie A</h1>', 1);
-  perform pg_temp.assert_true(v_rev = 2, 'T-18 : sauvegarder_fichier doit incrémenter rev à 2');
+  perform test_helpers.assert_true(v_rev = 2, 'T-18 : sauvegarder_fichier doit incrémenter rev à 2');
 
   -- 2e appel concurrent avec la même _expected_rev = 1 -> lève CONFLIT_REVISION
   v_caught := false;
@@ -279,7 +281,7 @@ begin
       v_caught := true;
     end if;
   end;
-  perform pg_temp.assert_true(v_caught, 'T-18 : sauvegarder_fichier avec ancienne révision doit lever CONFLIT_REVISION');
+  perform test_helpers.assert_true(v_caught, 'T-18 : sauvegarder_fichier avec ancienne révision doit lever CONFLIT_REVISION');
 
   -- ============================================================================
   -- 9. T-06a, T-06b, T-06c, T-07a (SEC-01) : Verrouillage de passages_examen
@@ -303,7 +305,7 @@ begin
     now() - interval '5 minutes'
   );
 
-  perform pg_temp.switch_to_user('authenticated', v_eleve_a);
+  perform test_helpers.switch_to_user('authenticated', v_eleve_a);
 
   v_caught := false;
   begin
@@ -311,7 +313,7 @@ begin
   exception when others then
     v_caught := true;
   end;
-  perform pg_temp.assert_true(v_caught, 'T-06b : modification de projet_fichiers après échéance doit être rejetée');
+  perform test_helpers.assert_true(v_caught, 'T-06b : modification de projet_fichiers après échéance doit être rejetée');
 
   -- T-08b : sceller_snapshot_examen après l'échéance doit être refusé
   v_caught := false;
@@ -320,13 +322,13 @@ begin
   exception when others then
     v_caught := true;
   end;
-  perform pg_temp.assert_true(v_caught, 'T-08b : sceller_snapshot_examen après l échéance doit être refusé');
+  perform test_helpers.assert_true(v_caught, 'T-08b : sceller_snapshot_examen après l échéance doit être refusé');
 
   -- Retirer le passage expiré pour tester le cycle nominal et les attaques T-06a/T-06c/T-07a
   reset role;
   delete from public.passages_examen where id = v_passage_exp;
 
-  perform pg_temp.switch_to_user('authenticated', v_eleve_a);
+  perform test_helpers.switch_to_user('authenticated', v_eleve_a);
 
   -- T-06c : un élève ne peut pas lier le projet d'un autre élève via demarrer_passage
   v_caught := false;
@@ -335,24 +337,24 @@ begin
   exception when others then
     v_caught := true;
   end;
-  perform pg_temp.assert_true(v_caught, 'T-06c : demarrer_passage doit refuser le projet d un autre élève');
+  perform test_helpers.assert_true(v_caught, 'T-06c : demarrer_passage doit refuser le projet d un autre élève');
 
   -- Démarrage légitime par RPC
   select id into v_passage_a from public.demarrer_passage(v_session_active, v_projet_a);
-  perform pg_temp.assert_true(v_passage_a is not null, 'SEC-01 : demarrer_passage doit créer le passage élève');
+  perform test_helpers.assert_true(v_passage_a is not null, 'SEC-01 : demarrer_passage doit créer le passage élève');
 
   -- T-06a : l'élève tente un UPDATE direct pour s'accorder temps_supp_min = 999 ou repousser echeance_eleve
-  perform pg_temp.switch_to_user('authenticated', v_eleve_a);
+  perform test_helpers.switch_to_user('authenticated', v_eleve_a);
   update public.passages_examen
   set temps_supp_min = 999, echeance_eleve = now() + interval '10 hours'
   where id = v_passage_a;
   get diagnostics v_count = row_count;
-  perform pg_temp.assert_true(v_count = 0, 'T-06a : un élève ne peut pas modifier directement temps_supp_min ou echeance_eleve');
+  perform test_helpers.assert_true(v_count = 0, 'T-06a : un élève ne peut pas modifier directement temps_supp_min ou echeance_eleve');
 
   -- T-07a : l'élève tente de passer son passage à 'corrige'
   update public.passages_examen set statut = 'corrige' where id = v_passage_a;
   get diagnostics v_count = row_count;
-  perform pg_temp.assert_true(v_count = 0, 'T-07a : un élève ne peut pas passer son passage à corrige');
+  perform test_helpers.assert_true(v_count = 0, 'T-07a : un élève ne peut pas passer son passage à corrige');
 
   -- T-04 en examen actif : debloquer_solution doit être refusé pendant que v_session_active est en_cours
   v_caught := false;
@@ -361,12 +363,12 @@ begin
   exception when others then
     v_caught := true;
   end;
-  perform pg_temp.assert_true(v_caught, 'T-04 : debloquer_solution doit être refusé pendant un examen actif');
+  perform test_helpers.assert_true(v_caught, 'T-04 : debloquer_solution doit être refusé pendant un examen actif');
 
   -- ============================================================================
   -- 10. T-08a & T-08c (SEC-03) : Scellement serveur exclusif des snapshots
   -- ============================================================================
-  perform pg_temp.switch_to_user('authenticated', v_eleve_a);
+  perform test_helpers.switch_to_user('authenticated', v_eleve_a);
 
   -- T-08a : insertion directe dans public.snapshots refusée
   v_caught := false;
@@ -376,7 +378,7 @@ begin
   exception when insufficient_privilege then
     v_caught := true;
   end;
-  perform pg_temp.assert_true(v_caught, 'T-08a : INSERT direct dans snapshots par authenticated doit être refusé');
+  perform test_helpers.assert_true(v_caught, 'T-08a : INSERT direct dans snapshots par authenticated doit être refusé');
 
   -- T-08c : scellement serveur via sceller_snapshot_examen sur deux passages ayant le même contenu
   select id into v_passage_a2 from public.demarrer_passage(v_session_active_2, v_projet_a2);
@@ -384,7 +386,7 @@ begin
   select * into v_snap_1 from public.sceller_snapshot_examen(v_passage_a);
   select * into v_snap_2 from public.sceller_snapshot_examen(v_passage_a2);
 
-  perform pg_temp.assert_true(
+  perform test_helpers.assert_true(
     char_length(v_snap_1.hash) = 64 and v_snap_1.hash = v_snap_2.hash,
     'T-08c : deux scellements d un même contenu produisent exactement le même hash SHA-256 serveur'
   );
@@ -392,7 +394,7 @@ begin
   -- ============================================================================
   -- 11. T-15 (SEC-02) : Provenance obligatoire source='client' sur tentatives
   -- ============================================================================
-  perform pg_temp.switch_to_user('authenticated', v_eleve_a);
+  perform test_helpers.switch_to_user('authenticated', v_eleve_a);
 
   v_caught := false;
   begin
@@ -401,7 +403,7 @@ begin
   exception when others then
     v_caught := true;
   end;
-  perform pg_temp.assert_true(v_caught, 'T-15 : un élève ne peut pas insérer une tentative avec source=serveur');
+  perform test_helpers.assert_true(v_caught, 'T-15 : un élève ne peut pas insérer une tentative avec source=serveur');
 
   v_caught := false;
   begin
@@ -410,7 +412,7 @@ begin
   exception when others then
     v_caught := true;
   end;
-  perform pg_temp.assert_true(v_caught, 'T-15 : un élève ne peut pas insérer une tentative avec source=enseignant');
+  perform test_helpers.assert_true(v_caught, 'T-15 : un élève ne peut pas insérer une tentative avec source=enseignant');
 
   -- Insertion légitime avec source='client'
   insert into public.tentatives (projet_id, eleve_id, sujet_version_id, score, max, note20, detail, source)
@@ -419,14 +421,14 @@ begin
   -- ============================================================================
   -- 12. T-16 (SEC-06) : Écriture directe interdite sur maitrise et badges
   -- ============================================================================
-  perform pg_temp.switch_to_user('authenticated', v_eleve_a);
+  perform test_helpers.switch_to_user('authenticated', v_eleve_a);
 
   -- Vérifier que le trigger serveur sur tentatives a bien calculé la maîtrise et attribué PREMIERS_PAS
   select count(*) into v_count from public.maitrise where eleve_id = v_eleve_a and competence_id = 'HTML.STRUCT';
-  perform pg_temp.assert_true(v_count = 1, 'T-16 : le trigger serveur doit calculer la maîtrise lors d une tentative');
+  perform test_helpers.assert_true(v_count = 1, 'T-16 : le trigger serveur doit calculer la maîtrise lors d une tentative');
 
   select count(*) into v_count from public.badges where eleve_id = v_eleve_a and badge_id = 'PREMIERS_PAS';
-  perform pg_temp.assert_true(v_count = 1, 'T-16 : le trigger serveur doit attribuer le badge PREMIERS_PAS');
+  perform test_helpers.assert_true(v_count = 1, 'T-16 : le trigger serveur doit attribuer le badge PREMIERS_PAS');
 
   -- Tentative d'écriture directe élève sur maitrise
   v_caught := false;
@@ -436,7 +438,7 @@ begin
   exception when insufficient_privilege then
     v_caught := true;
   end;
-  perform pg_temp.assert_true(v_caught, 'T-16 : INSERT direct élève sur maitrise doit être refusé');
+  perform test_helpers.assert_true(v_caught, 'T-16 : INSERT direct élève sur maitrise doit être refusé');
 
   -- Tentative d'écriture directe élève sur badges
   v_caught := false;
@@ -446,21 +448,21 @@ begin
   exception when insufficient_privilege then
     v_caught := true;
   end;
-  perform pg_temp.assert_true(v_caught, 'T-16 : INSERT direct élève sur badges doit être refusé');
+  perform test_helpers.assert_true(v_caught, 'T-16 : INSERT direct élève sur badges doit être refusé');
 
   -- ============================================================================
   -- 13. T-14 (RGPD) & admin_etat_systeme()
   -- ============================================================================
-  perform pg_temp.switch_to_user('authenticated', v_admin);
+  perform test_helpers.switch_to_user('authenticated', v_admin);
 
   perform public.admin_anonymiser_eleve(v_eleve_rgpd);
-  perform pg_temp.assert_true(
+  perform test_helpers.assert_true(
     exists (select 1 from public.profiles where id = v_eleve_rgpd and nom = 'Anonyme' and anonymise_at is not null),
     'T-14 : admin_anonymiser_eleve doit anonymiser le profil élève'
   );
 
   v_etat := public.admin_etat_systeme();
-  perform pg_temp.assert_true(
+  perform test_helpers.assert_true(
     jsonb_array_length(v_etat -> 'tables_sans_rls') = 0
     and (v_etat ->> 'droits_clients_corriges')::int = 0
     and jsonb_array_length(v_etat -> 'tables_anon_ecriture') = 0
