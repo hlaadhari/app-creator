@@ -8,9 +8,11 @@ import {
   type SnapshotFichierManifeste,
   type SnapshotBaseManifeste,
   type SnapshotManifeste,
+  type SnapshotRecord,
   type VerificationIntegriteResult,
 } from "./types";
 import { creerArchiveZip, type ArchiveFileEntry } from "@/lib/export/archive-exporter";
+import { supabase } from "@/integrations/supabase/client";
 
 /**
  * Calcule l'empreinte SHA-256 canonique (hexadécimal 64 caractères)
@@ -294,4 +296,35 @@ export function creerArchiveSnapshotZip(
   });
 
   return creerArchiveZip(entries);
+}
+
+/**
+ * Scelle un snapshot d'examen exclusivement côté serveur via la RPC `sceller_snapshot_examen` (SEC-03 / T-08).
+ * Le serveur vérifie l'appartenance du passage, le respect de l'échéance serveur, lit `projet_fichiers`
+ * et calcule l'empreinte SHA-256 canonique via `pgcrypto`.
+ */
+export async function scellerSnapshotExamenServeur(
+  passageId: string,
+  storagePath: string = "",
+): Promise<SnapshotRecord> {
+  const { data, error } = await supabase.rpc("sceller_snapshot_examen", {
+    _passage_id: passageId,
+    _storage_path: storagePath,
+  });
+
+  if (error || !data) {
+    throw new Error(error?.message || "Impossible de sceller le snapshot d'examen côté serveur.");
+  }
+
+  return {
+    id: data.id,
+    projet_id: data.projet_id,
+    passage_id: data.passage_id,
+    eleve_id: data.eleve_id,
+    version_id: data.version_id,
+    date: data.date,
+    hash: data.hash,
+    manifeste: data.manifeste as unknown as SnapshotManifeste,
+    storage_archive_path: data.storage_archive_path,
+  };
 }
