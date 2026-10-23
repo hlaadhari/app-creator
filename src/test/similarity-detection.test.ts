@@ -1,5 +1,9 @@
 import { describe, it, expect } from "vitest";
-import { normaliserContenuCode, tokeniserCode } from "@/lib/similarity/normalizer";
+import {
+  normaliserContenuCode,
+  supprimerCommentaires,
+  tokeniserCode,
+} from "@/lib/similarity/normalizer";
 import {
   genererShingles,
   calculerSimilariteJaccard,
@@ -51,6 +55,15 @@ describe("Moteur d'analyse de similarité & Détection anti-plagiat (PRD F-65 / 
       const tokensCss1 = normaliserContenuCode(css1, "style.css");
       const tokensCss2 = normaliserContenuCode(css2, "style.css");
       expect(tokensCss1).toEqual(tokensCss2);
+    });
+
+    it("neutralise les commentaires HTML imbriqués ou non fermés sans laisser de séquence <!-- (CodeQL #4)", () => {
+      const htmlImbrique = `<!<!-- commentaire interne -->-- commentaire reconstitué --><div>Contenu</div><!-- non fermé`;
+      const propre = supprimerCommentaires(htmlImbrique, "index.html");
+
+      expect(propre).not.toContain("<!--");
+      expect(propre).not.toContain("-->");
+      expect(propre).toContain("<div>Contenu</div>");
     });
 
     it("doit normaliser les renommages de variables vers des identifiants canoniques", () => {

@@ -183,25 +183,42 @@ export function supprimerCommentaires(code: string, extension: string = "js"): s
   let sanitized = code;
 
   if (ext === "html" || ext === "htm") {
-    // Commentaires HTML : <!-- ... -->
-    sanitized = sanitized.replace(/<!--[\s\S]*?-->/g, "");
+    // Commentaires HTML : suppression itérative jusqu'au point fixe (CodeQL js/incomplete-multi-character-sanitization)
+    let previous: string;
+    do {
+      previous = sanitized;
+      sanitized = sanitized.replace(/<!--[\s\S]*?-->/g, " ");
+    } while (sanitized !== previous);
+    sanitized = sanitized.replace(/<!--|--!?>/g, " ");
   }
 
   if (ext === "css") {
     // Commentaires CSS : /* ... */
-    sanitized = sanitized.replace(/\/\*[\s\S]*?\*\//g, "");
+    let previous: string;
+    do {
+      previous = sanitized;
+      sanitized = sanitized.replace(/\/\*[\s\S]*?\*\//g, " ");
+    } while (sanitized !== previous);
   }
 
   if (ext === "sql") {
     // Commentaires SQL : -- ou /* ... */ ou #
-    sanitized = sanitized.replace(/\/\*[\s\S]*?\*\//g, "");
+    let previous: string;
+    do {
+      previous = sanitized;
+      sanitized = sanitized.replace(/\/\*[\s\S]*?\*\//g, " ");
+    } while (sanitized !== previous);
     sanitized = sanitized.replace(/--.*$/gm, "");
     sanitized = sanitized.replace(/#.*$/gm, "");
   }
 
   if (ext === "js" || ext === "ts" || ext === "php") {
     // Commentaires JS/PHP : /* ... */ et // ...
-    sanitized = sanitized.replace(/\/\*[\s\S]*?\*\//g, "");
+    let previous: string;
+    do {
+      previous = sanitized;
+      sanitized = sanitized.replace(/\/\*[\s\S]*?\*\//g, " ");
+    } while (sanitized !== previous);
     sanitized = sanitized.replace(/\/\/.*$/gm, "");
     if (ext === "php") {
       sanitized = sanitized.replace(/#.*$/gm, "");
