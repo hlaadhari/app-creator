@@ -24,6 +24,9 @@ vi.mock("@/integrations/supabase/client", () => ({
 
 import { saveToBuffer, getFromBuffer, deleteFromBuffer } from "@/lib/storage/indexeddb";
 import { sauvegarderFichierDistant } from "@/lib/supabase/projets";
+import { SUPPORTED_MONACO_LANGUAGES } from "@/lib/editor/monaco-setup";
+import { OFFLINE_SW_PATH } from "@/lib/storage/service-worker-register";
+import { loadSubjectCriteria } from "@/lib/content/all-subjects";
 import type { ProjectBuffer } from "@/lib/storage/types";
 
 describe("Tampon Local Garanti (labo_sti_buffer) - Issue #6 & Principe Directeur n°4", () => {
@@ -247,6 +250,28 @@ describe("Tampon Local Garanti (labo_sti_buffer) - Issue #6 & Principe Directeur
       expect(res2.conflict).toBe(true);
       expect(res2.remoteRev).toBe(2);
       expect(res2.remoteContent).toBe("<h1>Version onglet 1</h1>");
+    });
+  });
+
+  describe("Auto-hébergement Monaco, Service Worker hors-ligne et critères à la demande (Issue #124 / TEC-08)", () => {
+    it("configure Monaco Editor en mode auto-hébergé pour les 5 langages du programme et inclut public/sw.js", () => {
+      const monacoSetupSrc = readFileSync(
+        resolve(process.cwd(), "src/lib/editor/monaco-setup.ts"),
+        "utf-8",
+      );
+      const swSrc = readFileSync(resolve(process.cwd(), "public/sw.js"), "utf-8");
+
+      expect(SUPPORTED_MONACO_LANGUAGES).toEqual(["html", "css", "javascript", "php", "sql"]);
+      expect(monacoSetupSrc).toContain("loader.config({ monaco })");
+      expect(monacoSetupSrc).not.toContain("https://cdn.jsdelivr.net");
+      expect(OFFLINE_SW_PATH).toBe("/sw.js");
+      expect(swSrc).toContain("labo-sti-offline-v1");
+    });
+
+    it("charge les critères à la demande via loadSubjectCriteria(subjectId)", async () => {
+      const criteres = await loadSubjectCriteria("ex-html-css-01");
+      expect(criteres.length).toBeGreaterThan(0);
+      expect(criteres[0]?.id).toBeDefined();
     });
   });
 });

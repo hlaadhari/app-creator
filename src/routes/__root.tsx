@@ -14,6 +14,7 @@ import { Analytics } from "@vercel/analytics/react";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { AuthProvider } from "@/lib/supabase/auth";
+import { registerOfflineServiceWorker } from "@/lib/storage/service-worker-register";
 
 function NotFoundComponent() {
   return (
@@ -123,6 +124,10 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+
+  useEffect(() => {
+    void registerOfflineServiceWorker();
+  }, []);
 
   return (
     <QueryClientProvider client={queryClient}>

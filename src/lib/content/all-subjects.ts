@@ -513,3 +513,66 @@ export const contentSubjects: SubjectContentItem[] = rawSubjects.map((item) => (
   hints: item.hints,
   criteria: item.rawCriteria.map(critereDepuisJson),
 }));
+
+const subjectCriteriaCache = new Map<string, Criterion[]>();
+
+/**
+ * Charge les critères d'un sujet à la demande (import() dynamique par sujet)
+ * avec mise en cache mémoire (Issue #124 / TEC-08).
+ */
+export async function loadSubjectCriteria(subjectId: string): Promise<Criterion[]> {
+  const cached = subjectCriteriaCache.get(subjectId);
+  if (cached) return cached;
+
+  let raw: RawCriterion[];
+  switch (subjectId) {
+    case "ex-html-css-01":
+      raw = (await import("../../../content/ex-html-css-01/criteria.json"))
+        .default as unknown as RawCriterion[];
+      break;
+    case "ex-js-01":
+      raw = (await import("../../../content/ex-js-01/criteria.json"))
+        .default as unknown as RawCriterion[];
+      break;
+    case "ex-sql-01":
+      raw = (await import("../../../content/ex-sql-01/criteria.json"))
+        .default as unknown as RawCriterion[];
+      break;
+    case "tp-fs-01":
+      raw = (await import("../../../content/tp-fs-01/criteria.json"))
+        .default as unknown as RawCriterion[];
+      break;
+    case "tp-fs-02":
+      raw = (await import("../../../content/tp-fs-02/criteria.json"))
+        .default as unknown as RawCriterion[];
+      break;
+    case "exam-bac2023-location-habits":
+      raw = (await import("../../../content/exam-bac2023-location-habits/criteria.json"))
+        .default as unknown as RawCriterion[];
+      break;
+    case "exam-bac2018-test-drive":
+      raw = (await import("../../../content/exam-bac2018-test-drive/criteria.json"))
+        .default as unknown as RawCriterion[];
+      break;
+    case "exam-bac2025-droits-acces":
+      raw = (await import("../../../content/exam-bac2025-droits-acces/criteria.json"))
+        .default as unknown as RawCriterion[];
+      break;
+    case "exam-bac2026-bijoux-aurythia":
+      raw = (await import("../../../content/exam-bac2026-bijoux-aurythia/criteria.json"))
+        .default as unknown as RawCriterion[];
+      break;
+    case "exam-bac2026-croisieres-marivana":
+      raw = (await import("../../../content/exam-bac2026-croisieres-marivana/criteria.json"))
+        .default as unknown as RawCriterion[];
+      break;
+    default: {
+      const fallback = contentSubjects.find((s) => s.id === subjectId);
+      return fallback?.criteria ?? [];
+    }
+  }
+
+  const parsed = raw.map(critereDepuisJson);
+  subjectCriteriaCache.set(subjectId, parsed);
+  return parsed;
+}

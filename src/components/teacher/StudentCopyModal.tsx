@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Editor from "@monaco-editor/react";
+import { ensureMonacoConfigured } from "@/lib/editor/monaco-setup";
 import {
   Dialog,
   DialogContent,
@@ -29,6 +30,12 @@ export function StudentCopyModal({
   loading,
 }: StudentCopyModalProps) {
   const [selectedFileIndex, setSelectedFileIndex] = useState(0);
+
+  useEffect(() => {
+    if (isOpen) {
+      void ensureMonacoConfigured();
+    }
+  }, [isOpen]);
 
   if (!eleve) return null;
 
