@@ -1,9 +1,11 @@
 /**
- * Labo STI - Immutability Guards (T-08 & T-09, PRD §12, docs/SECURITY.md)
+ * Labo STI - Immutability UI Helper (T-08 & T-09, PRD §12, docs/SECURITY.md)
  *
- * Assure l'intégrité pédagogique absolue et l'immuabilité :
- * - T-08 : Immuabilité absolue des snapshots scellés (rejet de UPDATE et DELETE).
- * - T-09 : Immuabilité des versions de sujets publiées (publiee = true).
+ * ⚠️ AVERTISSEMENT D'ARCHITECTURE (TEC-11 / Principe « Zéro Confiance Côté Client ») :
+ * Ces fonctions servent uniquement à refléter les règles d'immuabilité dans l'interface client.
+ * L'immuabilité réelle des versions publiées (`sujet_versions`) et des `snapshots` d'examen
+ * est garantie côté serveur par les triggers PostgreSQL (`protect_published_version`,
+ * `protect_published_children`, `empecher_modification_snapshot`) et les RPC `security definer`.
  */
 
 export interface SnapshotRecord {

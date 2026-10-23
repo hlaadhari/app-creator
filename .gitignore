@@ -38,5 +38,6 @@ supabase/.temp/
 *.sw?
 .vercel
 .env*
+!.env.example
 
 .vercel

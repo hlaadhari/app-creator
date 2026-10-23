@@ -1,9 +1,11 @@
 /**
- * Labo STI - Exam Security Guard (T-06 & T-07, PRD §12, docs/SECURITY.md)
+ * Labo STI - Exam UI State Helper (T-06 & T-07, PRD §12, docs/SECURITY.md)
  *
- * Assure l'intégrité temporelle et la conformité d'état des examens :
- * - T-06 : Blocage strict des écritures post-échéance basé sur l'horloge serveur.
- * - T-07 : Rejet des transitions d'états illégales dans la machine à états de l'examen.
+ * ⚠️ AVERTISSEMENT D'ARCHITECTURE (TEC-11 / Principe « Zéro Confiance Côté Client ») :
+ * Ce module s'exécute dans le navigateur à des fins exclusivement ergonomiques (désactivation
+ * de boutons, affichage d'états et messages préventifs dans l'interface).
+ * L'autorité de sécurité réelle réside uniquement dans PostgreSQL (politiques RLS, privilèges
+ * de colonnes, triggers `verifier_transition_passage_examen` et RPC `security definer`).
  */
 
 export type StatutPassageExamen = "non_demarre" | "en_cours" | "rendu" | "clos" | "corrige";
