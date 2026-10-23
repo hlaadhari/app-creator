@@ -22,6 +22,7 @@ import {
 } from "lucide-react";
 import type { TeacherClassMember } from "@/lib/supabase/teacher";
 import type { StudentBlockageAlert } from "@/lib/analytics/class-analytics";
+import { getLibelleSourceTentative } from "@/lib/supabase/tentative-details";
 
 interface StudentProgressTableProps {
   students: TeacherClassMember[];
@@ -159,8 +160,19 @@ export function StudentProgressTable({
 
                     <TableCell>
                       <div className="space-y-1">
-                        <div className="flex justify-between text-[11px] font-mono">
+                        <div className="flex items-center justify-between gap-1 text-[11px] font-mono">
                           <span>{score}%</span>
+                          <Badge
+                            variant="outline"
+                            className={`text-[9px] px-1.5 py-0 h-4 ${
+                              eleve.score_source === "serveur" ||
+                              eleve.score_source === "enseignant"
+                                ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/30"
+                                : "bg-amber-500/10 text-amber-600 border-amber-500/30"
+                            }`}
+                          >
+                            {getLibelleSourceTentative(eleve.score_source)}
+                          </Badge>
                         </div>
                         <Progress value={score} className="h-1.5" />
                       </div>

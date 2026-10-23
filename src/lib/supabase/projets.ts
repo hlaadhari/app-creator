@@ -62,6 +62,7 @@ export async function enregistrerTentative(params: {
       detail: params.details as unknown as Json,
       max: params.pointsTotal,
       score: params.pointsObtenus,
+      source: "client",
     });
   } catch (err) {
     console.warn("[Tentatives] Erreur lors de l'enregistrement distant :", err);

@@ -177,6 +177,7 @@ export async function enregistrerNouvelleTentative(params: {
         detail: params.criteres as unknown as Json,
         max: params.pointsTotal,
         score: params.pointsObtenus,
+        source: "client",
       });
     }
   } catch (err) {
