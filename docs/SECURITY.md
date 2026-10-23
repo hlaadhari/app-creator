@@ -76,15 +76,17 @@ Chaque test négatif doit être implémenté sous forme d'un test automatisé en
 
 ## 4. Politique de Sécurité du Contenu (CSP) & En-têtes HTTP
 
-Le serveur SSR injecte les en-têtes HTTP suivants :
+Les en-têtes HTTP de sécurité sont déclarés dans [`vercel.json`](../vercel.json) pour le déploiement CDN/Edge :
+
+- **Actuellement déployés dans `vercel.json`** :
+  - `X-Frame-Options: SAMEORIGIN`
+  - `X-Content-Type-Options: nosniff`
+  - `Referrer-Policy: strict-origin-when-cross-origin`
+  - `Permissions-Policy: camera=(), microphone=(), geolocation=(), interest-cohort=()`
+- **Cible d'en-tête CSP (Issue #122 — Horizon 1)** :
 
 ```http
-Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-eval' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://*.supabase.co; frame-src 'self' blob:; worker-src 'self' blob:; connect-src 'self' https://*.supabase.co wss://*.supabase.co;
-Cross-Origin-Embedder-Policy: require-corp
-Cross-Origin-Opener-Policy: same-origin
-X-Frame-Options: SAMEORIGIN
-X-Content-Type-Options: nosniff
-Referrer-Policy: strict-origin-when-cross-origin
+Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; img-src 'self' data: blob: https://*.supabase.co; font-src 'self' data: https://cdn.jsdelivr.net; frame-src 'self' blob:; worker-src 'self' blob:; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://cdn.jsdelivr.net; object-src 'none'; base-uri 'self'; frame-ancestors 'self';
 ```
 
-_(Remarque : `Cross-Origin-Embedder-Policy` et `Cross-Origin-Opener-Policy` sont indispensables pour permettre à WebAssembly d'utiliser `SharedArrayBuffer` en Phase 2)._
+_(Remarque : `Cross-Origin-Embedder-Policy: require-corp` et `Cross-Origin-Opener-Policy: same-origin` ne sont requis que dans le cas d'un futur recours à `SharedArrayBuffer` pour des runtimes WebAssembly multi-threads)._

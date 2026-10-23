@@ -1,27 +1,27 @@
 # CONTEXT.md — Labo STI (Plateforme d'Entraînement Bac STI)
 
-> **Source de référence** : PRD v3.1 (18 octobre 2026) disponible dans [`docs/PRD.md`](file:///d:/My%20Projects/lab-analysis/app-creator/docs/PRD.md).  
-> **Dernière mise à jour du contexte** : 19 octobre 2026 (Jalons M0, M4, M5 et M6 validés).
+> **Source de référence** : PRD v3.1 (18 octobre 2026) disponible dans [`docs/PRD.md`](docs/PRD.md).  
+> **Dernière mise à jour du contexte** : 23 octobre 2026 (Alignement post-audit technique, sécurité et pédagogique).
 
 ---
 
 ## 1. Identité et Vision du Projet
 
-**Labo STI** est une plateforme web d'entraînement et d'examen blanc conçue spécifiquement pour les élèves de **Bac STI** (filière STI2D / NSI / systèmes numériques) et leurs enseignants.  
+**Labo STI** est une plateforme web d'entraînement et d'examen blanc conçue spécifiquement pour les élèves de **4e année du Baccalauréat Sciences de l'Informatique (STI — Tunisie)** et leurs enseignants.  
 Elle combine un **environnement de développement intégré dans le navigateur (type VS Code)** avec un **moteur pédagogique temps réel** :
 
-- **Élève** : code sans installation locale, bénéficie d'une prévisualisation immédiate dans un bac à sable sécurisé, reçoit un feedback instantané critère par critère via le bouton « Vérifier », débloque des indices progressifs (3 niveaux) et s'entraîne dans un mode examen blanc synchronisé par horloge serveur.
-- **Enseignant** : publie des sujets rigoureusement testés et versionnés de manière immuable, suit en direct la progression de sa classe, consulte les travaux en lecture seule, accède au catalogue des Modules A, B et C, rejoue la correction de référence sur snapshots certifiés et ajuste les notes officielles avec motivation pédagogique.
-- **Administrateur** : valide formellement les comptes enseignants (`profiles.valide_par`) pour prévenir toute usurpation (T-03), gère les rôles applicatifs (`eleve`, `enseignant`, `admin`), surveille la santé des runtimes (WASM, SQLite, horloge serveur) et pilote la conformité RGPD (anonymisation irréversible T-14, matrice T-01 à T-14).
+- **Élève** : code sans installation locale, bénéficie d'une prévisualisation immédiate dans un bac à sable sécurisé, reçoit un feedback instantané critère par critère via le bouton « Vérifier », débloque des indices progressifs (3 niveaux), révise via le hub multimédia `/cours` et s'entraîne dans un mode examen blanc synchronisé par horloge serveur.
+- **Enseignant** : conçoit et publie des sujets via le Studio enseignant (`/enseignant/studio`) avec banc didactique à 3 variantes (`canonique`, `alternative`, `invalide`), suit en direct la progression de sa classe, consulte les travaux en lecture seule, accède au catalogue des Modules A, B et C (10 sujets), rejoue la correction de référence sur snapshots certifiés et ajuste les notes officielles avec motivation pédagogique.
+- **Administrateur** : valide formellement les demandes d'accès enseignant (`demandes_enseignant`, `profiles.valide_par`) pour prévenir toute usurpation (T-03), gère les rôles applicatifs (`eleve`, `enseignant`, `admin`), surveille la santé des services et pilote la conformité RGPD (anonymisation irréversible T-14).
 
 ---
 
 ## 2. Principes Directeurs Fondamentaux
 
-1. **Valider avant d'élargir** : l'exécution client PHP 8.2 WASM + SQLite relationnel local est validée (Jalon M0 - Go conditionnel sur poste 4 Go RAM).
-2. **Parcours complet avant modules** : un parcours de bout en bout est opérationnel (onboarding -> édition Monaco -> arborescence fichiers -> aperçu sandboxé -> tampon IndexedDB résilient -> vérification formative -> sessions d'examen -> scellement cryptographique).
-3. **Le résultat observable prime sur le code** : les sondes vérifient le rendu final et les effets de bord (DOM calculé, styles CSS, interactions JS, requêtes HTTP PHP, tables et contraintes SQL), jamais une syntaxe artificielle imposée.
-4. **Aucune donnée de confiance côté client** : corrigés types (`solutions`), critères masqués, sessions, clôture d'examen et snapshots sont strictement régis par le serveur (Supabase RLS, triggers SQL et horloge serveur monotone).
+1. **Transparence des moteurs d'exécution** : l'exécution locale PHP et SQL repose actuellement sur un **simulateur PHP procédural en Web Worker** (`php-worker-core.ts` / `MySqliSimulator` avec watchdog 3s) et un **moteur relationnel SQLite/MySQLi en mémoire TypeScript** (`sqlite-engine.ts` / `sql-checker.ts`), accompagnés d'un contrôleur de dialecte MySQL/MariaDB (`dialect-controller.ts`).
+2. **Parcours complet de bout en bout** : onboarding -> édition Monaco -> arborescence fichiers -> aperçu sandboxé -> tampon IndexedDB résilient -> vérification formative -> sessions d'examen -> scellement cryptographique -> Studio de création de sujets.
+3. **Le résultat observable prime sur le code** : les sondes vérifient le rendu final et les effets de bord (DOM calculé, styles CSS, interactions JS par cas `js_test_cas`, sorties PHP, tables et contraintes SQL).
+4. **Aucune donnée de confiance côté client** : corrigés types (`solutions`, `solutions_banc`), critères masqués, sessions, clôture d'examen et snapshots sont strictement régis par le serveur (Supabase RLS, triggers SQL et horloge serveur monotone).
 5. **Ne jamais perdre le travail d'un élève** : sauvegarde locale en premier (IndexedDB `labo_sti_buffer`), synchronisation en tâche de fond avec numéros de révision (`rev`) et arbitrage explicite en cas de conflit (aucun écrasement silencieux).
 6. **L'humain décide** : l'enseignant reste l'unique maître de la note finale et des ajustements ; la correction automatique de référence sur snapshot scellé pré-remplit la grille officielle, mais impose une motivation pédagogique tracée en cas d'ajustement.
 
@@ -37,12 +37,12 @@ Elle combine un **environnement de développement intégré dans le navigateur (
 │   ├── Éditeur de code (Monaco Editor avec coloration HTML/CSS/JS/PHP/SQL)            │
 │   ├── Panneau latéral : Énoncé Markdown, Indices (3 niveaux), Résultats critères     │
 │   ├── Aperçu HTML/CSS/JS (iframe sandbox isolée, sans réseau sortant)                │
-│   ├── Moteur PHP 8.2 WASM (Web Worker dédié, Watchdog 3s, Max 64 Mo)                │
-│   ├── Base SQL locale (SQLite Engine + Contrôleur de dialecte MySQL/MariaDB)         │
+│   ├── Simulateur PHP local (Web Worker dédié, Watchdog 3s, MySQLi procédural)        │
+│   ├── Base SQL locale (Moteur SQLite/MySQLi TS + Contrôleur de dialecte MySQL)       │
 │   ├── Tampon local persistant (IndexedDB labo_sti_buffer) avec arbitrage conflits    │
 │   ├── Salle d'attente Realtime & Minuteur asservi à l'horloge serveur                │
 │   ├── Moteur de scellement SHA-256 et export officiel SW_xxxxx.zip                   │
-│   └── Espaces dédiés : Espace Enseignant (/enseignant) & Espace Admin (/admin)       │
+│   └── Espaces dédiés : Cours (/cours), Enseignant (/enseignant, Studio) & Admin      │
 │                                                                                      │
 └──────────────────────────────────────────┬───────────────────────────────────────────┘
                                            │ HTTPS / TLS (API & RLS)
@@ -54,8 +54,8 @@ Elle combine un **environnement de développement intégré dans le navigateur (
 │                                                                                      │
 │   Supabase Cloud / Postgres                                                          │
 │   ├── Auth : Authentification e-mail / mot de passe, rôles applicatifs               │
-│   ├── Base de données : 26 tables relationnelles, RLS stricte, Triggers d'immuabilité│
-│   │   ├── Migrations 0000 à 0004 (profiles, sujets, classes, examens, snapshots, etc)│
+│   ├── Base de données : 30 tables relationnelles, RLS stricte, Triggers d'immuabilité│
+│   │   ├── 17 migrations SQL versionnées dans supabase/migrations/ (0000 à 0016+)     │
 │   │   ├── Triggers anti-triche : T-06 (échéance), T-07 (machine états), T-08 (snapshot)│
 │   │   └── Triggers immuabilité : T-09 (sujet_versions publiées et critères protégés) │
 │   ├── Storage S3 : Énoncés, médias, dumps SQL, archives scellées                     │
@@ -66,22 +66,23 @@ Elle combine un **environnement de développement intégré dans le navigateur (
 
 ### Détail des Composants Clés
 
-| Composant               | Technologie retenue                    | Rôle & Contraintes                                                                       |
-| ----------------------- | -------------------------------------- | ---------------------------------------------------------------------------------------- |
-| **Framework Fullstack** | TanStack Start (React 19, Nitro, Vite) | Rendu SSR/CSR, routage déclaratif typé (`src/routeTree.gen.ts`), performances maximales  |
-| **Styles & Composants** | Tailwind CSS v4 + Radix UI + Lucide    | UI moderne, responsive (≥ 1024px pour l'éditeur), thèmes sombre/clair                    |
-| **Éditeur de code**     | Monaco Editor (`@monaco-editor/react`) | Coloration syntaxique HTML/CSS/JS/PHP/SQL, minimap, complétion                           |
-| **Backend & Base**      | Supabase Postgres + Auth + Storage     | RLS activée sur 100% des tables, triggers d'intégrité, stockage fichiers                 |
-| **ORM & Migrations**    | Drizzle ORM + Supabase Migrations      | 5 migrations versionnées (`0000` à `0004`), schémas typés TypeScript                     |
-| **Bac à sable Web**     | `iframe sandbox="allow-scripts"`       | Confinement strict : blocage réseau (T-11), absence de cookies maîtres                   |
-| **Moteur PHP local**    | PHP 8.2 WASM (Web Worker)              | Isolation totale, watchdog 3 secondes (T-10), mémoire plafonnée à 64 Mo                  |
-| **Moteur SQL local**    | SQLite Engine relationnel local        | DDL/DML, chargement scripts `.sql`, visualiseur de tables interactif                     |
-| **Contrôleur Dialecte** | `dialect-controller.ts`                | Analyse statique alertant sur les permissivités SQLite non portables sur MySQL           |
-| **Résilience Offline**  | IndexedDB (`labo_sti_buffer`)          | Écriture locale instantanée (< 1s), gestion de conflits par numéros de révision (`rev`)  |
-| **Horloge Serveur**     | `server-clock.ts`                      | Élimination de la dérive client (`offsetMs`), calcul insensible à la manipulation locale |
-| **Scellement Copies**   | `snapshot-engine.ts`                   | Empreinte SHA-256 canonique composite, trigger immuable T-08, export ZIP standardisé     |
-| **Rejouage Référence**  | `replay-engine.ts`                     | Correction officielle déterministe rejouée sur le snapshot, grille sur 20 points         |
-| **Espace Admin**        | `src/routes/admin.tsx`                 | Validation enseignants (`valide_par`), gestion des rôles, matrice T-01..T-14, RGPD       |
+| Composant               | Technologie retenue                                  | Rôle & Contraintes                                                                       |
+| ----------------------- | ---------------------------------------------------- | ---------------------------------------------------------------------------------------- |
+| **Framework Fullstack** | TanStack Start (React 19, Nitro, Vite)               | Rendu SSR/CSR, routage déclaratif typé (`src/routeTree.gen.ts`), performances maximales  |
+| **Styles & Composants** | Tailwind CSS v4 + Radix UI + Lucide                  | UI moderne, responsive (≥ 1024px pour l'éditeur), thèmes sombre/clair                    |
+| **Éditeur de code**     | Monaco Editor (`@monaco-editor/react`)               | Coloration syntaxique HTML/CSS/JS/PHP/SQL, minimap, complétion                           |
+| **Backend & Base**      | Supabase Postgres + Auth + Storage                   | RLS activée sur 100% des 30 tables, triggers d'intégrité, stockage fichiers              |
+| **Migrations SQL**      | `supabase/migrations/` (source unique de vérité)     | 17 migrations versionnées (`0000` à `0016+`), schémas et RPC PostgreSQL                  |
+| **Bac à sable Web**     | `iframe sandbox="allow-scripts"`                     | Confinement strict : blocage réseau (T-11), absence de cookies maîtres                   |
+| **Moteur PHP local**    | Simulateur PHP procédural en Web Worker              | Isolation Web Worker, watchdog 3 secondes (T-10), support procédural `mysqli_*`          |
+| **Moteur SQL local**    | Moteur SQLite/MySQLi en mémoire (`sqlite-engine.ts`) | DDL/DML, chargement scripts `.sql`, visualiseur de tables interactif                     |
+| **Contrôleur Dialecte** | `dialect-controller.ts` & `sql-checker.ts`           | Analyse statique alertant sur les syntaxes SQL non portables sur MySQL/MariaDB           |
+| **Résilience Offline**  | IndexedDB (`labo_sti_buffer`)                        | Écriture locale instantanée (< 1s), gestion de conflits par numéros de révision (`rev`)  |
+| **Horloge Serveur**     | `server-clock.ts`                                    | Élimination de la dérive client (`offsetMs`), calcul insensible à la manipulation locale |
+| **Scellement Copies**   | `snapshot-engine.ts`                                 | Empreinte SHA-256 canonique composite, trigger immuable T-08, export ZIP standardisé     |
+| **Rejouage Référence**  | `replay-engine.ts`                                   | Correction officielle déterministe rejouée sur le snapshot, grille sur 20 points         |
+| **Studio Enseignant**   | `src/routes/enseignant.studio.tsx`                   | Création/édition de sujets, banc didactique 3 variantes, publication immuable            |
+| **Espace Admin**        | `src/routes/admin.tsx`                               | Validation enseignants (`demandes_enseignant`), gestion des rôles, audit sécurité, RGPD  |
 
 ---
 
@@ -123,16 +124,18 @@ flowchart LR
 
 ## 5. Modèle de Données & Règles d'Immuabilité
 
-Le schéma Supabase Postgres repose sur **26 tables relationnelles** réparties en 6 domaines métier :
+Le schéma Supabase Postgres repose sur **30 tables relationnelles** réparties en 6 domaines métier (définies dans l'unique source de vérité `supabase/migrations/`) :
 
 ```mermaid
 erDiagram
     PROFILES ||--o{ CLASS_MEMBERS : participe
+    PROFILES ||--o{ DEMANDES_ENSEIGNANT : soumet
     CLASSES ||--o{ CLASS_MEMBERS : contient
     CLASSES ||--o{ CLASS_INVITATIONS : possede
     CLASSES ||--o{ CLASS_SUJETS : affecte
     SUJETS ||--o{ SUJET_VERSIONS : versionne
     SUJET_VERSIONS ||--o{ SUJET_VERSION_FICHIERS : starter
+    SUJET_VERSIONS ||--o{ SOLUTIONS_BANC : valide
     SUJET_VERSIONS ||--o{ CRITERES : evalue
     SUJET_VERSIONS ||--o{ CLASS_SUJETS : distribue
     CRITERES ||--o{ INDICES : fournit
@@ -147,13 +150,18 @@ erDiagram
     SNAPSHOTS ||--o{ NOTES : justifie
 ```
 
-### Migrations Déployées
+### Migrations Déployées (`supabase/migrations/`)
 
 - `0000_etape1_profiles_roles.sql` : Table `profiles`, enum `app_role`, table `user_roles`, trigger `handle_new_user`, validation enseignant (`valide_par`).
-- `0001_etape2_sujets.sql` : Tables `sujets`, `sujet_versions`, `sujet_version_fichiers`, `criteres`, `solutions`, `indices`, triggers d'immuabilité `protect_published_version` et `protect_published_children`.
+- `0001_etape2_sujets.sql` : Tables `sujets`, `sujet_versions`, `sujet_version_fichiers`, `criteres`, `solutions`, `indices`, `indices_debloques`, triggers d'immuabilité `protect_published_version` et `protect_published_children`.
 - `0002_etape3_classes_projets.sql` : Tables `classes`, `class_invitations`, `class_members`, `class_sujets`, `projets`, `projet_fichiers`, `tentatives`, RPC `rejoindre_classe` et `initialiser_projet`.
 - `0003_etape4_sessions_examen.sql` : Tables `sessions_examen`, `passages_examen`, triggers `verifier_echeance_ecriture` (T-06) et `verifier_transition_passage_examen` (T-07), RPC `lancer_coup_denvoi_examen`, fonction `obtenir_horloge_serveur`.
-- `0004_etape4_snapshots_rejouage.sql` : Table `snapshots` immuable avec trigger `interdire_mutation_snapshot` (T-08), table `notes`, RPC `sceller_snapshot_examen`, RLS et contraintes d'intégrité.
+- `0004_etape4_snapshots_rejouage.sql` : Table `snapshots` immuable avec trigger `interdire_mutation_snapshot` (T-08), table `notes`, RPC `sceller_snapshot_examen`.
+- `0005_etape3_contestations_solutions.sql` : Tables `journal_securite`, `contestations`, `journal_acces_solutions` et RPC associées.
+- `0006_etape5_competences_maitrise.sql` : Tables `competences`, `critere_competences`, `maitrise`, `badges_definition`, `badges`.
+- `0007` à `0013` : Correction de récursion RLS, révocation des `GRANT` par défaut, administration des utilisateurs, `demandes_enseignant`, libellés de critères, état système admin et écriture contrôlée dans `journal_securite`.
+- `0014_studio_sujets.sql` & `0015_studio_publication.sql` : Table `solutions_banc` et RPC du Studio enseignant (`studio_lister_sujets`, `studio_charger_version`, `studio_enregistrer_brouillon`, `studio_publier_version`, `studio_nouvelle_version`, `sujet_publie_pour_eleve`).
+- `0016_restreindre_has_role.sql` : Révocation de `EXECUTE` sur `public.has_role` pour `PUBLIC` et `anon` et restriction de l'inspection des rôles d'un tiers aux seuls administrateurs.
 
 ### Règles d'Immuabilité Pédagogique
 
@@ -197,21 +205,21 @@ L'intégralité des 14 tests négatifs obligatoires définis dans [`docs/SECURIT
 
 ---
 
-## 8. État d'Avancement Réel du Dépôt (Audit au 19/10/2026)
+## 8. État d'Avancement Réel du Dépôt (Vérifié au 23/10/2026)
 
-| Domaine / Composant                         | État Réel d'Implémentation                                                                                                                                                                                                            | Couverture & Validation                                                              |
-| ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
-| **Base de Données & RLS**                   | 26 tables relationnelles, 7 migrations SQL (`0000` à `0006`) complètes, RLS sur toutes les tables, triggers immuabilité et anti-triche.                                                                                               | Conforme PRD v3.1, déployable sur Supabase.                                          |
-| **Éditeur de Code**                         | Monaco Editor intégré, coloration syntaxique multi-langages, arborescence VS Code normalisée `Travail_Eleve/SW_<NCIN>`.                                                                                                               | Validé sous toutes résolutions (≥ 1024px).                                           |
-| **Runtimes & Moteurs**                      | PHP 8.2 WASM avec watchdog 3s, SQLite Engine avec visualiseur interactif de tables, contrôleur de dialecte MySQL/MariaDB.                                                                                                             | Tests de faisabilité et d'isolation au vert.                                         |
-| **Pédagogie & Résilience Élève (Jalon M5)** | Interface de contestation élève (`ContestationModal`), historique des tentatives avec deltas didactiques (`AttemptsTimelineDrawer`), déblocage tracé des corrigés (`ReferenceSolutionModal`) et garde-fou strict T-04/T-06 en examen. | 14 tests dédiés validés, neutralisation et recalcul de classe en direct.             |
-| **Compétences & Progression (Jalon M7)**    | Référentiel officiel de 25 compétences Bac STI, calcul déterministe de maîtrise v1.0, 8 badges pédagogiques, radar 5 axes et modale interactive `ProgressionModal`.                                                                   | 20 tests dédiés validés, points forts et axes prioritaires calculés automatiquement. |
-| **Mode Examen**                             | Salle d'attente Realtime, coup d'envoi simultané, tiers-temps (1.33x), minuteur asservi à l'horloge serveur, coupure des aides.                                                                                                       | Verrouillage T-06 et transitions T-07 validés.                                       |
-| **Snapshots & Rejouage**                    | Scellement cryptographique SHA-256 canonique, trigger T-08, rejouage de référence reproductible, grille sur 20 points avec motivation obligatoire.                                                                                    | Rejouabilité déterministe certifiée (100%).                                          |
-| **Catalogue de Contenu**                    | 7 sujets complets intégrés : Modules A (Formatifs HTML/CSS, JS CIN, SQL LDD), B (TP Full-Stack Don, TP Météo Bac 2021) et C (Annales Bac 2023, Bac 2018).                                                                             | Solutions valides et critères testés.                                                |
-| **Espaces Dédiés**                          | Espace Élève (`/`, `/sujet/$id`), Espace Enseignant (`/enseignant` avec gestionnaire de classes, invitations et contestations), Espace Admin (`/admin`).                                                                              | Routes typées TanStack Router, Mode Démo interactif.                                 |
-| **Suite de Tests CI**                       | **247 tests automatisés** au vert across 20 fichiers de test (`vitest run`). Typage strict TypeScript (`tsc --noEmit`) à 0 erreur.                                                                                                    | CI GitHub Actions 100% verte sur `main`.                                             |
-| **Build & Déploiement**                     | Build de production réussi (Client Vite + SSR Nitro / Cloudflare & Vercel Edge).                                                                                                                                                      | Déployable en production.                                                            |
+| Domaine / Composant                         | État Réel d'Implémentation                                                                                                                                                                                                            | Couverture & Validation                                                           |
+| ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
+| **Base de Données & RLS**                   | 30 tables relationnelles, 17 migrations SQL (`0000` à `0016`) dans `supabase/migrations/`, RLS sur toutes les tables, triggers immuabilité et anti-triche.                                                                            | Déployable sur Supabase, durcissement Horizon 1 en cours (#113–#119).             |
+| **Éditeur de Code**                         | Monaco Editor intégré, coloration syntaxique multi-langages, arborescence VS Code normalisée `Travail_Eleve/SW_<NCIN>`.                                                                                                               | Validé sur écrans ≥ 1024px (mode lecture mobile prévu en #135).                   |
+| **Runtimes & Moteurs**                      | Simulateur PHP procédural en Web Worker avec watchdog 3s (`php-worker-core.ts`, `MySqliSimulator`), moteur SQLite/MySQLi TS (`sqlite-engine.ts`) avec visualiseur interactif et contrôleur de dialecte MySQL/MariaDB.                 | Unification et extension SQL prévues en #125 et #126.                             |
+| **Pédagogie & Résilience Élève (Jalon M5)** | Interface de contestation élève (`ContestationModal`), historique des tentatives avec deltas didactiques (`AttemptsTimelineDrawer`), déblocage tracé des corrigés (`ReferenceSolutionModal`) et garde-fou strict T-04/T-06 en examen. | Tests dédiés validés, neutralisation et recalcul de classe en direct.             |
+| **Compétences & Progression (Jalon M7)**    | Référentiel officiel de 25 compétences Bac STI, calcul déterministe de maîtrise v1.0, 8 badges pédagogiques, radar 5 axes et modale interactive `ProgressionModal`.                                                                   | Tests dédiés validés, points forts et axes prioritaires calculés automatiquement. |
+| **Mode Examen**                             | Salle d'attente Realtime, coup d'envoi simultané, tiers-temps (1.33x), minuteur asservi à l'horloge serveur, coupure des aides.                                                                                                       | Verrouillage T-06 et transitions T-07 validés.                                    |
+| **Snapshots & Rejouage**                    | Scellement cryptographique SHA-256 canonique, trigger T-08, rejouage de référence reproductible, grille sur 20 points avec motivation obligatoire.                                                                                    | Rejouabilité déterministe certifiée.                                              |
+| **Catalogue de Contenu & Cours**            | 10 sujets complets intégrés dans `content/` (Modules A, B et C dont Bac 2021, 2022, 2023, 2025, 2026) + Hub interactif `/cours` (10 capsules vidéo, flashcards, quiz et tuteur IA du carnet STI-BAC INFO).                            | Solutions canoniques et critères testés automatiquement.                          |
+| **Espaces Dédiés**                          | Espace Élève (`/`, `/sujet/$id`, `/cours`), Espace Enseignant (`/enseignant`, `/enseignant/studio`), Espace Admin (`/admin`).                                                                                                         | Routes typées TanStack Router, Mode Démo interactif.                              |
+| **Suite de Tests CI**                       | Plus de **440 tests automatisés** au vert (`vitest run`), formatage Prettier, lint ESLint (`--max-warnings=0`) et typage strict TypeScript (`tsc --noEmit`) à 0 erreur.                                                               | CI GitHub Actions bloquante avant déploiement Vercel.                             |
+| **Build & Déploiement**                     | Build de production réussi (Client Vite + SSR Nitro / Cloudflare & Vercel Edge).                                                                                                                                                      | Déployable en production.                                                         |
 
 ---
 

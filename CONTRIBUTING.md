@@ -41,7 +41,7 @@ Tout contributeur doit respecter sans exception les principes architecturaux iss
 
 ### Règle 7 : Sécurité RLS Systématique
 
-- Toute nouvelle table PostgreSQL créée dans `drizzle/migrations/` ou `supabase/migrations/` doit obligatoirement être accompagnée de ses politiques **Row Level Security (RLS)** pour `anon`, `authenticated` et `service_role`.
+- Toute nouvelle table PostgreSQL créée dans `supabase/migrations/` doit obligatoirement être accompagnée de ses politiques **Row Level Security (RLS)** pour `anon`, `authenticated` et `service_role`.
 
 ### Règle 8 : Typage TypeScript Strict
 
@@ -99,7 +99,7 @@ _Exemples valides :_
 
 ### 3.2 Gestion des Données & Migrations
 
-- Tout changement de schéma passe par un fichier SQL dans `drizzle/migrations/` numéroté séquentiellement (`0000_...`, `0001_...`, `0002_...`).
+- Tout changement de schéma passe par un fichier SQL dans `supabase/migrations/` horodaté et numéroté séquentiellement (`YYYYMMDDHHMMSS_00XX_...sql`).
 - N'effectuez jamais de `DROP TABLE` sans plan de migration et accord explicite des mainteneurs.
 
 ### 3.3 Vérifications Locales Obligatoires Avant Push

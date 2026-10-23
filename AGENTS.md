@@ -21,12 +21,12 @@ Bienvenue sur le projet **Labo STI**. En tant qu'agent ou développeur travailla
 
 Avant toute modification structurelle ou ajout de fonctionnalité, consultez les documents de cadrage :
 
-- [`CONTEXT.md`](file:///d:/My%20Projects/lab-analysis/app-creator/CONTEXT.md) : Synthèse centrale du projet, vision, stack et gap analysis.
-- [`docs/PRD.md`](file:///d:/My%20Projects/lab-analysis/app-creator/docs/PRD.md) : Spécification fonctionnelle et technique complète (v3.1).
-- [`docs/ARCHITECTURE.md`](file:///d:/My%20Projects/lab-analysis/app-creator/docs/ARCHITECTURE.md) : Détail de l'architecture (bac à sable iframe, WASM, Plan B, résilience).
-- [`docs/DATA_MODEL.md`](file:///d:/My%20Projects/lab-analysis/app-creator/docs/DATA_MODEL.md) : Schéma des 26 tables, triggers d'intégrité et relations.
-- [`docs/SECURITY.md`](file:///d:/My%20Projects/lab-analysis/app-creator/docs/SECURITY.md) : Modèle de menace, matrice RLS et spécification des 14 tests négatifs (T-01 à T-14).
-- [`roadmap.md`](file:///d:/My%20Projects/lab-analysis/app-creator/roadmap.md) : Suivi des jalons (M0 à M8) et critères d'acceptation par phase.
+- [`CONTEXT.md`](CONTEXT.md) : Synthèse centrale du projet, vision, stack et gap analysis.
+- [`docs/PRD.md`](docs/PRD.md) : Spécification fonctionnelle et technique complète (v3.1).
+- [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) : Détail de l'architecture (bac à sable iframe, WASM, Plan B, résilience).
+- [`docs/DATA_MODEL.md`](docs/DATA_MODEL.md) : Schéma des 30 tables, triggers d'intégrité et relations.
+- [`docs/SECURITY.md`](docs/SECURITY.md) : Modèle de menace, matrice RLS et spécification des tests négatifs de sécurité.
+- [`roadmap.md`](roadmap.md) : Suivi des jalons (M0 à M8) et critères d'acceptation par phase.
 
 ---
 
@@ -62,7 +62,7 @@ Avant toute modification structurelle ou ajout de fonctionnalité, consultez les
 - **Composants & Design System** : Radix UI + Tailwind CSS v4. Conserver la palette sombre/claire et le design compact adapté aux résolutions de lycée (écrans ≥ 1024px).
 - **Gestion d'État & Requêtes** : TanStack Query (`@tanstack/react-query`) pour le cache asynchrone Supabase.
 - **Base de Données & Migrations** :
-  - Définitions dans `drizzle/migrations/` et `supabase/migrations/`.
+  - Source unique de vérité SQL dans `supabase/migrations/`.
   - Toujours accompagner une nouvelle table de ses politiques **Row Level Security (RLS)** pour `anon`, `authenticated` et `service_role`.
 - **Qualité Pédagogique** :
   - Tout sujet d'exercice doit être accompagné d'au moins **2 solutions valides différentes** et d'au moins **1 solution invalide** testées avant publication.

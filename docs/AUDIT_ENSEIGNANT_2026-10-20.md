@@ -22,7 +22,7 @@ Cette PR ne contient **que le plan** ; chaque lot ci-dessous fera l'objet d'une 
 ### Lot 1 — Réparer la RLS en production (C1) — _bloquant_
 
 1. Récupérer le message d'erreur Postgres des 500 (logs Supabase) ; identifier politique récursive ou dérive.
-2. Comparer les politiques déployées (`pg_policies`) aux migrations ; écrire une migration corrective idempotente (`supabase/migrations/` + `drizzle/migrations/`) avec RLS pour `anon`, `authenticated`, `service_role`.
+2. Comparer les politiques déployées (`pg_policies`) aux migrations ; écrire une migration corrective idempotente dans `supabase/migrations/` avec RLS pour `anon`, `authenticated`, `service_role`.
 3. Lecture des profils des élèves d'une classe par l'enseignant via fonction `security definer` (évite la récursion).
 4. Critère de sortie : 0 réponse 500 sur `/enseignant` et `/admin`, tests T-01..T-14 toujours verts.
 
