@@ -55,7 +55,7 @@ export function OnboardingGuide({ forceOpen = false, onClose }: OnboardingGuideP
 
   const steps = [
     {
-      title: "Bienvenue sur Sprout Workshop / Labo STI",
+      title: "Bienvenue sur Labo STI",
       subtitle: "Plateforme d'entraînement et d'examen pour le Baccalauréat STI2D",
       icon: <Code2 className="h-8 w-8 text-primary" />,
       content: (

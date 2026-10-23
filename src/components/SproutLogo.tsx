@@ -3,6 +3,7 @@ import React from "react";
 interface SproutLogoProps {
   size?: "sm" | "md" | "lg";
   showText?: boolean;
+  title?: string;
   subtitle?: string;
   className?: string;
 }
@@ -10,7 +11,8 @@ interface SproutLogoProps {
 export function SproutLogo({
   size = "md",
   showText = true,
-  subtitle = "Labo STI",
+  title = "Labo STI",
+  subtitle,
   className = "",
 }: SproutLogoProps) {
   const iconSizes = {
@@ -52,8 +54,7 @@ export function SproutLogo({
       {showText && (
         <div className="flex flex-col leading-none">
           <div className={`font-semibold tracking-tight ${textSizes[size]}`}>
-            <span className="text-emerald-500">Sprout</span>{" "}
-            <span className="text-foreground">Workshop</span>
+            <span className="text-emerald-500">{title}</span>
           </div>
           {subtitle && (
             <span className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground mt-0.5">

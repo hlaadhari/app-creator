@@ -33,13 +33,13 @@ export const Route = createFileRoute("/")({
   },
   head: () => ({
     meta: [
-      { title: "Sprout Workshop – Labo STI" },
+      { title: "Labo STI – Plateforme d'entraînement au Bac STI" },
       {
         name: "description",
         content:
-          "Entraînez-vous au Bac STI avec Sprout Workshop : HTML, CSS et JavaScript avec correction automatique et indices.",
+          "Entraînez-vous au Bac STI avec Labo STI : HTML, CSS et JavaScript avec correction automatique et indices.",
       },
-      { property: "og:title", content: "Sprout Workshop – Labo STI" },
+      { property: "og:title", content: "Labo STI – Plateforme d'entraînement au Bac STI" },
       {
         property: "og:description",
         content: "Éditeur dans le navigateur, aperçu en direct et correction automatique.",
@@ -180,7 +180,7 @@ function Index() {
   return (
     <div className="min-h-screen">
       <header className="border-b px-6 py-3.5 flex items-center justify-between">
-        <SproutLogo size="sm" subtitle="Labo STI" />
+        <SproutLogo size="sm" subtitle="Baccalauréat STI2D" />
         <div className="flex items-center gap-3">
           {/* Mémento & Support de cours officiel */}
           <Link to="/cours">
