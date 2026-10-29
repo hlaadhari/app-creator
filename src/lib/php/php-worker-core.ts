@@ -16,6 +16,8 @@ import {
   SESSION_TRAILER_MARKER,
 } from "./superglobals";
 import type { PhpExecutionRequest, PhpExecutionResponse } from "./types";
+import { executerScriptPhpProcedural, ENGINE_NAME } from "./procedural-simulator";
+export { executerScriptPhpProcedural, ENGINE_NAME } from "./procedural-simulator";
 
 export const MAX_MEMORY_LIMIT_BYTES = 64 * 1024 * 1024; // 64 Mo
 export const MAX_STDOUT_BYTES = 1024 * 1024; // 1 Mo
@@ -95,6 +97,21 @@ export async function executerScriptPhpCore(
 
   // Vérification de boucle infinie statique ou de timeout simulé
   const scriptContent = files[entrypoint] || req.script;
+
+  // Si le script utilise l'extension procédurale MySQLi ou une base SQL de sujet
+  if (
+    scriptContent.includes("mysqli_") ||
+    Boolean(req.initialSql) ||
+    Boolean(req.simulator) ||
+    Object.keys(files).some((f) => f.endsWith(".sql"))
+  ) {
+    return executerScriptPhpProcedural(req, {
+      ...options,
+      ...(req.initialSql !== undefined ? { initialSql: req.initialSql } : {}),
+      ...(req.simulator !== undefined ? { simulator: req.simulator as never } : {}),
+    });
+  }
+
   const hasInfiniteLoop = detecterBoucleInfinieStatique(scriptContent);
 
   // Estimation de la mémoire allouée (code + fichiers + variables)
@@ -348,5 +365,7 @@ export async function executerScriptPhpCore(
     memoryUsageBytes: allocatedBytes,
     timedOut: false,
     memoryExceeded: false,
+    engine: ENGINE_NAME,
+    isSimulator: true,
   };
 }

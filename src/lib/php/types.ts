@@ -13,19 +13,21 @@ export interface PhpSuperglobals {
 export interface PhpExecutionRequest {
   id: string;
   script: string;
-  files?: Record<string, string>;
-  entrypoint?: string;
-  method?: "GET" | "POST";
-  url?: string;
-  get?: Record<string, string>;
-  post?: Record<string, string>;
-  cookies?: Record<string, string>;
-  server?: Record<string, string>;
-  session?: Record<string, unknown>;
-  sqliteBuffer?: Uint8Array | null;
-  maxExecutionTimeMs?: number;
-  memoryLimitBytes?: number;
-  maxStdoutBytes?: number;
+  files?: Record<string, string> | undefined;
+  entrypoint?: string | undefined;
+  method?: "GET" | "POST" | undefined;
+  url?: string | undefined;
+  get?: Record<string, string> | undefined;
+  post?: Record<string, string> | undefined;
+  cookies?: Record<string, string> | undefined;
+  server?: Record<string, string> | undefined;
+  session?: Record<string, unknown> | undefined;
+  sqliteBuffer?: Uint8Array | null | undefined;
+  initialSql?: string | undefined;
+  simulator?: unknown | undefined;
+  maxExecutionTimeMs?: number | undefined;
+  memoryLimitBytes?: number | undefined;
+  maxStdoutBytes?: number | undefined;
 }
 
 export interface PhpExecutionResponse {
@@ -40,8 +42,14 @@ export interface PhpExecutionResponse {
   memoryUsageBytes: number;
   timedOut: boolean;
   memoryExceeded: boolean;
-  error?: string;
-  friendlyMessage?: string;
+  error?: string | undefined;
+  friendlyMessage?: string | undefined;
+  engine?: string | undefined;
+  isSimulator?: boolean | undefined;
+  executedQueries?: string[] | undefined;
+  mysqliErrors?: string[] | undefined;
+  databaseState?: Record<string, Record<string, unknown>[]> | undefined;
+  simulator?: unknown | undefined;
 }
 
 export type PhpWorkerIncomingMessage =
