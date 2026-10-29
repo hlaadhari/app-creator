@@ -10,6 +10,8 @@
  *   (PostgreSQL SERIAL, RETURNING, ILIKE, ::type, SQLite AUTOINCREMENT, PRAGMA, ||, strftime).
  */
 
+import { decouperRequetesSql } from "../sql/relational-engine";
+
 export interface SqlCurriculumWarning {
   code: string;
   syntaxeDetectee: string;
@@ -225,11 +227,7 @@ export class MySqliSimulator {
    * Exécute un script SQL multi-instructions
    */
   public executeScript(sqlScript: string): { success: boolean; errors: string[] } {
-    const clean = sqlScript.replace(/--.*$/gm, "").replace(/\/\*[\s\S]*?\*\//g, "");
-    const statements = clean
-      .split(";")
-      .map((s) => s.trim())
-      .filter((s) => s.length > 0);
+    const statements = decouperRequetesSql(sqlScript);
 
     const errors: string[] = [];
     for (const stmt of statements) {
