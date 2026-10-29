@@ -16,6 +16,7 @@
  */
 
 import { MySqliSimulator } from "./sql-checker";
+import { executerScriptPhpProcedural } from "../php/procedural-simulator";
 
 export interface PhpForbiddenConstruct {
   code: string;
@@ -242,135 +243,21 @@ export function executerScriptPhpMysqli(
   simulator: MySqliSimulator,
 ): PhpMysqliExecutionResult {
   const forbiddenConstructs = detecterConstructionsPhpHorsProgramme(phpCode);
-  const executedQueries: string[] = [];
-  const mysqliErrors: string[] = [];
-
-  // Environnement des variables scalaires PHP ($nom => valeur)
-  const vars: Record<string, string | number> = {};
-
-  // Si extract($_POST) est utilisé, injecter toutes les clés de postData comme variables $cle
-  if (/\bextract\s*\(\s*\$_POST\s*\)/i.test(phpCode)) {
-    for (const [k, v] of Object.entries(postData)) {
-      vars[k] = v;
-    }
-  }
-
-  // Résoudre les affectations de variables depuis $_POST : $x = $_POST['x'] (avec trim/intval/isset éventuel)
-  const cleanCode = phpCode.replace(/\/\/.*$/gm, "").replace(/\/\*[\s\S]*?\*\//g, "");
-
-  for (const m of cleanCode.matchAll(
-    /\$([a-zA-Z_][a-zA-Z0-9_]*)\s*=\s*[^;]*\$_POST\s*\[\s*['"]([^'"]+)['"]\s*\][^;]*;/g,
-  )) {
-    const varName = m[1];
-    const postKey = m[2];
-    if (varName && postKey && postData[postKey] !== undefined) {
-      vars[varName] = postData[postKey];
-    }
-  }
-
-  // Fonction utilitaire d'interpolation d'une chaîne SQL contenant des variables PHP ($var ou '.$var.')
-  const interpolateSql = (rawSqlExpr: string): string => {
-    let s = rawSqlExpr.trim();
-    // Retirer les guillemets englobants
-    if ((s.startsWith('"') && s.endsWith('"')) || (s.startsWith("'") && s.endsWith("'"))) {
-      s = s.slice(1, -1);
-    }
-    // Gérer les concaténations PHP : " . $var . " ou '.$var.'
-    s = s.replace(/["']\s*\.\s*\$([a-zA-Z_][a-zA-Z0-9_]*)\s*\.\s*["']/g, (_, vName: string) => {
-      return vars[vName] !== undefined ? String(vars[vName]) : "";
-    });
-    // Gérer $_POST['key'] direct dans la requête
-    s = s.replace(/\$_POST\s*\[\s*['"]([^'"]+)['"]\s*\]/g, (_, k: string) => {
-      return postData[k] !== undefined ? String(postData[k]) : "";
-    });
-    // Gérer l'interpolation directe "$var"
-    s = s.replace(/\$([a-zA-Z_][a-zA-Z0-9_]*)/g, (_, vName: string) => {
-      return vars[vName] !== undefined ? String(vars[vName]) : `$${vName}`;
-    });
-    return s.trim();
-  };
-
-  // Extraire les variables contenant des requêtes SQL ($req1 = "SELECT ...", $sql = "INSERT ...")
-  const sqlVarMap: Record<string, string> = {};
-  for (const m of cleanCode.matchAll(
-    /\$([a-zA-Z_][a-zA-Z0-9_]*)\s*=\s*(["'][\s\S]*?\b(?:SELECT|INSERT|UPDATE|DELETE|CREATE|ALTER)\b[\s\S]*?["'])\s*;/gi,
-  )) {
-    if (m[1] && m[2]) {
-      sqlVarMap[m[1]] = interpolateSql(m[2]);
-    }
-  }
-
-  // Collecter tous les appels mysqli_query($cnx, ...) dans l'ordre du script
-  const queryCalls: string[] = [];
-  for (const m of cleanCode.matchAll(/mysqli_query\s*\(\s*\$[a-zA-Z0-9_]+\s*,\s*([^)]+)\)/gi)) {
-    const arg = m[1]?.trim() || "";
-    if (arg.startsWith("$")) {
-      const varName = arg.slice(1).trim();
-      if (sqlVarMap[varName]) {
-        queryCalls.push(sqlVarMap[varName]);
-      }
-    } else {
-      queryCalls.push(interpolateSql(arg));
-    }
-  }
-
-  // Exécution séquentielle intelligente respectant la logique métier des sujets Bac STI :
-  // Si un SELECT de disponibilité ou d'existence échoue, les INSERT/UPDATE dépendants peuvent être court-circuités
-  let outputHtml = "";
-  let stopFurtherDml = false;
-
-  for (const sql of queryCalls) {
-    const upper = sql.toUpperCase();
-    const isDml =
-      upper.startsWith("INSERT") || upper.startsWith("UPDATE") || upper.startsWith("DELETE");
-
-    if (stopFurtherDml && isDml) {
-      continue;
-    }
-
-    executedQueries.push(sql);
-    const res = simulator.query(sql);
-
-    if (!res.success) {
-      mysqliErrors.push(res.error);
-      outputHtml += `<p class="mysqli-error">${res.error}</p>`;
-      stopFurtherDml = true;
-      continue;
-    }
-
-    if (upper.startsWith("SELECT")) {
-      // Vérifier si le SELECT porte sur un client inexistant ou un habit indisponible
-      if (/\bFROM\s+[`"']?client\b/i.test(sql) && res.numRows === 0) {
-        outputHtml += "<p>Erreur : Client inexistant dans la base.</p>";
-        stopFurtherDml = true;
-      } else if (/\bFROM\s+[`"']?habit\b/i.test(sql)) {
-        if (res.numRows === 0) {
-          outputHtml += "<p>Erreur : Habit inexistant ou non disponible.</p>";
-          stopFurtherDml = true;
-        } else {
-          const row = res.rows[0];
-          if (
-            row &&
-            row["disponible"] !== undefined &&
-            String(row["disponible"]).toUpperCase() === "N"
-          ) {
-            outputHtml += "<p>Erreur : Habit déjà loué (indisponible).</p>";
-            stopFurtherDml = true;
-          }
-        }
-      }
-    } else if (upper.startsWith("INSERT")) {
-      outputHtml += "<p>Insertion effectuée avec succès.</p>";
-    } else if (upper.startsWith("UPDATE")) {
-      outputHtml += "<p>Mise à jour effectuée avec succès.</p>";
-    }
-  }
+  const res = executerScriptPhpProcedural(
+    {
+      id: `check-${Date.now()}`,
+      script: phpCode,
+      post: postData,
+      method: "POST",
+    },
+    { simulator },
+  );
 
   return {
-    success: mysqliErrors.length === 0 && forbiddenConstructs.length === 0,
-    outputHtml,
-    executedQueries,
-    mysqliErrors,
+    success: res.success && forbiddenConstructs.length === 0,
+    outputHtml: res.stdout,
+    executedQueries: res.executedQueries || [],
+    mysqliErrors: res.mysqliErrors || [],
     forbiddenConstructs,
     simulator,
   };

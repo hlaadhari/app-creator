@@ -107,12 +107,14 @@ export function PhpRunnerPanel({ files, activeFileName, className = "" }: PhpRun
       <div className="flex items-center justify-between border-b bg-muted/40 px-3 py-2 shrink-0">
         <div className="flex items-center gap-2">
           <Terminal className="w-4 h-4 text-primary" />
-          <span className="font-semibold text-foreground">Console PHP 8.2 WASM</span>
+          <span className="font-semibold text-foreground">
+            Console PHP • Simulateur procédural MySQLi
+          </span>
           <Badge
             variant="outline"
             className="text-[10px] bg-primary/10 text-primary border-primary/20"
           >
-            Bac STI Watchdog 3s
+            Simulateur procédural Bac STI • Watchdog 3s
           </Badge>
         </div>
 
@@ -212,16 +214,33 @@ export function PhpRunnerPanel({ files, activeFileName, className = "" }: PhpRun
             <Cpu className="w-3.5 h-3.5" />
             <span>{Math.round(result.memoryUsageBytes / 1024)} Ko</span>
           </div>
+          {result.engine && (
+            <span className="text-[10px] text-primary/80 font-sans ml-auto">
+              Mode : {result.engine}
+            </span>
+          )}
         </div>
       )}
 
       {/* Sortie standard / Terminal stdout */}
-      <div className="flex-1 bg-neutral-950 text-neutral-100 p-3 font-mono text-xs overflow-auto select-text">
+      <div className="flex-1 bg-neutral-950 text-neutral-100 p-3 font-mono text-xs overflow-auto select-text space-y-3">
         {result ? (
-          <div className="space-y-2">
+          <div className="space-y-3">
             {result.error && (
               <div className="p-2 rounded bg-destructive/20 border border-destructive/40 text-destructive-foreground text-[11px] whitespace-pre-wrap">
                 ⚠️ {result.error}
+              </div>
+            )}
+            {result.executedQueries && result.executedQueries.length > 0 && (
+              <div className="p-2 rounded bg-neutral-900 border border-neutral-800 text-[11px] space-y-1">
+                <div className="text-neutral-400 font-semibold">
+                  Requêtes SQL exécutées sur la base du sujet ({result.executedQueries.length}) :
+                </div>
+                {result.executedQueries.map((q, i) => (
+                  <div key={i} className="text-emerald-400 font-mono break-all">
+                    ➜ {q}
+                  </div>
+                ))}
               </div>
             )}
             <div className="whitespace-pre-wrap leading-relaxed">
@@ -233,9 +252,9 @@ export function PhpRunnerPanel({ files, activeFileName, className = "" }: PhpRun
             </div>
           </div>
         ) : (
-          <div className="text-neutral-500 italic flex items-center justify-center h-full">
-            Cliquez sur « Exécuter {selectedScript} » pour lancer le script PHP dans le Web Worker
-            WebAssembly.
+          <div className="text-neutral-500 italic flex items-center justify-center h-full text-center px-4">
+            Cliquez sur « Exécuter {selectedScript} » pour lancer le script PHP dans le simulateur
+            procédural MySQLi Bac STI.
           </div>
         )}
       </div>

@@ -80,15 +80,16 @@ L'architecture de **Labo STI** repose sur un principe d'exécution locale dans l
   - L'émission de requêtes réseau (`fetch`, `XMLHttpRequest`, `WebSocket`, `EventSource`) est bloquée ou mockée.
 - **Ressources statiques** : Les images importées par l'élève dans `Travail_Eleve/` sont converties en `Blob URLs` ou `Data URIs` injectées localement dans l'iframe.
 
-### 2.2 Exécution PHP en WebAssembly (Phase 2)
+### 2.2 Exécution PHP & Simulateur Procédural MySQLi (Bac STI) (TEC-01)
 
-- **Mécanisme** : Runtime PHP compilé en WebAssembly (ex: `@php-wasm/web` ou équivalent standard), exécuté au sein d'un **Web Worker dédié**.
-- **Avantages** : L'exécution s'effectue hors du fil d'exécution principal de l'UI (pas de freeze en cas de boucle infinie).
-- **Contrôles de ressources** :
-  - **Timeout strict** : interruption forcée du Worker après 3 000 ms.
-  - **Limite mémoire** : plafond fixé à 64 Mo par exécution.
+- **Transparence d'Architecture & Décision de Conception** :
+  Le programme officiel du Bac STI évalue l'utilisation **procédurale** stricte de l'extension MySQLi (`mysqli_connect`, `mysqli_query`, `mysqli_num_rows`, `mysqli_affected_rows`, `mysqli_fetch_array`...) couplée aux superglobales (`$_POST`, `$_GET`, `$_SESSION`) et requêtes préparées (`mysqli_prepare`, `mysqli_stmt_bind_param`, `mysqli_stmt_execute`).
+  Pour garantir une instantanéité maximale, une compatibilité hors-ligne immédiate sans téléchargement lourd de binaires WASM (> 30 Mo) pénalisant le réseau des lycées, et une conformité pédagogique rigoureuse aux annales du Bac (2018 à 2026), Labo STI intègre un **simulateur procédural PHP/MySQLi certifié Bac STI** (`src/lib/php/procedural-simulator.ts`).
+- **Confinement & Contrôles de ressources** :
+  - **Timeout strict** : watchdog interrompant l'exécution après 3 000 ms (T-10).
+  - **Limite mémoire** : plafond fixé à 64 Mo par script.
   - **Taille de sortie** : troncature des buffers `stdout` à 1 Mo max.
-- **Support des fonctionnalités clés** : `GET`/`POST`, variables superglobales `$_SESSION`, parsing de requêtes HTTP simulées, fonctions de hachage et chaînes.
+- **Interfaçage BDD** : Le simulateur PHP est couplé au moteur relationnel local `MySqliSimulator`, initialisé directement à partir des scripts SQL (`db/init.sql`, `tables.sql`, etc.) du sujet. L'interface affiche explicitement le mode actif : _« Simulateur procédural PHP/MySQLi Bac STI »_.
 
 ### 2.3 Moteur SQL Local & Contrôleur de Dialecte (Phase 2)
 
