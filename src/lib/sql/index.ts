@@ -5,3 +5,4 @@
 export * from "./types";
 export * from "./dialect-controller";
 export * from "./sqlite-engine";
+export * from "./relational-engine";

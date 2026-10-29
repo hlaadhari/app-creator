@@ -1,30 +1,24 @@
 /**
- * Labo STI - Moteur SQL Relationnel Local (PRD §8.2, F-25 à F-31)
+ * Labo STI - Moteur SQL Relationnel Local (PRD §8.2, F-25 à F-31, TEC-02)
  *
  * Moteur de base de données relationnelle locale exécutant le SQL dans le navigateur
  * avec contrôle de dialecte MySQL/MariaDB, visualiseur de tables et réinitialisation instantanée.
+ *
+ * Supporte :
+ * - Découpage lexical SQL respectant les chaînes de caractères contenant ';' et les commentaires '--' / '/* ... *\/'
+ * - INNER JOIN / LEFT JOIN / jointures implicites multi-tables
+ * - GROUP BY, HAVING, ORDER BY ASC|DESC, LIMIT
+ * - Fonctions d'agrégation COUNT, SUM, AVG, MIN, MAX
+ * - Opérateurs =, !=, <>, <, <=, >, >=, BETWEEN, IN, LIKE, IS NULL, IS NOT NULL, AND, OR
+ * - Application stricte de PRIMARY KEY (simple et composée), FOREIGN KEY, NOT NULL, UNIQUE, DEFAULT, CHECK et ALTER TABLE
  */
 
-import { adapterRequetePourSqlite, verifierDialecteSql } from "./dialect-controller";
+import { verifierDialecteSql } from "./dialect-controller";
+import { decouperRequetesSql, RelationalDatabaseEngine } from "./relational-engine";
 import type { SqlColumnInfo, SqlEngineConfig, SqlQueryResult, SqlTableInfo } from "./types";
 
-interface InternalColumn {
-  name: string;
-  type: string;
-  primaryKey: boolean;
-  notNull: boolean;
-  autoIncrement: boolean;
-}
-
-interface InternalTable {
-  name: string;
-  columns: InternalColumn[];
-  rows: Record<string, unknown>[];
-  lastAutoId: number;
-}
-
 export class SqliteEngine {
-  private tables: Map<string, InternalTable> = new Map();
+  private engine: RelationalDatabaseEngine = new RelationalDatabaseEngine();
   private initialSql: string = "";
   private readonly enableDialectController: boolean;
 
@@ -36,13 +30,20 @@ export class SqliteEngine {
   }
 
   /**
+   * Retourne l'instance sous-jacente du moteur relationnel
+   */
+  public getRelationalEngine(): RelationalDatabaseEngine {
+    return this.engine;
+  }
+
+  /**
    * Initialise le moteur et charge le script SQL initial
    */
   public async init(initialSql?: string): Promise<void> {
     if (initialSql !== undefined) {
       this.initialSql = initialSql;
     }
-    this.tables.clear();
+    this.engine.clear();
     if (this.initialSql.trim()) {
       await this.loadSql(this.initialSql);
     }
@@ -52,7 +53,7 @@ export class SqliteEngine {
    * Réinitialise la base à son état initial exact (PRD F-27)
    */
   public async reset(): Promise<void> {
-    this.tables.clear();
+    this.engine.clear();
     if (this.initialSql.trim()) {
       await this.loadSql(this.initialSql);
     }
@@ -62,14 +63,9 @@ export class SqliteEngine {
    * Exécute un script multi-instructions SQL (.sql)
    */
   public async loadSql(sqlScript: string): Promise<SqlQueryResult[]> {
-    const cleanSql = sqlScript.replace(/--.*$/gm, "").replace(/\/\*[\s\S]*?\*\//g, "");
-
-    const statements = cleanSql
-      .split(";")
-      .map((s) => s.trim())
-      .filter((s) => s.length > 0);
-
+    const statements = decouperRequetesSql(sqlScript);
     const results: SqlQueryResult[] = [];
+
     for (const stmt of statements) {
       const res = await this.executeQuery(stmt);
       results.push(res);
@@ -90,43 +86,22 @@ export class SqliteEngine {
     // 1. Contrôle de dialecte MySQL/MariaDB
     const dialectWarnings = this.enableDialectController ? verifierDialecteSql(trimmed) : [];
 
-    // 2. Normalisation / Adaptation pour SQLite
-    const adaptedQuery = adapterRequetePourSqlite(trimmed);
+    // 2. Exécution relationnelle
+    const res = this.engine.query(trimmed);
 
-    try {
-      const upper = adaptedQuery.toUpperCase();
+    const out: SqlQueryResult = {
+      columns: res.columns,
+      rows: res.rows,
+      rowsAffected: res.affectedRows,
+      durationMs: Math.max(Date.now() - startTime, res.durationMs || 1),
+      dialectWarnings,
+    };
 
-      if (upper.startsWith("CREATE TABLE")) {
-        return this.handleCreateTable(adaptedQuery, startTime, dialectWarnings);
-      } else if (upper.startsWith("INSERT INTO")) {
-        return this.handleInsert(adaptedQuery, startTime, dialectWarnings);
-      } else if (upper.startsWith("SELECT")) {
-        return this.handleSelect(adaptedQuery, startTime, dialectWarnings);
-      } else if (upper.startsWith("UPDATE")) {
-        return this.handleUpdate(adaptedQuery, startTime, dialectWarnings);
-      } else if (upper.startsWith("DELETE FROM")) {
-        return this.handleDelete(adaptedQuery, startTime, dialectWarnings);
-      } else if (upper.startsWith("DROP TABLE")) {
-        return this.handleDropTable(adaptedQuery, startTime, dialectWarnings);
-      }
-
-      return {
-        columns: [],
-        rows: [],
-        rowsAffected: 0,
-        durationMs: Math.max(Date.now() - startTime, 1),
-        dialectWarnings,
-      };
-    } catch (err: unknown) {
-      return {
-        columns: [],
-        rows: [],
-        rowsAffected: 0,
-        durationMs: Math.max(Date.now() - startTime, 1),
-        error: err instanceof Error ? err.message : String(err),
-        dialectWarnings,
-      };
+    if (res.error) {
+      out.error = res.error;
     }
+
+    return out;
   }
 
   /**
@@ -134,18 +109,25 @@ export class SqliteEngine {
    */
   public async getTables(): Promise<SqlTableInfo[]> {
     const result: SqlTableInfo[] = [];
-    for (const [name, table] of this.tables.entries()) {
+    const tableNames = this.engine.getTableNames();
+
+    for (const name of tableNames) {
+      const table = this.engine.getTable(name);
+      if (!table) continue;
+
       result.push({
-        name,
+        name: table.name,
         rowCount: table.rows.length,
-        columns: table.columns.map((c) => ({
+        columns: table.columns.map((c): SqlColumnInfo => ({
           name: c.name,
-          type: c.type,
+          type: c.rawType,
           primaryKey: c.primaryKey,
           notNull: c.notNull,
+          defaultValue: c.defaultValue !== undefined ? String(c.defaultValue) : null,
         })),
       });
     }
+
     return result;
   }
 
@@ -157,7 +139,7 @@ export class SqliteEngine {
     limit: number = 50,
     offset: number = 0,
   ): Promise<SqlQueryResult> {
-    const table = this.tables.get(tableName.toLowerCase());
+    const table = this.engine.getTable(tableName);
     if (!table) {
       return {
         columns: [],
@@ -192,22 +174,39 @@ export class SqliteEngine {
       "",
     ];
 
-    for (const [tableName, table] of this.tables.entries()) {
-      lines.push(`-- Structure de la table \`${tableName}\``);
-      lines.push(`CREATE TABLE IF NOT EXISTS \`${tableName}\` (`);
+    for (const name of this.engine.getTableNames()) {
+      const table = this.engine.getTable(name);
+      if (!table) continue;
+
+      lines.push(`-- Structure de la table \`${table.name}\``);
+      lines.push(`CREATE TABLE IF NOT EXISTS \`${table.name}\` (`);
       const colDefs = table.columns.map((c) => {
-        let def = `  \`${c.name}\` ${c.type}`;
+        let def = `  \`${c.name}\` ${c.rawType}`;
         if (c.primaryKey) def += " PRIMARY KEY";
         if (c.autoIncrement) def += " AUTO_INCREMENT";
         if (c.notNull) def += " NOT NULL";
+        if (c.defaultValue !== undefined && c.defaultValue !== null) {
+          def += ` DEFAULT '${c.defaultValue}'`;
+        }
         return def;
       });
+
+      // Contraintes de table
+      for (const fk of table.foreignKeys) {
+        colDefs.push(
+          `  CONSTRAINT \`fk_${table.name}_${fk.refTable}\` FOREIGN KEY (\`${fk.columns.join("`, `")}\`) REFERENCES \`${fk.refTable}\` (\`${fk.refColumns.join("`, `")}\`)`,
+        );
+      }
+      for (const chk of table.checkConstraints) {
+        colDefs.push(`  CHECK (${chk})`);
+      }
+
       lines.push(colDefs.join(",\n"));
       lines.push(");");
       lines.push("");
 
       if (table.rows.length > 0) {
-        lines.push(`-- Données de la table \`${tableName}\``);
+        lines.push(`-- Données de la table \`${table.name}\``);
         const colNames = table.columns.map((c) => `\`${c.name}\``).join(", ");
         for (const row of table.rows) {
           const values = table.columns.map((c) => {
@@ -216,7 +215,7 @@ export class SqliteEngine {
             if (typeof val === "number") return String(val);
             return `'${String(val).replace(/'/g, "''")}'`;
           });
-          lines.push(`INSERT INTO \`${tableName}\` (${colNames}) VALUES (${values.join(", ")});`);
+          lines.push(`INSERT INTO \`${table.name}\` (${colNames}) VALUES (${values.join(", ")});`);
         }
         lines.push("");
       }
@@ -225,354 +224,14 @@ export class SqliteEngine {
     return lines.join("\n");
   }
 
-  // =========================================================================
-  // Handlers SQL
-  // =========================================================================
-
-  private handleCreateTable(
-    query: string,
-    startTime: number,
-    dialectWarnings: SqlQueryResult["dialectWarnings"],
-  ): SqlQueryResult {
-    const match = query.match(
-      /CREATE\s+TABLE\s+(?:IF\s+NOT\s+EXISTS\s+)?([`"'\w]+)\s*\(([\s\S]+)\)/i,
-    );
-    if (!match || !match[1] || !match[2]) {
-      throw new Error("Syntaxe CREATE TABLE invalide.");
+  /**
+   * Dump de l'état en dictionnaire { nomTable: lignes[] }
+   */
+  public async dumpState(): Promise<Record<string, Record<string, unknown>[]>> {
+    const state: Record<string, Record<string, unknown>[]> = {};
+    for (const name of this.engine.getTableNames()) {
+      state[name] = this.engine.getTableRows(name);
     }
-
-    const tableName = match[1].replace(/[`"']/g, "").toLowerCase();
-    const body = match[2];
-
-    const columns: InternalColumn[] = [];
-    const colLines = body
-      .split(",")
-      .map((l) => l.trim())
-      .filter((l) => l.length > 0);
-
-    for (const line of colLines) {
-      const upperLine = line.toUpperCase();
-      if (
-        upperLine.startsWith("PRIMARY KEY") ||
-        upperLine.startsWith("FOREIGN KEY") ||
-        upperLine.startsWith("CONSTRAINT") ||
-        upperLine.startsWith("CHECK")
-      ) {
-        continue;
-      }
-
-      const parts = line.split(/\s+/);
-      const colName = parts[0]?.replace(/[`"']/g, "") || "";
-      const colType = parts[1] || "TEXT";
-      const isPk = upperLine.includes("PRIMARY KEY");
-      const isAuto = upperLine.includes("AUTOINCREMENT") || upperLine.includes("AUTO_INCREMENT");
-      const isNotNull = upperLine.includes("NOT NULL");
-
-      if (colName) {
-        columns.push({
-          name: colName,
-          type: colType,
-          primaryKey: isPk,
-          autoIncrement: isAuto,
-          notNull: isNotNull,
-        });
-      }
-    }
-
-    this.tables.set(tableName, {
-      name: tableName,
-      columns,
-      rows: [],
-      lastAutoId: 0,
-    });
-
-    return {
-      columns: [],
-      rows: [],
-      rowsAffected: 0,
-      durationMs: Math.max(Date.now() - startTime, 1),
-      dialectWarnings,
-    };
-  }
-
-  private handleInsert(
-    query: string,
-    startTime: number,
-    dialectWarnings: SqlQueryResult["dialectWarnings"],
-  ): SqlQueryResult {
-    const match = query.match(
-      /INSERT\s+INTO\s+([`"'\w]+)(?:\s*\(([^)]+)\))?\s+VALUES\s*\(([\s\S]+?)\)/i,
-    );
-    if (!match || !match[1] || !match[3]) {
-      throw new Error("Syntaxe INSERT INTO invalide.");
-    }
-
-    const tableName = match[1].replace(/[`"']/g, "").toLowerCase();
-    const table = this.tables.get(tableName);
-    if (!table) {
-      throw new Error(`Table '${tableName}' inexistante.`);
-    }
-
-    const specifiedCols = match[2]
-      ? match[2].split(",").map((c) => c.trim().replace(/[`"']/g, ""))
-      : table.columns.map((c) => c.name);
-
-    const rawValues = match[3].split(",").map((v) => v.trim());
-    const row: Record<string, unknown> = {};
-
-    table.lastAutoId++;
-
-    table.columns.forEach((col) => {
-      const idx = specifiedCols.indexOf(col.name);
-      if (idx !== -1 && rawValues[idx] !== undefined) {
-        const raw = (rawValues[idx] ?? "").trim();
-        let val: unknown = raw;
-        if (
-          (raw.startsWith("'") && raw.endsWith("'")) ||
-          (raw.startsWith('"') && raw.endsWith('"'))
-        ) {
-          val = raw.slice(1, -1);
-        } else if (raw === "NULL") {
-          val = null;
-        } else if (!isNaN(Number(raw))) {
-          val = Number(raw);
-        }
-        row[col.name] = val;
-      } else if (col.autoIncrement) {
-        row[col.name] = table.lastAutoId;
-      } else {
-        row[col.name] = null;
-      }
-    });
-
-    table.rows.push(row);
-
-    return {
-      columns: [],
-      rows: [],
-      rowsAffected: 1,
-      durationMs: Math.max(Date.now() - startTime, 1),
-      dialectWarnings,
-    };
-  }
-
-  private handleSelect(
-    query: string,
-    startTime: number,
-    dialectWarnings: SqlQueryResult["dialectWarnings"],
-  ): SqlQueryResult {
-    const fromMatch = query.match(/FROM\s+([`"'\w]+)/i);
-    if (!fromMatch || !fromMatch[1]) {
-      // Requête sans FROM (ex: SELECT 1 + 1, SELECT CURDATE())
-      return {
-        columns: ["result"],
-        rows: [{ result: 1 }],
-        rowsAffected: 1,
-        durationMs: Math.max(Date.now() - startTime, 1),
-        dialectWarnings,
-      };
-    }
-
-    const tableName = fromMatch[1].replace(/[`"']/g, "").toLowerCase();
-    const table = this.tables.get(tableName);
-    if (!table) {
-      throw new Error(`Table '${tableName}' inexistante.`);
-    }
-
-    const selectMatch = query.match(/SELECT\s+([\s\S]+?)\s+FROM/i);
-    const rawSelect = selectMatch?.[1]?.trim() || "*";
-
-    let rows = [...table.rows];
-
-    // Traitement simple de clause WHERE
-    const whereMatch = query.match(/WHERE\s+([^;]+?)(?:\s+ORDER|\s+GROUP|\s+LIMIT|;|$)/i);
-    if (whereMatch && whereMatch[1]) {
-      const cond = whereMatch[1].trim();
-      const eqMatch = cond.match(/([`"'\w]+)\s*=\s*(['"]?[^'"]+['"]?)/);
-      if (eqMatch && eqMatch[1] && eqMatch[2]) {
-        const field = eqMatch[1].replace(/[`"']/g, "");
-        let expectedVal: unknown = eqMatch[2].trim();
-        if (
-          typeof expectedVal === "string" &&
-          ((expectedVal.startsWith("'") && expectedVal.endsWith("'")) ||
-            (expectedVal.startsWith('"') && expectedVal.endsWith('"')))
-        ) {
-          expectedVal = expectedVal.slice(1, -1);
-        } else if (!isNaN(Number(expectedVal))) {
-          expectedVal = Number(expectedVal);
-        }
-        rows = rows.filter((r) => String(r[field]) === String(expectedVal));
-      }
-    }
-
-    // Traitement de clause LIMIT
-    const limitMatch = query.match(/LIMIT\s+(\d+)/i);
-    if (limitMatch && limitMatch[1]) {
-      const lim = parseInt(limitMatch[1], 10);
-      rows = rows.slice(0, lim);
-    }
-
-    // Sélection des colonnes
-    let columns: string[] = [];
-    let formattedRows: Record<string, unknown>[] = [];
-
-    if (rawSelect === "*") {
-      columns = table.columns.map((c) => c.name);
-      formattedRows = rows;
-    } else if (rawSelect.toUpperCase().includes("COUNT(")) {
-      columns = ["total"];
-      formattedRows = [{ total: rows.length }];
-    } else {
-      columns = rawSelect.split(",").map((c) => c.trim().replace(/[`"']/g, ""));
-      formattedRows = rows.map((r) => {
-        const outRow: Record<string, unknown> = {};
-        columns.forEach((c) => {
-          outRow[c] = r[c] !== undefined ? r[c] : null;
-        });
-        return outRow;
-      });
-    }
-
-    return {
-      columns,
-      rows: formattedRows,
-      rowsAffected: formattedRows.length,
-      durationMs: Math.max(Date.now() - startTime, 1),
-      dialectWarnings,
-    };
-  }
-
-  private handleUpdate(
-    query: string,
-    startTime: number,
-    dialectWarnings: SqlQueryResult["dialectWarnings"],
-  ): SqlQueryResult {
-    const updatePrefixMatch = query.match(/UPDATE\s+([`"'\w]+)\s+SET\s+/i);
-    if (!updatePrefixMatch || !updatePrefixMatch[1]) {
-      throw new Error("Syntaxe UPDATE invalide.");
-    }
-
-    const tableName = updatePrefixMatch[1].replace(/[`"']/g, "").toLowerCase();
-    const table = this.tables.get(tableName);
-    if (!table) {
-      throw new Error(`Table '${tableName}' inexistante.`);
-    }
-
-    const afterSet = query.slice(updatePrefixMatch[0].length);
-    const whereIdx = afterSet.toUpperCase().indexOf(" WHERE ");
-
-    let setPart = "";
-    let wherePart = "";
-    if (whereIdx !== -1) {
-      setPart = afterSet.slice(0, whereIdx).trim();
-      wherePart = afterSet
-        .slice(whereIdx + 7)
-        .replace(/;$/, "")
-        .trim();
-    } else {
-      setPart = afterSet.replace(/;$/, "").trim();
-    }
-
-    const setClauses = setPart.split(",").map((c) => c.trim());
-    let affected = 0;
-
-    table.rows.forEach((row) => {
-      // Vérifier la condition WHERE si présente
-      if (wherePart) {
-        const eqMatch = wherePart.match(/([`"'\w]+)\s*=\s*(['"]?[^'"]+['"]?)/);
-        if (eqMatch && eqMatch[1] && eqMatch[2]) {
-          const whereField = eqMatch[1].replace(/[`"']/g, "");
-          const rawExpected = (eqMatch[2] ?? "").trim();
-          let expectedVal: unknown = rawExpected;
-          if (
-            (rawExpected.startsWith("'") && rawExpected.endsWith("'")) ||
-            (rawExpected.startsWith('"') && rawExpected.endsWith('"'))
-          ) {
-            expectedVal = rawExpected.slice(1, -1);
-          } else if (!isNaN(Number(rawExpected))) {
-            expectedVal = Number(rawExpected);
-          }
-          if (String(row[whereField]) !== String(expectedVal)) {
-            return; // ne pas modifier cette ligne
-          }
-        }
-      }
-
-      setClauses.forEach((clause) => {
-        const [col, val] = clause.split("=").map((p) => p.trim());
-        if (col && val !== undefined) {
-          const colClean = col.replace(/[`"']/g, "");
-          let cleanVal: unknown = val;
-          if (
-            (val.startsWith("'") && val.endsWith("'")) ||
-            (val.startsWith('"') && val.endsWith('"'))
-          ) {
-            cleanVal = val.slice(1, -1);
-          } else if (!isNaN(Number(val))) {
-            cleanVal = Number(val);
-          }
-          row[colClean] = cleanVal;
-        }
-      });
-      affected++;
-    });
-
-    return {
-      columns: [],
-      rows: [],
-      rowsAffected: affected,
-      durationMs: Math.max(Date.now() - startTime, 1),
-      dialectWarnings,
-    };
-  }
-
-  private handleDelete(
-    query: string,
-    startTime: number,
-    dialectWarnings: SqlQueryResult["dialectWarnings"],
-  ): SqlQueryResult {
-    const match = query.match(/DELETE\s+FROM\s+([`"'\w]+)/i);
-    if (!match || !match[1]) {
-      throw new Error("Syntaxe DELETE invalide.");
-    }
-
-    const tableName = match[1].replace(/[`"']/g, "").toLowerCase();
-    const table = this.tables.get(tableName);
-    if (!table) {
-      throw new Error(`Table '${tableName}' inexistante.`);
-    }
-
-    const initialCount = table.rows.length;
-    table.rows = [];
-
-    return {
-      columns: [],
-      rows: [],
-      rowsAffected: initialCount,
-      durationMs: Math.max(Date.now() - startTime, 1),
-      dialectWarnings,
-    };
-  }
-
-  private handleDropTable(
-    query: string,
-    startTime: number,
-    dialectWarnings: SqlQueryResult["dialectWarnings"],
-  ): SqlQueryResult {
-    const match = query.match(/DROP\s+TABLE\s+(?:IF\s+EXISTS\s+)?([`"'\w]+)/i);
-    if (!match || !match[1]) {
-      throw new Error("Syntaxe DROP TABLE invalide.");
-    }
-
-    const tableName = match[1].replace(/[`"']/g, "").toLowerCase();
-    const existed = this.tables.delete(tableName);
-
-    return {
-      columns: [],
-      rows: [],
-      rowsAffected: existed ? 1 : 0,
-      durationMs: Math.max(Date.now() - startTime, 1),
-      dialectWarnings,
-    };
+    return state;
   }
 }
