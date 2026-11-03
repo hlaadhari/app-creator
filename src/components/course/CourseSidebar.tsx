@@ -64,10 +64,12 @@ export function CourseSidebar({
         <div className="relative">
           <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground pointer-events-none" />
           <input
+            id="course-sidebar-search"
             type="text"
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
             placeholder="Rechercher (ex: mysqli, verif...)"
+            aria-label="Rechercher dans le sommaire du cours"
             className="w-full pl-8 pr-7 py-1.5 text-xs bg-background/60 border rounded-md focus:outline-none focus:ring-1 focus:ring-primary text-foreground placeholder:text-muted-foreground/60 transition-colors"
           />
           {searchQuery && (
@@ -75,6 +77,7 @@ export function CourseSidebar({
               onClick={() => onSearchChange("")}
               className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground p-0.5 cursor-pointer"
               title="Effacer la recherche"
+              aria-label="Effacer la recherche dans le sommaire"
             >
               <X className="h-3 w-3" />
             </button>
