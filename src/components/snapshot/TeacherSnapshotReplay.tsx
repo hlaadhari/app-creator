@@ -19,13 +19,13 @@ import {
   ajusterPointsCritere,
   ajusterNoteFinaleGlobale,
 } from "@/lib/snapshot/grading-service";
-import { type CriterionDefinition } from "@/lib/evaluation/probe-runner";
+import type { Criterion } from "@/lib/exercises";
 
 export interface TeacherSnapshotReplayProps {
   snapshot: SnapshotManifeste;
   fichiers: Record<string, string | Uint8Array>;
   sqlDump?: string | null;
-  criteres: CriterionDefinition[];
+  criteres: Criterion[];
   numeroCin: string;
   nomEleve: string;
   enseignantId: string;

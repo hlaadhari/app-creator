@@ -3,9 +3,17 @@
  *
  * Exécute une réévaluation reproductible et déterministe d'un snapshot certifié
  * avec les critères de notation versionnés.
+ *
+ * Moteur unique (TEC-05 / issue #127) : le rejouage évalue la copie exactement comme la
+ * vérification formative de l'élève et le banc didactique du Studio (`evaluerCopie` :
+ * critères évalués page par page, scripts exécutés, même calcul de note). Une même copie
+ * obtient donc le même score dans les trois contextes.
  */
 
-import { type CriterionDefinition, evaluateCriteria } from "@/lib/evaluation/probe-runner";
+import type { Criterion } from "@/lib/exercises";
+import { evaluerCopie, type FabriqueEvaluateur } from "@/lib/evaluation/evaluation-par-page";
+import type { FichiersEvaluation } from "@/lib/evaluation/document-evaluation";
+import { evaluateurFrame } from "@/lib/evaluation/iframe-evaluation";
 import {
   type SnapshotManifeste,
   type GrilleNotationOfficielle,
@@ -18,55 +26,22 @@ import { SqliteEngine } from "@/lib/sql/sqlite-engine";
 export interface RejouerCorrectionOptions {
   snapshot: SnapshotManifeste;
   fichiers: Record<string, string | Uint8Array>;
-  criteres: CriterionDefinition[];
+  criteres: Criterion[];
   sqlDump?: string | null | undefined;
   baremeTotal?: number; // Par défaut 20 points
+  /** Évaluateur de page : frame sandboxée du navigateur par défaut, JSDOM dans les tests. */
+  evaluateurPour?: FabriqueEvaluateur;
 }
 
-/**
- * Crée un environnement DOM synthétique à partir des fichiers HTML et CSS du snapshot
- */
-function preparerDocumentSnapshot(fichiers: Record<string, string | Uint8Array>): {
-  doc: Document;
-  win: Window;
-} {
-  // Recherche du fichier HTML principal (ex: index.html, location.html, Don.html ou premier .html)
-  const chemHtml =
-    Object.keys(fichiers).find((k) => k.toLowerCase() === "index.html") ||
-    Object.keys(fichiers).find((k) => k.toLowerCase().endsWith(".html")) ||
-    "index.html";
-
-  const contenuHtmlBrut = fichiers[chemHtml] || "<html><head></head><body></body></html>";
+/** Fichiers texte du snapshot, tels qu'évalués côté élève (les binaires sont décodés en UTF-8). */
+function fichiersTexteSnapshot(fichiers: Record<string, string | Uint8Array>): FichiersEvaluation {
   const decoder = new TextDecoder();
-  const htmlStr =
-    typeof contenuHtmlBrut === "string" ? contenuHtmlBrut : decoder.decode(contenuHtmlBrut);
-
-  const parser = new DOMParser();
-  const doc = parser.parseFromString(htmlStr, "text/html");
-
-  // Injection des feuilles de style CSS locales
-  for (const [nom, contenu] of Object.entries(fichiers)) {
-    if (nom.toLowerCase().endsWith(".css")) {
-      const cssStr = typeof contenu === "string" ? contenu : decoder.decode(contenu);
-      const styleEl = doc.createElement("style");
-      styleEl.setAttribute("data-source", nom);
-      styleEl.textContent = cssStr;
-      doc.head.appendChild(styleEl);
-    }
-  }
-
-  // Window mock pour les styles calculés si non présent
-  const win = (doc.defaultView ||
-    globalThis.window || {
-      getComputedStyle: (el: Element) => {
-        const inline = (el as HTMLElement).style;
-        return {
-          getPropertyValue: (prop: string) => inline?.getPropertyValue(prop) || "",
-        };
-      },
-    }) as unknown as Window;
-
-  return { doc, win };
+  return Object.fromEntries(
+    Object.entries(fichiers).map(([nom, contenu]) => [
+      nom,
+      typeof contenu === "string" ? contenu : decoder.decode(contenu),
+    ]),
+  );
 }
 
 /**
@@ -74,7 +49,8 @@ function preparerDocumentSnapshot(fichiers: Record<string, string | Uint8Array>)
  */
 async function executerPasseEvaluation(
   fichiers: Record<string, string | Uint8Array>,
-  criteres: CriterionDefinition[],
+  criteres: Criterion[],
+  evaluateurPour: FabriqueEvaluateur,
   sqlDump?: string | null,
   baremeTotal = 20,
 ): Promise<{
@@ -82,11 +58,15 @@ async function executerPasseEvaluation(
   journal: string[];
 }> {
   const journal: string[] = [];
-  const { doc, win } = preparerDocumentSnapshot(fichiers);
+  const fichiersTexte = fichiersTexteSnapshot(fichiers);
 
-  // 1. Évaluation des sondes DOM, CSS et JS
-  journal.push(`Exécution de ${criteres.length} critère(s) de référence sur le DOM.`);
-  const summary = evaluateCriteria(criteres, doc, win);
+  // 1. Évaluation par le moteur unique (mêmes critères, mêmes pages, même calcul que l'élève)
+  journal.push(`Exécution de ${criteres.length} critère(s) de référence (moteur unique).`);
+  const { resultats, bilan } = await evaluerCopie(
+    criteres,
+    fichiersTexte,
+    evaluateurPour(fichiersTexte),
+  );
 
   // 2. Gestion éventuelle d'une validation SQL
   let sqliteEngine: SqliteEngine | null = null;
@@ -103,30 +83,32 @@ async function executerPasseEvaluation(
     }
   }
 
-  // 3. Construction de la rubrique détaillée
-  let totalPointsMax = 0;
-  let totalPointsAuto = 0;
-
-  const rubriqueCriteres: RubriqueCritereNote[] = summary.results.map((res) => {
-    totalPointsMax += res.maxPoints;
-    totalPointsAuto += res.points;
-
+  // 3. Construction de la rubrique détaillée (mêmes résultats par critère que l'élève)
+  const rubriqueCriteres: RubriqueCritereNote[] = resultats.map((res) => {
+    const pointsAuto = res.ok ? res.points : 0;
+    const critere = criteres.find((c) => c.id === res.id);
+    const code = typeof critere?.raw?.["code"] === "string" ? critere.raw["code"] : res.id;
     return {
       critereId: res.id,
-      code: res.code,
+      code: code.toUpperCase(),
       label: res.label,
-      pointsMax: res.maxPoints,
-      pointsAuto: res.points,
-      pointsAjustes: res.points, // Par défaut égal aux points auto
-      valide: res.passed,
+      pointsMax: res.points,
+      pointsAuto,
+      pointsAjustes: pointsAuto, // Par défaut égal aux points auto
+      valide: res.ok,
       message: res.message,
     };
   });
 
+  const totalPointsMax = bilan.total;
+  const totalPointsAuto = bilan.got;
+  // Même note que l'élève (`score`) si baremeTotal === 20, sinon mise à l'échelle
   const noteAuto20 =
-    totalPointsMax > 0
-      ? Math.round((totalPointsAuto / totalPointsMax) * baremeTotal * 100) / 100
-      : 0;
+    baremeTotal === 20
+      ? bilan.note20
+      : totalPointsMax > 0
+        ? Math.round((totalPointsAuto / totalPointsMax) * baremeTotal * 10) / 10
+        : 0;
 
   const grille: GrilleNotationOfficielle = {
     criteres: rubriqueCriteres,
@@ -168,10 +150,13 @@ export async function rejouerCorrectionReference(
     );
   }
 
+  const evaluateurPour = options.evaluateurPour ?? evaluateurFrame;
+
   // 2. Première passe d'évaluation
   const passe1 = await executerPasseEvaluation(
     options.fichiers,
     options.criteres,
+    evaluateurPour,
     options.sqlDump,
     options.baremeTotal ?? 20,
   );
@@ -181,6 +166,7 @@ export async function rejouerCorrectionReference(
   const passe2 = await executerPasseEvaluation(
     options.fichiers,
     options.criteres,
+    evaluateurPour,
     options.sqlDump,
     options.baremeTotal ?? 20,
   );

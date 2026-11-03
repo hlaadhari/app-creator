@@ -4,11 +4,14 @@
  * index.html : un élève qui réussissait une autre page ne gagnait aucun de ses points.
  */
 
-import type { Criterion, Result } from "@/lib/exercises";
+import { score, type Criterion, type Result } from "@/lib/exercises";
 import { pageParDefaut, type FichiersEvaluation } from "@/lib/evaluation/document-evaluation";
 
 /** Évalue un groupe de critères sur une page (iframe dans l'application, JSDOM dans les tests). */
 export type EvaluerPage = (page: string, criteres: Criterion[]) => Promise<Result[]>;
+
+/** Fabrique l'évaluateur d'une page à partir des fichiers de la copie évaluée. */
+export type FabriqueEvaluateur = (fichiers: FichiersEvaluation) => EvaluerPage;
 
 export const messagePageAbsente = (page: string) =>
   `La page ${page} est absente de votre projet : ce critère ne peut pas être vérifié.`;
@@ -61,4 +64,25 @@ export async function evaluerParPage(
   return criteres.map(
     (c) => parCritere.get(c.id) ?? resultatNonValide(c, "Ce critère n'a pas pu être évalué."),
   );
+}
+
+/** Résultat complet de l'évaluation d'une copie : détail par critère et bilan chiffré. */
+export interface EvaluationCopie {
+  resultats: Result[];
+  bilan: ReturnType<typeof score>;
+}
+
+/**
+ * Moteur d'évaluation unique (TEC-05 / issue #127) : vérification formative de l'élève, banc
+ * didactique du Studio et rejouage officiel d'un snapshot passent tous par cette fonction.
+ * Seul l'évaluateur de page change selon le contexte (frame sandboxée dans le navigateur, JSDOM
+ * dans les tests) : critères, découpage par page et calcul de la note sont strictement identiques.
+ */
+export async function evaluerCopie(
+  criteres: Criterion[],
+  fichiers: FichiersEvaluation,
+  evaluerPage: EvaluerPage,
+): Promise<EvaluationCopie> {
+  const resultats = await evaluerParPage(criteres, fichiers, evaluerPage);
+  return { resultats, bilan: score(resultats) };
 }

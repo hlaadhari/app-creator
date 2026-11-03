@@ -4,8 +4,8 @@
  * un critère sans vérification automatique réelle bloque la publication.
  */
 
-import { score, type Criterion, type Files } from "@/lib/exercises";
-import { evaluerParPage, type EvaluerPage } from "@/lib/evaluation/evaluation-par-page";
+import type { Criterion } from "@/lib/exercises";
+import { evaluerCopie, type FabriqueEvaluateur } from "@/lib/evaluation/evaluation-par-page";
 import type {
   DidacticValidationResult,
   PreValidationReport,
@@ -14,16 +14,18 @@ import type {
 
 type TypeSolution = ValidationSolution["type"];
 
-/** Fabrique l'évaluateur d'une page à partir des fichiers de la solution testée. */
-export type FabriqueEvaluateur = (fichiers: Files) => EvaluerPage;
+export type { FabriqueEvaluateur };
 
 export async function testerSolutionReelle(
   criteres: Criterion[],
   solution: ValidationSolution,
   evaluateurPour: FabriqueEvaluateur,
 ): Promise<DidacticValidationResult> {
-  const resultats = await evaluerParPage(criteres, solution.files, evaluateurPour(solution.files));
-  const bilan = score(resultats);
+  const { resultats, bilan } = await evaluerCopie(
+    criteres,
+    solution.files,
+    evaluateurPour(solution.files),
+  );
   const verifiables = resultats.filter((r) => r.automatique);
   const reussis = verifiables.filter((r) => r.ok).length;
   const total = verifiables.length;

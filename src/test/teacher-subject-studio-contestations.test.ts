@@ -1,6 +1,5 @@
 import { describe, expect, it } from "vitest";
 import {
-  validerBancDidactique,
   publierVersionSujet,
   creerNouvelleVersion,
   type SubjectVersionRecord,
@@ -13,6 +12,9 @@ import {
   type StudentAttemptRecord,
 } from "@/lib/subjects/contestations-service";
 import type { CriterionDefinition } from "@/lib/evaluation/probe-runner";
+import { critereDepuisJson, type RawCriterion } from "@/lib/evaluation/critere-json";
+import { validerBancDidactiqueReel } from "@/lib/subjects/banc-didactique";
+import { evaluateurJsdom } from "./helpers/evaluateur-jsdom";
 
 describe("Studio Enseignant, Immuabilité et Arbitrage (Issue #11 - PRD F-32, F-35, F-36, F-44, F-45, T-09)", () => {
   const criteria: CriterionDefinition[] = [
@@ -44,6 +46,8 @@ describe("Studio Enseignant, Immuabilité et Arbitrage (Issue #11 - PRD F-32, F-
       message_echec: "Moins de 3 éléments li",
     },
   ];
+  // Banc didactique évalué par le moteur unique des élèves (issue #127).
+  const criteresMoteur = criteria.map((d) => critereDepuisJson(d as unknown as RawCriterion));
 
   const solutionsConformes: ValidationSolution[] = [
     {
@@ -109,8 +113,12 @@ describe("Studio Enseignant, Immuabilité et Arbitrage (Issue #11 - PRD F-32, F-
   ];
 
   describe("Banc de Pré-validation didactique (PRD §10.4, F-35)", () => {
-    it("valide avec succès le banc didactique lorsque les 2 solutions valides et 1 invalide sont conformes", () => {
-      const report = validerBancDidactique(criteria, solutionsConformes);
+    it("valide avec succès le banc didactique lorsque les 2 solutions valides et 1 invalide sont conformes", async () => {
+      const report = await validerBancDidactiqueReel(
+        criteresMoteur,
+        solutionsConformes,
+        evaluateurJsdom,
+      );
 
       expect(report.readyToPublish).toBe(true);
       expect(report.canoniquePassed).toBe(true);
@@ -120,7 +128,7 @@ describe("Studio Enseignant, Immuabilité et Arbitrage (Issue #11 - PRD F-32, F-
       expect(report.results).toHaveLength(3);
     });
 
-    it("refuse la publication si la solution alternative échoue (faux négatif)", () => {
+    it("refuse la publication si la solution alternative échoue (faux négatif)", async () => {
       const solutionsDefaillantes: ValidationSolution[] = [
         solutionsConformes[0]!,
         {
@@ -142,14 +150,18 @@ describe("Studio Enseignant, Immuabilité et Arbitrage (Issue #11 - PRD F-32, F-
         solutionsConformes[2]!,
       ];
 
-      const report = validerBancDidactique(criteria, solutionsDefaillantes);
+      const report = await validerBancDidactiqueReel(
+        criteresMoteur,
+        solutionsDefaillantes,
+        evaluateurJsdom,
+      );
 
       expect(report.readyToPublish).toBe(false);
       expect(report.alternativePassed).toBe(false);
       expect(report.errors.some((e) => e.includes("alternative"))).toBe(true);
     });
 
-    it("refuse la publication si la solution invalide est acceptée à 100% (critère non discriminant)", () => {
+    it("refuse la publication si la solution invalide est acceptée à 100% (critère non discriminant)", async () => {
       const solutionsLaxistes: ValidationSolution[] = [
         solutionsConformes[0]!,
         solutionsConformes[1]!,
@@ -171,7 +183,11 @@ describe("Studio Enseignant, Immuabilité et Arbitrage (Issue #11 - PRD F-32, F-
         },
       ];
 
-      const report = validerBancDidactique(criteria, solutionsLaxistes);
+      const report = await validerBancDidactiqueReel(
+        criteresMoteur,
+        solutionsLaxistes,
+        evaluateurJsdom,
+      );
 
       expect(report.readyToPublish).toBe(false);
       expect(report.invalideFailedAsExpected).toBe(false);
@@ -211,8 +227,12 @@ describe("Studio Enseignant, Immuabilité et Arbitrage (Issue #11 - PRD F-32, F-
       expect(res.error).toContain("Publication refusée : la validation didactique");
     });
 
-    it("autorise la publication lorsque le banc didactique est certifié conforme", () => {
-      const validReport = validerBancDidactique(criteria, solutionsConformes);
+    it("autorise la publication lorsque le banc didactique est certifié conforme", async () => {
+      const validReport = await validerBancDidactiqueReel(
+        criteresMoteur,
+        solutionsConformes,
+        evaluateurJsdom,
+      );
       const res = publierVersionSujet(mockVersion, validReport);
 
       expect(res.success).toBe(true);
@@ -220,14 +240,18 @@ describe("Studio Enseignant, Immuabilité et Arbitrage (Issue #11 - PRD F-32, F-
       expect(res.version?.published_at).toBeTruthy();
     });
 
-    it("interdit formellement toute modification d'une version déjà publiée (T-09)", () => {
+    it("interdit formellement toute modification d'une version déjà publiée (T-09)", async () => {
       const publishedVersion: SubjectVersionRecord = {
         ...mockVersion,
         publiee: true,
         published_at: new Date().toISOString(),
       };
 
-      const report = validerBancDidactique(criteria, solutionsConformes);
+      const report = await validerBancDidactiqueReel(
+        criteresMoteur,
+        solutionsConformes,
+        evaluateurJsdom,
+      );
       const res = publierVersionSujet(publishedVersion, report);
 
       expect(res.success).toBe(false);
