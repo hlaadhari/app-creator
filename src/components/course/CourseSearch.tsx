@@ -25,10 +25,12 @@ export function CourseSearch({ value, onChange, className = "" }: CourseSearchPr
       <div className="relative">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground pointer-events-none" />
         <input
+          id="course-search-input"
           type="text"
           value={value}
           onChange={(e) => onChange(e.target.value)}
           placeholder="Rechercher une notion (ex: mysqli, verif, CHECK...)"
+          aria-label="Rechercher une notion dans le cours"
           className="w-full pl-9 pr-8 py-1.5 text-xs bg-background/80 border rounded-md focus:outline-none focus:ring-1 focus:ring-primary text-foreground placeholder:text-muted-foreground/60 transition-colors"
         />
         {value && (
@@ -37,6 +39,7 @@ export function CourseSearch({ value, onChange, className = "" }: CourseSearchPr
             onClick={() => onChange("")}
             className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground p-0.5 cursor-pointer"
             title="Effacer la recherche"
+            aria-label="Effacer la recherche"
           >
             <X className="h-3 w-3" />
           </button>

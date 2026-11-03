@@ -62,6 +62,7 @@ export function SyncStatusBar({
             onClick={onConflictClick}
             className="flex items-center gap-1.5 text-amber-500 hover:text-amber-600 font-semibold cursor-pointer animate-pulse underline"
             title="Cliquer pour résoudre le conflit de révision"
+            aria-label="Résoudre le conflit de révision"
           >
             <AlertTriangle className="h-3 w-3" />
             <span>Conflit détecté (cliquer)</span>
@@ -81,6 +82,7 @@ export function SyncStatusBar({
             onClick={onManualSync}
             className="flex items-center gap-1.5 text-rose-500 hover:text-rose-600 font-medium cursor-pointer"
             title="Réessayer la synchronisation"
+            aria-label="Réessayer la synchronisation"
           >
             <AlertTriangle className="h-3 w-3" />
             <span>Erreur réseau (réessayer)</span>

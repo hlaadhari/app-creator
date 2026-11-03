@@ -132,6 +132,7 @@ export function WorkspaceFileTree({
         <button
           onClick={() => fileInputRef.current?.click()}
           title="Importer une image ou ressource locale"
+          aria-label="Importer des fichiers locaux"
           className="hover:text-foreground p-0.5 rounded transition-colors"
         >
           <Upload className="h-3.5 w-3.5" />
@@ -142,6 +143,7 @@ export function WorkspaceFileTree({
           multiple
           className="hidden"
           accept="image/*,.html,.css,.js,.svg,.woff2"
+          aria-label="Sélectionner des fichiers à importer"
           onChange={handleFileUpload}
         />
       </div>

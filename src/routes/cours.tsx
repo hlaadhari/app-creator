@@ -179,6 +179,7 @@ function CoursPage() {
             onClick={() => setMobileSidebarOpen(!mobileSidebarOpen)}
             className="md:hidden p-1.5 rounded hover:bg-accent text-muted-foreground hover:text-foreground cursor-pointer"
             title="Menu du cours"
+            aria-label={mobileSidebarOpen ? "Fermer le menu du cours" : "Ouvrir le menu du cours"}
           >
             {mobileSidebarOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
           </button>
@@ -197,9 +198,7 @@ function CoursPage() {
 
           <div className="flex items-center gap-1.5 shrink-0">
             <BookOpen className="h-4 w-4 text-primary shrink-0" />
-            <span className="text-xs font-semibold text-foreground hidden lg:inline">
-              Carnet STI-BAC INFO
-            </span>
+            <h1 className="text-xs font-semibold text-foreground">Carnet STI-BAC INFO</h1>
             <span className="hidden xl:inline text-[10px] px-1.5 py-0.2 rounded bg-primary/10 text-primary border border-primary/20 font-mono shrink-0">
               10 Vidéos • 262 Sources
             </span>
@@ -351,6 +350,7 @@ function CoursPage() {
                 onClick={() => setMobileSidebarOpen(false)}
                 className="p-1 rounded text-muted-foreground hover:text-foreground cursor-pointer"
                 title="Fermer le menu"
+                aria-label="Fermer le menu"
               >
                 <X className="h-4 w-4" />
               </button>
@@ -437,7 +437,7 @@ function CoursPage() {
       )}
 
       {/* Contenu principal + Volet Tuteur IA Carnet STI-BAC INFO */}
-      <div className="flex flex-1 min-h-0 relative">
+      <main className="flex flex-1 min-h-0 relative">
         {viewMode === "manuel" ? (
           <>
             <div className="hidden md:flex w-72 lg:w-80 shrink-0 h-full border-r">
@@ -563,7 +563,7 @@ function CoursPage() {
             </aside>
 
             {/* Corps de la Fiche Active ou des Annales */}
-            <main className="flex-1 overflow-y-auto px-6 py-6 md:px-10 md:py-8 min-h-0 bg-background/50">
+            <div className="flex-1 overflow-y-auto px-6 py-6 md:px-10 md:py-8 min-h-0 bg-background/50">
               <div className="max-w-4xl mx-auto space-y-6">
                 {searchResults !== null ? (
                   /* Résultats de recherche plein texte */
@@ -608,7 +608,7 @@ function CoursPage() {
                   />
                 )}
               </div>
-            </main>
+            </div>
           </>
         )}
 
@@ -618,7 +618,7 @@ function CoursPage() {
             <CourseNotebookTutor activeCategoryId={activeCategoryId} />
           </div>
         )}
-      </div>
+      </main>
 
       {/* Modale de Lecture Vidéo / Audio Interactive */}
       <VideoPlayerModal capsule={activeVideoCapsule} onClose={() => setActiveVideoCapsule(null)} />

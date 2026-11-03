@@ -45,6 +45,7 @@ import {
   TrendingUp,
   Bot,
   Lock,
+  Info,
 } from "lucide-react";
 import { SubjectCompetencesPill } from "@/components/competences/SubjectCompetencesPill";
 import { ProgressionModal } from "@/components/competences/ProgressionModal";
@@ -161,6 +162,22 @@ function WorkspaceView({ ex }: { ex: Exercise }) {
     () => (ex.criteria ? calculerBaremeRepartition(ex.criteria) : null),
     [ex.criteria],
   );
+
+  const accessibilityMessage = useMemo(() => {
+    if (evaluationSummary) {
+      return `Évaluation terminée. Note formative : ${evaluationSummary.note20} sur 20. ${evaluationSummary.earnedPoints} points obtenus sur ${evaluationSummary.totalPoints}.`;
+    }
+    if (syncStatus === "synced") {
+      return "Code synchronisé et sauvegardé.";
+    }
+    if (syncStatus === "local") {
+      return "Modifications enregistrées dans le tampon local.";
+    }
+    if (syncStatus === "conflict") {
+      return "Attention : Conflit de version détecté.";
+    }
+    return "";
+  }, [evaluationSummary, syncStatus]);
 
   const handleInsertCourseCode = (snippet: string, targetFile?: string | undefined) => {
     const destFile = targetFile && files[targetFile] ? targetFile : activeFileName;
@@ -384,9 +401,9 @@ function WorkspaceView({ ex }: { ex: Exercise }) {
           <span className="text-muted-foreground/60">/</span>
           <span className="text-muted-foreground">Sujets</span>
           <span className="text-muted-foreground/60">/</span>
-          <span className="font-medium text-foreground truncate max-w-[200px] sm:max-w-none">
+          <h1 className="font-medium text-foreground truncate max-w-[200px] sm:max-w-none text-xs inline">
             {ex.title}
-          </span>
+          </h1>
           <span className="rounded bg-primary/10 border border-primary/20 px-1.5 py-0.5 text-[10px] text-primary hidden md:inline">
             SW_{id}
           </span>
@@ -443,6 +460,7 @@ function WorkspaceView({ ex }: { ex: Exercise }) {
               <button
                 className="flex items-center gap-1.5 rounded border border-primary/30 bg-primary/10 px-2.5 py-1 text-primary hover:bg-primary/20 transition-colors cursor-pointer text-xs font-mono"
                 title="Consulter mon bilan de compétences et badges"
+                aria-label="Consulter mon bilan de compétences et badges"
               >
                 <TrendingUp className="h-3 w-3" />
                 <span className="hidden md:inline">Bilan Compétences</span>
@@ -455,6 +473,7 @@ function WorkspaceView({ ex }: { ex: Exercise }) {
               onClick={() => setShowCourseDrawer(true)}
               className="flex items-center gap-1.5 rounded border border-border/80 bg-background/80 hover:bg-accent/40 px-2.5 py-1 text-xs font-mono transition-colors cursor-pointer text-foreground"
               title="Consulter le support de cours officiel et insérer des extraits de code"
+              aria-label="Consulter le support de cours officiel Mémento STI"
             >
               <BookOpen className="h-3 w-3 text-primary" />
               <span className="hidden sm:inline">Mémento STI</span>
@@ -470,6 +489,7 @@ function WorkspaceView({ ex }: { ex: Exercise }) {
                   : "border-primary/30 bg-primary/10 text-primary hover:bg-primary/20"
               }`}
               title="Consulter le tuteur pédagogique d'aide contextuelle"
+              aria-label="Consulter le tuteur pédagogique STI"
             >
               <Bot className="h-3 w-3" />
               <span className="hidden sm:inline">Tuteur STI</span>
@@ -480,13 +500,32 @@ function WorkspaceView({ ex }: { ex: Exercise }) {
         </div>
       </header>
 
+      {/* Bandeau consultation / révision sur écran < 1024px (WCAG 2.1 AA / UX-03) */}
+      <div className="lg:hidden bg-amber-500/10 border-b border-amber-500/30 px-3 py-1.5 flex items-center justify-between text-[11px] font-mono text-amber-600 dark:text-amber-400">
+        <div className="flex items-center gap-1.5 truncate">
+          <Info className="h-3.5 w-3.5 shrink-0" />
+          <span className="truncate">
+            Mode consultation — Écran ≥ 1024 px recommandé pour l'éditeur VS Code.
+          </span>
+        </div>
+        <button
+          type="button"
+          onClick={() => setSidebarTab((prev) => (prev === "enonce" ? "resultats" : "enonce"))}
+          className="ml-2 text-[10px] underline font-semibold shrink-0 cursor-pointer text-amber-700 dark:text-amber-300"
+          aria-label="Basculer entre l'énoncé et les résultats d'évaluation"
+        >
+          {sidebarTab === "enonce" ? "Résultats" : "Énoncé"}
+        </button>
+      </div>
+
       {/* Corps du Workspace en 3 Panneaux */}
-      <div className="grid flex-1 min-h-0 grid-cols-1 lg:grid-cols-[320px_1fr_1fr] divide-x">
+      <main className="grid flex-1 min-h-0 grid-cols-1 lg:grid-cols-[320px_1fr_1fr] divide-x">
         {/* Panneau Latéral Gauche : Énoncé / Fichiers / Résultats */}
         <aside className="flex min-h-0 flex-col bg-panel">
           <div className="flex border-b text-xs font-mono bg-panel/80 shrink-0">
             <button
               onClick={() => setSidebarTab("enonce")}
+              aria-label="Afficher l'énoncé du sujet"
               className={`flex-1 py-2 flex items-center justify-center gap-1.5 uppercase tracking-wider text-[11px] transition-colors ${
                 sidebarTab === "enonce"
                   ? "border-b-2 border-primary text-foreground font-semibold bg-background/40"
@@ -498,6 +537,7 @@ function WorkspaceView({ ex }: { ex: Exercise }) {
             </button>
             <button
               onClick={() => setSidebarTab("fichiers")}
+              aria-label="Afficher l'arborescence des fichiers"
               className={`flex-1 py-2 flex items-center justify-center gap-1.5 uppercase tracking-wider text-[11px] transition-colors ${
                 sidebarTab === "fichiers"
                   ? "border-b-2 border-primary text-foreground font-semibold bg-background/40"
@@ -509,6 +549,7 @@ function WorkspaceView({ ex }: { ex: Exercise }) {
             </button>
             <button
               onClick={() => setSidebarTab("resultats")}
+              aria-label="Afficher les résultats de vérification"
               className={`flex-1 py-2 flex items-center justify-center gap-1.5 uppercase tracking-wider text-[11px] transition-colors ${
                 sidebarTab === "resultats"
                   ? "border-b-2 border-primary text-foreground font-semibold bg-background/40"
@@ -527,6 +568,7 @@ function WorkspaceView({ ex }: { ex: Exercise }) {
             {!isExamMode && (
               <button
                 onClick={() => setSidebarTab("tuteur")}
+                aria-label="Afficher le tuteur pédagogique d'aide contextuelle"
                 className={`flex-1 py-2 flex items-center justify-center gap-1.5 uppercase tracking-wider text-[11px] transition-colors ${
                   sidebarTab === "tuteur"
                     ? "border-b-2 border-primary text-foreground font-semibold bg-background/40"
@@ -712,15 +754,16 @@ function WorkspaceView({ ex }: { ex: Exercise }) {
         {/* Panneau Central : Éditeur Monaco + Onglets VS Code + Actions (Item 5) */}
         <section className="flex min-h-0 flex-col bg-editor">
           {/* Barre d'onglets de fichiers et actions d'évaluation */}
-          <div className="flex items-center justify-between border-b bg-panel text-xs font-mono shrink-0 select-none px-1 overflow-x-auto">
-            {/* Onglets des fichiers */}
-            <div className="flex items-center min-w-0">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b bg-panel text-xs font-mono shrink-0 select-none px-1 gap-1">
+            {/* Onglets des fichiers avec scroll horizontal isolé sans chevauchement */}
+            <div className="flex items-center overflow-x-auto no-scrollbar flex-1 min-w-0">
               {Object.keys(files).map((fileName) => {
                 const isActive = activeFileName === fileName;
                 return (
                   <button
                     key={fileName}
                     onClick={() => setActiveFileName(fileName)}
+                    aria-label={`Ouvrir le fichier ${fileName}`}
                     className={`flex items-center gap-2 border-r px-3.5 py-2 transition-colors border-t-2 shrink-0 cursor-pointer ${
                       isActive
                         ? "bg-editor text-foreground border-t-primary font-medium"
@@ -753,13 +796,14 @@ function WorkspaceView({ ex }: { ex: Exercise }) {
             </div>
 
             {/* Actions de l'éditeur : Mémento, Réinitialiser & Vérifier mon code */}
-            <div className="flex items-center gap-2 px-2 py-1 shrink-0">
+            <div className="flex items-center justify-end gap-1.5 px-2 py-1 shrink-0">
               {!isExamMode && (
                 <button
                   type="button"
                   onClick={() => setShowCourseDrawer(true)}
                   className="flex items-center gap-1.5 rounded border border-primary/35 bg-primary/10 hover:bg-primary/20 text-primary px-2.5 py-1 text-xs font-medium transition-colors cursor-pointer"
                   title="Ouvrir le panneau Mémento Bac STI avec injection directe dans Monaco"
+                  aria-label="Ouvrir le cours et mémento"
                 >
                   <BookOpen className="h-3 w-3" />
                   <span className="hidden md:inline">📘 Cours & Mémento</span>
@@ -771,6 +815,7 @@ function WorkspaceView({ ex }: { ex: Exercise }) {
                 disabled={isExamExpired}
                 className="flex items-center gap-1.5 rounded border bg-background/60 px-2.5 py-1 text-xs text-muted-foreground hover:text-foreground hover:bg-accent transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
                 title="Réinitialiser le fichier à l'état de départ"
+                aria-label="Réinitialiser le fichier à l'état de départ"
               >
                 <RotateCcw className="h-3 w-3" />
                 <span className="hidden sm:inline">Réinitialiser</span>
@@ -781,6 +826,7 @@ function WorkspaceView({ ex }: { ex: Exercise }) {
                 disabled={verifying || isExamExpired}
                 className="flex items-center gap-1.5 rounded bg-emerald-600 hover:bg-emerald-500 text-white font-medium px-3 py-1 shadow-xs transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                 title="Vérifier mon code (Ctrl + Entrée)"
+                aria-label="Vérifier mon code"
               >
                 <Play className="h-3 w-3 fill-current" />
                 <span>{verifying ? "Vérification..." : "Vérifier mon code"}</span>
@@ -842,6 +888,7 @@ function WorkspaceView({ ex }: { ex: Exercise }) {
             <div className="flex border-b bg-panel text-xs font-mono shrink-0 select-none">
               <button
                 onClick={() => setRightPanelTab("preview")}
+                aria-label="Afficher l'aperçu Web"
                 className={`flex-1 py-2 text-center transition-colors border-b-2 ${
                   rightPanelTab === "preview"
                     ? "border-b-primary font-semibold text-foreground bg-background/50"
@@ -853,6 +900,7 @@ function WorkspaceView({ ex }: { ex: Exercise }) {
               {hasSql && (
                 <button
                   onClick={() => setRightPanelTab("sql")}
+                  aria-label="Afficher la base de données SQL"
                   className={`flex-1 py-2 text-center transition-colors border-b-2 ${
                     rightPanelTab === "sql"
                       ? "border-b-primary font-semibold text-foreground bg-background/50"
@@ -865,6 +913,7 @@ function WorkspaceView({ ex }: { ex: Exercise }) {
               {hasPhp && (
                 <button
                   onClick={() => setRightPanelTab("php")}
+                  aria-label="Afficher la console d'exécution PHP"
                   className={`flex-1 py-2 text-center transition-colors border-b-2 ${
                     rightPanelTab === "php"
                       ? "border-b-primary font-semibold text-foreground bg-background/50"
@@ -892,6 +941,11 @@ function WorkspaceView({ ex }: { ex: Exercise }) {
             )}
           </div>
         </section>
+      </main>
+
+      {/* Annonce d'accessibilité en direct (WCAG 2.1 AA - PRD UX-03) */}
+      <div className="sr-only" role="status" aria-live="polite" aria-atomic="true">
+        {accessibilityMessage}
       </div>
 
       {/* Barre de Statut Résiliente */}

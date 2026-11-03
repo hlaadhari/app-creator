@@ -210,6 +210,7 @@ function Index() {
               variant="outline"
               size="sm"
               className="gap-1.5 text-xs text-foreground border-border hover:bg-accent/40"
+              aria-label="Mémento STI"
             >
               <BookOpen className="h-4 w-4 text-primary" />
               <span className="hidden sm:inline">Mémento STI</span>
@@ -221,6 +222,7 @@ function Index() {
             size="sm"
             onClick={() => setShowGuide(true)}
             className="gap-1.5 text-xs text-muted-foreground hover:text-foreground"
+            aria-label="Guide de démarrage"
           >
             <HelpCircle className="h-4 w-4" />
             <span className="hidden sm:inline">Guide de démarrage</span>
@@ -233,6 +235,7 @@ function Index() {
                 variant="outline"
                 size="sm"
                 className="gap-1.5 text-xs text-primary border-primary/30 hover:bg-primary/10"
+                aria-label="Espace Enseignant"
               >
                 <GraduationCap className="h-4 w-4" />
                 <span className="hidden sm:inline">Espace Enseignant</span>
@@ -247,6 +250,7 @@ function Index() {
                 variant="outline"
                 size="sm"
                 className="gap-1.5 text-xs text-rose-500 border-rose-500/30 hover:bg-rose-500/10"
+                aria-label="Administration"
               >
                 <Shield className="h-4 w-4" />
                 <span className="hidden sm:inline">Administration</span>

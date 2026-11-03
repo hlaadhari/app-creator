@@ -475,6 +475,7 @@ export function CourseNotebookTutor({ activeCategoryId }: NotebookTutorChatProps
           onClick={() => setMessages((prev) => (prev.length > 0 ? [prev[0] as ChatEntry] : []))}
           className="p-1.5 rounded text-muted-foreground hover:text-foreground hover:bg-accent cursor-pointer"
           title="Réinitialiser la discussion"
+          aria-label="Réinitialiser la discussion"
         >
           <RotateCcw className="w-3.5 h-3.5" />
         </button>
@@ -537,9 +538,16 @@ export function CourseNotebookTutor({ activeCategoryId }: NotebookTutorChatProps
           value={input}
           onChange={(e) => setInput(e.target.value)}
           placeholder="Question sur le carnet STI-BAC INFO..."
+          aria-label="Poser une question au tuteur STI-BAC"
           className="flex-1 px-3 py-1.5 text-xs bg-panel border border-border rounded-md focus:outline-none focus:ring-1 focus:ring-primary text-foreground"
         />
-        <Button type="submit" size="sm" className="h-8 px-2.5 cursor-pointer" title="Envoyer">
+        <Button
+          type="submit"
+          size="sm"
+          className="h-8 px-2.5 cursor-pointer"
+          title="Envoyer"
+          aria-label="Envoyer la question"
+        >
           <Send className="w-3.5 h-3.5" />
         </Button>
       </form>
