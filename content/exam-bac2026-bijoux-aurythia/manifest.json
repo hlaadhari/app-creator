@@ -1,6 +1,12 @@
 {
   "id": "exam-bac2026-bijoux-aurythia",
   "titre": "Bac 2026 - Bijoux Aurythia (Session de 8h30)",
+  "referentiel_id": "bac-si-tn",
+  "type_sujet": "annale_adaptee",
+  "session_annee": 2026,
+  "session_libelle": "Épreuve blanche (08h30)",
+  "source_reference": "Examen Blanc — Conception Pédagogique",
+  "statut_validation": "valide_pedagogiquement",
   "module": "Module C",
   "duree_minutes": 120,
   "niveau": 3,

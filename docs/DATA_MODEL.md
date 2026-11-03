@@ -67,7 +67,7 @@ Gère les rôles applicatifs (`eleve`, `enseignant`, `admin`).
 #### `classes`
 
 - `id` (uuid, PK, default `gen_random_uuid()`)
-- `nom` (text, not null - ex: "Terminale STI2D 1")
+- `nom` (text, not null - ex: "4ème SI 1")
 - `enseignant_id` (uuid, references `profiles(id)`, not null)
 - `annee` (text, not null - ex: "2026-2027")
 - `archivee` (boolean, default false)

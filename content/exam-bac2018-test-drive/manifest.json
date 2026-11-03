@@ -1,6 +1,12 @@
 {
   "id": "exam-bac2018-test-drive",
   "titre": "Bac 2018 - Évaluation & Essai Test Drive",
+  "referentiel_id": "bac-si-tn",
+  "type_sujet": "annale_officielle",
+  "session_annee": 2018,
+  "session_libelle": "Session principale",
+  "source_reference": "Ministère de l'Éducation — Tunisie",
+  "statut_validation": "valide_pedagogiquement",
   "module": "Module C",
   "duree_minutes": 90,
   "niveau": 3,

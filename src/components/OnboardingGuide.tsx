@@ -56,7 +56,8 @@ export function OnboardingGuide({ forceOpen = false, onClose }: OnboardingGuideP
   const steps = [
     {
       title: "Bienvenue sur Labo STI",
-      subtitle: "Plateforme d'entraînement et d'examen pour le Baccalauréat STI2D",
+      subtitle:
+        "Plateforme d'entraînement et d'examen pour le Baccalauréat STI (Sciences de l'Informatique)",
       icon: <Code2 className="h-8 w-8 text-primary" />,
       content: (
         <div className="space-y-3 text-xs leading-relaxed text-muted-foreground">

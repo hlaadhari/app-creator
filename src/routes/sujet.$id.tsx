@@ -382,6 +382,21 @@ function WorkspaceView({ ex }: { ex: Exercise }) {
           <span className="rounded bg-primary/10 border border-primary/20 px-1.5 py-0.5 text-[10px] text-primary hidden md:inline">
             SW_{id}
           </span>
+          {ex.typeSujet === "annale_officielle" && (
+            <span className="hidden lg:inline-flex items-center gap-1 rounded border border-rose-500/20 bg-rose-500/10 px-2 py-0.5 text-[10px] text-rose-500 font-semibold">
+              Annale {ex.sessionAnnee || "Officielle"}
+            </span>
+          )}
+          {ex.typeSujet === "annale_adaptee" && (
+            <span className="hidden lg:inline-flex items-center gap-1 rounded border border-purple-500/20 bg-purple-500/10 px-2 py-0.5 text-[10px] text-purple-600 dark:text-purple-400 font-semibold">
+              Blanc {ex.sessionAnnee || "Adapté"}
+            </span>
+          )}
+          {ex.typeSujet === "tp" && (
+            <span className="hidden lg:inline-flex items-center gap-1 rounded border border-cyan-500/20 bg-cyan-500/10 px-2 py-0.5 text-[10px] text-cyan-600 dark:text-cyan-400 font-medium">
+              TP Synthèse
+            </span>
+          )}
           {isExamMode && (
             <span className="ml-2 inline-flex items-center gap-1.5 rounded-full border border-rose-500/30 bg-rose-500/10 px-2.5 py-0.5 text-[11px] font-semibold text-rose-500">
               <Lock className="h-3 w-3" />
@@ -517,16 +532,42 @@ function WorkspaceView({ ex }: { ex: Exercise }) {
                     {ex.competence}
                   </div>
                   <h2 className="text-base font-semibold mt-1">{ex.title}</h2>
-                  <div className="flex items-center gap-2 mt-1">
-                    <span className="rounded border px-1.5 py-0.2 text-[10px] font-mono text-muted-foreground">
+                  <div className="flex flex-wrap items-center gap-1.5 mt-1.5">
+                    <span className="rounded border px-1.5 py-0.5 text-[10px] font-mono text-muted-foreground">
                       Niveau : {ex.level}
                     </span>
+                    <span className="rounded border bg-primary/10 border-primary/20 px-1.5 py-0.5 text-[10px] font-mono text-primary font-medium">
+                      Bac 4ème SI (STI)
+                    </span>
+                    {ex.typeSujet === "annale_officielle" && (
+                      <span className="rounded border border-rose-500/30 bg-rose-500/10 px-1.5 py-0.5 text-[10px] font-mono text-rose-500 font-semibold">
+                        Annale {ex.sessionAnnee ? `${ex.sessionAnnee}` : "Officielle"}
+                        {ex.sessionLibelle ? ` • ${ex.sessionLibelle}` : ""}
+                      </span>
+                    )}
+                    {ex.typeSujet === "annale_adaptee" && (
+                      <span className="rounded border border-purple-500/30 bg-purple-500/10 px-1.5 py-0.5 text-[10px] font-mono text-purple-600 dark:text-purple-400 font-semibold">
+                        Annale Blanche {ex.sessionAnnee ? `${ex.sessionAnnee}` : ""}
+                        {ex.sessionLibelle ? ` • ${ex.sessionLibelle}` : ""}
+                      </span>
+                    )}
+                    {ex.typeSujet === "tp" && (
+                      <span className="rounded border border-cyan-500/30 bg-cyan-500/10 px-1.5 py-0.5 text-[10px] font-mono text-cyan-600 dark:text-cyan-400 font-medium">
+                        TP Synthèse{ex.sessionAnnee ? ` (${ex.sessionAnnee})` : ""}
+                      </span>
+                    )}
                     {bestScore !== undefined && (
-                      <span className="rounded bg-success/10 border border-success/30 px-1.5 py-0.2 text-[10px] font-mono text-success">
+                      <span className="rounded bg-success/10 border border-success/30 px-1.5 py-0.5 text-[10px] font-mono text-success">
                         Meilleur score : {bestScore}/20
                       </span>
                     )}
                   </div>
+                  {ex.sourceReference && (
+                    <div className="mt-1.5 text-[11px] font-mono text-muted-foreground/80 flex items-center gap-1">
+                      <span className="text-muted-foreground/60">Source :</span>
+                      <span>{ex.sourceReference}</span>
+                    </div>
+                  )}
                   <div className="mt-2.5">
                     <SubjectCompetencesPill
                       exerciseId={id}

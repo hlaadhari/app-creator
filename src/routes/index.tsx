@@ -181,7 +181,7 @@ function Index() {
   return (
     <div className="min-h-screen">
       <header className="border-b px-6 py-3.5 flex items-center justify-between">
-        <SproutLogo size="sm" subtitle="Baccalauréat STI2D" />
+        <SproutLogo size="sm" subtitle="Baccalauréat STI" />
         <div className="flex items-center gap-3">
           {/* Mémento & Support de cours officiel */}
           <Link to="/cours">
@@ -410,16 +410,26 @@ function Index() {
                     >
                       {e.module || "Initiation"}
                     </span>
-                    {e.examMode && (
+                    {e.typeSujet === "annale_officielle" && (
                       <span className="rounded bg-rose-500/10 border border-rose-500/20 px-1.5 py-0.5 text-[10px] font-mono text-rose-500 font-semibold">
-                        Bac Blanc
+                        Annale {e.sessionAnnee || ""}
+                      </span>
+                    )}
+                    {e.typeSujet === "annale_adaptee" && (
+                      <span className="rounded bg-purple-500/10 border border-purple-500/20 px-1.5 py-0.5 text-[10px] font-mono text-purple-600 dark:text-purple-400 font-semibold">
+                        Blanc {e.sessionAnnee || ""}
+                      </span>
+                    )}
+                    {e.typeSujet === "tp" && (
+                      <span className="rounded bg-cyan-500/10 border border-cyan-500/20 px-1.5 py-0.5 text-[10px] font-mono text-cyan-600 dark:text-cyan-400 font-medium">
+                        TP
                       </span>
                     )}
                   </div>
                 </div>
 
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 flex-wrap">
                     <span className="font-medium text-foreground truncate group-hover:text-primary transition-colors text-sm sm:text-base">
                       {e.titre}
                     </span>
@@ -436,14 +446,36 @@ function Index() {
                     >
                       {e.module || "Initiation"}
                     </span>
-                    {e.examMode && (
+                    {e.typeSujet === "annale_officielle" && (
                       <span className="hidden sm:inline-block rounded bg-rose-500/10 border border-rose-500/20 px-2 py-0.5 text-[10px] font-mono text-rose-500 font-semibold shrink-0">
-                        Bac Blanc Officiel
+                        Annale Officielle {e.sessionAnnee ? `${e.sessionAnnee}` : ""}
+                        {e.sessionLibelle ? ` (${e.sessionLibelle})` : ""}
+                      </span>
+                    )}
+                    {e.typeSujet === "annale_adaptee" && (
+                      <span className="hidden sm:inline-block rounded bg-purple-500/10 border border-purple-500/20 px-2 py-0.5 text-[10px] font-mono text-purple-600 dark:text-purple-400 font-semibold shrink-0">
+                        Annale Blanche {e.sessionAnnee ? `${e.sessionAnnee}` : ""}
+                        {e.sessionLibelle ? ` (${e.sessionLibelle})` : ""}
+                      </span>
+                    )}
+                    {e.typeSujet === "tp" && (
+                      <span className="hidden sm:inline-block rounded bg-cyan-500/10 border border-cyan-500/20 px-2 py-0.5 text-[10px] font-mono text-cyan-600 dark:text-cyan-400 font-medium shrink-0">
+                        TP Synthèse{e.sessionAnnee ? ` (Bac ${e.sessionAnnee})` : ""}
+                      </span>
+                    )}
+                    {e.typeSujet === "exercice" && (
+                      <span className="hidden sm:inline-block rounded bg-muted/60 border border-border px-1.5 py-0.5 text-[10px] font-mono text-muted-foreground shrink-0">
+                        Exercice
                       </span>
                     )}
                   </div>
-                  <div className="text-xs text-muted-foreground truncate mt-0.5">
-                    {e.competence}
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground truncate mt-0.5">
+                    <span className="truncate">{e.competence}</span>
+                    {e.sourceReference && (
+                      <span className="hidden md:inline-block text-[10px] font-mono text-muted-foreground/75 shrink-0">
+                        • {e.sourceReference}
+                      </span>
+                    )}
                   </div>
                 </div>
 

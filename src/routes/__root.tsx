@@ -84,7 +84,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { title: "Labo STI – Plateforme d'entraînement au Bac STI" },
       {
         name: "description",
-        content: "Plateforme d'entraînement et d'examen pratique au Baccalauréat STI2D – Labo STI",
+        content:
+          "Plateforme d'entraînement et d'examen pratique au Baccalauréat STI (Sciences de l'Informatique) – Labo STI",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

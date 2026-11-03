@@ -29,18 +29,30 @@ export type Criterion = {
   check: (doc: Document, win: Window) => boolean;
 };
 
+export type ExerciseType =
+  "exercice" | "tp" | "annale_officielle" | "annale_adaptee" | "sujet_original";
+
+export type ExerciseValidationStatus =
+  "brouillon" | "en_revue" | "valide_pedagogiquement" | "archive";
+
 export type Exercise = {
   id: string;
   title: string;
   level: "Facile" | "Moyen" | "Difficile";
   competence: string;
-  module?: string;
-  dureeMinutes?: number;
-  tags?: string[];
-  examMode?: boolean;
-  bareme?: number;
+  module?: string | undefined;
+  dureeMinutes?: number | undefined;
+  tags?: string[] | undefined;
+  examMode?: boolean | undefined;
+  bareme?: number | undefined;
+  referentielId?: string | undefined;
+  typeSujet?: ExerciseType | undefined;
+  sessionAnnee?: number | undefined;
+  sessionLibelle?: string | undefined;
+  sourceReference?: string | undefined;
+  statutValidation?: ExerciseValidationStatus | undefined;
   statement: string[];
-  enonceMarkdown?: string;
+  enonceMarkdown?: string | undefined;
   starter: Files;
   criteria: Criterion[];
   hints: string[];

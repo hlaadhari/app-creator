@@ -1,6 +1,12 @@
 {
   "id": "tp-fs-02",
   "titre": "Consultation Météo & Agrégations (Bac 2021)",
+  "referentiel_id": "bac-si-tn",
+  "type_sujet": "tp",
+  "session_annee": 2021,
+  "session_libelle": "Session de contrôle",
+  "source_reference": "Ministère de l'Éducation — Tunisie",
+  "statut_validation": "valide_pedagogiquement",
   "module": "Module B",
   "duree_minutes": 60,
   "niveau": 2,

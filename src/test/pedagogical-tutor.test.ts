@@ -24,7 +24,7 @@ describe("Tuteur Pédagogique d'Aide Contextuelle (Issue #35 - PRD §15, F-56, T
 
   const examContext: TutorContext = {
     ...defaultContext,
-    sujetId: "exam-blanc-sti2d-2026",
+    sujetId: "exam-blanc-sti-2026",
     isExamMode: true,
   };
 
@@ -122,7 +122,7 @@ describe("Tuteur Pédagogique d'Aide Contextuelle (Issue #35 - PRD §15, F-56, T
     it("détecte également le mode examen pour un sujet portant un identifiant d'épreuve officielle", () => {
       const bacContext: TutorContext = {
         ...defaultContext,
-        sujetId: "bac2026-sti2d-sin",
+        sujetId: "bac2026-sti-si",
         isExamMode: false,
       };
       expect(estNeutraliseEnExamen(bacContext)).toBe(true);
