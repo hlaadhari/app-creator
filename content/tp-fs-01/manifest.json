@@ -1,6 +1,10 @@
 {
   "id": "tp-fs-01",
   "titre": "Formulaire de Don pour les Lycées",
+  "referentiel_id": "bac-si-tn",
+  "type_sujet": "tp",
+  "source_reference": "Labo STI — Équipe Pédagogique",
+  "statut_validation": "valide_pedagogiquement",
   "module": "Module B",
   "duree_minutes": 45,
   "niveau": 2,

@@ -1,5 +1,11 @@
 import { supabase } from "@/integrations/supabase/client";
-import { exercises, type Exercise, type Files } from "@/lib/exercises";
+import {
+  exercises,
+  type Exercise,
+  type Files,
+  type ExerciseType,
+  type ExerciseValidationStatus,
+} from "@/lib/exercises";
 
 export interface RemoteSujet {
   id: string;
@@ -7,10 +13,16 @@ export interface RemoteSujet {
   niveau: "Facile" | "Moyen" | "Difficile";
   competence: string;
   ordre: number;
-  module?: string;
-  dureeMinutes?: number;
-  tags?: string[];
-  examMode?: boolean;
+  module?: string | undefined;
+  dureeMinutes?: number | undefined;
+  tags?: string[] | undefined;
+  examMode?: boolean | undefined;
+  referentielId?: string | undefined;
+  typeSujet?: ExerciseType | undefined;
+  sessionAnnee?: number | undefined;
+  sessionLibelle?: string | undefined;
+  sourceReference?: string | undefined;
+  statutValidation?: ExerciseValidationStatus | undefined;
 }
 
 /**
@@ -28,6 +40,12 @@ export async function getSujetsCatalog(): Promise<RemoteSujet[]> {
     dureeMinutes: e.dureeMinutes || 20,
     tags: e.tags || [],
     examMode: e.examMode || false,
+    referentielId: e.referentielId,
+    typeSujet: e.typeSujet,
+    sessionAnnee: e.sessionAnnee,
+    sessionLibelle: e.sessionLibelle,
+    sourceReference: e.sourceReference,
+    statutValidation: e.statutValidation,
   }));
 
   try {
@@ -53,6 +71,12 @@ export async function getSujetsCatalog(): Promise<RemoteSujet[]> {
         dureeMinutes: local?.dureeMinutes || 20,
         tags: local?.tags || [],
         examMode: local?.examMode || false,
+        referentielId: local?.referentielId,
+        typeSujet: local?.typeSujet,
+        sessionAnnee: local?.sessionAnnee,
+        sessionLibelle: local?.sessionLibelle,
+        sourceReference: local?.sourceReference,
+        statutValidation: local?.statutValidation,
       };
     });
 

@@ -56,7 +56,7 @@ describe("Règle Pédagogique PRD §10.4 : Validation des Sujets Pré-Publicatio
           <main>
             <article class="carte">
               <h1><span>Sarah</span> - Portfolio</h1>
-              <p>Élève en Terminale <strong>STI2D</strong>.</p>
+              <p>Élève en 4ème <strong>Sciences de l'Informatique</strong>.</p>
               <ul>
                 <li><span>Robotique</span></li>
                 <li><span>Domotique</span></li>

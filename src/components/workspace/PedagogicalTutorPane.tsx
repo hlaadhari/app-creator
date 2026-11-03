@@ -159,7 +159,7 @@ export function PedagogicalTutorPane({ context, onSelectCriterion }: Pedagogical
             Tuteur Neutralisé en Session d'Examen
           </h4>
           <p className="text-[11px] text-muted-foreground leading-relaxed">
-            Conformément au règlement officiel des épreuves du Bac STI2D / NSI (PRD F-56, T-06),
+            Conformément au règlement officiel des épreuves du Baccalauréat STI (PRD F-56, T-06),
             l'ensemble des assistants interactifs et tuteurs IA sont strictement désactivés pendant
             les sessions d'examen blanc.
           </p>

@@ -318,7 +318,7 @@ describe("Studio Enseignant, Immuabilité et Arbitrage (Issue #11 - PRD F-32, F-
       eleve_id: "e1",
       eleve_nom: "Amira",
       classe_id: "class-1",
-      classe_nom: "Terminale STI2D 1",
+      classe_nom: "4ème SI 1",
       texte: "L'énoncé n'était pas clair sur la balise ul vs ol.",
       statut: "en_attente",
       created_at: new Date().toISOString(),

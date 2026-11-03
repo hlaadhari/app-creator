@@ -1,6 +1,10 @@
 {
   "id": "ex-html-css-01",
   "titre": "Mise en forme & Transitions CSS3",
+  "referentiel_id": "bac-si-tn",
+  "type_sujet": "exercice",
+  "source_reference": "Labo STI — Équipe Pédagogique",
+  "statut_validation": "valide_pedagogiquement",
   "module": "Module A",
   "duree_minutes": 20,
   "niveau": 1,

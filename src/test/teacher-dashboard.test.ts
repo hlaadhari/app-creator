@@ -62,7 +62,7 @@ describe("Espace Enseignant & Dashboard de Classe (Issue #10 - PRD F-01, F-02, F
     ];
 
     it("génère un contenu CSV valide avec les entêtes attendues", () => {
-      const csv = exporterResultatsCsv(mockEleves, "Terminale STI2D");
+      const csv = exporterResultatsCsv(mockEleves, "4ème SI");
       const lines = csv.split("\r\n");
 
       expect(lines[0]).toBe(
@@ -72,7 +72,7 @@ describe("Espace Enseignant & Dashboard de Classe (Issue #10 - PRD F-01, F-02, F
     });
 
     it("inclut fidèlement les scores, statuts et points faibles", () => {
-      const csv = exporterResultatsCsv(mockEleves, "Terminale STI2D");
+      const csv = exporterResultatsCsv(mockEleves, "4ème SI");
 
       expect(csv).toContain('"Dupont","Lucas","rendu",100,5,5');
       expect(csv).toContain('"Martin","Emma","en_cours",60,3,5');

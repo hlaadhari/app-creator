@@ -9,7 +9,7 @@ describe("Moteur d'Évaluation Formative 3 Niveaux (Issue #8 - PRD F-38 à F-48,
       const html = `
         <article class="carte">
           <h1>Hatem</h1>
-          <p>Élève STI2D</p>
+          <p>Élève STI</p>
           <ul>
             <li>Prog</li>
             <li>Élec</li>

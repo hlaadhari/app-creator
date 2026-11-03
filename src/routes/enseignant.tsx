@@ -67,7 +67,7 @@ export const Route = createFileRoute("/enseignant")({
 const DEMO_CLASSES: TeacherClass[] = [
   {
     id: "demo-cls-1",
-    nom: "Terminale STI2D - Groupe 1",
+    nom: "4ème SI - Groupe 1",
     annee: "2026-2027",
     archivee: false,
     created_at: new Date().toISOString(),
@@ -76,7 +76,7 @@ const DEMO_CLASSES: TeacherClass[] = [
   },
   {
     id: "demo-cls-2",
-    nom: "Terminale STI2D - Groupe 2",
+    nom: "4ème SI - Groupe 2",
     annee: "2026-2027",
     archivee: false,
     created_at: new Date().toISOString(),
@@ -856,7 +856,7 @@ function TeacherDashboardPage() {
 
             <div>
               <Input
-                placeholder="Nom de la classe (ex: Terminale STI2D-A)"
+                placeholder="Nom de la classe (ex: 4ème SI-A)"
                 value={newClassName}
                 onChange={(e) => setNewClassName(e.target.value)}
                 className="text-xs"

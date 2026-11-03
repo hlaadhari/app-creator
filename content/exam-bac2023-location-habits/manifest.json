@@ -1,6 +1,12 @@
 {
   "id": "exam-bac2023-location-habits",
   "titre": "Bac 2023 - Location d'Habits Traditionnels",
+  "referentiel_id": "bac-si-tn",
+  "type_sujet": "annale_officielle",
+  "session_annee": 2023,
+  "session_libelle": "Session principale",
+  "source_reference": "Ministère de l'Éducation — Tunisie",
+  "statut_validation": "valide_pedagogiquement",
   "module": "Module C",
   "duree_minutes": 90,
   "niveau": 3,

@@ -1,6 +1,6 @@
 /**
  * Moteur d'Analyse Statistique de Classe & Détection des Décrochages / Blocages (PRD F-61, F-62, F-63, F-64, Jalon M7)
- * Conforme aux exigences du Bac STI2D / NSI et au format académique standard.
+ * Conforme aux exigences du Baccalauréat STI (Sciences de l'Informatique) et au format académique standard.
  */
 
 import type { TeacherClassMember } from "@/lib/supabase/teacher";
@@ -324,7 +324,7 @@ export function calculerStatistiquesClasse(
       const totalCriteres = e.total_criteres || 5;
       const reussis = e.criteres_reussis ?? Math.round((e.score_formatif || 0) / 20);
 
-      // Attribution par défaut répartie sur les compétences STI2D
+      // Attribution par défaut répartie sur les compétences STI
       const domains = ["HTML", "CSS", "JAVASCRIPT", "PHP", "SQL"];
       domains.forEach((dom) => {
         let current = domainCounters[dom];

@@ -1,6 +1,10 @@
 {
   "id": "ex-js-01",
   "titre": "Validation JS - Contrôle CIN & Chaînes",
+  "referentiel_id": "bac-si-tn",
+  "type_sujet": "exercice",
+  "source_reference": "Labo STI — Équipe Pédagogique",
+  "statut_validation": "valide_pedagogiquement",
   "module": "Module A",
   "duree_minutes": 25,
   "niveau": 1,

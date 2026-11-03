@@ -1,5 +1,5 @@
 /**
- * Référentiel Officiel des Compétences du Bac STI (STI2D / SIN / NSI)
+ * Référentiel Officiel des Compétences du Baccalauréat STI (Sciences de l'Informatique)
  * et Définitions des Badges Pédagogiques (PRD Domaine 6, Jalon M7)
  */
 

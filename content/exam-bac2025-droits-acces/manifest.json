@@ -1,6 +1,12 @@
 {
   "id": "exam-bac2025-droits-acces",
   "titre": "Bac 2025 - Droits d'Accès aux Documents Partagés",
+  "referentiel_id": "bac-si-tn",
+  "type_sujet": "annale_officielle",
+  "session_annee": 2025,
+  "session_libelle": "Sujet spécimen",
+  "source_reference": "Inspection Générale de l'Informatique",
+  "statut_validation": "valide_pedagogiquement",
   "module": "Module C",
   "duree_minutes": 120,
   "niveau": 3,

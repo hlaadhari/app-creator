@@ -244,7 +244,8 @@ export function ClassAnalyticsDashboard({
               Taux de Maîtrise par Domaine Technique
             </CardTitle>
             <CardDescription className="text-xs">
-              Indicateurs de succès sur les domaines clés du Bac STI2D / NSI.
+              Indicateurs de succès sur les domaines clés du Baccalauréat STI (Sciences de
+              l'Informatique).
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-3">
