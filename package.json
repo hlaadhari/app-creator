@@ -5,9 +5,10 @@
   "type": "module",
   "scripts": {
     "dev": "vite dev",
-    "build": "vite build",
+    "build": "bun run validate:criteria && vite build",
     "build:dev": "vite build --mode development",
-    "build:vercel": "NITRO_PRESET=vercel vite build",
+    "build:vercel": "bun run validate:criteria && NITRO_PRESET=vercel vite build",
+    "validate:criteria": "bun run scripts/valider-criteres.ts",
     "preview": "vite preview",
     "lint": "eslint . --max-warnings=0",
     "format": "prettier --write .",
