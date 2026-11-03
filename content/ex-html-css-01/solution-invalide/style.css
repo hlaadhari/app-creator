@@ -1,0 +1,28 @@
+/* Solution Invalide - Exercice ex-html-css-01 (comporte des erreurs ciblées) */
+
+body {
+  font-family: sans-serif;
+  margin: 20px;
+}
+
+h1 {
+  text-align: center;
+  /* Erreur : pas de transition */
+}
+
+/* Erreur : pas de règle h1:hover */
+
+.L1 {
+  /* Erreur : block au lieu de inline-block */
+  display: block;
+  /* Erreur : largeur erronée */
+  width: 150px;
+  margin: 10px;
+  padding: 15px;
+}
+
+.b1 {
+  /* Erreur : bordure dashed au lieu de solid */
+  border: 1px dashed red;
+  /* Erreur : pas de border-radius */
+}

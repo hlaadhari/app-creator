@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Test Drive - Évaluation Véhicule</title>
+    <link rel="stylesheet" href="mesStyles.css" />
+    <script src="controle.js"></script>
+  </head>
+  <body>
+    <header>
+      <h1>Fiche d'Évaluation Essai Véhicule (Test Drive)</h1>
+    </header>
+
+    <main>
+      <form method="POST" action="evaluer.php" onsubmit="return test();">
+        <fieldset>
+          <legend>Informations de l'Essai et Notation</legend>
+          <table>
+            <tr>
+              <td><label for="cin">Numéro CIN :</label></td>
+              <td>
+                <input
+                  type="text"
+                  id="cin"
+                  name="cin"
+                  maxlength="8"
+                  placeholder="Ex: 09876543"
+                  required
+                />
+              </td>
+            </tr>
+            <tr>
+              <td><label for="immatriculation">Véhicule testé :</label></td>
+              <td>
+                <select id="immatriculation" name="immatriculation" required>
+                  <option value="">-- Choisir une voiture --</option>
+                  <option value="198-TN-1234">Peugeot 208 GT-Line (Essence)</option>
+                  <option value="210-TN-5678">Renault Clio 5 Intens (Diesel)</option>
+                  <option value="225-TN-9999">Volkswagen Golf 8 Style (Hybride)</option>
+                </select>
+              </td>
+            </tr>
+            <tr>
+              <td><label for="date_test">Date de l'essai :</label></td>
+              <td><input type="date" id="date_test" name="date_test" required /></td>
+            </tr>
+            <tr>
+              <td><label for="note_confort">Note Confort (1 à 5) :</label></td>
+              <td>
+                <input
+                  type="number"
+                  id="note_confort"
+                  name="note_confort"
+                  min="1"
+                  max="5"
+                  value="4"
+                  required
+                />
+              </td>
+            </tr>
+            <tr>
+              <td><label for="note_conduite">Note Conduite (1 à 5) :</label></td>
+              <td>
+                <input
+                  type="number"
+                  id="note_conduite"
+                  name="note_conduite"
+                  min="1"
+                  max="5"
+                  value="4"
+                  required
+                />
+              </td>
+            </tr>
+            <tr>
+              <td><label for="note_securite">Note Sécurité (1 à 5) :</label></td>
+              <td>
+                <input
+                  type="number"
+                  id="note_securite"
+                  name="note_securite"
+                  min="1"
+                  max="5"
+                  value="5"
+                  required
+                />
+              </td>
+            </tr>
+            <tr>
+              <td><label for="commentaire">Commentaires :</label></td>
+              <td>
+                <textarea
+                  id="commentaire"
+                  name="commentaire"
+                  rows="3"
+                  placeholder="Vos impressions sur la tenue de route, freinage..."
+                ></textarea>
+              </td>
+            </tr>
+            <tr>
+              <td colspan="2" class="actions">
+                <input type="submit" value="Enregistrer l'évaluation" class="btn-submit" />
+                <input type="reset" value="Réinitialiser" class="btn-reset" />
+              </td>
+            </tr>
+          </table>
+        </fieldset>
+      </form>
+    </main>
+  </body>
+</html>

@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Inscription STI - Contrôle Candidat</title>
+  </head>
+  <body>
+    <h1>Identification du Candidat</h1>
+
+    <form name="f" action="enregistrer.php" method="post" onsubmit="return verif();">
+      <label for="cin">Numéro CIN (8 chiffres) :</label>
+      <input type="text" id="cin" name="cin" placeholder="Ex: 09876543" />
+      <button type="submit" id="btnValider">Valider</button>
+    </form>
+
+    <script src="controle.js"></script>
+  </body>
+</html>
