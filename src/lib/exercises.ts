@@ -1,7 +1,10 @@
 import { contentSubjects } from "./content/all-subjects";
+import { diagnostiquerCause } from "./evaluation/diagnostique-cause";
 
 export type FileName = string;
 export type Files = Record<string, string>;
+
+export type CriterionFailureCause = "syntaxe" | "execution" | "absent" | "valeur";
 
 export type Criterion = {
   id: string;
@@ -292,6 +295,8 @@ export type Result = {
   /** Vrai : critère déclaré corrigé par l'enseignant. */
   manuel?: boolean;
   message: string;
+  /** Cause d'échec qualifiée quand ok === false (Issue #130 / PED-05) */
+  cause?: CriterionFailureCause;
 };
 
 export const MESSAGE_NON_VERIFIABLE =
@@ -304,14 +309,31 @@ export function runCriteria(criteria: Criterion[], doc: Document, win: Window): 
   return criteria.map((c) => {
     const automatique = c.automatique !== false;
     let ok = false;
-    // Échec par défaut : un critère sans vérification réelle n'est jamais validé.
+    let cause: CriterionFailureCause | undefined;
+    let executionError: unknown;
+
     if (automatique) {
+      // Nettoyer les drapeaux d'erreurs précédentes sur la fenêtre
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const winAny = win as any;
+      if (winAny) {
+        delete winAny.__dernierErreurExecution;
+        delete winAny.__dernierElementAbsent;
+        delete winAny.__dernierErreurSyntaxe;
+      }
+
       try {
         ok = c.check(doc, win);
-      } catch {
+      } catch (err) {
         ok = false;
+        executionError = err;
+      }
+
+      if (!ok) {
+        cause = diagnostiquerCause(c, doc, win, executionError);
       }
     }
+
     return {
       id: c.id,
       label: c.label,
@@ -326,6 +348,7 @@ export function runCriteria(criteria: Criterion[], doc: Document, win: Window): 
           : ok
             ? "Validé"
             : c.fail,
+      ...(cause ? { cause } : {}),
     };
   });
 }

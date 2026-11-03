@@ -24,6 +24,7 @@ const resultatNonValide = (c: Criterion, message: string): Result => ({
   ok: false,
   automatique: c.automatique !== false,
   message,
+  cause: "absent",
 });
 
 /** Page visée par chaque critère (la page principale quand le critère n'en précise pas). */
