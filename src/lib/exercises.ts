@@ -26,6 +26,8 @@ export type Criterion = {
   fichier?: string;
   /** Définition JSON sérialisable d'origine (utilisée pour l'évaluation dans l'iframe sandboxée). */
   raw?: Record<string, unknown>;
+  /** Indices progressifs à 3 niveaux pour ce critère (Issue #133 / PED-06) */
+  hints?: string[] | undefined;
   check: (doc: Document, win: Window) => boolean;
 };
 
@@ -308,7 +310,9 @@ export type Result = {
   manuel?: boolean;
   message: string;
   /** Cause d'échec qualifiée quand ok === false (Issue #130 / PED-05) */
-  cause?: CriterionFailureCause;
+  cause?: CriterionFailureCause | undefined;
+  /** Indices progressifs à 3 niveaux (Issue #133 / PED-06) */
+  hints?: string[] | undefined;
 };
 
 export const MESSAGE_NON_VERIFIABLE =
@@ -361,6 +365,7 @@ export function runCriteria(criteria: Criterion[], doc: Document, win: Window): 
             ? "Validé"
             : c.fail,
       ...(cause ? { cause } : {}),
+      ...(c.hints && c.hints.length > 0 ? { hints: c.hints } : {}),
     };
   });
 }
