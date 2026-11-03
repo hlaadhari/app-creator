@@ -30,6 +30,8 @@ import { PreviewSandbox } from "@/components/workspace/PreviewSandbox";
 import { DatabasePanel } from "@/components/sql/DatabasePanel";
 import { PhpRunnerPanel } from "@/components/php/PhpRunnerPanel";
 import type { WorkspaceFile } from "@/components/workspace/types";
+import { calculerBaremeRepartition } from "@/lib/pedagogy/bareme-repartition";
+import { BaremeRepartitionBadge } from "@/components/workspace/BaremeRepartitionBadge";
 import {
   BookOpen,
   FolderTree,
@@ -154,6 +156,11 @@ function WorkspaceView({ ex }: { ex: Exercise }) {
   const [verifying, setVerifying] = useState(false);
   const [cursorPos, setCursorPos] = useState({ line: 1, col: 1 });
   const [showCourseDrawer, setShowCourseDrawer] = useState(false);
+
+  const baremeRepartition = useMemo(
+    () => (ex.criteria ? calculerBaremeRepartition(ex.criteria) : null),
+    [ex.criteria],
+  );
 
   const handleInsertCourseCode = (snippet: string, targetFile?: string | undefined) => {
     const destFile = targetFile && files[targetFile] ? targetFile : activeFileName;
@@ -407,6 +414,14 @@ function WorkspaceView({ ex }: { ex: Exercise }) {
         </div>
 
         <div className="flex items-center gap-2">
+          {baremeRepartition && (
+            <BaremeRepartitionBadge
+              repartition={baremeRepartition}
+              variant="detailed"
+              className="hidden lg:inline-flex"
+            />
+          )}
+
           {isExamMode && countdown && (
             <div
               className={`flex items-center gap-1.5 rounded border px-2.5 py-1 text-xs font-mono ${

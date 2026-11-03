@@ -14,6 +14,14 @@ import { getLocalAttempts } from "@/lib/pedagogy/attempts-service";
 import { getExercise } from "@/lib/exercises";
 import { load as loadProgress } from "@/lib/progress";
 import {
+  getDernierTravailEnCours,
+  calculerBaremeRepartition,
+  type DernierTravailEnCours,
+  type BaremeRepartition,
+} from "@/lib/pedagogy/bareme-repartition";
+import { RepriseRapideBanner } from "@/components/workspace/RepriseRapideBanner";
+import { BaremeRepartitionBadge } from "@/components/workspace/BaremeRepartitionBadge";
+import {
   HelpCircle,
   GraduationCap,
   Users,
@@ -70,6 +78,18 @@ function Index() {
   >({});
   const [mesClasses, setMesClasses] = useState<ClassInfo[]>([]);
   const [showGuide, setShowGuide] = useState(false);
+  const [dernierTravail, setDernierTravail] = useState<DernierTravailEnCours | null>(null);
+
+  const repartitionMap = useMemo(() => {
+    const map: Record<string, BaremeRepartition> = {};
+    for (const s of sujets) {
+      const ex = getExercise(s.id);
+      if (ex?.criteria) {
+        map[s.id] = calculerBaremeRepartition(ex.criteria);
+      }
+    }
+    return map;
+  }, [sujets]);
 
   const computeProgress = async (catalog: RemoteSujet[]) => {
     try {
@@ -140,6 +160,7 @@ function Index() {
 
       setBest(scores);
       setProgressMap(map);
+      getDernierTravailEnCours(catalog).then(setDernierTravail);
     } catch (e) {
       console.warn("Erreur calcul progression catalogue :", e);
     }
@@ -285,6 +306,9 @@ function Index() {
             )}
           </div>
         </div>
+
+        {/* Reprise rapide sur l'accueil (Issue #134 / UX-04 / PED-06) */}
+        <RepriseRapideBanner dernierTravail={dernierTravail} />
 
         {/* Bloc classes actives pour l'élève connecté */}
         {user && mesClasses.length > 0 && (
@@ -481,6 +505,12 @@ function Index() {
 
                 <div className="flex items-center justify-between sm:justify-end gap-3 shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0">
                   <div className="flex items-center gap-2">
+                    {repartitionMap[e.id] ? (
+                      <BaremeRepartitionBadge
+                        repartition={repartitionMap[e.id]!}
+                        variant="compact"
+                      />
+                    ) : null}
                     <span className="rounded border px-2 py-0.5 text-[11px] font-mono text-muted-foreground">
                       {e.niveau}
                     </span>
