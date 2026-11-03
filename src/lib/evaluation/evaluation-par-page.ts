@@ -6,6 +6,7 @@
 
 import { score, type Criterion, type Result } from "@/lib/exercises";
 import { pageParDefaut, type FichiersEvaluation } from "@/lib/evaluation/document-evaluation";
+import { estCritereSqlOuPhp, evaluerCritereSqlPhp } from "./sql-php-evaluator";
 
 /** Évalue un groupe de critères sur une page (iframe dans l'application, JSDOM dans les tests). */
 export type EvaluerPage = (page: string, criteres: Criterion[]) => Promise<Result[]>;
@@ -50,13 +51,26 @@ export async function evaluerParPage(
 ): Promise<Result[]> {
   const parCritere = new Map<string, Result>();
 
-  for (const [page, groupe] of grouperCriteresParPage(criteres, fichiers)) {
-    if (fichiers[page] === undefined) {
-      for (const c of groupe) parCritere.set(c.id, resultatNonValide(c, messagePageAbsente(page)));
-      continue;
-    }
-    for (const resultat of await evaluerPage(page, groupe)) {
-      parCritere.set(resultat.id, resultat);
+  // 1. Évaluation des critères SQL et PHP sur l'état réel de la base et des scripts (PED-03 / TEC-01 / TEC-02)
+  const criteresSqlPhp = criteres.filter((c) => estCritereSqlOuPhp(c));
+  const criteresDom = criteres.filter((c) => !estCritereSqlOuPhp(c));
+
+  for (const c of criteresSqlPhp) {
+    const res = await evaluerCritereSqlPhp(c, fichiers);
+    parCritere.set(c.id, res);
+  }
+
+  // 2. Évaluation des critères DOM / CSS / JS page par page
+  if (criteresDom.length > 0) {
+    for (const [page, groupe] of grouperCriteresParPage(criteresDom, fichiers)) {
+      if (fichiers[page] === undefined) {
+        for (const c of groupe)
+          parCritere.set(c.id, resultatNonValide(c, messagePageAbsente(page)));
+        continue;
+      }
+      for (const resultat of await evaluerPage(page, groupe)) {
+        parCritere.set(resultat.id, resultat);
+      }
     }
   }
 

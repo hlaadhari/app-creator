@@ -35,6 +35,12 @@ export function sondeEstVerifiable(probe: RawProbe | null | undefined): boolean 
     }
     case "css_property":
       return !!probe.selector?.trim() && !!probe.property?.trim();
+    case "sql_table_check":
+      return typeof probe["table"] === "string" && (probe["table"] as string).trim().length > 0;
+    case "sql_query_result":
+      return typeof probe["query"] === "string" && (probe["query"] as string).trim().length > 0;
+    case "php_mysqli_check":
+      return true;
     default:
       // js_eval (existence seule) et types inconnus : non vérifiables automatiquement.
       return false;

@@ -117,15 +117,15 @@ describe("Critères sans vérification réelle (issue #82)", () => {
       expect(fautifs).toEqual([]);
     });
 
-    it("un sujet sans critère vérifiable obtient 0 point vérifiable, pas 20/20", () => {
+    it("ex-sql-01 et tp-fs-02 ont désormais tous leurs critères vérifiables (PED-03 / issue #129)", () => {
       for (const id of ["ex-sql-01", "tp-fs-02"]) {
         const sujet = contentSubjects.find((s) => s.id === id)!;
         const { doc, win } = documentVide();
         const sc = score(runCriteria(sujet.criteria, doc, win));
 
-        expect(sc.verifiable, id).toBe(0);
+        expect(sc.verifiable, id).toBe(sc.total);
         expect(sc.got, id).toBe(0);
-        expect(sc.nonVerifiable, id).toBe(sc.total);
+        expect(sc.nonVerifiable, id).toBe(0);
       }
     });
 
@@ -148,14 +148,13 @@ describe("Critères sans vérification réelle (issue #82)", () => {
       }
     });
 
-    it("les examens ne comptent que ce qui est réellement vérifiable (HTML et CSS)", () => {
+    it("l'examen Bac 2023 compte désormais l'ensemble de ses 20 points vérifiables", () => {
       const sujet = contentSubjects.find((s) => s.id === "exam-bac2023-location-habits")!;
       const { doc, win } = documentVide();
       const sc = score(runCriteria(sujet.criteria, doc, win));
 
-      // HTML 2 pts + CSS 2 pts vérifiables ; JavaScript, PHP et SQL (16 pts) ne le sont pas.
-      expect(sc.verifiable).toBe(4);
-      expect(sc.nonVerifiable).toBe(16);
+      expect(sc.verifiable).toBe(20);
+      expect(sc.nonVerifiable).toBe(0);
       expect(sc.got).toBe(0);
     });
 

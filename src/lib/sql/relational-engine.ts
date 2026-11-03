@@ -60,6 +60,7 @@ export interface RelationalQueryResult {
   numRows: number;
   affectedRows: number;
   durationMs: number;
+  success?: boolean;
   error?: string | undefined;
   errno?: number | undefined;
 }
@@ -238,6 +239,18 @@ export class RelationalDatabaseEngine {
     return this.lastAffectedRows;
   }
 
+  public mysqli_error(): string {
+    return this.lastError;
+  }
+
+  public mysqli_errno(): number {
+    return this.lastErrno;
+  }
+
+  public mysqli_affected_rows(): number {
+    return this.lastAffectedRows;
+  }
+
   public clear(): void {
     this.tables.clear();
     this.lastError = "";
@@ -270,9 +283,14 @@ export class RelationalDatabaseEngine {
   /**
    * Exécute un script multi-instructions
    */
-  public executeScript(script: string): { success: boolean; results: RelationalQueryResult[] } {
+  public executeScript(script: string): {
+    success: boolean;
+    errors: string[];
+    results: RelationalQueryResult[];
+  } {
     const stmts = decouperRequetesSql(script);
     const results: RelationalQueryResult[] = [];
+    const errors: string[] = [];
     let success = true;
 
     for (const stmt of stmts) {
@@ -280,11 +298,12 @@ export class RelationalDatabaseEngine {
       results.push(res);
       if (res.error) {
         success = false;
+        errors.push(res.error);
         break;
       }
     }
 
-    return { success, results };
+    return { success, errors, results };
   }
 
   /**
@@ -295,15 +314,20 @@ export class RelationalDatabaseEngine {
     this.clearError();
     this.lastAffectedRows = 0;
 
+    const wrap = (res: RelationalQueryResult): RelationalQueryResult => {
+      res.success = !res.error;
+      return res;
+    };
+
     const trimmed = sql.trim().replace(/;$/, "").trim();
     if (!trimmed) {
-      return {
+      return wrap({
         columns: [],
         rows: [],
         numRows: 0,
         affectedRows: 0,
         durationMs: 0,
-      };
+      });
     }
 
     const upper = trimmed.toUpperCase();
@@ -311,89 +335,89 @@ export class RelationalDatabaseEngine {
     try {
       if (upper.startsWith("CREATE TABLE")) {
         this.handleCreateTable(trimmed);
-        return {
+        return wrap({
           columns: [],
           rows: [],
           numRows: 0,
           affectedRows: 0,
           durationMs: Math.max(Date.now() - startTime, 1),
-        };
+        });
       }
 
       if (upper.startsWith("ALTER TABLE")) {
         this.handleAlterTable(trimmed);
-        return {
+        return wrap({
           columns: [],
           rows: [],
           numRows: 0,
           affectedRows: 0,
           durationMs: Math.max(Date.now() - startTime, 1),
-        };
+        });
       }
 
       if (upper.startsWith("DROP TABLE")) {
         this.handleDropTable(trimmed);
-        return {
+        return wrap({
           columns: [],
           rows: [],
           numRows: 0,
           affectedRows: 0,
           durationMs: Math.max(Date.now() - startTime, 1),
-        };
+        });
       }
 
       if (upper.startsWith("INSERT INTO")) {
         const count = this.handleInsert(trimmed);
         this.lastAffectedRows = count;
-        return {
+        return wrap({
           columns: [],
           rows: [],
           numRows: 0,
           affectedRows: count,
           durationMs: Math.max(Date.now() - startTime, 1),
-        };
+        });
       }
 
       if (upper.startsWith("UPDATE")) {
         const count = this.handleUpdate(trimmed);
         this.lastAffectedRows = count;
-        return {
+        return wrap({
           columns: [],
           rows: [],
           numRows: 0,
           affectedRows: count,
           durationMs: Math.max(Date.now() - startTime, 1),
-        };
+        });
       }
 
       if (upper.startsWith("DELETE FROM")) {
         const count = this.handleDelete(trimmed);
         this.lastAffectedRows = count;
-        return {
+        return wrap({
           columns: [],
           rows: [],
           numRows: 0,
           affectedRows: count,
           durationMs: Math.max(Date.now() - startTime, 1),
-        };
+        });
       }
 
       if (upper.startsWith("SELECT")) {
         const { columns, rows } = this.handleSelect(trimmed);
-        return {
+        return wrap({
           columns,
           rows,
           numRows: rows.length,
           affectedRows: 0,
           durationMs: Math.max(Date.now() - startTime, 1),
-        };
+        });
       }
 
       this.setError(
         1064,
         `You have an error in your SQL syntax; check the manual near '${trimmed.slice(0, 30)}'`,
       );
-      return {
+      return wrap({
         columns: [],
         rows: [],
         numRows: 0,
@@ -401,12 +425,12 @@ export class RelationalDatabaseEngine {
         durationMs: Math.max(Date.now() - startTime, 1),
         error: this.lastError,
         errno: this.lastErrno,
-      };
+      });
     } catch (err: unknown) {
       if (!this.lastError) {
         this.setError(1064, err instanceof Error ? err.message : String(err));
       }
-      return {
+      return wrap({
         columns: [],
         rows: [],
         numRows: 0,
@@ -414,7 +438,7 @@ export class RelationalDatabaseEngine {
         durationMs: Math.max(Date.now() - startTime, 1),
         error: this.lastError,
         errno: this.lastErrno,
-      };
+      });
     }
   }
 
@@ -1517,6 +1541,38 @@ export class RelationalDatabaseEngine {
 
   private resolveValue(row: Record<string, unknown>, expr: string): unknown {
     const clean = expr.trim().replace(/[`"']/g, "").toLowerCase();
+
+    // Fonctions scalaires SQL Bac STI courantes : YEAR(col), MONTH(col), DAY(col), UPPER(col), LOWER(col)
+    const yearMatch = clean.match(/^year\((.+)\)$/i);
+    if (yearMatch && yearMatch[1]) {
+      const inner = this.resolveValue(row, yearMatch[1]);
+      if (inner) {
+        const d = new Date(String(inner));
+        if (!isNaN(d.getTime())) return d.getFullYear();
+      }
+      return undefined;
+    }
+
+    const monthMatch = clean.match(/^month\((.+)\)$/i);
+    if (monthMatch && monthMatch[1]) {
+      const inner = this.resolveValue(row, monthMatch[1]);
+      if (inner) {
+        const d = new Date(String(inner));
+        if (!isNaN(d.getTime())) return d.getMonth() + 1;
+      }
+      return undefined;
+    }
+
+    const dayMatch = clean.match(/^day\((.+)\)$/i);
+    if (dayMatch && dayMatch[1]) {
+      const inner = this.resolveValue(row, dayMatch[1]);
+      if (inner) {
+        const d = new Date(String(inner));
+        if (!isNaN(d.getTime())) return d.getDate();
+      }
+      return undefined;
+    }
+
     if (row[clean] !== undefined) return row[clean];
 
     // Recherche par suffixe de colonne (ex: "idUtil" quand le row est stocké sous "u.idutil")

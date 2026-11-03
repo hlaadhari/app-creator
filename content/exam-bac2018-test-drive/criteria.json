@@ -6,6 +6,7 @@
     "description": "Le formulaire evaluation.html doit comporter les champs cin, immatriculation, date_test, note_confort, note_conduite, note_securite et envoyer en POST vers evaluer.php.",
     "points": 2,
     "ordre": 1,
+    "fichier": "evaluation.html",
     "sonde": {
       "type": "dom_selector",
       "selector": "form[method=\"POST\" i][action=\"evaluer.php\"] input#cin, form select#immatriculation, form input#date_test, form input#note_confort, form input#note_conduite, form input#note_securite",
@@ -20,6 +21,7 @@
     "description": "La feuille mesStyles.css doit appliquer des règles de présentation sur le fieldset et les boutons.",
     "points": 2,
     "ordre": 2,
+    "fichier": "evaluation.html",
     "sonde": {
       "type": "css_property",
       "selector": "fieldset",
@@ -35,10 +37,26 @@
     "description": "La fonction test() doit vérifier que le champ CIN comporte exactement 8 chiffres et qu'un véhicule est sélectionné.",
     "points": 2.5,
     "ordre": 3,
-    "sonde": {
-      "type": "js_eval",
-      "checkSelector": "#cin"
-    },
+    "fichier": "evaluation.html",
+    "type": "js_test_cas",
+    "function_name": "test",
+    "cas": [
+      {
+        "saisies": { "cin": "123" },
+        "attendu": false
+      },
+      {
+        "saisies": {
+          "cin": "09876543",
+          "immatriculation": "198-TN-1234",
+          "date_test": "2026-05-15",
+          "note_confort": "4",
+          "note_conduite": "5",
+          "note_securite": "4"
+        },
+        "attendu": true
+      }
+    ],
     "fail_message": "La fonction test() ne valide pas le format 8 chiffres du CIN ou la sélection obligatoire du véhicule."
   },
   {
@@ -48,10 +66,33 @@
     "description": "La fonction test() doit vérifier que la date est renseignée et que chaque note (confort, conduite, sécurité) est comprise entre 1 et 5 inclus.",
     "points": 2.5,
     "ordre": 4,
-    "sonde": {
-      "type": "js_eval",
-      "checkSelector": "#note_confort"
-    },
+    "fichier": "evaluation.html",
+    "type": "js_test_cas",
+    "function_name": "test",
+    "cas": [
+      {
+        "saisies": {
+          "cin": "09876543",
+          "immatriculation": "198-TN-1234",
+          "date_test": "2026-05-15",
+          "note_confort": "6",
+          "note_conduite": "5",
+          "note_securite": "4"
+        },
+        "attendu": false
+      },
+      {
+        "saisies": {
+          "cin": "09876543",
+          "immatriculation": "198-TN-1234",
+          "date_test": "2026-05-15",
+          "note_confort": "5",
+          "note_conduite": "5",
+          "note_securite": "5"
+        },
+        "attendu": true
+      }
+    ],
     "fail_message": "La fonction test() ne valide pas les bornes [1..5] des notes ou la présence de la date."
   },
   {
@@ -61,9 +102,19 @@
     "description": "Le script evaluer.php doit se connecter à MySQLi et récupérer les variables postées avec validation.",
     "points": 4,
     "ordre": 5,
+    "fichier": "evaluer.php",
     "sonde": {
-      "type": "dom_selector",
-      "selector": "body"
+      "type": "php_mysqli_check",
+      "entrypoint": "evaluer.php",
+      "postData": {
+        "cin": "00000000",
+        "immatriculation": "198-TN-1234",
+        "date_test": "2026-05-15",
+        "note_confort": "4",
+        "note_conduite": "5",
+        "note_securite": "4"
+      },
+      "expectedStdoutContains": "client"
     },
     "fail_message": "Connexion MySQLi ou extraction des paramètres POST invalide dans evaluer.php."
   },
@@ -74,9 +125,23 @@
     "description": "Le script doit vérifier l'existence du client et de la voiture puis exécuter la requête INSERT INTO evaluation.",
     "points": 4,
     "ordre": 6,
+    "fichier": "evaluer.php",
     "sonde": {
-      "type": "dom_selector",
-      "selector": "body"
+      "type": "php_mysqli_check",
+      "entrypoint": "evaluer.php",
+      "postData": {
+        "cin": "09876543",
+        "immatriculation": "198-TN-1234",
+        "date_test": "2026-05-15",
+        "note_confort": "4",
+        "note_conduite": "5",
+        "note_securite": "4",
+        "commentaire": "Essai concluant"
+      },
+      "expectedTableRows": {
+        "table": "evaluation",
+        "minCount": 3
+      }
     },
     "fail_message": "L'insertion dans la table evaluation ou la vérification client/voiture est absente ou erronée."
   },
@@ -87,9 +152,20 @@
     "description": "Le script doit calculer la moyenne du test et exécuter une requête SQL d'agrégation AVG() pour restituer les moyennes globales.",
     "points": 3,
     "ordre": 7,
+    "fichier": "evaluer.php",
     "sonde": {
-      "type": "dom_selector",
-      "selector": "body"
+      "type": "php_mysqli_check",
+      "entrypoint": "evaluer.php",
+      "postData": {
+        "cin": "09876543",
+        "immatriculation": "198-TN-1234",
+        "date_test": "2026-05-15",
+        "note_confort": "4",
+        "note_conduite": "5",
+        "note_securite": "4",
+        "commentaire": "Essai concluant"
+      },
+      "expectedStdoutPattern": "moyenne|synthèse|note"
     },
     "fail_message": "La requête d'agrégation AVG() ou le calcul de moyenne est manquant dans evaluer.php."
   }
