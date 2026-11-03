@@ -35,6 +35,8 @@ export function sondeEstVerifiable(probe: RawProbe | null | undefined): boolean 
     }
     case "css_property":
       return !!probe.selector?.trim() && !!probe.property?.trim();
+    case "js_test_cas":
+      return Array.isArray(probe["cas"]) && (probe["cas"] as unknown[]).length > 0;
     case "sql_table_check":
       return typeof probe["table"] === "string" && (probe["table"] as string).trim().length > 0;
     case "sql_query_result":
@@ -100,13 +102,42 @@ export function makeProbeCheck(
         if (!el) return false;
         const val = win.getComputedStyle(el).getPropertyValue(probe.property).trim();
         if (probe.expectedValue) {
-          if (val.includes(probe.expectedValue)) return true;
-          // Un navigateur renvoie « rgb(0, 0, 255) » pour « blue » : on compare aussi à la valeur
-          // attendue telle que le navigateur la normalise pour cette propriété.
+          const exp = probe.expectedValue.trim().toLowerCase();
+          const valNorm = val.toLowerCase();
+          // Comparaison exacte directe
+          if (valNorm === exp) return true;
+          // Comparaison normalisée (ex: "blue" -> "rgb(0, 0, 255)")
           const normalisee = valeurNormalisee(doc, win, probe.property, probe.expectedValue);
-          return normalisee !== null && val.includes(normalisee);
+          if (normalisee !== null && valNorm === normalisee.toLowerCase()) return true;
+          // Si la valeur attendue est un mot-clé ou valeur dans une liste/shorthand
+          // Découpage strict par délimiteurs pour éviter que "1" match "10px"
+          const tokens = valNorm.split(/[\s,]+/);
+          if (tokens.includes(exp)) return true;
+          if (normalisee !== null && tokens.includes(normalisee.toLowerCase())) return true;
+          return false;
         }
-        if (probe.isGreaterThanZero) return parseFloat(val) > 0;
+        if (probe.isGreaterThanZero) {
+          const num = parseFloat(val);
+          return !isNaN(num) && num > 0;
+        }
+        // Durcissement PED-05 (Issue #130) : ne valide plus 0px ou none par défaut
+        const valLower = val.toLowerCase();
+        if (
+          !valLower ||
+          valLower === "none" ||
+          valLower === "0" ||
+          valLower === "0px" ||
+          valLower === "0rem" ||
+          valLower === "0em" ||
+          valLower === "0%" ||
+          valLower === "transparent" ||
+          valLower === "initial" ||
+          valLower === "inherit" ||
+          valLower === "unset" ||
+          parseFloat(valLower) === 0
+        ) {
+          return false;
+        }
         return val.length > 0;
       }
       return false;

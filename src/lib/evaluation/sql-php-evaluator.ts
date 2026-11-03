@@ -12,7 +12,7 @@
  *   vérification du stdout (contains, regex) et des effets de bord sur la base (lignes insérées/mises à jour).
  */
 
-import type { Criterion, Result } from "@/lib/exercises";
+import type { Criterion, CriterionFailureCause, Result } from "@/lib/exercises";
 import type { FichiersEvaluation } from "./document-evaluation";
 import { RelationalDatabaseEngine } from "@/lib/sql/relational-engine";
 import { executerScriptPhpProcedural, resoudreSqlInitial } from "@/lib/php/procedural-simulator";
@@ -69,7 +69,11 @@ export function estCritereSqlOuPhp(critere: Criterion): boolean {
   return type === "sql_table_check" || type === "sql_query_result" || type === "php_mysqli_check";
 }
 
-function echec(critere: Criterion, message?: string): Result {
+function echec(
+  critere: Criterion,
+  message?: string,
+  cause: CriterionFailureCause = "valeur",
+): Result {
   return {
     id: critere.id,
     label: critere.label,
@@ -77,6 +81,7 @@ function echec(critere: Criterion, message?: string): Result {
     ok: false,
     automatique: true,
     message: message ?? critere.fail ?? "Critère non validé",
+    cause,
   };
 }
 
@@ -121,7 +126,7 @@ export function evaluerSqlTableCheck(
 ): Result {
   const sqlScript = resoudreScriptSql(critere, fichiers);
   if (!sqlScript.trim()) {
-    return echec(critere, "Aucun script SQL trouvé pour vérifier ce critère.");
+    return echec(critere, "Aucun script SQL trouvé pour vérifier ce critère.", "absent");
   }
 
   const engine = new RelationalDatabaseEngine();
@@ -135,7 +140,11 @@ export function evaluerSqlTableCheck(
   const tableName = (probe.table || "").trim().toLowerCase();
   const table = engine.getTable(tableName);
   if (!table) {
-    return echec(critere, `La table '${probe.table}' n'a pas été trouvée dans la base de données.`);
+    return echec(
+      critere,
+      `La table '${probe.table}' n'a pas été trouvée dans la base de données.`,
+      "absent",
+    );
   }
 
   // 1. Clé primaire
@@ -188,7 +197,11 @@ export function evaluerSqlTableCheck(
     for (const exp of probe.columns) {
       const col = table.columns.find((c) => c.name.toLowerCase() === exp.name.toLowerCase());
       if (!col) {
-        return echec(critere, `Colonne '${exp.name}' manquante dans la table '${probe.table}'.`);
+        return echec(
+          critere,
+          `Colonne '${exp.name}' manquante dans la table '${probe.table}'.`,
+          "absent",
+        );
       }
       if (exp.baseType && col.baseType.toLowerCase() !== exp.baseType.toLowerCase()) {
         return echec(
@@ -245,7 +258,12 @@ export function evaluerSqlQueryResult(
   const res = engine.query(query);
 
   if (res.error) {
-    return echec(critere, `Erreur lors de l'exécution de la requête SQL : ${res.error}`);
+    const isSyntax = /syntax|near/i.test(res.error);
+    return echec(
+      critere,
+      `Erreur lors de l'exécution de la requête SQL : ${res.error}`,
+      isSyntax ? "syntaxe" : "execution",
+    );
   }
 
   if (probe.expectedRowCount !== undefined && res.numRows !== probe.expectedRowCount) {
@@ -289,7 +307,7 @@ export function evaluerPhpMySqliCheck(
   const entrypoint = probe.entrypoint || critere.fichier || "index.php";
   const scriptContent = fichiers[entrypoint];
   if (!scriptContent) {
-    return echec(critere, `Le fichier '${entrypoint}' est absent du projet.`);
+    return echec(critere, `Le fichier '${entrypoint}' est absent du projet.`, "absent");
   }
 
   const postData = (probe.postData || {}) as Record<string, unknown>;
@@ -322,6 +340,15 @@ export function evaluerPhpMySqliCheck(
     initialSql: initSql,
     files: fichiers,
   });
+
+  if (execRes.error) {
+    const isSyntax = /syntax|parse error/i.test(execRes.error);
+    return echec(
+      critere,
+      `Erreur lors de l'exécution PHP : ${execRes.error}`,
+      isSyntax ? "syntaxe" : "execution",
+    );
+  }
 
   if (probe.expectedStdoutContains) {
     if (!execRes.stdout.includes(probe.expectedStdoutContains)) {

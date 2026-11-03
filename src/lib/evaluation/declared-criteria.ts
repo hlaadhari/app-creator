@@ -38,12 +38,20 @@ function appelerAvecSaisies(
   saisies: Record<string, string>,
 ): { vrai: boolean } | undefined {
   const fn = fonctionGlobale(win, nomFonction);
-  if (!fn) return undefined;
+  if (!fn) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (win as any).__dernierElementAbsent = nomFonction;
+    return undefined;
+  }
 
   const champs: Array<{ champ: HTMLInputElement; ancienne: string }> = [];
   for (const [nom, valeur] of Object.entries(saisies)) {
     const champ = trouverChamp(doc, nom);
-    if (!champ) return undefined;
+    if (!champ) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (win as any).__dernierElementAbsent = nom;
+      return undefined;
+    }
     champs.push({ champ, ancienne: champ.value });
     champ.value = valeur;
   }
@@ -60,6 +68,10 @@ function appelerAvecSaisies(
 
   try {
     return { vrai: Boolean(fn.call(win)) };
+  } catch (err) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (win as any).__dernierErreurExecution = err;
+    return undefined;
   } finally {
     dialogues.alert = sauvegardes.alert;
     dialogues.confirm = sauvegardes.confirm;
@@ -161,7 +173,11 @@ function executerCas(
   const texte = dictionnaire(cas.texte);
   const nomFonction = typeof cas.appel === "string" ? cas.appel : defaut;
   const fn = nomFonction ? fonctionGlobale(win, nomFonction) : null;
-  if (!fn) return false;
+  if (!fn) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (win as any).__dernierElementAbsent = nomFonction || "fonction";
+    return false;
+  }
 
   const touches = new Map<string, EtatChamp>();
   const retenir = (nom: string): HTMLInputElement | null => {
@@ -187,13 +203,21 @@ function executerCas(
   try {
     for (const [nom, valeur] of Object.entries(saisies)) {
       const champ = retenir(nom);
-      if (!champ) return false;
+      if (!champ) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (win as any).__dernierElementAbsent = nom;
+        return false;
+      }
       const v = valeurDeChamp(valeur);
       if (typeof v === "boolean") champ.checked = v;
       else champ.value = v;
     }
     for (const nom of [...Object.keys(etat ?? {}), ...Object.keys(texte ?? {})]) {
-      if (!retenir(nom)) return false;
+      if (!retenir(nom)) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (win as any).__dernierElementAbsent = nom;
+        return false;
+      }
     }
 
     dialogues.alert = () => undefined;
@@ -215,7 +239,9 @@ function executerCas(
       if ((touches.get(nom)?.champ.textContent ?? "").trim() !== String(attendu)) return false;
     }
     return true;
-  } catch {
+  } catch (err) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (win as any).__dernierErreurExecution = err;
     return false;
   } finally {
     dialogues.alert = sauvegardes.alert;
@@ -330,17 +356,29 @@ function verificationRegleCss(critere: CritereBrut): VerificationCritere | null 
  * qu'elle serait vraie sans que l'élève ait rien fait.
  */
 export function construireVerificationDeclaree(critere: CritereBrut): VerificationCritere | null {
-  switch (critere["type"]) {
+  const typeDeclared =
+    critere["type"] ??
+    (typeof critere["sonde"] === "object" && critere["sonde"] !== null
+      ? (critere["sonde"] as Record<string, unknown>)["type"]
+      : undefined);
+  const source =
+    typeof critere["sonde"] === "object" &&
+    critere["sonde"] !== null &&
+    (critere["sonde"] as Record<string, unknown>)["type"]
+      ? { ...critere, ...(critere["sonde"] as Record<string, unknown>) }
+      : critere;
+
+  switch (typeDeclared) {
     case "js_function_exists": {
-      const nom = texte(critere["function_name"]);
+      const nom = texte(source["function_name"]);
       return nom ? (_doc, win) => fonctionGlobale(win, nom) !== null : null;
     }
     case "js_test_execution":
-      return verificationComportement(critere);
+      return verificationComportement(source);
     case "js_test_cas":
-      return verificationParCas(critere);
+      return verificationParCas(source);
     case undefined:
-      return verificationCssCalcule(critere) ?? verificationRegleCss(critere) ?? null;
+      return verificationCssCalcule(source) ?? verificationRegleCss(source) ?? null;
     default:
       return null;
   }

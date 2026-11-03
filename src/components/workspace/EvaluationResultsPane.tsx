@@ -288,7 +288,28 @@ export function EvaluationResultsPane({
                       <AlertCircle className="h-4 w-4 text-amber-500 shrink-0 mt-0.5" />
                     )}
                     <div>
-                      <div className="text-xs font-semibold text-foreground">{r.label}</div>
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <span className="text-xs font-semibold text-foreground">{r.label}</span>
+                        {!r.passed && automatique && r.cause && (
+                          <Badge
+                            variant="outline"
+                            className={`text-[10px] px-1.5 py-0 h-4 font-normal ${
+                              r.cause === "absent"
+                                ? "bg-rose-500/10 text-rose-600 border-rose-500/30"
+                                : r.cause === "syntaxe"
+                                  ? "bg-purple-500/10 text-purple-600 border-purple-500/30"
+                                  : r.cause === "execution"
+                                    ? "bg-destructive/10 text-destructive border-destructive/30"
+                                    : "bg-amber-500/10 text-amber-600 border-amber-500/30"
+                            }`}
+                          >
+                            {r.cause === "absent" && "Élément absent"}
+                            {r.cause === "syntaxe" && "Erreur de syntaxe"}
+                            {r.cause === "execution" && "Erreur d'exécution JS"}
+                            {r.cause === "valeur" && "Valeur incorrecte"}
+                          </Badge>
+                        )}
+                      </div>
                       <p
                         className={`text-[11px] mt-0.5 leading-relaxed ${
                           !automatique

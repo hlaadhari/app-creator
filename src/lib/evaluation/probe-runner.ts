@@ -1,3 +1,5 @@
+import type { CriterionFailureCause } from "@/lib/exercises";
+
 export interface DomProbe {
   type: "dom_selector";
   selector: string;
@@ -51,7 +53,9 @@ export interface CriterionEvaluationResult {
   message: string;
   durationMs: number;
   /** Faux : aucune vérification automatique réelle (critère évalué par l'enseignant). */
-  automatique?: boolean;
+  automatique?: boolean | undefined;
+  /** Cause d'échec qualifiée quand passed === false (Issue #130 / PED-05) */
+  cause?: CriterionFailureCause | undefined;
 }
 
 export interface EvaluationSummary {
