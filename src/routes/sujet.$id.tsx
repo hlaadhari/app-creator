@@ -3,7 +3,6 @@ import { useEffect, useRef, useState, useMemo, useCallback } from "react";
 import {
   getExercise,
   runCriteria,
-  score,
   type Exercise,
   type FileName,
   type Result,
@@ -16,8 +15,8 @@ import { SyncStatusBar } from "@/components/workspace/SyncStatusBar";
 import { ConflictModal } from "@/components/workspace/ConflictModal";
 import { EvaluationResultsPane } from "@/components/workspace/EvaluationResultsPane";
 import { SubjectStatement } from "@/components/workspace/SubjectStatement";
-import { evaluerParPage } from "@/lib/evaluation/evaluation-par-page";
-import { evaluerDansFrame } from "@/lib/evaluation/iframe-evaluation";
+import { evaluerCopie } from "@/lib/evaluation/evaluation-par-page";
+import { evaluateurFrame } from "@/lib/evaluation/iframe-evaluation";
 import { debloquerNiveauIndice, type UnlockedHint } from "@/lib/evaluation/hints-service";
 import { calculerCompteARebours, getTempsServeurSynchronise } from "@/lib/exam/server-clock";
 import type { EvaluationSummary } from "@/lib/evaluation/probe-runner";
@@ -232,13 +231,14 @@ function WorkspaceView({ ex }: { ex: Exercise }) {
     );
 
     try {
-      // Chaque critère est évalué sur la page qu'il vise (frame masquée par page)
-      const r = await evaluerParPage(ex.criteria, fichiersTexte, (page, criteres) =>
-        evaluerDansFrame(fichiersTexte, page, criteres),
+      // Moteur unique (issue #127) : chaque critère est évalué sur sa page, dans une frame sandboxée
+      const { resultats: r, bilan: sc } = await evaluerCopie(
+        ex.criteria,
+        fichiersTexte,
+        evaluateurFrame(fichiersTexte),
       );
 
       const duration = Math.round(performance.now() - startTime);
-      const sc = score(r);
       const n = sc.note20;
       // Sans critère vérifiable, aucune note n'existe : ni meilleur score ni tentative enregistrée.
       const notable = sc.verifiable > 0;

@@ -34,6 +34,8 @@ import {
   ImmutabilityViolationError,
 } from "@/lib/security/immutability-guard";
 import { type CriterionDefinition } from "@/lib/evaluation/probe-runner";
+import { critereDepuisJson, type RawCriterion } from "@/lib/evaluation/critere-json";
+import { evaluateurJsdom } from "./helpers/evaluateur-jsdom";
 
 describe("Scellement Cryptographique des Snapshots (SHA-256) & Rejouage (Issue #16)", () => {
   const dummyFiles: Record<string, string> = {
@@ -68,7 +70,7 @@ CREATE TABLE don (
 INSERT INTO don (nom, montant) VALUES ('Lycée Pilote', 150.00);
 `;
 
-  const dummyCriteres: CriterionDefinition[] = [
+  const definitionsCriteres: CriterionDefinition[] = [
     {
       id: "crit-1",
       code: "HTML.HEADER",
@@ -94,6 +96,10 @@ INSERT INTO don (nom, montant) VALUES ('Lycée Pilote', 150.00);
       message_echec: "Formulaire ou champ CIN introuvable.",
     },
   ];
+  // Rejouage par le moteur unique (issue #127) : critères convertis comme pour l'élève.
+  const dummyCriteres = definitionsCriteres.map((d) =>
+    critereDepuisJson(d as unknown as RawCriterion),
+  );
 
   // =========================================================================
   // 1. Calcul SHA-256 canonique & Normalisation
@@ -286,6 +292,7 @@ INSERT INTO don (nom, montant) VALUES ('Lycée Pilote', 150.00);
         snapshot,
         fichiers: dummyFiles,
         criteres: dummyCriteres,
+        evaluateurPour: evaluateurJsdom,
         sqlDump: dummySqlDump,
         baremeTotal: 20,
       });
@@ -349,6 +356,7 @@ INSERT INTO don (nom, montant) VALUES ('Lycée Pilote', 150.00);
         snapshot,
         fichiers: dummyFiles,
         criteres: dummyCriteres,
+        evaluateurPour: evaluateurJsdom,
       });
 
       const note = initialiserNoteOfficielle(
@@ -377,6 +385,7 @@ INSERT INTO don (nom, montant) VALUES ('Lycée Pilote', 150.00);
         snapshot,
         fichiers: dummyFiles,
         criteres: dummyCriteres,
+        evaluateurPour: evaluateurJsdom,
       });
 
       const note = initialiserNoteOfficielle(snapshot.projetId, null, replay, "prof-007");
@@ -405,6 +414,7 @@ INSERT INTO don (nom, montant) VALUES ('Lycée Pilote', 150.00);
         snapshot,
         fichiers: dummyFiles,
         criteres: dummyCriteres,
+        evaluateurPour: evaluateurJsdom,
       });
 
       const note = initialiserNoteOfficielle(snapshot.projetId, null, replay, "prof-007");

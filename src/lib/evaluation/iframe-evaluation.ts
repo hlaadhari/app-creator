@@ -10,6 +10,7 @@ import {
   construireDocumentEvaluationSandbox,
   type FichiersEvaluation,
 } from "@/lib/evaluation/document-evaluation";
+import type { FabriqueEvaluateur } from "@/lib/evaluation/evaluation-par-page";
 import { validerIframeSandbox } from "@/lib/security/sandbox-watchdog";
 
 export const EVALUATION_IFRAME_SANDBOX = "allow-scripts";
@@ -70,3 +71,7 @@ export function evaluerDansFrame(
     frame.srcdoc = construireDocumentEvaluationSandbox(fichiers, page, criteres, requestId);
   });
 }
+
+/** Évaluateur de page du navigateur (frame sandboxée), partagé par l'élève, le Studio et le rejouage. */
+export const evaluateurFrame: FabriqueEvaluateur = (fichiers) => (page, criteres) =>
+  evaluerDansFrame(fichiers, page, criteres);
