@@ -6,6 +6,7 @@
     "description": "Le formulaire location.html doit comporter les champs cin, id_habit, date_loc, duree et la méthode POST vers location.php.",
     "points": 2,
     "ordre": 1,
+    "fichier": "location.html",
     "sonde": {
       "type": "dom_selector",
       "selector": "form[method=\"POST\" i][action=\"location.php\"] input#cin, form select#id_habit, form input#date_loc, form input#duree",
@@ -20,6 +21,7 @@
     "description": "La feuille mesStyles.css doit styliser le conteneur fieldset avec bordure, padding et coins arrondis.",
     "points": 2,
     "ordre": 2,
+    "fichier": "location.html",
     "sonde": {
       "type": "css_property",
       "selector": "fieldset",
@@ -35,10 +37,24 @@
     "description": "La fonction verif2() doit valider que le champ CIN contient exactement 8 chiffres.",
     "points": 2.5,
     "ordre": 3,
-    "sonde": {
-      "type": "js_eval",
-      "checkSelector": "#cin"
-    },
+    "fichier": "location.html",
+    "type": "js_test_cas",
+    "function_name": "verif2",
+    "cas": [
+      {
+        "saisies": { "cin": "123" },
+        "attendu": false
+      },
+      {
+        "saisies": {
+          "cin": "12345678",
+          "id_habit": "1",
+          "date_loc": "2026-05-10",
+          "duree": "3"
+        },
+        "attendu": true
+      }
+    ],
     "fail_message": "La fonction verif2() ne valide pas correctement la longueur et le format à 8 chiffres du CIN."
   },
   {
@@ -48,10 +64,29 @@
     "description": "La fonction verif2() doit refuser la soumission si aucun habit n'est choisi, si la date est vide ou si la durée est inférieure ou égale à zéro.",
     "points": 2.5,
     "ordre": 4,
-    "sonde": {
-      "type": "js_eval",
-      "checkSelector": "#duree"
-    },
+    "fichier": "location.html",
+    "type": "js_test_cas",
+    "function_name": "verif2",
+    "cas": [
+      {
+        "saisies": {
+          "cin": "12345678",
+          "id_habit": "",
+          "date_loc": "2026-05-10",
+          "duree": "3"
+        },
+        "attendu": false
+      },
+      {
+        "saisies": {
+          "cin": "12345678",
+          "id_habit": "1",
+          "date_loc": "2026-05-10",
+          "duree": "3"
+        },
+        "attendu": true
+      }
+    ],
     "fail_message": "La fonction verif2() ne valide pas la sélection de l'habit, la date ou la durée strictement positive."
   },
   {
@@ -61,9 +96,17 @@
     "description": "Le script location.php doit établir la connexion à bd2023 et extraire les variables cin, id_habit, date_loc et duree.",
     "points": 4,
     "ordre": 5,
+    "fichier": "location.php",
     "sonde": {
-      "type": "dom_selector",
-      "selector": "body"
+      "type": "php_mysqli_check",
+      "entrypoint": "location.php",
+      "postData": {
+        "cin": "00000000",
+        "id_habit": "1",
+        "date_loc": "2026-05-10",
+        "duree": "3"
+      },
+      "expectedStdoutContains": "Client"
     },
     "fail_message": "Connexion MySQLi ou extraction des paramètres POST incorrecte dans location.php."
   },
@@ -74,9 +117,20 @@
     "description": "Le script doit vérifier l'existence du client et insérer un nouvel enregistrement dans la table location.",
     "points": 4,
     "ordre": 6,
+    "fichier": "location.php",
     "sonde": {
-      "type": "dom_selector",
-      "selector": "body"
+      "type": "php_mysqli_check",
+      "entrypoint": "location.php",
+      "postData": {
+        "cin": "12345678",
+        "id_habit": "1",
+        "date_loc": "2026-05-10",
+        "duree": "3"
+      },
+      "expectedTableRows": {
+        "table": "location",
+        "minCount": 1
+      }
     },
     "fail_message": "La vérification du client ou la requête INSERT INTO location est manquante ou incorrecte."
   },
@@ -87,9 +141,24 @@
     "description": "Le script doit exécuter UPDATE habit SET disponible = 'N' et afficher le montant total calculé.",
     "points": 3,
     "ordre": 7,
+    "fichier": "location.php",
     "sonde": {
-      "type": "dom_selector",
-      "selector": "body"
+      "type": "php_mysqli_check",
+      "entrypoint": "location.php",
+      "postData": {
+        "cin": "12345678",
+        "id_habit": "1",
+        "date_loc": "2026-05-10",
+        "duree": "3"
+      },
+      "expectedTableRows": {
+        "table": "habit",
+        "where": {
+          "id_habit": 1,
+          "disponible": "N"
+        }
+      },
+      "expectedStdoutPattern": "Location Enregistrée|Montant Total"
     },
     "fail_message": "La mise à jour de la disponibilité dans habit ou le récapitulatif de location est manquant."
   }

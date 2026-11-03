@@ -506,23 +506,60 @@ describe("Banc de test de la notation : JavaScript des examens (js_test_cas)", (
   });
 });
 
-describe("Banc de test de la notation : sujets pas encore vérifiables", () => {
-  // Ces sujets contiennent encore des critères sans vérification réelle (PHP, SQL, JavaScript des
-  // examens). Cette liste doit rétrécir : un sujet y entre tant que son banc n'est pas écrit.
-  const EN_ATTENTE = [
-    "ex-sql-01",
-    "tp-fs-01",
-    "tp-fs-02",
-    "exam-bac2018-test-drive",
-    "exam-bac2023-location-habits",
-  ];
+describe("Banc de test de la notation : ex-sql-01 (SQL relationnel LDD)", () => {
+  const ID = "ex-sql-01";
 
-  it.each(EN_ATTENTE)(
-    "%s : aucun point gagné avec le code de départ, jamais de faux 20/20",
-    async (id) => {
-      const r = await evaluer(id, lireVariante(id, "initial"));
-      expect(r.got / r.total).toBeLessThan(0.5);
-      expect(r.nonVerifiable).toBeGreaterThan(0);
-    },
-  );
+  it("le corrigé officiel obtient tous les points (20/20), tous les critères étant vérifiables", async () => {
+    const r = await evaluer(ID, lireVariante(ID, "solution"));
+    expect(r.got).toBe(20);
+    expect(r.total).toBe(20);
+    expect(r.verifiable).toBe(20);
+    expect(r.echoues).toEqual([]);
+  });
+
+  it("le squelette de départ ne crée pas la table mesure et obtient 0/20", async () => {
+    const r = await evaluer(ID, lireVariante(ID, "initial"));
+    expect(r.got).toBe(0);
+    expect(r.total).toBe(20);
+    expect(r.verifiable).toBe(20);
+    expect(r.reussis).toEqual([]);
+  });
+});
+
+describe("Banc de test de la notation : tp-fs-02 (Full-stack météo & agrégations)", () => {
+  const ID = "tp-fs-02";
+
+  it("le corrigé officiel obtient tous les points (20/20), tous les critères étant vérifiables", async () => {
+    const r = await evaluer(ID, lireVariante(ID, "solution"));
+    expect(r.got).toBe(20);
+    expect(r.total).toBe(20);
+    expect(r.verifiable).toBe(20);
+    expect(r.echoues).toEqual([]);
+  });
+
+  it("le squelette initial obtient 0/20", async () => {
+    const r = await evaluer(ID, lireVariante(ID, "initial"));
+    expect(r.got).toBe(0);
+    expect(r.total).toBe(20);
+    expect(r.verifiable).toBe(20);
+    expect(r.reussis).toEqual([]);
+  });
+});
+
+describe("Banc de test de la notation : tp-fs-01 (Full-stack formulaire de don)", () => {
+  const ID = "tp-fs-01";
+
+  it("le corrigé officiel obtient tous les points (20/20), tous les critères étant vérifiables", async () => {
+    const r = await evaluer(ID, lireVariante(ID, "solution"));
+    expect(r.got).toBe(20);
+    expect(r.total).toBe(20);
+    expect(r.verifiable).toBe(20);
+    expect(r.echoues).toEqual([]);
+  });
+
+  it("le squelette initial obtient moins de 50 % des points", async () => {
+    const r = await evaluer(ID, lireVariante(ID, "initial"));
+    expect(r.got / r.total).toBeLessThan(0.5);
+    expect(r.verifiable).toBe(20);
+  });
 });

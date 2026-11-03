@@ -52,10 +52,76 @@ export const JsProbeSchema = z
   })
   .strict();
 
+export const SqlTableCheckProbeSchema = z
+  .object({
+    type: z.literal("sql_table_check"),
+    table: z.string().min(1),
+    primaryKey: z.array(z.string()).optional(),
+    foreignKeys: z
+      .array(
+        z
+          .object({
+            column: z.string().min(1),
+            refTable: z.string().min(1),
+            refColumn: z.string().optional(),
+          })
+          .strict(),
+      )
+      .optional(),
+    columns: z
+      .array(
+        z
+          .object({
+            name: z.string().min(1),
+            baseType: z.string().optional(),
+            notNull: z.boolean().optional(),
+            hasCheck: z.boolean().optional(),
+            hasDefault: z.boolean().optional(),
+            unique: z.boolean().optional(),
+          })
+          .strict(),
+      )
+      .optional(),
+    hasCheck: z.boolean().optional(),
+    checkMinRows: z.number().int().min(0).optional(),
+  })
+  .strict();
+
+export const SqlQueryResultProbeSchema = z
+  .object({
+    type: z.literal("sql_query_result"),
+    query: z.string().min(1),
+    expectedRowCount: z.number().int().optional(),
+    minRowCount: z.number().int().optional(),
+    expectedValues: z.record(z.unknown()).optional(),
+  })
+  .strict();
+
+export const PhpMySqliCheckProbeSchema = z
+  .object({
+    type: z.literal("php_mysqli_check"),
+    entrypoint: z.string().min(1).optional(),
+    postData: z.record(z.union([z.string(), z.number(), z.boolean()])).optional(),
+    expectedStdoutContains: z.string().optional(),
+    expectedStdoutPattern: z.string().optional(),
+    expectedTableRows: z
+      .object({
+        table: z.string().min(1),
+        minCount: z.number().int().optional(),
+        where: z.record(z.unknown()).optional(),
+      })
+      .strict()
+      .optional(),
+  })
+  .strict();
+
 export const ProbeSchema = z.discriminatedUnion("type", [
   DomProbeSchema,
   CssProbeSchema,
   JsProbeSchema,
+  SqlTableCheckProbeSchema,
+  SqlQueryResultProbeSchema,
+  PhpMySqliCheckProbeSchema,
 ]);
 
 /**

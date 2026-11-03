@@ -14,14 +14,17 @@
  */
 
 import { MySqliSimulator } from "../evaluator/sql-checker";
+import { RelationalDatabaseEngine } from "../sql/relational-engine";
 import { MAX_EXECUTION_TIME_MS, MAX_MEMORY_LIMIT_BYTES, MAX_STDOUT_BYTES } from "./php-worker-core";
 import { preparerSuperglobales } from "./superglobals";
 import type { PhpExecutionRequest, PhpExecutionResponse } from "./types";
 
 export const ENGINE_NAME = "Simulateur procédural PHP/MySQLi Bac STI";
 
+export type AnySqlSimulator = RelationalDatabaseEngine | MySqliSimulator;
+
 export interface PhpSimulatorOptions {
-  simulator?: MySqliSimulator | undefined;
+  simulator?: AnySqlSimulator | undefined;
   initialSql?: string | undefined;
   files?: Record<string, string> | undefined;
   maxExecutionTimeMs?: number | undefined;
@@ -127,7 +130,7 @@ export class ProceduralPhpInterpreter {
   public stdout = "";
   public terminated = false;
 
-  private simulator: MySqliSimulator;
+  private simulator: AnySqlSimulator;
   private post: Record<string, string>;
   private get: Record<string, string>;
   private server: Record<string, string>;
@@ -135,7 +138,7 @@ export class ProceduralPhpInterpreter {
   private maxStdout: number;
 
   constructor(
-    simulator: MySqliSimulator,
+    simulator: AnySqlSimulator,
     globals: {
       post: Record<string, string>;
       get: Record<string, string>;
@@ -267,6 +270,21 @@ export class ProceduralPhpInterpreter {
         const k = String(this.vars[postDynMatch[1]] ?? "");
         return this.post[k] !== undefined && this.post[k] !== "";
       }
+      const arrAccess = target.match(/^\$([a-zA-Z_][a-zA-Z0-9_]*)\s*\[\s*([^\]]+)\]$/);
+      if (arrAccess && arrAccess[1] && arrAccess[2]) {
+        const arr = this.vars[arrAccess[1]] as Record<string, unknown> | undefined;
+        let k = arrAccess[2].trim();
+        if ((k.startsWith('"') && k.endsWith('"')) || (k.startsWith("'") && k.endsWith("'"))) {
+          k = k.slice(1, -1);
+        } else {
+          k = String(this.evalExpr(k) ?? "");
+        }
+        return (
+          arr !== undefined &&
+          arr !== null &&
+          (arr[k] !== undefined || arr[k.toLowerCase()] !== undefined)
+        );
+      }
       const varMatch = target.match(/^\$([a-zA-Z_][a-zA-Z0-9_]*)$/);
       if (varMatch && varMatch[1]) {
         const v = this.vars[varMatch[1]];
@@ -300,6 +318,22 @@ export class ProceduralPhpInterpreter {
     const intvalMatch = expr.match(/^intval\s*\((.+)\)$/i);
     if (intvalMatch && intvalMatch[1]) {
       return parseInt(String(this.evalExpr(intvalMatch[1])), 10) || 0;
+    }
+
+    // floatval(...)
+    const floatvalMatch = expr.match(/^floatval\s*\((.+)\)$/i);
+    if (floatvalMatch && floatvalMatch[1]) {
+      return parseFloat(String(this.evalExpr(floatvalMatch[1]))) || 0.0;
+    }
+
+    // mysqli_real_escape_string(...) / addslashes(...)
+    const escapeMatch = expr.match(/^mysqli_real_escape_string\s*\(\s*[^,]+,\s*(.+)\)$/i);
+    if (escapeMatch && escapeMatch[1]) {
+      return String(this.evalExpr(escapeMatch[1]) ?? "");
+    }
+    const addslashesMatch = expr.match(/^addslashes\s*\((.+)\)$/i);
+    if (addslashesMatch && addslashesMatch[1]) {
+      return String(this.evalExpr(addslashesMatch[1]) ?? "");
     }
 
     // trim(...)
@@ -384,7 +418,48 @@ export class ProceduralPhpInterpreter {
         ? expr.slice(1, -1)
         : expr.slice(expr.indexOf("(") + 1, -1);
       if (!inner.trim()) return [];
-      return this.splitCommas(inner).map((item) => this.evalExpr(item));
+      const items = this.splitCommas(inner);
+      const isAssoc = items.some((item) => item.includes("=>"));
+      if (isAssoc) {
+        const obj: Record<string, unknown> = {};
+        for (const item of items) {
+          const arrowIdx = item.indexOf("=>");
+          if (arrowIdx !== -1) {
+            const rawKey = item.slice(0, arrowIdx).trim();
+            const rawVal = item.slice(arrowIdx + 2).trim();
+            const k = String(this.evalExpr(rawKey) ?? "");
+            obj[k] = this.evalExpr(rawVal);
+          }
+        }
+        return obj;
+      }
+      return items.map((item) => this.evalExpr(item));
+    }
+
+    // Opérations arithmétiques binaires (+, -, *, /)
+    for (const op of ["+", "-"]) {
+      const parts = this.splitByOp(expr, [op]);
+      if (parts.length > 1 && parts[0]?.trim()) {
+        const left = Number(this.evalExpr(parts[0]));
+        const rest = parts.slice(1).map((p) => Number(this.evalExpr(p)));
+        if (!isNaN(left) && rest.every((n) => !isNaN(n))) {
+          return op === "+"
+            ? rest.reduce((acc, n) => acc + n, left)
+            : rest.reduce((acc, n) => acc - n, left);
+        }
+      }
+    }
+    for (const op of ["*", "/"]) {
+      const parts = this.splitByOp(expr, [op]);
+      if (parts.length > 1 && parts[0]?.trim()) {
+        const left = Number(this.evalExpr(parts[0]));
+        const rest = parts.slice(1).map((p) => Number(this.evalExpr(p)));
+        if (!isNaN(left) && rest.every((n) => !isNaN(n))) {
+          return op === "*"
+            ? rest.reduce((acc, n) => acc * n, left)
+            : rest.reduce((acc, n) => (n !== 0 ? acc / n : 0), left);
+        }
+      }
     }
 
     // Concaténation point '.' (évaluée avant les chaînes littérales pour résoudre les expressions composées)
@@ -421,7 +496,7 @@ export class ProceduralPhpInterpreter {
       return this.session[k] !== undefined ? this.session[k] : "";
     }
 
-    // Accès tableau dynamique : $client["nom"] ou $ligne['id']
+    // Accès tableau dynamique : $client["nom"] ou $ligne['id'] ou $prix_catalogue[$article]
     const arrayAccessMatch = expr.match(
       /^\$([a-zA-Z_][a-zA-Z0-9_]*)\s*\[\s*['"]([^'"]+)['"]\s*\]$/,
     );
@@ -430,6 +505,15 @@ export class ProceduralPhpInterpreter {
       const key = arrayAccessMatch[2];
       if (arr) {
         return arr[key] !== undefined ? arr[key] : (arr[key.toLowerCase()] ?? "");
+      }
+      return "";
+    }
+    const arrayDynKeyMatch = expr.match(/^\$([a-zA-Z_][a-zA-Z0-9_]*)\s*\[\s*([^'"][^\]]*)\]$/);
+    if (arrayDynKeyMatch && arrayDynKeyMatch[1] && arrayDynKeyMatch[2]) {
+      const arr = this.vars[arrayDynKeyMatch[1]] as Record<string, unknown> | undefined;
+      const keyVal = String(this.evalExpr(arrayDynKeyMatch[2].trim()) ?? "");
+      if (arr) {
+        return arr[keyVal] !== undefined ? arr[keyVal] : (arr[keyVal.toLowerCase()] ?? "");
       }
       return "";
     }
@@ -563,7 +647,7 @@ export class ProceduralPhpInterpreter {
 
     // mysqli_query($con, $sql)
     const queryAssignMatch = clean.match(
-      /^\$([a-zA-Z_][a-zA-Z0-9_]*)\s*=\s*mysqli_query\s*\(\s*[^,]+,\s*(.+)\)$/i,
+      /^\$([a-zA-Z_][a-zA-Z0-9_]*)\s*=\s*mysqli_query\s*\(\s*[^,]+,\s*([\s\S]+)\)$/i,
     );
     if (queryAssignMatch && queryAssignMatch[1] && queryAssignMatch[2]) {
       const resVar = queryAssignMatch[1];
@@ -586,7 +670,7 @@ export class ProceduralPhpInterpreter {
     }
 
     // mysqli_query sans assignation : mysqli_query($con, $sql);
-    const directQueryMatch = clean.match(/^mysqli_query\s*\(\s*[^,]+,\s*(.+)\)$/i);
+    const directQueryMatch = clean.match(/^mysqli_query\s*\(\s*[^,]+,\s*([\s\S]+)\)$/i);
     if (directQueryMatch && directQueryMatch[1]) {
       const sql = String(this.evalExpr(directQueryMatch[1]) ?? "").trim();
       this.executedQueries.push(sql);
@@ -598,7 +682,7 @@ export class ProceduralPhpInterpreter {
     }
 
     // Assignation tableau $arr[] = expr;
-    const arrayAppendMatch = clean.match(/^\$([a-zA-Z_][a-zA-Z0-9_]*)\s*\[\s*\]\s*=\s*(.+)$/);
+    const arrayAppendMatch = clean.match(/^\$([a-zA-Z_][a-zA-Z0-9_]*)\s*\[\s*\]\s*=\s*([\s\S]+)$/);
     if (arrayAppendMatch && arrayAppendMatch[1] && arrayAppendMatch[2]) {
       const arrName = arrayAppendMatch[1];
       if (!Array.isArray(this.vars[arrName])) {
@@ -609,7 +693,9 @@ export class ProceduralPhpInterpreter {
     }
 
     // Assignation superglobale $_SESSION['k'] = expr;
-    const sessionAssignMatch = clean.match(/^\$_SESSION\s*\[\s*['"]([^'"]+)['"]\s*\]\s*=\s*(.+)$/);
+    const sessionAssignMatch = clean.match(
+      /^\$_SESSION\s*\[\s*['"]([^'"]+)['"]\s*\]\s*=\s*([\s\S]+)$/,
+    );
     if (sessionAssignMatch && sessionAssignMatch[1] && sessionAssignMatch[2]) {
       const k = sessionAssignMatch[1];
       this.session[k] = this.evalExpr(sessionAssignMatch[2]);
@@ -617,7 +703,7 @@ export class ProceduralPhpInterpreter {
     }
 
     // Assignation variable classique : $var = expr;
-    const assignMatch = clean.match(/^\$([a-zA-Z_][a-zA-Z0-9_]*)\s*=\s*(.+)$/);
+    const assignMatch = clean.match(/^\$([a-zA-Z_][a-zA-Z0-9_]*)\s*=\s*([\s\S]+)$/);
     if (assignMatch && assignMatch[1] && assignMatch[2]) {
       const vName = assignMatch[1];
       this.vars[vName] = this.evalExpr(assignMatch[2]);
@@ -646,7 +732,7 @@ export class ProceduralPhpInterpreter {
     this.executedQueries.push(sql);
     const res = this.simulator.query(sql);
     stmt.lastResult = {
-      success: res.success,
+      success: Boolean(res.success),
       rows: res.rows || [],
       numRows: res.numRows || 0,
       affectedRows: res.affectedRows || 0,
@@ -657,7 +743,7 @@ export class ProceduralPhpInterpreter {
     if (!res.success && res.error) {
       this.mysqliErrors.push(res.error);
     }
-    return res.success;
+    return Boolean(res.success);
   }
 
   /**
@@ -1008,7 +1094,7 @@ export function executerScriptPhpProcedural(
   const scriptContent = virtualFiles[entrypoint] || req.script;
 
   // Initialisation ou récupération du simulateur SQL
-  const simulator = options.simulator ?? new MySqliSimulator();
+  const simulator = options.simulator ?? new RelationalDatabaseEngine();
   const initSql = options.initialSql || resoudreSqlInitial(virtualFiles);
   if (initSql && (!options.simulator || Object.keys(simulator).length === 0)) {
     simulator.executeScript(initSql);

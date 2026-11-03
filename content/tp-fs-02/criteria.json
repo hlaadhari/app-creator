@@ -3,35 +3,75 @@
     "id": "c1_form_selection",
     "titre": "Formulaire de sélection de station météo",
     "points": 4,
+    "fichier": "consultation.html",
     "fail_message": "Le formulaire doit contenir la liste déroulante #station et le champ numérique #annee.",
-    "selector": "form#fMeteo select#station, form#fMeteo input#annee"
+    "sonde": {
+      "type": "dom_selector",
+      "selector": "form#fMeteo select#station, form#fMeteo input#annee",
+      "minCount": 2
+    }
   },
   {
     "id": "c2_js_test2",
     "titre": "Fonction de contrôle test2()",
     "points": 4,
+    "fichier": "consultation.html",
     "fail_message": "La fonction test2() doit valider la sélection d'une station et une année comprise entre 2020 et 2026.",
-    "js_function": "test2"
+    "type": "js_test_cas",
+    "function_name": "test2",
+    "cas": [
+      { "saisies": { "station": "", "annee": "2024" }, "attendu": false },
+      { "saisies": { "station": "1", "annee": "2019" }, "attendu": false },
+      { "saisies": { "station": "1", "annee": "2027" }, "attendu": false },
+      { "saisies": { "station": "1", "annee": "2024" }, "attendu": true }
+    ]
   },
   {
     "id": "c3_db_schema",
     "titre": "Schéma relationnel station et mesure",
     "points": 4,
+    "fichier": "db/init.sql",
     "fail_message": "Le script init.sql doit créer les tables station et mesure avec clé étrangère et contraintes.",
-    "sql_pattern": "CREATE\\s+TABLE[\\s\\S]*?station[\\s\\S]*?CREATE\\s+TABLE[\\s\\S]*?mesure"
+    "sonde": {
+      "type": "sql_table_check",
+      "table": "mesure",
+      "foreignKeys": [{ "column": "id_station", "refTable": "station" }],
+      "columns": [
+        { "name": "temperature", "notNull": true },
+        { "name": "humidite", "hasCheck": true }
+      ]
+    }
   },
   {
     "id": "c4_sql_aggregation",
     "titre": "Requête SQL d'agrégation statistique (AVG, MAX, MIN, GROUP BY)",
     "points": 4,
+    "fichier": "meteo.php",
     "fail_message": "La requête PHP doit utiliser AVG(temperature), MAX(temperature), MIN(temperature) et GROUP BY.",
-    "php_pattern": "SELECT[\\s\\S]*?AVG\\([\\s\\S]*?GROUP\\s+BY"
+    "sonde": {
+      "type": "php_mysqli_check",
+      "entrypoint": "meteo.php",
+      "postData": {
+        "station": "1",
+        "annee": "2026"
+      },
+      "expectedStdoutContains": "Station Nord"
+    }
   },
   {
     "id": "c5_html_table_render",
     "titre": "Restitution des résultats dans un tableau HTML",
     "points": 4,
+    "fichier": "meteo.php",
     "fail_message": "Le résultat doit être affiché sous forme d'un tableau HTML <table> avec mise en forme des valeurs.",
-    "php_pattern": "<table>[\\s\\S]*?<th>[\\s\\S]*?<td>"
+    "sonde": {
+      "type": "php_mysqli_check",
+      "entrypoint": "meteo.php",
+      "postData": {
+        "station": "1",
+        "annee": "2026"
+      },
+      "expectedStdoutPattern": "<table[\\s\\S]*?<th[\\s\\S]*?<td"
+    }
   }
 ]
