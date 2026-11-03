@@ -181,6 +181,10 @@ export const CriterionJsonSchema = z
     // Vérifications déclarées SQL / PHP (patterns LDD/LMD/MySQLi)
     sql_pattern: z.string().optional(),
     php_pattern: z.string().optional(),
+
+    // Indices progressifs à 3 niveaux (Issue #133 / PED-06)
+    indices: z.array(z.string().min(1)).max(3).optional(),
+    hints: z.array(z.string().min(1)).max(3).optional(),
   })
   .strict()
   .refine((data) => !!(data.titre || data.label || data.description), {

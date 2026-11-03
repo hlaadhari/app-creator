@@ -26,6 +26,7 @@ import {
 } from "@/lib/pedagogy/contestations-client";
 import { listerHistoriqueAvecDeltas, type AttemptWithDelta } from "@/lib/pedagogy/attempts-service";
 import type { ContestationRecord } from "@/lib/subjects/contestations-service";
+import { genererIndicesProgressifs } from "@/lib/evaluation/progressive-hints";
 
 interface EvaluationResultsPaneProps {
   summary: EvaluationSummary | null;
@@ -63,6 +64,7 @@ export function EvaluationResultsPane({
   } | null>(null);
 
   const [contestations, setContestations] = useState<ContestationRecord[]>([]);
+  const [unlockedHints, setUnlockedHints] = useState<Record<string, number>>({});
 
   // Chargement des contestations de l'élève pour ce sujet
   useEffect(() => {
@@ -334,6 +336,86 @@ export function EvaluationResultsPane({
                     {automatique ? `+${r.points} / ${r.maxPoints} pts` : `${r.maxPoints} pts`}
                   </span>
                 </div>
+
+                {/* Indices progressifs 3 niveaux (Issue #133 / PED-06) */}
+                {!r.passed && automatique && (
+                  <div className="mt-2.5 pt-2 border-t border-border/50">
+                    {examMode ? (
+                      <div className="flex items-center gap-1.5 text-[11px] font-mono text-muted-foreground/75">
+                        <Lock className="h-3 w-3" />
+                        <span>Indices progressifs désactivés en mode examen (T-04 / T-06)</span>
+                      </div>
+                    ) : (
+                      (() => {
+                        const critHints =
+                          r.hints && r.hints.length >= 3
+                            ? r.hints
+                            : genererIndicesProgressifs(
+                                r as unknown as Parameters<typeof genererIndicesProgressifs>[0],
+                              );
+                        const currentLvl = unlockedHints[r.id] ?? 0;
+
+                        return (
+                          <div className="space-y-1.5 text-xs">
+                            <div className="flex items-center justify-between">
+                              <span className="font-mono text-[11px] text-amber-600 dark:text-amber-400 font-medium flex items-center gap-1">
+                                <Sparkles className="h-3 w-3" />
+                                <span>Indices progressifs ({currentLvl}/3)</span>
+                              </span>
+                              {currentLvl < 3 ? (
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    setUnlockedHints((prev) => ({
+                                      ...prev,
+                                      [r.id]: (prev[r.id] ?? 0) + 1,
+                                    }))
+                                  }
+                                  className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/30 hover:bg-amber-500/20 cursor-pointer transition-colors"
+                                >
+                                  Débloquer niveau {currentLvl + 1}
+                                </button>
+                              ) : (
+                                <span className="text-[10px] font-mono text-muted-foreground">
+                                  3/3 débloqués
+                                </span>
+                              )}
+                            </div>
+
+                            {currentLvl >= 1 && (
+                              <div className="rounded bg-muted/60 border border-border p-2 text-[11px] leading-relaxed">
+                                <div className="font-semibold text-foreground text-[10px] uppercase font-mono tracking-wider text-amber-600 dark:text-amber-400 mb-0.5">
+                                  Niveau 1 — Conceptuel
+                                </div>
+                                <p className="text-foreground/90">{critHints[0]}</p>
+                              </div>
+                            )}
+
+                            {currentLvl >= 2 && (
+                              <div className="rounded bg-muted/60 border border-border p-2 text-[11px] leading-relaxed">
+                                <div className="font-semibold text-foreground text-[10px] uppercase font-mono tracking-wider text-blue-600 dark:text-blue-400 mb-0.5">
+                                  Niveau 2 — Piste Syntaxique
+                                </div>
+                                <p className="text-foreground/90">{critHints[1]}</p>
+                              </div>
+                            )}
+
+                            {currentLvl >= 3 && (
+                              <div className="rounded bg-muted/60 border border-border p-2 text-[11px] leading-relaxed">
+                                <div className="font-semibold text-foreground text-[10px] uppercase font-mono tracking-wider text-purple-600 dark:text-purple-400 mb-0.5">
+                                  Niveau 3 — Extrait d'Illustration
+                                </div>
+                                <pre className="font-mono text-[10px] bg-background/80 border rounded p-1.5 overflow-x-auto text-foreground mt-1 whitespace-pre-wrap">
+                                  {critHints[2]}
+                                </pre>
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })()
+                    )}
+                  </div>
+                )}
 
                 {/* Section Contestation pour les critères non validés */}
                 {!r.passed && automatique && (

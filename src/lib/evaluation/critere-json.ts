@@ -6,6 +6,7 @@
 
 import type { Criterion } from "../exercises";
 import { construireVerificationDeclaree } from "./declared-criteria";
+import { genererIndicesProgressifs } from "./progressive-hints";
 
 export interface RawProbe {
   type?: string;
@@ -164,6 +165,7 @@ export function critereDepuisJson(c: RawCriterion): Criterion {
     ...(manuel ? { manuel: true } : {}),
     ...(typeof c["fichier"] === "string" ? { fichier: c["fichier"] } : {}),
     raw: c as Record<string, unknown>,
+    hints: genererIndicesProgressifs(c),
     check: declaree ?? makeProbeCheck(c.sonde),
   };
 }

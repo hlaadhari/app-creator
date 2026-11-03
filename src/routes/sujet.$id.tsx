@@ -256,6 +256,7 @@ function WorkspaceView({ ex }: { ex: Exercise }) {
           durationMs: 12,
           automatique: c.automatique,
           ...(c.cause ? { cause: c.cause } : {}),
+          ...(c.hints && c.hints.length > 0 ? { hints: c.hints } : {}),
         })),
         earnedPoints: sc.got,
         totalPoints: sc.total,

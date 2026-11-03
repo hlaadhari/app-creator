@@ -56,6 +56,8 @@ export interface CriterionEvaluationResult {
   automatique?: boolean | undefined;
   /** Cause d'échec qualifiée quand passed === false (Issue #130 / PED-05) */
   cause?: CriterionFailureCause | undefined;
+  /** Indices progressifs à 3 niveaux (Issue #133 / PED-06) */
+  hints?: string[] | undefined;
 }
 
 export interface EvaluationSummary {
