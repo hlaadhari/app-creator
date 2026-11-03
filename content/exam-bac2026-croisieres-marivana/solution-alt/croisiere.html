@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Recherche de croisières</title>
+    <link rel="stylesheet" href="styles2.css" />
+    <script src="controles2.js"></script>
+  </head>
+  <body>
+    <form action="croisiere.php" method="post" onsubmit="return verif1();">
+      <fieldset>
+        <legend>Recherche de croisières</legend>
+        <label for="dest"> Destination : </label>
+        <select id="dest" name="dest">
+          <option value="" selected>Choisir une destination</option>
+          <option value="1">Alexandrie</option>
+          <option value="2">Barcelone</option>
+          <option value="3">Beyrouth</option>
+        </select>
+        <fieldset>
+          <legend>Date de départ entre</legend>
+          <label> Date 1 : </label>
+          <input type="date" id="DD" name="DD" /><br />
+          <label> Date 2 : </label>
+          <input type="date" id="DF" name="DF" /><br />
+        </fieldset>
+        <br />
+        <fieldset>
+          <legend>Informations supplémentaires à afficher</legend>
+          <input type="checkbox" id="duree" name="duree" value="1" /> Durée
+          <input type="checkbox" id="prix" name="prix" value="1" /> Prix
+          <input type="checkbox" id="capacite" name="capacite" value="1" /> Capacité
+        </fieldset>
+        <br />
+        <div>
+          <input type="reset" value="Annuler" />
+          <input type="submit" value="Chercher" />
+        </div>
+      </fieldset>
+    </form>
+  </body>
+</html>
