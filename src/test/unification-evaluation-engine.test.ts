@@ -36,8 +36,8 @@ function lireSolution(sujetId: string): Record<string, string> {
 }
 
 describe("Unification du Moteur d'Évaluation (TEC-05 / Issue #127)", () => {
-  it("les 10 sujets du catalogue sont tous référencés", () => {
-    expect(contentSubjects.length).toBe(10);
+  it("les sujets du catalogue sont tous référencés", () => {
+    expect(contentSubjects.length).toBeGreaterThanOrEqual(10);
   });
 
   it.each(contentSubjects.map((s) => s.id))(

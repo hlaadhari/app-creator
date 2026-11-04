@@ -1,0 +1,48 @@
+-- Base de données : bd_agvoy2022
+-- Baccalauréat STI 2022 - Session Principale
+
+CREATE TABLE IF NOT EXISTS Ville (
+  NumVille INT PRIMARY KEY,
+  LibVille VARCHAR(30) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS Site (
+  NumSite INT PRIMARY KEY,
+  LibSite VARCHAR(30) NOT NULL,
+  NumVille INT,
+  FOREIGN KEY (NumVille) REFERENCES Ville(NumVille) ON UPDATE CASCADE ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS Participant (
+  IdParticipant VARCHAR(10) PRIMARY KEY,
+  NomPrenom VARCHAR(50) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS Excursion (
+  NumEx INT PRIMARY KEY,
+  DateEx DATE NOT NULL,
+  PrixEx INT NOT NULL CHECK (PrixEx > 0),
+  NumSite INT,
+  FOREIGN KEY (NumSite) REFERENCES Site(NumSite) ON UPDATE CASCADE ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS Participer (
+  IdParticipant VARCHAR(10),
+  NumEx INT,
+  PRIMARY KEY (IdParticipant, NumEx),
+  FOREIGN KEY (IdParticipant) REFERENCES Participant(IdParticipant) ON UPDATE CASCADE ON DELETE CASCADE,
+  FOREIGN KEY (NumEx) REFERENCES Excursion(NumEx) ON UPDATE CASCADE ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS Eleve (
+  Cin VARCHAR(8) PRIMARY KEY,
+  Nom VARCHAR(30) NOT NULL,
+  Prenom VARCHAR(30) NOT NULL,
+  Tel VARCHAR(8) NOT NULL
+);
+
+-- Données initiales
+INSERT INTO Ville VALUES (10, 'Toujane'), (20, 'Tabarka'), (30, 'Monastir');
+INSERT INTO Site VALUES (100, 'Site Archéologique', 10), (200, 'Oasis & Montagne', 10);
+INSERT INTO Excursion VALUES (15, '2022-08-01', 120, 100), (20, '2022-08-10', 150, 200), (23, '2022-08-15', 90, 100);
+INSERT INTO Eleve VALUES ('01234567', 'Ben Ali', 'Sami', '98765432'), ('08765432', 'Triki', 'Amira', '21654987');

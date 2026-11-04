@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Modifier Coordonnées Élève - Bac 2022</title>
+    <link rel="stylesheet" href="mesStyles.css" />
+    <script src="controles.js"></script>
+  </head>
+  <body>
+    <header>
+      <h1>Agence AgVoy - Gestion des Élèves</h1>
+      <nav>
+        <a href="index.html">Accueil</a> | <a href="modifier.html">Modifier Coordonnées</a> |
+        <a href="excursion.html">Excursions</a>
+      </nav>
+    </header>
+
+    <main>
+      <form method="POST" action="modifier.php" onsubmit="return verif();">
+        <fieldset>
+          <legend>Mise à jour des coordonnées élève</legend>
+          <table>
+            <tr>
+              <td><label for="cin">Numéro CIN (8 chiffres) :</label></td>
+              <td><input type="text" id="cin" name="cin" maxlength="8" /></td>
+            </tr>
+            <tr>
+              <td><label for="nom">Nom de l'élève :</label></td>
+              <td><input type="text" id="nom" name="nom" maxlength="30" /></td>
+            </tr>
+            <tr>
+              <td><label for="prenom">Prénom de l'élève :</label></td>
+              <td><input type="text" id="prenom" name="prenom" maxlength="30" /></td>
+            </tr>
+            <tr>
+              <td><label for="tel">Numéro Téléphone (8 chiffres) :</label></td>
+              <td><input type="text" id="tel" name="tel" maxlength="8" /></td>
+            </tr>
+            <tr>
+              <td colspan="2" style="text-align: center">
+                <input type="submit" value="Valider les modifications" />
+                <input type="reset" value="Annuler" />
+              </td>
+            </tr>
+          </table>
+        </fieldset>
+      </form>
+    </main>
+  </body>
+</html>

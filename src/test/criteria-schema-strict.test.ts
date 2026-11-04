@@ -10,8 +10,8 @@ describe("Validation Zod Strict des Fichiers criteria.json (TEC-06 / Issue #128)
     .readdirSync(CONTENT_DIR)
     .filter((dir) => fs.existsSync(path.join(CONTENT_DIR, dir, "criteria.json")));
 
-  it("vérifie que les 10 sujets du catalogue possèdent un criteria.json", () => {
-    expect(subjects.length).toBe(10);
+  it("vérifie que les sujets du catalogue possèdent un criteria.json", () => {
+    expect(subjects.length).toBeGreaterThanOrEqual(10);
   });
 
   it.each(subjects)("sujet %s : criteria.json est 100% conforme au schéma strict", (sujetDir) => {

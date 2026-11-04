@@ -1,0 +1,27 @@
+{
+  "id": "exam-bac2022-principale",
+  "titre": "Bac STI 2022 (Session Principale) - Agence AgVoy & Gestion Élèves",
+  "referentiel_id": "bac-si-tn",
+  "type_sujet": "annale_officielle",
+  "session_annee": 2022,
+  "session_libelle": "Session principale",
+  "source_reference": "Ministère de l'Éducation — Tunisie",
+  "statut_validation": "valide_pedagogiquement",
+  "module": "Module C",
+  "duree_minutes": 90,
+  "niveau": 3,
+  "exam_mode": true,
+  "bareme": 20,
+  "tags": ["Bac STI", "HTML5", "CSS3", "JavaScript", "PHP", "MySQLi", "Examen Blanc"],
+  "description": "Sujet officiel du Bac STI 2022 (Session Principale) : gestion de l'agence AgVoy et mise à jour des coordonnées élèves avec validation de formulaire, contrôle du CIN et script PHP/MySQLi.",
+  "fichiers_attendus": [
+    "index.html",
+    "modifier.html",
+    "excursion.html",
+    "mesStyles.css",
+    "controles.js",
+    "modifier.php",
+    "excursion.php"
+  ],
+  "base_de_donnees": "db/init.sql"
+}
