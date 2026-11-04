@@ -10,6 +10,7 @@ import criteres_ex_js_01 from "../../../content/ex-js-01/criteria.json";
 import criteres_ex_sql_01 from "../../../content/ex-sql-01/criteria.json";
 import criteres_tp_fs_01 from "../../../content/tp-fs-01/criteria.json";
 import criteres_tp_fs_02 from "../../../content/tp-fs-02/criteria.json";
+import criteres_exam_bac2022_principale from "../../../content/exam-bac2022-principale/criteria.json";
 import criteres_exam_bac2023_location_habits from "../../../content/exam-bac2023-location-habits/criteria.json";
 import criteres_exam_bac2018_test_drive from "../../../content/exam-bac2018-test-drive/criteria.json";
 import criteres_exam_bac2025_droits_acces from "../../../content/exam-bac2025-droits-acces/criteria.json";
@@ -281,6 +282,48 @@ const rawSubjects = [
       "Vérifiez les points d'arrêt et la conformité des types/formats de données.",
     ],
     rawCriteria: criteres_tp_fs_02 as unknown as RawCriterion[],
+  },
+  {
+    id: "exam-bac2022-principale",
+    title: "Bac STI 2022 (Session Principale) - Agence AgVoy & Gestion Élèves",
+    referentielId: "bac-si-tn",
+    typeSujet: "annale_officielle",
+    sessionAnnee: 2022,
+    sessionLibelle: "Session principale",
+    sourceReference: "Ministère de l'Éducation — Tunisie",
+    statutValidation: "valide_pedagogiquement",
+    level: "Difficile",
+    competence: "Bac STI • HTML5 • CSS3 • JavaScript • PHP • MySQLi • Examen Blanc",
+    module: "Module C",
+    dureeMinutes: 90,
+    tags: ["Bac STI", "HTML5", "CSS3", "JavaScript", "PHP", "MySQLi", "Examen Blanc"],
+    examMode: true,
+    bareme: 20,
+    statement: [
+      "Sujet officiel du Bac STI 2022 (Session Principale) : gestion de l'agence AgVoy et mise à jour des coordonnées élèves avec validation de formulaire, contrôle du CIN et script PHP/MySQLi.",
+    ],
+    enonceMarkdown:
+      "# Épreuve Pratique du Baccalauréat STI 2022\n\n## Sujet : Agence de Voyage AgVoy & Gestion des Coordonnées Élèves (Session Principale)\n\n**Durée :** 1 heure 30 minutes (90 minutes)  \n**Coefficient :** 1.5  \n**Note Maximale :** 20 points (Mode Examen Blanc)\n\n---\n\n## Contexte et Présentation\n\nL'agence de voyage **AgVoy** souhaite informatiser ses services de réservation d'excursions touristiques et la gestion des données de ses adhérents. L'application repose sur une base de données relationnelle locale nommée `bd_agvoy2022` comprenant six tables :\n\n1. **`Ville`** (`NumVille`, `LibVille`)\n2. **`Site`** (`NumSite`, `LibSite`, `#NumVille`)\n3. **`Participant`** (`IdParticipant`, `NomPrenom`)\n4. **`Excursion`** (`NumEx`, `DateEx`, `PrixEx`, `#NumSite`) avec `PrixEx > 0`\n5. **`Participer`** (`#IdParticipant`, `#NumEx`)\n6. **`Eleve`** (`Cin`, `Nom`, `Prenom`, `Tel`)\n\nL'arborescence de travail est remise à l'élève sous la forme : `Travail_Eleve/SW_<NCIN>/`.\n\n---\n\n## Travail Demandé\n\n### 1. Base de Données & Structure SQL (3 points)\n\nLe fichier `db/init.sql` initialise la structure relationnelle avec clés primaires, clés étrangères et contraintes d'intégrité.\n\n### 2. Interface Web & Feuilles de Styles CSS3 (5 points)\n\nDans le fichier `modifier.html` : formulaire POST vers `modifier.php` avec `onsubmit=\"return verif();\"` contenant les champs `cin`, `nom`, `prenom`, `tel` et stylisé par `mesStyles.css`.\n\n### 3. Contrôles Côté Client en JavaScript (5 points)\n\nDans `controles.js`, programmer la fonction `verif()` : CIN de 8 chiffres, nom et prénom obligatoires, téléphone de 8 chiffres, blocage avec `return false;` et `return true;` si tout est conforme.\n\n### 4. Traitement Côté Serveur en PHP & MySQLi (7 points)\n\nDans `modifier.php` : connexion MySQLi à `bd_agvoy2022`, détection d'élève introuvable, et mise à jour `UPDATE Eleve ...` avec message de succès.\n",
+    starter: {
+      "index.html":
+        '<!doctype html>\n<html lang="fr">\n  <head>\n    <meta charset="UTF-8" />\n    <meta name="viewport" content="width=device-width, initial-scale=1.0" />\n    <title>Agence AgVoy - Bac 2022</title>\n    <link rel="stylesheet" href="mesStyles.css" />\n  </head>\n  <body>\n    <header>\n      <h1>Bienvenue chez AgVoy</h1>\n      <nav>\n        <a href="index.html">Accueil</a> |\n        <a href="modifier.html">Modifier Coordonnées</a> |\n        <a href="excursion.html">Excursions</a>\n      </nav>\n    </header>\n    <main>\n      <p style="text-align: center">\n        Plateforme officielle de gestion des excursions et des adhérents de l\'agence AgVoy.\n      </p>\n    </main>\n  </body>\n</html>\n',
+      "modifier.html":
+        '<!doctype html>\n<html lang="fr">\n  <head>\n    <meta charset="UTF-8" />\n    <meta name="viewport" content="width=device-width, initial-scale=1.0" />\n    <title>Modifier Coordonnées Élève - Bac 2022</title>\n    <link rel="stylesheet" href="mesStyles.css" />\n    <script src="controles.js"></script>\n  </head>\n  <body>\n    <header>\n      <h1>Agence AgVoy - Gestion des Élèves</h1>\n      <nav>\n        <a href="index.html">Accueil</a> |\n        <a href="modifier.html">Modifier Coordonnées</a> |\n        <a href="excursion.html">Excursions</a>\n      </nav>\n    </header>\n\n    <main>\n      <!-- Formulaire à compléter par l\'élève : méthode POST vers modifier.php avec onsubmit="return verif();" -->\n      <form method="POST" action="modifier.php" onsubmit="return verif();">\n        <fieldset>\n          <legend>Mise à jour des coordonnées élève</legend>\n          <p>Complétez le formulaire avec les champs cin, nom, prenom et tel.</p>\n        </fieldset>\n      </form>\n    </main>\n  </body>\n</html>\n',
+      "excursion.html":
+        '<!doctype html>\n<html lang="fr">\n  <head>\n    <meta charset="UTF-8" />\n    <meta name="viewport" content="width=device-width, initial-scale=1.0" />\n    <title>Excursions - Agence AgVoy</title>\n    <link rel="stylesheet" href="mesStyles.css" />\n  </head>\n  <body>\n    <header>\n      <h1>Gestion des Excursions AgVoy</h1>\n      <nav>\n        <a href="index.html">Accueil</a> |\n        <a href="modifier.html">Modifier Coordonnées</a> |\n        <a href="excursion.html">Excursions</a>\n      </nav>\n    </header>\n    <main>\n      <form method="POST" action="excursion.php">\n        <fieldset>\n          <legend>Liste des excursions disponibles</legend>\n          <p>Consultez ou réservez vos excursions auprès de l\'agence.</p>\n          <input type="submit" value="Afficher les excursions" />\n        </fieldset>\n      </form>\n    </main>\n  </body>\n</html>\n',
+      "mesStyles.css":
+        "/* Feuille de style initiale à enrichir par l'élève */\nbody {\n  font-family: Arial, sans-serif;\n  margin: 20px;\n  background-color: #f4f7f9;\n  color: #2c3e50;\n}\n\nheader {\n  text-align: center;\n  margin-bottom: 30px;\n}\n\nh1 {\n  color: #0056b3;\n}\n\nnav a {\n  color: #0056b3;\n  text-decoration: none;\n  font-weight: bold;\n  margin: 0 10px;\n}\n\nfieldset {\n  width: 600px;\n  margin: 0 auto;\n  padding: 20px;\n  border: 1px solid #ccc;\n  background-color: #ffffff;\n}\n\nlegend {\n  font-weight: bold;\n  color: #0056b3;\n  padding: 0 10px;\n}\n",
+      "controles.js":
+        "// Validation côté client pour le formulaire modifier.html\n// À compléter par l'élève conformément aux consignes\nfunction verif() {\n  // 1. Contrôle du numéro CIN (8 chiffres)\n  // 2. Contrôle du nom et prénom (non vides)\n  // 3. Contrôle du téléphone (8 chiffres)\n  return true;\n}\n",
+      "modifier.php":
+        "<?php\n// Bac STI 2022 Session Principale - Mise à jour des coordonnées élève\n// À compléter par l'élève\n\n// 1. Connexion au serveur MySQL (base bd_agvoy2022)\n\n// 2. Récupération des paramètres transmis par POST (cin, nom, prenom, tel)\n\n// 3. Vérification de l'existence de l'élève (SELECT * FROM Eleve WHERE Cin = '$cin')\n\n// 4. Si trouvé : mise à jour (UPDATE Eleve SET Nom=..., Prenom=..., Tel=... WHERE Cin=...)\n//    Sinon : afficher le message \"Élève introuvable dans la base de données.\"\n?>\n",
+      "excursion.php":
+        '<?php\n// Bac STI 2022 - Consultation des excursions\n$conn = mysqli_connect("localhost", "root", "", "bd_agvoy2022");\nif (!$conn) {\n    die("Échec de connexion.");\n}\n?>\n',
+      "db/init.sql":
+        "-- Base de données : bd_agvoy2022\n-- Baccalauréat STI 2022 - Session Principale\n\nCREATE TABLE IF NOT EXISTS Ville (\n  NumVille INT PRIMARY KEY,\n  LibVille VARCHAR(30) NOT NULL\n);\n\nCREATE TABLE IF NOT EXISTS Site (\n  NumSite INT PRIMARY KEY,\n  LibSite VARCHAR(30) NOT NULL,\n  NumVille INT,\n  FOREIGN KEY (NumVille) REFERENCES Ville(NumVille) ON UPDATE CASCADE ON DELETE CASCADE\n);\n\nCREATE TABLE IF NOT EXISTS Participant (\n  IdParticipant VARCHAR(10) PRIMARY KEY,\n  NomPrenom VARCHAR(50) NOT NULL\n);\n\nCREATE TABLE IF NOT EXISTS Excursion (\n  NumEx INT PRIMARY KEY,\n  DateEx DATE NOT NULL,\n  PrixEx INT NOT NULL CHECK (PrixEx > 0),\n  NumSite INT,\n  FOREIGN KEY (NumSite) REFERENCES Site(NumSite) ON UPDATE CASCADE ON DELETE CASCADE\n);\n\nCREATE TABLE IF NOT EXISTS Participer (\n  IdParticipant VARCHAR(10),\n  NumEx INT,\n  PRIMARY KEY (IdParticipant, NumEx),\n  FOREIGN KEY (IdParticipant) REFERENCES Participant(IdParticipant) ON UPDATE CASCADE ON DELETE CASCADE,\n  FOREIGN KEY (NumEx) REFERENCES Excursion(NumEx) ON UPDATE CASCADE ON DELETE CASCADE\n);\n\nCREATE TABLE IF NOT EXISTS Eleve (\n  Cin VARCHAR(8) PRIMARY KEY,\n  Nom VARCHAR(30) NOT NULL,\n  Prenom VARCHAR(30) NOT NULL,\n  Tel VARCHAR(8) NOT NULL\n);\n\n-- Données initiales\nINSERT INTO Ville VALUES (10, 'Toujane'), (20, 'Tabarka'), (30, 'Monastir');\nINSERT INTO Site VALUES (100, 'Site Archéologique', 10), (200, 'Oasis & Montagne', 10);\nINSERT INTO Excursion VALUES (15, '2022-08-01', 120, 100), (20, '2022-08-10', 150, 200), (23, '2022-08-15', 90, 100);\nINSERT INTO Eleve VALUES ('01234567', 'Ben Ali', 'Sami', '98765432'), ('08765432', 'Triki', 'Amira', '21654987');\n",
+    },
+    hints: ["Consultez l'énoncé officiel et les consignes du Bac STI 2022 (Session Principale)."],
+    rawCriteria: criteres_exam_bac2022_principale as unknown as RawCriterion[],
   },
   {
     id: "exam-bac2023-location-habits",
@@ -602,6 +645,10 @@ export async function loadSubjectCriteria(subjectId: string): Promise<Criterion[
       break;
     case "tp-fs-02":
       raw = (await import("../../../content/tp-fs-02/criteria.json"))
+        .default as unknown as RawCriterion[];
+      break;
+    case "exam-bac2022-principale":
+      raw = (await import("../../../content/exam-bac2022-principale/criteria.json"))
         .default as unknown as RawCriterion[];
       break;
     case "exam-bac2023-location-habits":

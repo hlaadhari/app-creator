@@ -377,7 +377,10 @@ export function evaluerPhpMySqliCheck(
     }
     if (expTable.where) {
       const match = rows.some((r) =>
-        Object.entries(expTable.where!).every(([k, v]) => String(r[k]) === String(v)),
+        Object.entries(expTable.where!).every(([k, v]) => {
+          const actualKey = Object.keys(r).find((rk) => rk.toLowerCase() === k.toLowerCase()) ?? k;
+          return String(r[actualKey]) === String(v);
+        }),
       );
       if (!match) {
         return echec(

@@ -1,0 +1,226 @@
+[
+  {
+    "id": "BAC22-01",
+    "code": "SQL-01",
+    "titre": "Structure relationnelle de la table Eleve",
+    "description": "La table Eleve doit être définie avec la clé primaire Cin de type VARCHAR(8) et les colonnes Nom, Prenom et Tel non nulles.",
+    "points": 1.5,
+    "ordre": 1,
+    "fichier": "db/init.sql",
+    "sonde": {
+      "type": "sql_table_check",
+      "table": "Eleve",
+      "primaryKey": ["Cin"]
+    },
+    "fail_message": "La table Eleve n'est pas correctement définie ou sa clé primaire Cin est manquante.",
+    "indices": [
+      "Vérifiez que la table Eleve comporte Cin en clé primaire (PRIMARY KEY).",
+      "Syntaxe : CREATE TABLE IF NOT EXISTS Eleve (Cin VARCHAR(8) PRIMARY KEY, Nom VARCHAR(30) NOT NULL, Prenom VARCHAR(30) NOT NULL, Tel VARCHAR(8) NOT NULL);",
+      "Extrait : CREATE TABLE Eleve (Cin VARCHAR(8) PRIMARY KEY, ...);"
+    ]
+  },
+  {
+    "id": "BAC22-02",
+    "code": "SQL-02",
+    "titre": "Contraintes d'intégrité et contrainte CHECK sur Excursion",
+    "description": "La table Excursion doit comporter la clé primaire NumEx, la clé étrangère NumSite et la contrainte CHECK (PrixEx > 0).",
+    "points": 1.5,
+    "ordre": 2,
+    "fichier": "db/init.sql",
+    "sonde": {
+      "type": "sql_table_check",
+      "table": "Excursion",
+      "primaryKey": ["NumEx"],
+      "hasCheck": true
+    },
+    "fail_message": "La table Excursion ne respecte pas les contraintes attendues (clé primaire ou contrainte CHECK sur PrixEx).",
+    "indices": [
+      "Déclarez la table Excursion avec une contrainte CHECK vérifiant que le prix de l'excursion est strictement positif.",
+      "Syntaxe : PrixEx INT NOT NULL CHECK (PrixEx > 0), FOREIGN KEY (NumSite) REFERENCES Site(NumSite)",
+      "Extrait : `PrixEx` INT NOT NULL CHECK (`PrixEx` > 0)"
+    ]
+  },
+  {
+    "id": "BAC22-03",
+    "code": "HTML-01",
+    "titre": "Formulaire HTML5 de mise à jour des coordonnées (modifier.html)",
+    "description": "Le formulaire doit utiliser la méthode POST, cibler modifier.php et contenir les champs cin, nom, prenom et tel.",
+    "points": 2.5,
+    "ordre": 3,
+    "fichier": "modifier.html",
+    "sonde": {
+      "type": "dom_selector",
+      "selector": "form[method=\"POST\" i][action=\"modifier.php\"] input#cin, form input#nom, form input#prenom, form input#tel",
+      "minCount": 4
+    },
+    "fail_message": "Le formulaire modifier.html ne comporte pas l'ensemble des 4 champs (cin, nom, prenom, tel) ou ne cible pas modifier.php en POST.",
+    "indices": [
+      "Vérifiez que chaque champ de formulaire possède les attributs id et name correspondants aux spécifications.",
+      "Syntaxe : <form method=\"POST\" action=\"modifier.php\" onsubmit=\"return verif();\"><input id=\"cin\" ...>",
+      "Extrait : <input type=\"text\" id=\"cin\" name=\"cin\" maxlength=\"8\" />"
+    ]
+  },
+  {
+    "id": "BAC22-04",
+    "code": "CSS-01",
+    "titre": "Mise en page et liaison CSS externe (mesStyles.css)",
+    "description": "La feuille de style mesStyles.css doit appliquer des bordures et une mise en forme structurée sur le fieldset du formulaire.",
+    "points": 2.5,
+    "ordre": 4,
+    "fichier": "modifier.html",
+    "sonde": {
+      "type": "css_property",
+      "selector": "fieldset",
+      "property": "border-width",
+      "isGreaterThanZero": true
+    },
+    "fail_message": "La feuille de style externe mesStyles.css n'applique pas les styles requis sur le conteneur fieldset.",
+    "indices": [
+      "Assurez-vous que modifier.html est lié à mesStyles.css via une balise <link rel=\"stylesheet\">.",
+      "Syntaxe : fieldset { border: 2px solid #0056b3; border-radius: 8px; padding: 20px; }",
+      "Extrait : border-width: 2px;"
+    ]
+  },
+  {
+    "id": "BAC22-05",
+    "code": "JS-01",
+    "titre": "Validation JavaScript du format CIN et des champs obligatoires",
+    "description": "La fonction verif() doit refuser la soumission si le CIN ne comporte pas exactement 8 chiffres ou si le nom est vide.",
+    "points": 3,
+    "ordre": 5,
+    "fichier": "modifier.html",
+    "type": "js_test_cas",
+    "function_name": "verif",
+    "cas": [
+      {
+        "saisies": {
+          "cin": "123",
+          "nom": "Ben Ali",
+          "prenom": "Sami",
+          "tel": "98765432"
+        },
+        "attendu": false
+      },
+      {
+        "saisies": {
+          "cin": "01234567",
+          "nom": "",
+          "prenom": "Sami",
+          "tel": "98765432"
+        },
+        "attendu": false
+      },
+      {
+        "saisies": {
+          "cin": "01234567",
+          "nom": "Ben Ali",
+          "prenom": "Sami",
+          "tel": "98765432"
+        },
+        "attendu": true
+      }
+    ],
+    "fail_message": "La fonction verif() ne valide pas correctement la longueur à 8 chiffres du CIN ou accepte un nom vide.",
+    "indices": [
+      "Vérifiez que le CIN comporte 8 chiffres (cin.length === 8 et !isNaN(cin)) et que le nom n'est pas vide.",
+      "Syntaxe : if (cin.length !== 8 || isNaN(cin)) { alert('CIN invalide'); return false; }",
+      "Extrait : if (nom.trim() === '') { alert('Nom obligatoire'); return false; }"
+    ]
+  },
+  {
+    "id": "BAC22-06",
+    "code": "JS-02",
+    "titre": "Validation du numéro de téléphone et soumission autorisée",
+    "description": "La fonction verif() doit vérifier que le téléphone comporte 8 chiffres et autoriser la soumission (return true) si tous les champs sont conformes.",
+    "points": 2,
+    "ordre": 6,
+    "fichier": "modifier.html",
+    "type": "js_test_cas",
+    "function_name": "verif",
+    "cas": [
+      {
+        "saisies": {
+          "cin": "01234567",
+          "nom": "Ben Ali",
+          "prenom": "Sami",
+          "tel": "123"
+        },
+        "attendu": false
+      },
+      {
+        "saisies": {
+          "cin": "01234567",
+          "nom": "Ben Ali",
+          "prenom": "Sami",
+          "tel": "98765432"
+        },
+        "attendu": true
+      }
+    ],
+    "fail_message": "La fonction verif() ne valide pas la longueur du numéro de téléphone ou ne renvoie pas true lorsque tous les champs sont valides.",
+    "indices": [
+      "Contrôlez la longueur du numéro de téléphone (8 chiffres) et renvoyez true en fin de fonction.",
+      "Syntaxe : if (tel.length !== 8 || isNaN(tel)) { alert('Téléphone invalide'); return false; } return true;",
+      "Extrait : return true;"
+    ]
+  },
+  {
+    "id": "BAC22-07",
+    "code": "PHP-01",
+    "titre": "Connexion MySQLi et détection d'élève introuvable",
+    "description": "Le script modifier.php doit établir la connexion à bd_agvoy2022 et afficher un message d'erreur explicite lorsque le CIN n'existe pas.",
+    "points": 2,
+    "ordre": 7,
+    "fichier": "modifier.php",
+    "sonde": {
+      "type": "php_mysqli_check",
+      "entrypoint": "modifier.php",
+      "postData": {
+        "cin": "99999999",
+        "nom": "Inconnu",
+        "prenom": "Test",
+        "tel": "12345678"
+      },
+      "expectedStdoutContains": "introuvable"
+    },
+    "fail_message": "Le script modifier.php n'affiche pas de message d'erreur lorsque le numéro de CIN est introuvable.",
+    "indices": [
+      "Exécutez une requête SELECT pour vérifier l'existence de l'élève avant toute modification.",
+      "Syntaxe : $res = mysqli_query($conn, \"SELECT * FROM Eleve WHERE Cin = '$cin'\"); if (mysqli_num_rows($res) == 0) { echo \"Élève introuvable\"; }",
+      "Extrait : if (mysqli_num_rows($res) === 0) { die('Élève introuvable dans la base'); }"
+    ]
+  },
+  {
+    "id": "BAC22-08",
+    "code": "PHP-02",
+    "titre": "Mise à jour UPDATE Eleve et confirmation de succès",
+    "description": "Le script modifier.php doit exécuter la requête UPDATE Eleve pour actualiser les coordonnées et afficher un message de confirmation avec succès.",
+    "points": 5,
+    "ordre": 8,
+    "fichier": "modifier.php",
+    "sonde": {
+      "type": "php_mysqli_check",
+      "entrypoint": "modifier.php",
+      "postData": {
+        "cin": "01234567",
+        "nom": "Ben Ali Modifie",
+        "prenom": "Sami",
+        "tel": "98765432"
+      },
+      "expectedTableRows": {
+        "table": "eleve",
+        "where": {
+          "cin": "01234567",
+          "nom": "Ben Ali Modifie"
+        }
+      },
+      "expectedStdoutContains": "succès"
+    },
+    "fail_message": "La requête de mise à jour UPDATE Eleve n'a pas été exécutée ou le message de succès est manquant.",
+    "indices": [
+      "Exécutez la requête UPDATE pour mettre à jour les champs Nom, Prenom et Tel pour le CIN donné.",
+      "Syntaxe : $sql = \"UPDATE Eleve SET Nom='$nom', Prenom='$prenom', Tel='$tel' WHERE Cin='$cin'\"; mysqli_query($conn, $sql);",
+      "Extrait : echo \"Les coordonnées de l'élève ont été modifiées avec succès.\";"
+    ]
+  }
+]

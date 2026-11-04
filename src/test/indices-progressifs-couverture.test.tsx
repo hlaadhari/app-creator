@@ -14,6 +14,7 @@ const SUBJECT_DIRS = [
   "tp-fs-01",
   "tp-fs-02",
   "exam-bac2018-test-drive",
+  "exam-bac2022-principale",
   "exam-bac2023-location-habits",
   "exam-bac2025-droits-acces",
   "exam-bac2026-bijoux-aurythia",

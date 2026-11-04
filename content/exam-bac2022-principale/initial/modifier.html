@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Modifier Coordonnées Élève - Bac 2022</title>
+    <link rel="stylesheet" href="mesStyles.css" />
+    <script src="controles.js"></script>
+  </head>
+  <body>
+    <header>
+      <h1>Agence AgVoy - Gestion des Élèves</h1>
+      <nav>
+        <a href="index.html">Accueil</a> | <a href="modifier.html">Modifier Coordonnées</a> |
+        <a href="excursion.html">Excursions</a>
+      </nav>
+    </header>
+
+    <main>
+      <!-- Formulaire à compléter par l'élève : méthode POST vers modifier.php avec onsubmit="return verif();" -->
+      <form method="POST" action="modifier.php" onsubmit="return verif();">
+        <fieldset>
+          <legend>Mise à jour des coordonnées élève</legend>
+          <p>Complétez le formulaire avec les champs cin, nom, prenom et tel.</p>
+        </fieldset>
+      </form>
+    </main>
+  </body>
+</html>
