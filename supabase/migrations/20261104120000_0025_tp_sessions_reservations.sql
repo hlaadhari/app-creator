@@ -57,7 +57,7 @@ create policy "Lecture des sessions TP"
     or public.est_membre_classe(class_id)
     or public.est_enseignant_classe(class_id)
     or created_by = auth.uid()
-    or public.has_role('admin')
+    or public.has_role(auth.uid(), 'admin')
   );
 
 create policy "Gestion des sessions TP par enseignant"
@@ -65,14 +65,14 @@ create policy "Gestion des sessions TP par enseignant"
   using (
     created_by = auth.uid()
     or (class_id is not null and public.est_enseignant_classe(class_id))
-    or public.has_role('enseignant')
-    or public.has_role('admin')
+    or public.has_role(auth.uid(), 'enseignant')
+    or public.has_role(auth.uid(), 'admin')
   )
   with check (
     created_by = auth.uid()
     or (class_id is not null and public.est_enseignant_classe(class_id))
-    or public.has_role('enseignant')
-    or public.has_role('admin')
+    or public.has_role(auth.uid(), 'enseignant')
+    or public.has_role(auth.uid(), 'admin')
   );
 
 -- Politiques RLS pour tp_reservations
@@ -87,7 +87,7 @@ create policy "Lecture des reservations TP"
         or public.est_membre_classe(s.class_id)
         or public.est_enseignant_classe(s.class_id)
         or s.created_by = auth.uid()
-        or public.has_role('admin')
+        or public.has_role(auth.uid(), 'admin')
       )
     )
   );
@@ -114,8 +114,8 @@ create policy "Enseignant valide ou refuse reservation"
       and (
         s.created_by = auth.uid()
         or (s.class_id is not null and public.est_enseignant_classe(s.class_id))
-        or public.has_role('enseignant')
-        or public.has_role('admin')
+        or public.has_role(auth.uid(), 'enseignant')
+        or public.has_role(auth.uid(), 'admin')
       )
     )
   )
@@ -126,8 +126,8 @@ create policy "Enseignant valide ou refuse reservation"
       and (
         s.created_by = auth.uid()
         or (s.class_id is not null and public.est_enseignant_classe(s.class_id))
-        or public.has_role('enseignant')
-        or public.has_role('admin')
+        or public.has_role(auth.uid(), 'enseignant')
+        or public.has_role(auth.uid(), 'admin')
       )
     )
   );
@@ -141,8 +141,8 @@ create policy "Enseignant supprime les reservations"
       and (
         s.created_by = auth.uid()
         or (s.class_id is not null and public.est_enseignant_classe(s.class_id))
-        or public.has_role('enseignant')
-        or public.has_role('admin')
+        or public.has_role(auth.uid(), 'enseignant')
+        or public.has_role(auth.uid(), 'admin')
       )
     )
   );
