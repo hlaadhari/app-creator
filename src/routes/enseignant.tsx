@@ -49,7 +49,9 @@ import {
   KeyRound,
   MessageSquareWarning,
   PenTool,
+  Monitor,
 } from "lucide-react";
+import { TpSessionManager } from "@/components/tp/TpSessionManager";
 import {
   detecterBlocagesEtAlertes,
   type StudentAttemptHistory,
@@ -978,6 +980,14 @@ function TeacherDashboardPage() {
                     )}
                   </TabsTrigger>
                   <TabsTrigger
+                    value="tp"
+                    className="text-xs flex items-center gap-1.5 shrink-0 px-3 py-1.5"
+                  >
+                    <Monitor className="w-3.5 h-3.5" />
+                    <span>Séances TP</span>
+                    <span className="hidden md:inline">& Postes</span>
+                  </TabsTrigger>
+                  <TabsTrigger
                     value="invitations"
                     className="text-xs flex items-center gap-1.5 shrink-0 px-3 py-1.5"
                   >
@@ -1040,6 +1050,10 @@ function TeacherDashboardPage() {
                   className={activeClass.nom}
                   copies={similarityCopies}
                 />
+              </TabsContent>
+
+              <TabsContent value="tp">
+                <TpSessionManager currentClassId={activeClass.id} teacherId={user?.id} />
               </TabsContent>
 
               <TabsContent value="invitations">

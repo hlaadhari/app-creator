@@ -32,6 +32,7 @@ import {
   TrendingUp,
   CheckCircle2,
   BookOpen,
+  Calendar,
 } from "lucide-react";
 
 export const Route = createFileRoute("/")({
@@ -214,6 +215,19 @@ function Index() {
             >
               <BookOpen className="h-4 w-4 text-primary" />
               <span className="hidden sm:inline">Mémento STI</span>
+            </Button>
+          </Link>
+
+          {/* Planning des Séances TP & Réservation de Postes (Issue #161) */}
+          <Link to="/calendrier">
+            <Button
+              variant="outline"
+              size="sm"
+              className="gap-1.5 text-xs text-foreground border-border hover:bg-accent/40"
+              aria-label="Planning et Postes TP"
+            >
+              <Calendar className="h-4 w-4 text-primary" />
+              <span className="hidden sm:inline">Séances TP</span>
             </Button>
           </Link>
 
