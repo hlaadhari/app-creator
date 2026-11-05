@@ -726,7 +726,16 @@ export async function evaluerCopieEcrite(
           itemRes = evaluerModeling(q as WrittenModelingQuestion, ans, section.id, sharedEngine);
           break;
         case "sql":
-          itemRes = evaluerSql(q as WrittenSqlQuestion, ans, section.id, baseSql || "");
+          if ((q as { type?: string }).type === "representation") {
+            itemRes = evaluerModeling(
+              q as unknown as WrittenModelingQuestion,
+              ans,
+              section.id,
+              sharedEngine,
+            );
+          } else {
+            itemRes = evaluerSql(q as WrittenSqlQuestion, ans, section.id, baseSql || "");
+          }
           break;
         case "code_analysis":
           itemRes = evaluerCodeAnalysis(q as WrittenCodeAnalysisQuestion, ans, section.id);

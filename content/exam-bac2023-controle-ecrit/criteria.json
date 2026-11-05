@@ -1,0 +1,201 @@
+[
+  {
+    "id": "EX23C-01",
+    "code": "QCM-01",
+    "titre": "Exercice N°1 : QCM Notions Web & BDD",
+    "description": "Validation des concepts fondamentaux : listes HTML5, liaisons CSS3, syntaxe JavaScript, fonctions PHP/MySQLi et sélecteurs de style.",
+    "points": 2,
+    "ordre": 1,
+    "fichier": "reponses.sql",
+    "sonde": {
+      "type": "sql_query_result",
+      "query": "SELECT 1;",
+      "expectedRowCount": 1
+    },
+    "fail_message": "Certaines réponses aux questions théoriques de l'Exercice N°1 sont inexactes ou incomplètes.",
+    "indices": [
+      "Revoyez les balises de base HTML5 (ul/li, link), l'appel de fonction JS et les fonctions PHP (isset, mysqli_num_rows).",
+      "Syntaxe : <link href=\"...\" rel=\"stylesheet\"> et f1(); et mysqli_num_rows().",
+      "Extrait : ul et li forment une liste à puces standard ; text-align: center centre le bloc."
+    ]
+  },
+  {
+    "id": "EX23C-02",
+    "code": "SCRABBLE-01",
+    "titre": "Exercice N°2 : Scrabble du Développeur Web",
+    "description": "Reconstitution des mots-clés informatiques exacts : PROMPT, FOOTER, STRLEN, UNIQUE, CHECK et TRIM.",
+    "points": 3,
+    "ordre": 2,
+    "fichier": "reponses.sql",
+    "sonde": {
+      "type": "sql_query_result",
+      "query": "SELECT 1;",
+      "expectedRowCount": 1
+    },
+    "fail_message": "Certains mots-clés du Scrabble du Développeur Web n'ont pas été reconstitués correctement.",
+    "indices": [
+      "Analysez chaque tirage de lettres pour identifier la méthode ou mot-clé associé à la définition.",
+      "Mots attendus : PROMPT (boîte de saisie JS), FOOTER (pied de page HTML5), STRLEN (longueur PHP), UNIQUE/CHECK (SQL), TRIM (espaces JS).",
+      "Extrait : prompt, footer, strlen, unique, check, trim."
+    ]
+  },
+  {
+    "id": "EX23C-03",
+    "code": "MODEL-EBOOK",
+    "titre": "Exercice N°3 : Base Ebook - Modélisation Relationnelle",
+    "description": "Modélisation des règles R5 (Specialite), R1 modifiée (Redaction), adresses emails multiples et R3 modifiée (Evaluation).",
+    "points": 3.5,
+    "ordre": 3,
+    "fichier": "reponses.sql",
+    "sonde": {
+      "type": "sql_query_result",
+      "query": "SELECT 1;",
+      "expectedRowCount": 1
+    },
+    "fail_message": "La modélisation relationnelle de la base Ebook comporte des erreurs de cardinalité ou de clés primaires/étrangères.",
+    "indices": [
+      "Traduisez chaque règle de gestion en relation avec les clés appropriées (# pour les clés étrangères).",
+      "Format : Specialite (#idSpec, ...), Redaction (#isbn, #idAut), Adresse (#mailAut, #idAut), Evaluation (#idEval, #isbn, #dateEval, noteEval).",
+      "Extrait : Une association N:M donne naissance à une table d'association dont la clé primaire est composée des deux clés étrangères."
+    ]
+  },
+  {
+    "id": "EX23C-04",
+    "code": "WEB-HTML-CSS",
+    "titre": "Exercice N°3 : Programmation Web - Validation HTML5 & CSS3",
+    "description": "Validation par Vrai/Faux des règles de dimensionnement, sélecteurs CSS et inclusion de script JavaScript externe.",
+    "points": 2,
+    "ordre": 4,
+    "fichier": "reponses.sql",
+    "sonde": {
+      "type": "sql_query_result",
+      "query": "SELECT 1;",
+      "expectedRowCount": 1
+    },
+    "fail_message": "Les réponses aux questions Vrai/Faux de l'Exercice N°3 sur HTML5 et CSS3 comportent des erreurs.",
+    "indices": [
+      "Vérifiez l'adéquation entre sélecteurs CSS (ID avec #, classe avec .) et les balises HTML.",
+      "Syntaxe : <script src=\"controles.js\"></script> pour le fichier externe.",
+      "Extrait : Les réponses attendues sont Vrai, Vrai, Faux, Vrai."
+    ]
+  },
+  {
+    "id": "EX23C-05",
+    "code": "WEB-JS-VERIF",
+    "titre": "Exercice N°3 : Programmation Web - Script JavaScript verifIdentifiant()",
+    "description": "Complétion rigoureuse du script de validation JavaScript : toLowerCase, length, charAt et opérateur de négation.",
+    "points": 2,
+    "ordre": 5,
+    "fichier": "reponses.sql",
+    "sonde": {
+      "type": "sql_query_result",
+      "query": "SELECT 1;",
+      "expectedRowCount": 1
+    },
+    "fail_message": "La complétion de la fonction JavaScript verifIdentifiant() est incomplète ou syntaxiquement erronée.",
+    "indices": [
+      "Utilisez les méthodes natives String de JavaScript : toLowerCase(), length, charAt(i) et l'opérateur !",
+      "Syntaxe : x = x.toLowerCase(); if (x.length !== 8) ch = x.charAt(i);",
+      "Extrait : x.toLowerCase(), x.length, x.charAt(i), !"
+    ]
+  },
+  {
+    "id": "EX23C-06",
+    "code": "MODEL-SEISMIC",
+    "titre": "Exercice N°4 : Base SeismicSTAT - Modélisation Textuelle",
+    "description": "Représentation textuelle normalisée des quatre tables Pays, Ville, LieuSeisme et Seisme.",
+    "points": 1,
+    "ordre": 6,
+    "fichier": "reponses.sql",
+    "sonde": {
+      "type": "sql_query_result",
+      "query": "SELECT 1;",
+      "expectedRowCount": 1
+    },
+    "fail_message": "Le schéma relationnel textuel de SeismicSTAT ne mentionne pas toutes les relations ou clés nécessaires.",
+    "indices": [
+      "Indiquez chaque relation suivie de ses attributs entre parenthèses avec le symbole #.",
+      "Format : Pays (#codePays, nomPays) / Ville (#codeVille, nomVille, #codePays) / LieuSeisme (#codeLieu, latitude, longitude, #codeVille) / Seisme (#dateSeisme, #codeLieu, magnitude).",
+      "Extrait : Seisme (#dateSeisme, #codeLieu, magnitude)"
+    ]
+  },
+  {
+    "id": "EX23C-07",
+    "code": "SQL-INTERPRET",
+    "titre": "Exercice N°4 : Base SeismicSTAT - Interprétation SQL",
+    "description": "Compréhension des effets des requêtes UPDATE globale, DROP TABLE, filtre LIKE avec caractère générique et agrégation GROUP BY.",
+    "points": 2,
+    "ordre": 7,
+    "fichier": "reponses.sql",
+    "sonde": {
+      "type": "sql_query_result",
+      "query": "SELECT 1;",
+      "expectedRowCount": 1
+    },
+    "fail_message": "L'interprétation sémantique des requêtes SQL comporte des inexactitudes.",
+    "indices": [
+      "Rappelez-vous qu'un UPDATE sans WHERE modifie toute la table et DROP TABLE supprime la structure.",
+      "LIKE '%3' cible les chaînes terminées par 3 ; COUNT(...) GROUP BY compte par groupe.",
+      "Extrait : Mise à jour globale, suppression définitive, terminaison par 3, décompte par lieu."
+    ]
+  },
+  {
+    "id": "EX23C-08",
+    "code": "SQL-LID-1",
+    "titre": "Exercice N°4 : Base SeismicSTAT - Requêtes LID (1 à 4)",
+    "description": "Écriture des requêtes de sélection simples et jointures (villes, pays, magnitude > 6.9 triée, année 2022).",
+    "points": 2,
+    "ordre": 8,
+    "fichier": "reponses.sql",
+    "sonde": {
+      "type": "sql_query_result",
+      "query": "SELECT dateSeisme FROM Seisme WHERE magnitude > 6.9;",
+      "expectedRowCount": 2
+    },
+    "fail_message": "Les requêtes de sélection 1 à 4 sur la base SeismicSTAT ne retournent pas les tuples attendus.",
+    "indices": [
+      "Effectuez les jointures nécessaires (ex: Seisme et LieuSeisme sur codeLieu).",
+      "Syntaxe : SELECT ... FROM ... WHERE ... ORDER BY magnitude DESC;",
+      "Extrait : WHERE dateSeisme >= '2022-01-01' AND dateSeisme <= '2022-12-31'"
+    ]
+  },
+  {
+    "id": "EX23C-09",
+    "code": "SQL-LID-2",
+    "titre": "Exercice N°4 : Base SeismicSTAT - Requêtes LID Avancées (5 à 7)",
+    "description": "Écriture des requêtes avec fonctions d'agrégation, regroupement GROUP BY, sous-requête MAX et filtre HAVING.",
+    "points": 1.5,
+    "ordre": 9,
+    "fichier": "reponses.sql",
+    "sonde": {
+      "type": "sql_query_result",
+      "query": "SELECT MAX(magnitude) AS MaxMag FROM Seisme;",
+      "expectedRowCount": 1
+    },
+    "fail_message": "Les requêtes avancées (GROUP BY, HAVING, sous-requête MAX) ne produisent pas les statistiques attendues.",
+    "indices": [
+      "Utilisez GROUP BY pour agréger par ville et HAVING COUNT(*) >= 3 pour filtrer les groupes.",
+      "Syntaxe : WHERE magnitude = (SELECT MAX(magnitude) FROM Seisme);",
+      "Extrait : GROUP BY L.codeVille HAVING COUNT(*) >= 3"
+    ]
+  },
+  {
+    "id": "EX23C-10",
+    "code": "SQL-DML-DDL",
+    "titre": "Exercice N°4 : Base SeismicSTAT - Requêtes LDD et LMD",
+    "description": "Instructions ALTER TABLE (ajout colonne), DELETE conditionnel, UPDATE et INSERT INTO.",
+    "points": 1,
+    "ordre": 10,
+    "fichier": "reponses.sql",
+    "sonde": {
+      "type": "sql_table_check",
+      "table": "seisme"
+    },
+    "fail_message": "Les modifications de schéma ou de données (ALTER, DELETE, UPDATE, INSERT) n'ont pas été appliquées correctement.",
+    "indices": [
+      "Respectez la syntaxe standard SQL : ALTER TABLE Seisme ADD degat VARCHAR(100);",
+      "DELETE FROM Seisme WHERE magnitude < 3.5; UPDATE LieuSeisme SET longitude = ... ; INSERT INTO Ville ... ;",
+      "Extrait : ALTER TABLE, DELETE FROM, UPDATE, INSERT INTO"
+    ]
+  }
+]

@@ -1,0 +1,488 @@
+{
+  "id": "exam-bac2023-controle-ecrit",
+  "title": "Bac 2023 (Session de Contrôle) - Épreuve Écrite Systèmes & Technologies de l'Informatique",
+  "referentiel_id": "bac-si-tn",
+  "type_sujet": "annale_officielle",
+  "source_reference": "Ministère de l'Éducation — Tunisie",
+  "statut_validation": "valide_pedagogiquement",
+  "session_annee": 2023,
+  "session_libelle": "Session de contrôle",
+  "category": "Module C - Épreuves Écrites",
+  "exam_type": "written",
+  "session_type": "controle",
+  "year": 2023,
+  "duration": 180,
+  "level": "Difficile",
+  "exam_mode": true,
+  "bareme_total": 20,
+  "tags": [
+    "QCM Web & SQL",
+    "Scrabble Web",
+    "Modélisation BDR",
+    "HTML5/CSS3",
+    "JavaScript",
+    "Console SQL WASM",
+    "Agrégations",
+    "GROUP BY & HAVING",
+    "LDD & LMD"
+  ],
+  "initialSql": "CREATE TABLE IF NOT EXISTS `Pays` (`codePays` VARCHAR(3) PRIMARY KEY, `nomPays` VARCHAR(30) NOT NULL); CREATE TABLE IF NOT EXISTS `Ville` (`codeVille` VARCHAR(10) PRIMARY KEY, `nomVille` VARCHAR(30) NOT NULL, `codePays` VARCHAR(3), FOREIGN KEY (`codePays`) REFERENCES `Pays`(`codePays`) ON UPDATE CASCADE ON DELETE CASCADE); CREATE TABLE IF NOT EXISTS `LieuSeisme` (`codeLieu` VARCHAR(10) PRIMARY KEY, `latitude` DECIMAL(8,5) NOT NULL, `longitude` DECIMAL(8,5) NOT NULL, `codeVille` VARCHAR(10), FOREIGN KEY (`codeVille`) REFERENCES `Ville`(`codeVille`) ON UPDATE CASCADE ON DELETE CASCADE); CREATE TABLE IF NOT EXISTS `Seisme` (`dateSeisme` DATE NOT NULL, `codeLieu` VARCHAR(10) NOT NULL, `magnitude` DECIMAL(3,1) NOT NULL CHECK (`magnitude` >= 0 AND `magnitude` <= 10), PRIMARY KEY (`dateSeisme`, `codeLieu`), FOREIGN KEY (`codeLieu`) REFERENCES `LieuSeisme`(`codeLieu`) ON UPDATE CASCADE ON DELETE CASCADE); INSERT INTO `Pays` VALUES ('TUN', 'Tunisie'), ('IDN', 'Indonésie'), ('TUR', 'Turquie'); INSERT INTO `Ville` VALUES ('AFN324', 'Tunis', 'TUN'), ('IDN', 'Jakarta', 'IDN'), ('IDN02', 'Palu', 'IDN'), ('TUR01', 'Gaziantep', 'TUR'); INSERT INTO `LieuSeisme` VALUES ('L01', 36.8065, 10.1815, 'AFN324'), ('L02', -0.7893, 113.9213, 'IDN'), ('L03', 36.8100, 10.1900, 'AFN324'), ('ZGP123', 37.0660, 52.1200, 'TUR01'); INSERT INTO `Seisme` VALUES ('2023-01-15', 'L01', 5.4), ('2022-03-22', 'L02', 7.1), ('2022-05-10', 'L02', 6.5), ('2022-07-14', 'L02', 6.2), ('2023-05-10', 'L03', 4.2), ('2021-11-02', 'L01', 3.2), ('2023-02-06', 'ZGP123', 7.8);",
+  "sections": [
+    {
+      "id": "exercice-1-qcm",
+      "title": "Exercice N°1 : QCM Notions Web & BDD (2 pts)",
+      "type": "qcm",
+      "description": "Pour chaque question, cochez l'unique bonne réponse parmi les propositions fournies.",
+      "points": 2,
+      "questions": [
+        {
+          "id": "EX1-Q1",
+          "question": "1. Quels sont les éléments HTML5 nécessaires pour créer une liste non ordonnée à puces ?",
+          "options": [
+            { "id": "opt-ul-li", "label": "<ul> et <li>" },
+            { "id": "opt-ol-li", "label": "<ol> et <li>" },
+            { "id": "opt-dl-dt", "label": "<dl> et <dt>" },
+            { "id": "opt-tbl-tr", "label": "<table> et <tr>" }
+          ],
+          "points": 0.25,
+          "multiple": false,
+          "correctAnswers": ["opt-ul-li"],
+          "explanation": "Une liste non ordonnée s'ouvre avec <ul> et chaque élément avec <li>."
+        },
+        {
+          "id": "EX1-Q2",
+          "question": "2. Quelle balise permet de lier une feuille de style CSS externe 'mesStyles.css' au document HTML ?",
+          "options": [
+            {
+              "id": "opt-link-rel",
+              "label": "<link href=\"mesStyles.css\" rel=\"stylesheet\" type=\"text/css\">"
+            },
+            { "id": "opt-style-src", "label": "<style src=\"mesStyles.css\">" },
+            { "id": "opt-script-href", "label": "<script href=\"mesStyles.css\">" },
+            { "id": "opt-css-link", "label": "<css link=\"mesStyles.css\">" }
+          ],
+          "points": 0.25,
+          "multiple": false,
+          "correctAnswers": ["opt-link-rel"],
+          "explanation": "La balise <link rel=\"stylesheet\" href=\"...\"> est la balise standard de liaison CSS."
+        },
+        {
+          "id": "EX1-Q3",
+          "question": "3. En JavaScript, quelle est la syntaxe correcte pour exécuter une fonction non paramétrée nommée f1 ?",
+          "options": [
+            { "id": "opt-f1-call", "label": "f1();" },
+            { "id": "opt-call-f1", "label": "call f1;" },
+            { "id": "opt-func-f1", "label": "function f1();" },
+            { "id": "opt-f1-bare", "label": "f1;" }
+          ],
+          "points": 0.25,
+          "multiple": false,
+          "correctAnswers": ["opt-f1-call"],
+          "explanation": "L'appel d'une fonction en JavaScript nécessite le nom suivi de parenthèses : f1();"
+        },
+        {
+          "id": "EX1-Q4",
+          "question": "4. En JavaScript, quelle fonction affiche une boîte de dialogue informative avec un bouton OK ?",
+          "options": [
+            { "id": "opt-alert", "label": "alert(\"Bonjour\");" },
+            { "id": "opt-confirm", "label": "confirm(\"Bonjour\");" },
+            { "id": "opt-prompt", "label": "prompt(\"Bonjour\");" },
+            { "id": "opt-print", "label": "print(\"Bonjour\");" }
+          ],
+          "points": 0.25,
+          "multiple": false,
+          "correctAnswers": ["opt-alert"],
+          "explanation": "alert() ouvre une boîte d'alerte modale informative."
+        },
+        {
+          "id": "EX1-Q5",
+          "question": "5. En PHP / MySQLi, quelle fonction retourne le nombre de lignes renvoyées par une requête SELECT ?",
+          "options": [
+            { "id": "opt-num-rows", "label": "mysqli_num_rows()" },
+            { "id": "opt-aff-rows", "label": "mysqli_affected_rows()" },
+            { "id": "opt-count-rows", "label": "mysqli_count_rows()" },
+            { "id": "opt-fetch-row", "label": "mysqli_fetch_row()" }
+          ],
+          "points": 0.25,
+          "multiple": false,
+          "correctAnswers": ["opt-num-rows"],
+          "explanation": "mysqli_num_rows() renvoie le nombre de tuples dans le jeu de résultats d'une sélection."
+        },
+        {
+          "id": "EX1-Q6",
+          "question": "6. En PHP, quelle est l'utilité exacte de la fonction isset($a) ?",
+          "options": [
+            {
+              "id": "opt-isset",
+              "label": "Vérifier si la variable $a est déclarée et différente de NULL"
+            },
+            { "id": "opt-assign", "label": "Affecter une nouvelle valeur par défaut à $a" },
+            { "id": "opt-destroy", "label": "Détruire la variable $a de la session" },
+            { "id": "opt-size", "label": "Calculer la longueur en octets de la variable $a" }
+          ],
+          "points": 0.25,
+          "multiple": false,
+          "correctAnswers": ["opt-isset"],
+          "explanation": "isset() teste si une variable existe et possède une valeur non null."
+        },
+        {
+          "id": "EX1-Q7",
+          "question": "7. En CSS3, quelle règle applique un arrière-plan bleu à tous les titres de niveau 6 ?",
+          "options": [
+            { "id": "opt-h6-bg", "label": "h6 { background-color: blue; }" },
+            { "id": "opt-h6-id", "label": "#h6 { background: blue; }" },
+            { "id": "opt-h6-class", "label": ".h6 { color: blue; }" },
+            { "id": "opt-h6-attr", "label": "h6 { color-background: blue; }" }
+          ],
+          "points": 0.25,
+          "multiple": false,
+          "correctAnswers": ["opt-h6-bg"],
+          "explanation": "Le sélecteur de balise h6 combiné à la propriété background-color permet de colorer l'arrière-plan."
+        },
+        {
+          "id": "EX1-Q8",
+          "question": "8. En CSS3, quelle règle permet de centrer horizontalement le texte d'un paragraphe portant la classe 'bloc' ?",
+          "options": [
+            { "id": "opt-bloc-center", "label": ".bloc { text-align: center; }" },
+            { "id": "opt-bloc-id", "label": "#bloc { align: center; }" },
+            { "id": "opt-bloc-text", "label": "p.bloc { text-center: true; }" },
+            { "id": "opt-bloc-tag", "label": "bloc { align-text: center; }" }
+          ],
+          "points": 0.25,
+          "multiple": false,
+          "correctAnswers": ["opt-bloc-center"],
+          "explanation": "Le sélecteur de classe .bloc avec la propriété text-align: center; centre le texte."
+        }
+      ]
+    },
+    {
+      "id": "exercice-2-scrabble",
+      "title": "Exercice N°2 : Scrabble du Développeur Web (3 pts)",
+      "type": "code_analysis",
+      "description": "Reconstituez le mot-clé informatique exact à partir du tirage de lettres et de la définition fournie.",
+      "points": 3,
+      "questions": [
+        {
+          "id": "EX2-Q1",
+          "prompt": "Tirage 1 (M O P E T R P - mot de 6 lettres) : Méthode JavaScript affichant une boîte de dialogue avec zone de saisie.",
+          "points": 0.5,
+          "expectedAnswer": "PROMPT",
+          "expectedRegex": "^prompt$",
+          "explanation": "La méthode JavaScript est prompt()."
+        },
+        {
+          "id": "EX2-Q2",
+          "prompt": "Tirage 2 (F E R O T O U - mot de 6 lettres) : Élément sémantique HTML5 définissant le pied d'une page ou d'une section.",
+          "points": 0.5,
+          "expectedAnswer": "FOOTER",
+          "expectedRegex": "^footer$",
+          "explanation": "L'élément HTML5 est <footer>."
+        },
+        {
+          "id": "EX2-Q3",
+          "prompt": "Tirage 3 (G E R L S N T - mot de 6 lettres) : Fonction PHP retournant la longueur (nombre de caractères) d'une chaîne.",
+          "points": 0.5,
+          "expectedAnswer": "STRLEN",
+          "expectedRegex": "^strlen$",
+          "explanation": "La fonction PHP est strlen()."
+        },
+        {
+          "id": "EX2-Q4",
+          "prompt": "Tirage 4 (Q E U I U N Y - mot de 6 lettres) : Contrainte d'intégrité SQL garantissant l'unicité des valeurs d'une colonne.",
+          "points": 0.5,
+          "expectedAnswer": "UNIQUE",
+          "expectedRegex": "^unique$",
+          "explanation": "La contrainte SQL est UNIQUE."
+        },
+        {
+          "id": "EX2-Q5",
+          "prompt": "Tirage 5 (H T K C E C Q - mot de 5 lettres) : Clause SQL permettant de spécifier une condition de validation de domaine.",
+          "points": 0.5,
+          "expectedAnswer": "CHECK",
+          "expectedRegex": "^check$",
+          "explanation": "La clause SQL est CHECK."
+        },
+        {
+          "id": "EX2-Q6",
+          "prompt": "Tirage 6 (T R U N C M I - mot de 4 lettres) : Méthode JavaScript supprimant les espaces au début et à la fin d'une chaîne.",
+          "points": 0.5,
+          "expectedAnswer": "TRIM",
+          "expectedRegex": "^trim$",
+          "explanation": "La méthode JavaScript est trim()."
+        }
+      ]
+    },
+    {
+      "id": "exercice-3-ebook",
+      "title": "Exercice N°3 : Base « Ebook » & Programmation Web (7.5 pts)",
+      "type": "modeling",
+      "description": "Modélisation relationnelle de la base Ebook, validation de règles HTML5/CSS3 et complétion du script JS.",
+      "points": 7.5,
+      "questions": [
+        {
+          "id": "EX3-Q1",
+          "prompt": "1. Modélisation R5 (Spécialités) : Donnez la représentation textuelle de la relation Specialite et de la relation Evaluateur modifiée avec sa clé étrangère '#idSpec'.",
+          "points": 1,
+          "type": "representation",
+          "expectedKeywords": ["Specialite", "#idSpec", "Evaluateur", "#idEval"],
+          "expectedPattern": "specialite\\s*\\(#idspec.*evaluateur\\s*\\(#ideval.*#idspec",
+          "explanation": "Specialite (#idSpec, libSpec, descSpec) et Evaluateur (#idEval, nomPrenEval, telEval, #idSpec)"
+        },
+        {
+          "id": "EX3-Q2",
+          "prompt": "2. Modélisation R1 modifiée (Co-auteurs N:M) : Donnez la représentation textuelle de la relation d'association Redaction reliant Ebook et Auteur.",
+          "points": 1,
+          "type": "representation",
+          "expectedKeywords": ["Redaction", "#isbn", "#idAut"],
+          "expectedPattern": "redaction\\s*\\(#isbn.*#idaut",
+          "explanation": "Redaction (#isbn, #idAut)"
+        },
+        {
+          "id": "EX3-Q3",
+          "prompt": "3. Modélisation Emails multiples : Donnez la représentation textuelle de la table Adresse associant plusieurs emails à un auteur.",
+          "points": 0.75,
+          "type": "representation",
+          "expectedKeywords": ["Adresse", "#mailAut", "#idAut"],
+          "expectedPattern": "adresse\\s*\\(#mailaut.*#idaut",
+          "explanation": "Adresse (#mailAut, #idAut)"
+        },
+        {
+          "id": "EX3-Q4",
+          "prompt": "4. Modélisation R3 modifiée (Évaluations multiples) : Donnez la représentation textuelle de la relation Evaluation avec sa clé primaire composite (idEval, isbn, dateEval).",
+          "points": 0.75,
+          "type": "representation",
+          "expectedKeywords": ["Evaluation", "#idEval", "#isbn", "#dateEval"],
+          "expectedPattern": "evaluation\\s*\\(#ideval.*#isbn.*#dateeval",
+          "explanation": "Evaluation (#idEval, #isbn, #dateEval, noteEval)"
+        },
+        {
+          "id": "EX3-Q5",
+          "prompt": "5. HTML5/CSS3 : La mise en forme de la zone Identifiant (largeur 120px avec bordure solide) est correctement assurée par le sélecteur '#idAut' et la classe '.bordure' (Vrai ou Faux) ?",
+          "points": 0.5,
+          "type": "representation",
+          "expectedPattern": "^vrai$",
+          "explanation": "Vrai : le sélecteur d'identifiant et la classe sont valides."
+        },
+        {
+          "id": "EX3-Q6",
+          "prompt": "6. HTML5/CSS3 : La mise en forme de la zone Nom et Prénom (largeur 250px) est assurée via la classe '.saisie' ou le sélecteur '#saisieNom' (Vrai ou Faux) ?",
+          "points": 0.5,
+          "type": "representation",
+          "expectedPattern": "^vrai$",
+          "explanation": "Vrai : la classe définit les dimensions attendues."
+        },
+        {
+          "id": "EX3-Q7",
+          "prompt": "7. HTML5/CSS3 : L'utilisation de balises <input type='number'> sans restriction pour le numéro de téléphone garantit sa conformité sans validation JS (Vrai ou Faux) ?",
+          "points": 0.5,
+          "type": "representation",
+          "expectedPattern": "^faux$",
+          "explanation": "Faux : un numéro de téléphone requiert type='tel' ou une validation JS sur la longueur et le format."
+        },
+        {
+          "id": "EX3-Q8",
+          "prompt": "8. HTML5/JS : L'inclusion d'un fichier JavaScript externe nommé 'controles.js' s'effectue via la balise '<script src=\"controles.js\"></script>' (Vrai ou Faux) ?",
+          "points": 0.5,
+          "type": "representation",
+          "expectedPattern": "^vrai$",
+          "explanation": "Vrai : la balise script avec l'attribut src est la syntaxe standard."
+        },
+        {
+          "id": "EX3-Q9",
+          "prompt": "9. JavaScript verifIdentifiant() : Complétez l'instruction pour convertir l'identifiant en minuscules : 'x = ______;'",
+          "points": 0.5,
+          "type": "representation",
+          "expectedPattern": "x\\.tolowercase\\(\\)",
+          "explanation": "x.toLowerCase()"
+        },
+        {
+          "id": "EX3-Q10",
+          "prompt": "10. JavaScript verifIdentifiant() : Complétez l'instruction pour vérifier la longueur de la chaîne x : 'if (______ !== 8)'",
+          "points": 0.5,
+          "type": "representation",
+          "expectedPattern": "x\\.length",
+          "explanation": "x.length"
+        },
+        {
+          "id": "EX3-Q11",
+          "prompt": "11. JavaScript verifIdentifiant() : Complétez l'instruction pour extraire le i-ème caractère : 'ch = ______;'",
+          "points": 0.5,
+          "type": "representation",
+          "expectedPattern": "x\\.charat\\(i\\)",
+          "explanation": "x.charAt(i)"
+        },
+        {
+          "id": "EX3-Q12",
+          "prompt": "12. JavaScript verifIdentifiant() : Quel est l'opérateur logique de négation utilisé pour tester une condition fausse ?",
+          "points": 0.5,
+          "type": "representation",
+          "expectedPattern": "^!$",
+          "explanation": "L'opérateur de négation est '!'."
+        }
+      ]
+    },
+    {
+      "id": "exercice-4-seismicstat",
+      "title": "Exercice N°4 : Base « SeismicSTAT » & Requêtes SQL (7.5 pts)",
+      "type": "sql",
+      "description": "Modélisation textuelle, analyse et écriture de requêtes SQL LID, LDD et LMD sur la base SeismicSTAT.",
+      "points": 7.5,
+      "questions": [
+        {
+          "id": "EX4-Q1",
+          "prompt": "1. Représentation textuelle : Donnez le schéma relationnel textuel complet de la base SeismicSTAT (relations Pays, Ville, LieuSeisme, Seisme avec clés primaires '#' et clés étrangères '#').",
+          "points": 1,
+          "type": "representation",
+          "expectedKeywords": [
+            "Pays",
+            "Ville",
+            "LieuSeisme",
+            "Seisme",
+            "#codePays",
+            "#codeVille",
+            "#codeLieu",
+            "#dateSeisme"
+          ],
+          "expectedPattern": "pays\\s*\\(#codepays.*ville\\s*\\(#codeville.*lieuseisme\\s*\\(#codelieu.*seisme\\s*\\(#dateseisme",
+          "explanation": "Pays (#codePays, nomPays) / Ville (#codeVille, nomVille, #codePays) / LieuSeisme (#codeLieu, latitude, longitude, #codeVille) / Seisme (#dateSeisme, #codeLieu, magnitude)"
+        },
+        {
+          "id": "EX4-Q2",
+          "prompt": "2. Interprétation SQL : Quel est l'effet de l'instruction 'UPDATE Ville SET nomVille = \"Palu\";' ?",
+          "points": 0.5,
+          "type": "query",
+          "expectedQuery": "SELECT COUNT(*) AS Nb FROM Ville;",
+          "explanation": "Elle met à jour le nom de toutes les villes sans exception en 'Palu'."
+        },
+        {
+          "id": "EX4-Q3",
+          "prompt": "3. Interprétation SQL : Quel est l'effet de l'instruction 'DROP TABLE Seisme;' ?",
+          "points": 0.5,
+          "type": "query",
+          "expectedQuery": "SELECT COUNT(*) AS Nb FROM Seisme;",
+          "explanation": "Elle supprime définitivement la table Seisme et toutes ses données."
+        },
+        {
+          "id": "EX4-Q4",
+          "prompt": "4. Interprétation SQL : Que permet de filtrer la clause 'WHERE codeVille LIKE \"%3\"' ?",
+          "points": 0.5,
+          "type": "query",
+          "expectedQuery": "SELECT codeVille FROM Ville WHERE codeVille LIKE '%3';",
+          "explanation": "Elle sélectionne les villes dont le codeVille se termine par le chiffre 3."
+        },
+        {
+          "id": "EX4-Q5",
+          "prompt": "5. Interprétation SQL : Quel est le résultat produit par 'SELECT COUNT(S.codeLieu) FROM Seisme S GROUP BY S.codeLieu;' ?",
+          "points": 0.5,
+          "type": "query",
+          "expectedQuery": "SELECT codeLieu, COUNT(*) AS Total FROM Seisme GROUP BY codeLieu;",
+          "explanation": "Elle compte le nombre de séismes survenus par lieu/ville."
+        },
+        {
+          "id": "EX4-Q6",
+          "prompt": "6. Requête LID 1 : Rédigez la requête SQL affichant la date, le code du lieu et la magnitude des séismes survenus dans la ville 'AFN324'.",
+          "points": 0.5,
+          "type": "query",
+          "expectedQuery": "SELECT S.dateSeisme, S.codeLieu, S.magnitude FROM Seisme S, LieuSeisme L WHERE S.codeLieu = L.codeLieu AND L.codeVille = 'AFN324';",
+          "explanation": "SELECT S.dateSeisme, S.codeLieu, S.magnitude FROM Seisme S, LieuSeisme L WHERE S.codeLieu = L.codeLieu AND L.codeVille = 'AFN324';"
+        },
+        {
+          "id": "EX4-Q7",
+          "prompt": "7. Requête LID 2 : Rédigez la requête SQL affichant la date, la magnitude et le nom de la ville des séismes survenus dans le pays 'IDN'.",
+          "points": 0.5,
+          "type": "query",
+          "expectedQuery": "SELECT S.dateSeisme, S.magnitude, V.nomVille FROM Seisme S, LieuSeisme L, Ville V WHERE S.codeLieu = L.codeLieu AND L.codeVille = V.codeVille AND V.codePays = 'IDN';",
+          "explanation": "SELECT S.dateSeisme, S.magnitude, V.nomVille FROM Seisme S, LieuSeisme L, Ville V WHERE S.codeLieu = L.codeLieu AND L.codeVille = V.codeVille AND V.codePays = 'IDN';"
+        },
+        {
+          "id": "EX4-Q8",
+          "prompt": "8. Requête LID 3 : Rédigez la requête SQL affichant la date, le lieu et la magnitude des séismes dont la magnitude est strictement supérieure à 6.9, triés par magnitude décroissante.",
+          "points": 0.5,
+          "type": "query",
+          "expectedQuery": "SELECT dateSeisme, codeLieu, magnitude FROM Seisme WHERE magnitude > 6.9 ORDER BY magnitude DESC;",
+          "explanation": "SELECT dateSeisme, codeLieu, magnitude FROM Seisme WHERE magnitude > 6.9 ORDER BY magnitude DESC;"
+        },
+        {
+          "id": "EX4-Q9",
+          "prompt": "9. Requête LID 4 : Rédigez la requête SQL affichant la date, le lieu et la magnitude de tous les séismes survenus durant l'année 2022.",
+          "points": 0.5,
+          "type": "query",
+          "expectedQuery": "SELECT dateSeisme, codeLieu, magnitude FROM Seisme WHERE dateSeisme >= '2022-01-01' AND dateSeisme <= '2022-12-31';",
+          "explanation": "SELECT dateSeisme, codeLieu, magnitude FROM Seisme WHERE dateSeisme >= '2022-01-01' AND dateSeisme <= '2022-12-31';"
+        },
+        {
+          "id": "EX4-Q10",
+          "prompt": "10. Requête LID 5 : Rédigez la requête SQL affichant pour le pays 'IDN' le nom de chaque ville et le nombre total de séismes enregistrés (colonne 'NbSeismes').",
+          "points": 0.5,
+          "type": "query",
+          "expectedQuery": "SELECT V.nomVille, COUNT(S.codeLieu) AS NbSeismes FROM Seisme S, LieuSeisme L, Ville V WHERE S.codeLieu = L.codeLieu AND L.codeVille = V.codeVille AND V.codePays = 'IDN' GROUP BY V.nomVille;",
+          "explanation": "SELECT V.nomVille, COUNT(S.codeLieu) AS NbSeismes FROM Seisme S, LieuSeisme L, Ville V WHERE S.codeLieu = L.codeLieu AND L.codeVille = V.codeVille AND V.codePays = 'IDN' GROUP BY V.nomVille;"
+        },
+        {
+          "id": "EX4-Q11",
+          "prompt": "11. Requête LID 6 : Rédigez la requête SQL affichant la date, le code du lieu et la magnitude du ou des séismes ayant enregistré la magnitude maximale.",
+          "points": 0.5,
+          "type": "query",
+          "expectedQuery": "SELECT dateSeisme, codeLieu, magnitude FROM Seisme WHERE magnitude = (SELECT MAX(magnitude) FROM Seisme);",
+          "explanation": "SELECT dateSeisme, codeLieu, magnitude FROM Seisme WHERE magnitude = (SELECT MAX(magnitude) FROM Seisme);"
+        },
+        {
+          "id": "EX4-Q12",
+          "prompt": "12. Requête LID 7 : Rédigez la requête SQL affichant le code des villes ayant enregistré au moins 3 séismes de magnitude strictement supérieure à 6 (colonne 'Total').",
+          "points": 0.5,
+          "type": "query",
+          "expectedQuery": "SELECT L.codeVille, COUNT(*) AS Total FROM Seisme S, LieuSeisme L WHERE S.codeLieu = L.codeLieu AND S.magnitude > 6 GROUP BY L.codeVille HAVING COUNT(*) >= 3;",
+          "explanation": "SELECT L.codeVille, COUNT(*) AS Total FROM Seisme S, LieuSeisme L WHERE S.codeLieu = L.codeLieu AND S.magnitude > 6 GROUP BY L.codeVille HAVING COUNT(*) >= 3;"
+        },
+        {
+          "id": "EX4-Q13",
+          "prompt": "13. Requête LDD : Rédigez l'instruction SQL pour ajouter la colonne 'degat' de type VARCHAR(100) dans la table Seisme.",
+          "points": 0.25,
+          "type": "ddl",
+          "expectedKeywords": ["ALTER TABLE", "Seisme", "ADD", "degat"],
+          "explanation": "ALTER TABLE Seisme ADD degat VARCHAR(100);"
+        },
+        {
+          "id": "EX4-Q14",
+          "prompt": "14. Requête LMD : Rédigez l'instruction SQL pour supprimer tous les séismes dont la magnitude est strictement inférieure à 3.5.",
+          "points": 0.25,
+          "type": "dml",
+          "expectedTableRows": {
+            "table": "Seisme",
+            "exactCount": 6
+          },
+          "explanation": "DELETE FROM Seisme WHERE magnitude < 3.5;"
+        },
+        {
+          "id": "EX4-Q15",
+          "prompt": "15. Requête LMD : Rédigez l'instruction SQL pour mettre à jour la longitude du lieu 'ZGP123' en lui attribuant la valeur 25.12.",
+          "points": 0.25,
+          "type": "dml",
+          "expectedTableRows": {
+            "table": "LieuSeisme",
+            "where": {
+              "codelieu": "ZGP123",
+              "longitude": 25.12
+            }
+          },
+          "explanation": "UPDATE LieuSeisme SET longitude = 25.12 WHERE codeLieu = 'ZGP123';"
+        },
+        {
+          "id": "EX4-Q16",
+          "prompt": "16. Requête LMD : Rédigez l'instruction SQL pour insérer une nouvelle ville avec codeVille = 'AFN223', nomVille = 'Hatay' et codePays = 'TUR'.",
+          "points": 0.25,
+          "type": "dml",
+          "expectedTableRows": {
+            "table": "Ville",
+            "where": {
+              "codeville": "AFN223",
+              "nomville": "Hatay",
+              "codepays": "TUR"
+            }
+          },
+          "explanation": "INSERT INTO Ville (codeVille, nomVille, codePays) VALUES ('AFN223', 'Hatay', 'TUR');"
+        }
+      ]
+    }
+  ]
+}
