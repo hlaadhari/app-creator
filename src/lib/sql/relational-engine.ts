@@ -895,7 +895,7 @@ export class RelationalDatabaseEngine {
     }
 
     const setClauses = splitTopLevelCommas(m[2]);
-    const assignments: { col: RelationalColumnDef; val: unknown }[] = [];
+    const assignments: { col: RelationalColumnDef; expr: string }[] = [];
 
     for (const clause of setClauses) {
       const assignMatch = clause.match(/^[`"']?([a-zA-Z0-9_]+)[`"']?\s*=\s*([\s\S]+)$/);
@@ -908,8 +908,7 @@ export class RelationalDatabaseEngine {
         throw new Error(this.lastError);
       }
 
-      const parsedVal = this.parseValueLiterals(assignMatch[2])[0];
-      assignments.push({ col: colDef, val: parsedVal });
+      assignments.push({ col: colDef, expr: assignMatch[2].trim() });
     }
 
     const whereClause = m[3] || "";
@@ -919,8 +918,27 @@ export class RelationalDatabaseEngine {
       if (!this.evaluateWhereCondition(row, whereClause, [table])) return;
 
       const updatedRow = { ...row };
-      for (const { col, val } of assignments) {
-        updatedRow[col.name] = this.validateAndCoerce(table, col, val);
+      for (const { col, expr } of assignments) {
+        let valToCoerce: unknown;
+        const arithMatch = expr.match(
+          /^[`"']?([a-zA-Z0-9_]+)[`"']?\s*([+\-*/])\s*([0-9]+(?:\.[0-9]+)?)$/,
+        );
+        const m1 = arithMatch?.[1];
+        const m2 = arithMatch?.[2];
+        const m3 = arithMatch?.[3];
+        if (m1 && m2 && m3) {
+          const baseCol = m1.toLowerCase();
+          const op = m2;
+          const operand = parseFloat(m3);
+          const currentVal = Number(row[baseCol] ?? 0);
+          if (op === "+") valToCoerce = currentVal + operand;
+          else if (op === "-") valToCoerce = currentVal - operand;
+          else if (op === "*") valToCoerce = currentVal * operand;
+          else if (op === "/") valToCoerce = currentVal / operand;
+        } else {
+          valToCoerce = this.parseValueLiterals(expr)[0];
+        }
+        updatedRow[col.name] = this.validateAndCoerce(table, col, valToCoerce);
       }
 
       this.verifyIntegrityConstraints(table, updatedRow, idx);
