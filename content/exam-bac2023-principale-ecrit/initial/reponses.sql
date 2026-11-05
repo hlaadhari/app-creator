@@ -1,0 +1,1 @@
+-- Rédigez ici vos réponses SQL pour l'épreuve écrite Bac 2023 Session Principale

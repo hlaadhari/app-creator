@@ -1,0 +1,200 @@
+[
+  {
+    "id": "EX23P-01",
+    "code": "QCM-01",
+    "titre": "Exercice N°1 : QCM Notions Web & Programmation",
+    "description": "Validation des concepts fondamentaux : attributs HTML5, regroupement de champs, sélecteurs CSS3, superglobales PHP et boucles JS.",
+    "points": 2,
+    "ordre": 1,
+    "fichier": "reponses.sql",
+    "sonde": {
+      "type": "sql_query_result",
+      "query": "SELECT 1;",
+      "expectedRowCount": 1
+    },
+    "fail_message": "Certaines réponses aux questions théoriques de l'Exercice N°1 sont inexactes.",
+    "indices": [
+      "Revoyez les balises de base HTML5 (fieldset, checked), les sélecteurs CSS combinés et les superglobales PHP ($_GET).",
+      "Syntaxe : <input type=\"checkbox\" checked>, p.eleve, $_GET[\"cin\"], ch.trim().",
+      "Extrait : checked coche par défaut, fieldset regroupe les champs, trim() élimine les espaces."
+    ]
+  },
+  {
+    "id": "EX23P-02",
+    "code": "MOTS-CROISES-01",
+    "titre": "Exercice N°2 : Grille / Mots Croisés du Développeur Web",
+    "description": "Déduction des termes techniques informatiques exacts : BOTTOM, ECHO, ROUND, ONINPUT, UNIQUE et POST.",
+    "points": 3,
+    "ordre": 2,
+    "fichier": "reponses.sql",
+    "sonde": {
+      "type": "sql_query_result",
+      "query": "SELECT 1;",
+      "expectedRowCount": 1
+    },
+    "fail_message": "Certains termes de la grille de mots croisés n'ont pas été identifiés correctement.",
+    "indices": [
+      "Analysez chaque définition pour retrouver le mot-clé informatique de longueur spécifiée.",
+      "Termes attendus : BOTTOM (CSS), ECHO (PHP), ROUND (JS), ONINPUT (HTML5), UNIQUE (SQL), POST (HTTP).",
+      "Extrait : bottom, echo, round, oninput, unique, post."
+    ]
+  },
+  {
+    "id": "EX23P-03",
+    "code": "WEB-HTML-CSS",
+    "titre": "Exercice N°3 : Intégration Web - Déclarations HTML5 & CSS3",
+    "description": "Validation des sélecteurs, classes de style et liaisons CSS du formulaire ajoutCours.html.",
+    "points": 2,
+    "ordre": 3,
+    "fichier": "reponses.sql",
+    "sonde": {
+      "type": "sql_query_result",
+      "query": "SELECT 1;",
+      "expectedRowCount": 1
+    },
+    "fail_message": "Les réponses aux questions d'analyse HTML5 et CSS3 comportent des erreurs.",
+    "indices": [
+      "Vérifiez l'adéquation entre sélecteurs CSS et les attributs du formulaire.",
+      "Syntaxe : <link href=\"mesStyles.css\" rel=\"stylesheet\" type=\"text/css\">.",
+      "Extrait : Les 4 propositions sont vraies (Vrai, Vrai, Vrai, Vrai)."
+    ]
+  },
+  {
+    "id": "EX23P-04",
+    "code": "WEB-JS-TEST",
+    "titre": "Exercice N°3 : Intégration Web - Script JavaScript test(x)",
+    "description": "Complétion de la fonction de contrôle JavaScript : toUpperCase, initialisation booléenne, conjonction && et boîte alert.",
+    "points": 2,
+    "ordre": 4,
+    "fichier": "reponses.sql",
+    "sonde": {
+      "type": "sql_query_result",
+      "query": "SELECT 1;",
+      "expectedRowCount": 1
+    },
+    "fail_message": "La complétion de la fonction de contrôle JavaScript test(x) est incomplète ou erronée.",
+    "indices": [
+      "Utilisez les méthodes de manipulation de chaîne et les opérateurs logiques en JavaScript.",
+      "Syntaxe : x = x.toUpperCase(); valide = true; if (c1 && c2) alert(\"...\");",
+      "Extrait : x.toUpperCase(), true, &&, alert."
+    ]
+  },
+  {
+    "id": "EX23P-05",
+    "code": "MODEL-FOAD",
+    "titre": "Exercice N°4 : Modélisation Relationnelle BDR « EduNum-FOAD »",
+    "description": "Association des représentations aux règles R6/R7, correction de cardinalité Matière-Leçon et règle R5 Établissement.",
+    "points": 3,
+    "ordre": 5,
+    "fichier": "reponses.sql",
+    "sonde": {
+      "type": "sql_query_result",
+      "query": "SELECT 1;",
+      "expectedRowCount": 1
+    },
+    "fail_message": "La modélisation relationnelle de la plateforme EduNum comporte des anomalies de clés ou de cardinalités.",
+    "indices": [
+      "Identifiez où migre la clé étrangère pour une relation 1:N (du côté de la cardinalité (1,1)).",
+      "Schémas : Lecon (#idLec, descLec, lienLec, #idMat) et Apprenant (#idApp, nomPrenApp, mailApp, #idEtab).",
+      "Extrait : R6 / R7 pour la première question."
+    ]
+  },
+  {
+    "id": "EX23P-06",
+    "code": "BIOLAB-VF",
+    "titre": "Exercice N°5 : BioLab-Medoc - Analyse du Modèle Relationnel",
+    "description": "Validation par Vrai/Faux des cardinalités et règles de prescription médicale de la base BioLab.",
+    "points": 1.5,
+    "ordre": 6,
+    "fichier": "reponses.sql",
+    "sonde": {
+      "type": "sql_query_result",
+      "query": "SELECT 1;",
+      "expectedRowCount": 1
+    },
+    "fail_message": "Les réponses Vrai/Faux sur le schéma relationnel BioLab-Medoc comportent des erreurs.",
+    "indices": [
+      "Consultez les tables d'association Traitement (N:M) et Composition (N:M).",
+      "Réponses : 1: Faux, 2: Faux, 3: Faux, 4: Vrai, 5: Vrai, 6: Faux.",
+      "Extrait : Faux, Faux, Faux, Vrai, Vrai, Faux."
+    ]
+  },
+  {
+    "id": "EX23P-07",
+    "code": "BIOLAB-INTERPRET",
+    "titre": "Exercice N°5 : BioLab-Medoc - Interprétation des Requêtes SQL",
+    "description": "Compréhension des effets des requêtes DELETE globale, erreur d'INSERT incomplet, filtre égalité littérale et ORDER BY positionnel.",
+    "points": 2,
+    "ordre": 7,
+    "fichier": "reponses.sql",
+    "sonde": {
+      "type": "sql_query_result",
+      "query": "SELECT 1;",
+      "expectedRowCount": 1
+    },
+    "fail_message": "L'interprétation sémantique des requêtes SQL de l'Exercice N°5 comporte des inexactitudes.",
+    "indices": [
+      "Rappelez-vous qu'un DELETE sans WHERE vide la table et qu'une chaîne '4%' sans LIKE cherche l'exacte valeur.",
+      "ORDER BY 2 trie selon la deuxième colonne listée dans le SELECT.",
+      "Extrait : Vidage de table, erreur de colonnes, recherche exacte '4%', tri par nomPlante."
+    ]
+  },
+  {
+    "id": "EX23P-08",
+    "code": "BIOLAB-LDD",
+    "titre": "Exercice N°5 : BioLab-Medoc - Requêtes LDD",
+    "description": "Instructions ALTER TABLE pour l'ajout de colonne dateFin et la modification de taille de caracMed.",
+    "points": 1,
+    "ordre": 8,
+    "fichier": "reponses.sql",
+    "sonde": {
+      "type": "sql_table_check",
+      "table": "medicament"
+    },
+    "fail_message": "Les instructions SQL LDD (ALTER TABLE) sur la table Medicament n'ont pas été appliquées correctement.",
+    "indices": [
+      "Utilisez ALTER TABLE Medicament ADD dateFin DATE; et ALTER TABLE Medicament MODIFY caracMed VARCHAR(150);",
+      "Syntaxe : ALTER TABLE table ADD colonne type; et ALTER TABLE table MODIFY colonne type;",
+      "Extrait : ALTER TABLE Medicament ADD dateFin DATE;"
+    ]
+  },
+  {
+    "id": "EX23P-09",
+    "code": "BIOLAB-LID",
+    "titre": "Exercice N°5 : BioLab-Medoc - Requêtes LID Avancées",
+    "description": "Interrogation multi-tables avec jointures, filtres de dates, sous-requête MIN et regroupement HAVING.",
+    "points": 2.5,
+    "ordre": 9,
+    "fichier": "reponses.sql",
+    "sonde": {
+      "type": "sql_query_result",
+      "query": "SELECT codeMed FROM Traitement WHERE codeMaladie = 'TSE005';",
+      "expectedRowCount": 2
+    },
+    "fail_message": "Les requêtes de sélection avancée sur la base BioLab-Medoc ne produisent pas les tuples attendus.",
+    "indices": [
+      "Effectuez les jointures nécessaires (ex: Medicament et Forme sur codeForme, Composition et Plante sur codePlante).",
+      "Utilisez HAVING COUNT(codePlante) >= 2 pour les médicaments multi-plantes.",
+      "Extrait : WHERE duree = (SELECT MIN(duree) FROM Traitement WHERE codeMaladie = 'TSE005')"
+    ]
+  },
+  {
+    "id": "EX23P-10",
+    "code": "BIOLAB-LMD",
+    "titre": "Exercice N°5 : BioLab-Medoc - Requêtes LMD",
+    "description": "Instructions d'insertion nouvelle forme et de mise à jour de dose dans Composition.",
+    "points": 1,
+    "ordre": 10,
+    "fichier": "reponses.sql",
+    "sonde": {
+      "type": "sql_table_check",
+      "table": "forme"
+    },
+    "fail_message": "Les requêtes de manipulation LMD (INSERT INTO Forme et UPDATE Composition) comportent des erreurs.",
+    "indices": [
+      "Syntaxe : INSERT INTO Forme (codeForme, nomForme) VALUES ('IF0005', 'Inhalation');",
+      "Syntaxe : UPDATE Composition SET dose = 100 WHERE codePlante = 'BS0001' AND codeMed = 'Med001';",
+      "Extrait : INSERT INTO Forme ... et UPDATE Composition ..."
+    ]
+  }
+]

@@ -1,0 +1,523 @@
+{
+  "id": "exam-bac2023-principale-ecrit",
+  "title": "Bac 2023 (Session Principale) - Épreuve Écrite Systèmes & Technologies de l'Informatique",
+  "referentiel_id": "bac-si-tn",
+  "type_sujet": "annale_officielle",
+  "source_reference": "Ministère de l'Éducation — Tunisie",
+  "statut_validation": "valide_pedagogiquement",
+  "session_annee": 2023,
+  "session_libelle": "Session principale",
+  "category": "Module C - Épreuves Écrites",
+  "exam_type": "written",
+  "session_type": "principale",
+  "year": 2023,
+  "duration": 180,
+  "level": "Difficile",
+  "exam_mode": true,
+  "bareme_total": 20,
+  "tags": [
+    "QCM Web & PHP",
+    "Mots Croisés Web",
+    "HTML5/CSS3",
+    "JavaScript",
+    "Modélisation FOAD",
+    "BioLab-Medoc",
+    "Console SQL WASM",
+    "Jointures Multi-tables",
+    "Sous-requêtes & HAVING",
+    "LDD & LMD"
+  ],
+  "initialSql": "CREATE TABLE IF NOT EXISTS `Plante` (`codePlante` VARCHAR(6) PRIMARY KEY, `nomPlante` VARCHAR(30) NOT NULL, `descPlante` VARCHAR(100) NOT NULL); CREATE TABLE IF NOT EXISTS `Forme` (`codeForme` VARCHAR(6) PRIMARY KEY, `nomForme` VARCHAR(30) NOT NULL); CREATE TABLE IF NOT EXISTS `Medicament` (`codeMed` VARCHAR(6) PRIMARY KEY, `nomMed` VARCHAR(30) NOT NULL, `dateFab` DATE NOT NULL, `caracMed` VARCHAR(100) NOT NULL, `codeForme` VARCHAR(6), FOREIGN KEY (`codeForme`) REFERENCES `Forme`(`codeForme`) ON UPDATE CASCADE ON DELETE CASCADE); CREATE TABLE IF NOT EXISTS `Composition` (`codeMed` VARCHAR(6), `codePlante` VARCHAR(6), `dose` INT NOT NULL CHECK (`dose` > 0), PRIMARY KEY (`codeMed`, `codePlante`), FOREIGN KEY (`codeMed`) REFERENCES `Medicament`(`codeMed`) ON UPDATE CASCADE ON DELETE CASCADE, FOREIGN KEY (`codePlante`) REFERENCES `Plante`(`codePlante`) ON UPDATE CASCADE ON DELETE CASCADE); CREATE TABLE IF NOT EXISTS `Maladie` (`codeMaladie` VARCHAR(6) PRIMARY KEY, `nomMaladie` VARCHAR(30) NOT NULL); CREATE TABLE IF NOT EXISTS `Traitement` (`codeMed` VARCHAR(6), `codeMaladie` VARCHAR(6), `quantite` INT NOT NULL CHECK (`quantite` > 0), `duree` INT NOT NULL CHECK (`duree` > 0), PRIMARY KEY (`codeMed`, `codeMaladie`), FOREIGN KEY (`codeMed`) REFERENCES `Medicament`(`codeMed`) ON UPDATE CASCADE ON DELETE CASCADE, FOREIGN KEY (`codeMaladie`) REFERENCES `Maladie`(`codeMaladie`) ON UPDATE CASCADE ON DELETE CASCADE); INSERT INTO `Plante` VALUES ('BS0001', 'Thym', 'Plante antiseptique et stimulante'), ('BS0002', 'Eucalyptus', 'Plante décongestionnante respiratoire'), ('BS0003', 'Menthe Poivrée', 'Plante digestive et calmante'); INSERT INTO `Forme` VALUES ('F01', 'Sirop'), ('F02', 'Comprimé'), ('F03', 'Pommade'); INSERT INTO `Medicament` VALUES ('Med001', 'ThymoSirop', '2023-05-01', 'Sirop apaisant gorge', 'F01'), ('Med002', 'Eucalyptol', '2023-05-10', 'Comprimé respiratoire', 'F02'), ('Med003', 'DigestCalm', '2022-10-15', 'Sirop digestif', 'F01'); INSERT INTO `Composition` VALUES ('Med001', 'BS0001', 50), ('Med001', 'BS0002', 25), ('Med002', 'BS0002', 100), ('Med003', 'BS0003', 75); INSERT INTO `Maladie` VALUES ('TSE005', 'Toux Sèche'), ('MAL02', 'Fièvre'), ('MAL03', 'Troubles Digestifs'); INSERT INTO `Traitement` VALUES ('Med001', 'TSE005', 2, 5), ('Med002', 'TSE005', 3, 7), ('Med002', 'MAL02', 1, 3);",
+  "sections": [
+    {
+      "id": "exercice-1-qcm",
+      "title": "Exercice N°1 : QCM Notions Web & Programmation (2 pts)",
+      "type": "qcm",
+      "description": "Pour chaque question, cochez l'unique bonne réponse parmi les propositions fournies.",
+      "points": 2,
+      "questions": [
+        {
+          "id": "EX1-Q1",
+          "question": "1. Quel attribut HTML5 permet de cocher une case à cocher (<input type=\"checkbox\">) par défaut lors du chargement ?",
+          "options": [
+            { "id": "opt-checked", "label": "checked" },
+            { "id": "opt-selected", "label": "selected" },
+            { "id": "opt-value", "label": "value" },
+            { "id": "opt-default", "label": "default" }
+          ],
+          "points": 0.25,
+          "multiple": false,
+          "correctAnswers": ["opt-checked"],
+          "explanation": "L'attribut checked pré-sélectionne une case à cocher."
+        },
+        {
+          "id": "EX1-Q2",
+          "question": "2. Quelle balise sémantique HTML5 permet de regrouper visuellement et logiquement des champs de formulaire liés ?",
+          "options": [
+            { "id": "opt-fieldset", "label": "<fieldset>" },
+            { "id": "opt-group", "label": "<group>" },
+            { "id": "opt-section", "label": "<section>" },
+            { "id": "opt-legend", "label": "<legend>" }
+          ],
+          "points": 0.25,
+          "multiple": false,
+          "correctAnswers": ["opt-fieldset"],
+          "explanation": "<fieldset> regroupe des éléments d'un formulaire et peut être titré par <legend>."
+        },
+        {
+          "id": "EX1-Q3",
+          "question": "3. En CSS3, à quel élément s'applique la règle 'p.eleve { color: blue; }' ?",
+          "options": [
+            { "id": "opt-p-class", "label": "Aux éléments <p> ayant la classe 'eleve'" },
+            { "id": "opt-p-id", "label": "À l'unique élément d'identifiant #eleve" },
+            {
+              "id": "opt-p-all",
+              "label": "À tous les éléments <p> et à tous les éléments de classe 'eleve'"
+            },
+            {
+              "id": "opt-eleve-child",
+              "label": "Aux éléments de classe 'eleve' enfants directs d'un <p>"
+            }
+          ],
+          "points": 0.25,
+          "multiple": false,
+          "correctAnswers": ["opt-p-class"],
+          "explanation": "Le sélecteur combiné p.eleve cible les paragraphes possédant class=\"eleve\"."
+        },
+        {
+          "id": "EX1-Q4",
+          "question": "4. En CSS3, quelle déclaration applique la couleur rouge simultanément aux deux éléments d'identifiants p1 et p2 ?",
+          "options": [
+            { "id": "opt-p1-p2", "label": "#p1, #p2 { color: red; }" },
+            { "id": "opt-p1-and-p2", "label": "#p1 #p2 { color: red; }" },
+            { "id": "opt-p1-plus-p2", "label": "#p1 + #p2 { color: red; }" },
+            { "id": "opt-p1-or-p2", "label": "#p1.p2 { color: red; }" }
+          ],
+          "points": 0.25,
+          "multiple": false,
+          "correctAnswers": ["opt-p1-p2"],
+          "explanation": "La virgule sépare plusieurs sélecteurs partageant les mêmes propriétés CSS."
+        },
+        {
+          "id": "EX1-Q5",
+          "question": "5. En PHP, quelle superglobale permet de récupérer un paramètre nommé 'cin' transmis par l'URL en méthode GET ?",
+          "options": [
+            { "id": "opt-get-cin", "label": "$_GET[\"cin\"]" },
+            { "id": "opt-post-cin", "label": "$_POST[\"cin\"]" },
+            { "id": "opt-request-url", "label": "$_URL[\"cin\"]" },
+            { "id": "opt-server-cin", "label": "$_SERVER[\"cin\"]" }
+          ],
+          "points": 0.25,
+          "multiple": false,
+          "correctAnswers": ["opt-get-cin"],
+          "explanation": "$_GET['cin'] récupère les données transmises dans la chaîne de requête (query string)."
+        },
+        {
+          "id": "EX1-Q6",
+          "question": "6. En PHP, quelle instruction permet d'inclure obligatoirement le fichier 'connexion.php' en interrompant l'exécution en cas d'erreur ?",
+          "options": [
+            { "id": "opt-require", "label": "require(\"connexion.php\");" },
+            { "id": "opt-include", "label": "include(\"connexion.php\");" },
+            { "id": "opt-import", "label": "import(\"connexion.php\");" },
+            { "id": "opt-load", "label": "load(\"connexion.php\");" }
+          ],
+          "points": 0.25,
+          "multiple": false,
+          "correctAnswers": ["opt-require"],
+          "explanation": "require() provoque une erreur fatale et stoppe le script si le fichier est introuvable."
+        },
+        {
+          "id": "EX1-Q7",
+          "question": "7. En JavaScript, quelle méthode native supprime les espaces blancs au début et à la fin d'une chaîne 'ch' ?",
+          "options": [
+            { "id": "opt-trim", "label": "ch.trim()" },
+            { "id": "opt-strip", "label": "ch.strip()" },
+            { "id": "opt-clean", "label": "ch.clean()" },
+            { "id": "opt-delete", "label": "ch.deleteSpaces()" }
+          ],
+          "points": 0.25,
+          "multiple": false,
+          "correctAnswers": ["opt-trim"],
+          "explanation": "String.prototype.trim() élimine les espaces aux extrémités."
+        },
+        {
+          "id": "EX1-Q8",
+          "question": "8. En JavaScript, quelle boucle for s'exécute exactement 5 fois pour les indices de 0 à 4 ?",
+          "options": [
+            { "id": "opt-for-5", "label": "for (i = 0; i < 5; i++)" },
+            { "id": "opt-for-lte", "label": "for (i = 0; i <= 5; i++)" },
+            { "id": "opt-for-1-5", "label": "for (i = 1; i < 5; i++)" },
+            { "id": "opt-for-step", "label": "for (i = 0; i < 4; i++)" }
+          ],
+          "points": 0.25,
+          "multiple": false,
+          "correctAnswers": ["opt-for-5"],
+          "explanation": "for (i = 0; i < 5; i++) itère pour i = 0, 1, 2, 3, 4 (soit 5 itérations)."
+        }
+      ]
+    },
+    {
+      "id": "exercice-2-mots-croises",
+      "title": "Exercice N°2 : Grille / Mots Croisés du Développeur Web (3 pts)",
+      "type": "code_analysis",
+      "description": "Déduisez le terme technique informatique exact correspondant à chaque définition.",
+      "points": 3,
+      "questions": [
+        {
+          "id": "EX2-Q1",
+          "prompt": "Ligne 1 (mot de 6 lettres) : Propriété CSS spécifiant le décalage vertical d'un élément positionné par rapport au bas.",
+          "points": 0.5,
+          "expectedAnswer": "BOTTOM",
+          "expectedRegex": "^bottom$",
+          "explanation": "La propriété CSS est bottom."
+        },
+        {
+          "id": "EX2-Q2",
+          "prompt": "Ligne 2 (mot de 4 lettres) : Structure de langage PHP utilisée pour afficher une ou plusieurs expressions dans la page.",
+          "points": 0.5,
+          "expectedAnswer": "ECHO",
+          "expectedRegex": "^echo$",
+          "explanation": "La commande d'affichage PHP est echo."
+        },
+        {
+          "id": "EX2-Q3",
+          "prompt": "Ligne 3 (mot de 5 lettres) : Méthode de l'objet Math en JavaScript qui arrondit un nombre décimal à l'entier le plus proche.",
+          "points": 0.5,
+          "expectedAnswer": "ROUND",
+          "expectedRegex": "^round$",
+          "explanation": "Math.round() arrondit à l'entier le plus proche."
+        },
+        {
+          "id": "EX2-Q4",
+          "prompt": "Ligne 4 (mot de 7 lettres) : Événement HTML5 déclenché instantanément dès que l'utilisateur modifie le contenu d'un champ de saisie.",
+          "points": 0.5,
+          "expectedAnswer": "ONINPUT",
+          "expectedRegex": "^oninput$",
+          "explanation": "L'événement est oninput."
+        },
+        {
+          "id": "EX2-Q5",
+          "prompt": "Ligne 5 (mot de 6 lettres) : Contrainte d'intégrité SQL imposant que chaque valeur d'une colonne soit distincte.",
+          "points": 0.5,
+          "expectedAnswer": "UNIQUE",
+          "expectedRegex": "^unique$",
+          "explanation": "La contrainte SQL est UNIQUE."
+        },
+        {
+          "id": "EX2-Q6",
+          "prompt": "Ligne 6 (mot de 4 lettres) : Méthode HTTP recommandée pour transmettre de manière confidentielle les données d'un formulaire vers le serveur.",
+          "points": 0.5,
+          "expectedAnswer": "POST",
+          "expectedRegex": "^post$",
+          "explanation": "La méthode HTTP est POST."
+        }
+      ]
+    },
+    {
+      "id": "exercice-3-integration-web",
+      "title": "Exercice N°3 : Intégration Web & JavaScript (4 pts)",
+      "type": "modeling",
+      "description": "Validation des déclarations HTML5/CSS3 et complétion du script de contrôle JavaScript.",
+      "points": 4,
+      "questions": [
+        {
+          "id": "EX3-Q1",
+          "prompt": "Partie A - 1 : La zone 'Code' possède les attributs id='code' et class='bordure' (Vrai ou Faux) ?",
+          "points": 0.5,
+          "type": "representation",
+          "expectedPattern": "^vrai$",
+          "explanation": "Vrai : la zone de texte pour le code porte l'id code et la classe bordure."
+        },
+        {
+          "id": "EX3-Q2",
+          "prompt": "Partie A - 2 : La zone 'Intitulé' utilise la classe de style '.saisie' pour définir sa largeur à 250px (Vrai ou Faux) ?",
+          "points": 0.5,
+          "type": "representation",
+          "expectedPattern": "^vrai$",
+          "explanation": "Vrai : la classe .saisie définit une largeur de 250px."
+        },
+        {
+          "id": "EX3-Q3",
+          "prompt": "Partie A - 3 : La zone 'Description' est une balise <textarea> associée à la classe de style '.desc' (Vrai ou Faux) ?",
+          "points": 0.5,
+          "type": "representation",
+          "expectedPattern": "^vrai$",
+          "explanation": "Vrai : le champ multiligne utilise <textarea class=\"desc\">."
+        },
+        {
+          "id": "EX3-Q4",
+          "prompt": "Partie A - 4 : La liaison du fichier externe 'mesStyles.css' s'effectue via '<link href=\"mesStyles.css\" rel=\"stylesheet\" type=\"text/css\">' (Vrai ou Faux) ?",
+          "points": 0.5,
+          "type": "representation",
+          "expectedPattern": "^vrai$",
+          "explanation": "Vrai : il s'agit de la syntaxe standard de liaison CSS."
+        },
+        {
+          "id": "EX3-Q5",
+          "prompt": "Partie B - Tâche 1 : Complétez l'instruction de conversion en majuscules de la chaîne x : 'x = ______;'",
+          "points": 0.5,
+          "type": "representation",
+          "expectedPattern": "x\\.touppercase\\(\\)",
+          "explanation": "x.toUpperCase()"
+        },
+        {
+          "id": "EX3-Q6",
+          "prompt": "Partie B - Tâche 2 : Donnez la valeur booléenne initiale pour indiquer qu'une condition de validité est satisfaite : 'valide = ______;'",
+          "points": 0.5,
+          "type": "representation",
+          "expectedPattern": "^true$",
+          "explanation": "true"
+        },
+        {
+          "id": "EX3-Q7",
+          "prompt": "Partie B - Tâche 3 : Quel opérateur logique JavaScript correspond à la conjonction ET utilisée pour combiner deux prédicats ?",
+          "points": 0.5,
+          "type": "representation",
+          "expectedPattern": "^&&$",
+          "explanation": "&&"
+        },
+        {
+          "id": "EX3-Q8",
+          "prompt": "Partie B - Tâche 4 : Quelle méthode JavaScript est appelée pour notifier l'utilisateur d'une erreur de saisie ?",
+          "points": 0.5,
+          "type": "representation",
+          "expectedPattern": "^alert$",
+          "explanation": "alert"
+        }
+      ]
+    },
+    {
+      "id": "exercice-4-modelisation-foad",
+      "title": "Exercice N°4 : Modélisation Relationnelle BDR « EduNum-FOAD » (3 pts)",
+      "type": "modeling",
+      "description": "Règles de gestion, correction d'anomalies de conception et schéma textuel de la plateforme EduNum.",
+      "points": 3,
+      "questions": [
+        {
+          "id": "EX4-Q1",
+          "prompt": "1. Associez chaque représentation graphique à sa règle de gestion : Représentation 1 (clé composite idApp#, idLec#, dateLec) et Représentation 2 (clé composite idApp#, idLec#). Format attendu : 'R6 / R7'.",
+          "points": 1,
+          "type": "representation",
+          "expectedPattern": "r6\\s*/\\s*r7",
+          "explanation": "Représentation 1 correspond à R6 (séances multiples à dates distinctes) et Représentation 2 à R7 (assiduité unique par leçon)."
+        },
+        {
+          "id": "EX4-Q2",
+          "prompt": "2. Donnez la représentation textuelle corrigée des relations Matiere et Lecon après migration de la clé étrangère '#idMat' dans la table enfant Lecon.",
+          "points": 1,
+          "type": "representation",
+          "expectedKeywords": ["Matiere", "idMat", "Lecon", "#idMat"],
+          "expectedPattern": "matiere\\s*\\(#?idmat.*lecon\\s*\\(#?idlec.*#idmat",
+          "explanation": "Matiere (#idMat, libMat) et Lecon (#idLec, descLec, lienLec, #idMat)"
+        },
+        {
+          "id": "EX4-Q3",
+          "prompt": "3. Donnez la représentation textuelle normalisée des relations Etablissement et Apprenant traduisant la règle R5 (un apprenant est affecté à un unique établissement).",
+          "points": 1,
+          "type": "representation",
+          "expectedKeywords": ["Etablissement", "idEtab", "Apprenant", "#idEtab"],
+          "expectedPattern": "etablissement\\s*\\(#?idetab.*apprenant\\s*\\(#?idapp.*#idetab",
+          "explanation": "Etablissement (#idEtab, libEtab, govEtab) et Apprenant (#idApp, nomPrenApp, mailApp, #idEtab)"
+        }
+      ]
+    },
+    {
+      "id": "exercice-5-biolab",
+      "title": "Exercice N°5 : Base « BioLab-Medoc » & Requêtes SQL (8 pts)",
+      "type": "sql",
+      "description": "Analyse relationnelle, requêtes LDD, requêtes LID d'interrogation avancée et manipulation LMD.",
+      "points": 8,
+      "questions": [
+        {
+          "id": "EX5-Q1",
+          "prompt": "Partie 1 - 1 : Une maladie donnée est traitée par un et un seul médicament (Vrai ou Faux) ?",
+          "points": 0.25,
+          "type": "representation",
+          "expectedPattern": "^faux$",
+          "explanation": "Faux : une maladie peut être traitée par plusieurs médicaments distincts (association Traitement N:M)."
+        },
+        {
+          "id": "EX5-Q2",
+          "prompt": "Partie 1 - 2 : Un médicament donné n'est prescrit que pour une seule maladie (Vrai ou Faux) ?",
+          "points": 0.25,
+          "type": "representation",
+          "expectedPattern": "^faux$",
+          "explanation": "Faux : un médicament peut soigner plusieurs maladies."
+        },
+        {
+          "id": "EX5-Q3",
+          "prompt": "Partie 1 - 3 : Un même médicament peut se présenter sous plusieurs formes galéniques différentes dans la table Medicament (Vrai ou Faux) ?",
+          "points": 0.25,
+          "type": "representation",
+          "expectedPattern": "^faux$",
+          "explanation": "Faux : Medicament possède une seule clé étrangère codeForme."
+        },
+        {
+          "id": "EX5-Q4",
+          "prompt": "Partie 1 - 4 : Un médicament peut être composé de plusieurs plantes médicinales distinctes (Vrai ou Faux) ?",
+          "points": 0.25,
+          "type": "representation",
+          "expectedPattern": "^vrai$",
+          "explanation": "Vrai : la table Composition associe un médicament à plusieurs plantes."
+        },
+        {
+          "id": "EX5-Q5",
+          "prompt": "Partie 1 - 5 : Une même plante peut entrer dans la composition de plusieurs médicaments (Vrai ou Faux) ?",
+          "points": 0.25,
+          "type": "representation",
+          "expectedPattern": "^vrai$",
+          "explanation": "Vrai : une plante peut apparaître dans plusieurs lignes de Composition."
+        },
+        {
+          "id": "EX5-Q6",
+          "prompt": "Partie 1 - 6 : La durée de traitement prescrite pour un médicament est obligatoirement identique quelle que soit la maladie traitée (Vrai ou Faux) ?",
+          "points": 0.25,
+          "type": "representation",
+          "expectedPattern": "^faux$",
+          "explanation": "Faux : l'attribut duree est porté par la relation Traitement et dépend du couple (codeMed, codeMaladie)."
+        },
+        {
+          "id": "EX5-Q7",
+          "prompt": "Partie 2 - I - 1 : Interprétation : Quel est l'effet de l'instruction 'DELETE FROM Plante;' ?",
+          "points": 0.5,
+          "type": "query",
+          "expectedQuery": "SELECT COUNT(*) AS Nb FROM Plante;",
+          "explanation": "Elle supprime la totalité des enregistrements de la table Plante sans toucher à sa structure."
+        },
+        {
+          "id": "EX5-Q8",
+          "prompt": "Partie 2 - I - 2 : Interprétation : Quel est le résultat de l'exécution de 'INSERT INTO Plante VALUES (\"123\", \"Lin\");' ?",
+          "points": 0.5,
+          "type": "query",
+          "expectedQuery": "SELECT COUNT(*) AS Nb FROM Plante;",
+          "explanation": "Elle produit une erreur SQL car le nombre de colonnes fournies ne correspond pas à la définition de la table."
+        },
+        {
+          "id": "EX5-Q9",
+          "prompt": "Partie 2 - I - 3 : Interprétation : Que sélectionne la requête 'SELECT * FROM Plante WHERE codePlante = \"4%\";' ?",
+          "points": 0.5,
+          "type": "query",
+          "expectedQuery": "SELECT * FROM Plante WHERE codePlante = '4%';",
+          "explanation": "Elle cherche les plantes dont le codePlante est exactement égal à la chaîne de 2 caractères '4%'."
+        },
+        {
+          "id": "EX5-Q10",
+          "prompt": "Partie 2 - I - 4 : Interprétation : Quel est le critère de tri appliqué par 'SELECT codePlante, nomPlante FROM Plante ORDER BY 2;' ?",
+          "points": 0.5,
+          "type": "query",
+          "expectedQuery": "SELECT codePlante, nomPlante FROM Plante ORDER BY nomPlante ASC;",
+          "explanation": "ORDER BY 2 trie selon la 2ème colonne projetée dans la clause SELECT (nomPlante)."
+        },
+        {
+          "id": "EX5-Q11",
+          "prompt": "Partie 2 - II - 1 : Requête LDD : Rédigez l'instruction SQL pour ajouter la colonne 'dateFin' de type DATE dans la table Medicament.",
+          "points": 0.5,
+          "type": "ddl",
+          "expectedKeywords": ["ALTER TABLE", "Medicament", "ADD", "dateFin", "DATE"],
+          "explanation": "ALTER TABLE Medicament ADD dateFin DATE;"
+        },
+        {
+          "id": "EX5-Q12",
+          "prompt": "Partie 2 - II - 2 : Requête LDD : Rédigez l'instruction SQL pour modifier la taille de la colonne 'caracMed' de la table Medicament à VARCHAR(150).",
+          "points": 0.5,
+          "type": "ddl",
+          "expectedKeywords": ["ALTER TABLE", "Medicament", "caracMed", "150"],
+          "explanation": "ALTER TABLE Medicament MODIFY caracMed VARCHAR(150);"
+        },
+        {
+          "id": "EX5-Q13",
+          "prompt": "Partie 2 - III - A - 1 : Requête LID : Rédigez la requête SQL affichant toutes les plantes triées par ordre alphabétique décroissant sur leur nom.",
+          "points": 0.3125,
+          "type": "query",
+          "expectedQuery": "SELECT * FROM Plante ORDER BY nomPlante DESC;",
+          "explanation": "SELECT * FROM Plante ORDER BY nomPlante DESC;"
+        },
+        {
+          "id": "EX5-Q14",
+          "prompt": "Partie 2 - III - A - 2 : Requête LID : Rédigez la requête SQL affichant le nom et les caractéristiques de tous les médicaments se présentant sous la forme 'Sirop'.",
+          "points": 0.3125,
+          "type": "query",
+          "expectedQuery": "SELECT M.nomMed, M.caracMed FROM Medicament M, Forme F WHERE M.codeForme = F.codeForme AND F.nomForme = 'Sirop';",
+          "explanation": "SELECT M.nomMed, M.caracMed FROM Medicament M, Forme F WHERE M.codeForme = F.codeForme AND F.nomForme = 'Sirop';"
+        },
+        {
+          "id": "EX5-Q15",
+          "prompt": "Partie 2 - III - A - 3 : Requête LID : Rédigez la requête SQL affichant le code, le nom et la description des plantes entrant dans la composition du médicament de code 'Med001'.",
+          "points": 0.3125,
+          "type": "query",
+          "expectedQuery": "SELECT P.codePlante, P.nomPlante, P.descPlante FROM Plante P, Composition C WHERE P.codePlante = C.codePlante AND C.codeMed = 'Med001';",
+          "explanation": "SELECT P.codePlante, P.nomPlante, P.descPlante FROM Plante P, Composition C WHERE P.codePlante = C.codePlante AND C.codeMed = 'Med001';"
+        },
+        {
+          "id": "EX5-Q16",
+          "prompt": "Partie 2 - III - A - 4 : Requête LID : Rédigez la requête SQL affichant le nom des médicaments utilisés pour traiter la maladie 'Fièvre'.",
+          "points": 0.3125,
+          "type": "query",
+          "expectedQuery": "SELECT M.nomMed FROM Medicament M, Traitement T, Maladie MA WHERE M.codeMed = T.codeMed AND T.codeMaladie = MA.codeMaladie AND MA.nomMaladie = 'Fièvre';",
+          "explanation": "SELECT M.nomMed FROM Medicament M, Traitement T, Maladie MA WHERE M.codeMed = T.codeMed AND T.codeMaladie = MA.codeMaladie AND MA.nomMaladie = 'Fièvre';"
+        },
+        {
+          "id": "EX5-Q17",
+          "prompt": "Partie 2 - III - A - 5 : Requête LID : Rédigez la requête SQL affichant le code et le nom des médicaments fabriqués durant l'année 2023.",
+          "points": 0.3125,
+          "type": "query",
+          "expectedQuery": "SELECT codeMed, nomMed FROM Medicament WHERE dateFab >= '2023-01-01' AND dateFab <= '2023-12-31';",
+          "explanation": "SELECT codeMed, nomMed FROM Medicament WHERE dateFab >= '2023-01-01' AND dateFab <= '2023-12-31';"
+        },
+        {
+          "id": "EX5-Q18",
+          "prompt": "Partie 2 - III - A - 6 : Requête LID : Rédigez la requête SQL calculant la durée moyenne des traitements prescrits pour la maladie 'TSE005' (colonne renommée 'DureeMoyenne').",
+          "points": 0.3125,
+          "type": "query",
+          "expectedQuery": "SELECT AVG(duree) AS DureeMoyenne FROM Traitement WHERE codeMaladie = 'TSE005';",
+          "explanation": "SELECT AVG(duree) AS DureeMoyenne FROM Traitement WHERE codeMaladie = 'TSE005';"
+        },
+        {
+          "id": "EX5-Q19",
+          "prompt": "Partie 2 - III - A - 7 : Requête LID : Rédigez la requête SQL affichant le code des médicaments prescrits pour 'TSE005' avec la durée minimale de traitement (utiliser une sous-requête).",
+          "points": 0.3125,
+          "type": "query",
+          "expectedQuery": "SELECT codeMed FROM Traitement WHERE codeMaladie = 'TSE005' AND duree = (SELECT MIN(duree) FROM Traitement WHERE codeMaladie = 'TSE005');",
+          "explanation": "SELECT codeMed FROM Traitement WHERE codeMaladie = 'TSE005' AND duree = (SELECT MIN(duree) FROM Traitement WHERE codeMaladie = 'TSE005');"
+        },
+        {
+          "id": "EX5-Q20",
+          "prompt": "Partie 2 - III - A - 8 : Requête LID : Rédigez la requête SQL affichant le code et le nom des médicaments dont la formule comporte au moins deux plantes médicinales distinctes.",
+          "points": 0.3125,
+          "type": "query",
+          "expectedQuery": "SELECT M.codeMed, M.nomMed FROM Medicament M, Composition C WHERE M.codeMed = C.codeMed GROUP BY M.codeMed, M.nomMed HAVING COUNT(C.codePlante) >= 2;",
+          "explanation": "SELECT M.codeMed, M.nomMed FROM Medicament M, Composition C WHERE M.codeMed = C.codeMed GROUP BY M.codeMed, M.nomMed HAVING COUNT(C.codePlante) >= 2;"
+        },
+        {
+          "id": "EX5-Q21",
+          "prompt": "Partie 2 - III - B - 1 : Requête LMD : Rédigez l'instruction SQL pour insérer une nouvelle forme médicamenteuse de code 'IF0005' et de nom 'Inhalation'.",
+          "points": 0.5,
+          "type": "dml",
+          "expectedTableRows": {
+            "table": "Forme",
+            "where": {
+              "codeforme": "IF0005",
+              "nomforme": "Inhalation"
+            }
+          },
+          "explanation": "INSERT INTO Forme (codeForme, nomForme) VALUES ('IF0005', 'Inhalation');"
+        },
+        {
+          "id": "EX5-Q22",
+          "prompt": "Partie 2 - III - B - 2 : Requête LMD : Rédigez l'instruction SQL pour doubler la dose de la plante 'BS0001' dans la composition du médicament 'Med001' (la nouvelle dose devient 100).",
+          "points": 0.5,
+          "type": "dml",
+          "expectedTableRows": {
+            "table": "Composition",
+            "where": {
+              "codemed": "Med001",
+              "codeplante": "BS0001",
+              "dose": 100
+            }
+          },
+          "explanation": "UPDATE Composition SET dose = 100 WHERE codePlante = 'BS0001' AND codeMed = 'Med001';"
+        }
+      ]
+    }
+  ]
+}
