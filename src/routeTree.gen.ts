@@ -14,6 +14,7 @@ import { Route as AdminRouteImport } from './routes/admin'
 import { Route as CalendrierRouteImport } from './routes/calendrier'
 import { Route as CoursRouteImport } from './routes/cours'
 import { Route as EnseignantRouteImport } from './routes/enseignant'
+import { Route as ExamenEcritIdRouteImport } from './routes/examen-ecrit.$id'
 import { Route as SujetIdRouteImport } from './routes/sujet.$id'
 
 const IndexRoute = IndexRouteImport.update({
@@ -41,6 +42,11 @@ const EnseignantRoute = EnseignantRouteImport.update({
   path: '/enseignant',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ExamenEcritIdRoute = ExamenEcritIdRouteImport.update({
+  id: '/examen-ecrit/$id',
+  path: '/examen-ecrit/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SujetIdRoute = SujetIdRouteImport.update({
   id: '/sujet/$id',
   path: '/sujet/$id',
@@ -53,6 +59,7 @@ export interface FileRoutesByFullPath {
   '/calendrier': typeof CalendrierRoute
   '/cours': typeof CoursRoute
   '/enseignant': typeof EnseignantRoute
+  '/examen-ecrit/$id': typeof ExamenEcritIdRoute
   '/sujet/$id': typeof SujetIdRoute
 }
 export interface FileRoutesByTo {
@@ -61,6 +68,7 @@ export interface FileRoutesByTo {
   '/calendrier': typeof CalendrierRoute
   '/cours': typeof CoursRoute
   '/enseignant': typeof EnseignantRoute
+  '/examen-ecrit/$id': typeof ExamenEcritIdRoute
   '/sujet/$id': typeof SujetIdRoute
 }
 export interface FileRoutesById {
@@ -70,14 +78,28 @@ export interface FileRoutesById {
   '/calendrier': typeof CalendrierRoute
   '/cours': typeof CoursRoute
   '/enseignant': typeof EnseignantRoute
+  '/examen-ecrit/$id': typeof ExamenEcritIdRoute
   '/sujet/$id': typeof SujetIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    '/' | '/admin' | '/calendrier' | '/cours' | '/enseignant' | '/sujet/$id'
+    | '/'
+    | '/admin'
+    | '/calendrier'
+    | '/cours'
+    | '/enseignant'
+    | '/examen-ecrit/$id'
+    | '/sujet/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/admin' | '/calendrier' | '/cours' | '/enseignant' | '/sujet/$id'
+  to:
+    | '/'
+    | '/admin'
+    | '/calendrier'
+    | '/cours'
+    | '/enseignant'
+    | '/examen-ecrit/$id'
+    | '/sujet/$id'
   id:
     | '__root__'
     | '/'
@@ -85,6 +107,7 @@ export interface FileRouteTypes {
     | '/calendrier'
     | '/cours'
     | '/enseignant'
+    | '/examen-ecrit/$id'
     | '/sujet/$id'
   fileRoutesById: FileRoutesById
 }
@@ -94,6 +117,7 @@ export interface RootRouteChildren {
   CalendrierRoute: typeof CalendrierRoute
   CoursRoute: typeof CoursRoute
   EnseignantRoute: typeof EnseignantRoute
+  ExamenEcritIdRoute: typeof ExamenEcritIdRoute
   SujetIdRoute: typeof SujetIdRoute
 }
 
@@ -134,6 +158,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EnseignantRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/examen-ecrit/$id': {
+      id: '/examen-ecrit/$id'
+      path: '/examen-ecrit/$id'
+      fullPath: '/examen-ecrit/$id'
+      preLoaderRoute: typeof ExamenEcritIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/sujet/$id': {
       id: '/sujet/$id'
       path: '/sujet/$id'
@@ -150,6 +181,7 @@ const rootRouteChildren: RootRouteChildren = {
   CalendrierRoute: CalendrierRoute,
   CoursRoute: CoursRoute,
   EnseignantRoute: EnseignantRoute,
+  ExamenEcritIdRoute: ExamenEcritIdRoute,
   SujetIdRoute: SujetIdRoute,
 }
 export const routeTree = rootRouteImport
