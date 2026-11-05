@@ -1,0 +1,20 @@
+{
+  "EX1-Q1": "opt-select",
+  "EX1-Q2": "opt-check",
+  "EX1-Q3": "opt-link",
+  "EX1-Q4": "opt-ref",
+  "EX2-Q1": "CREATE TABLE Epreuve (CodeEpreuve VARCHAR(10) PRIMARY KEY, Libelle VARCHAR(30) NOT NULL, Coefficient DECIMAL(3,1) NOT NULL);",
+  "EX2-Q2": "ALTER TABLE Evaluation ADD FOREIGN KEY (CodeEpreuve) REFERENCES Epreuve(CodeEpreuve);",
+  "EX2-Q3": "ALTER TABLE Evaluation ADD CONSTRAINT chk_note CHECK (Note BETWEEN 0 AND 20);",
+  "EX2-Q4": "ALTER TABLE Candidat ADD Genre CHAR(1);",
+  "EX3-Q1": "ALTER TABLE Jeu ADD Version VARCHAR(10);",
+  "EX3-Q2": "INSERT INTO Categorie VALUES ('CAT3', 'Stratégie');",
+  "EX3-Q3": "INSERT INTO Jeu (CodeJeu, LibJeu, NatJeu, AgeMin, CodeCat) VALUES ('J010', 'Chess Master', 'P', 8, 'CAT1');",
+  "EX3-Q4": "SELECT J.CodeJeu, J.LibJeu, C.LibCat FROM Jeu J, Categorie C WHERE J.CodeCat = C.CodeCat ORDER BY J.LibJeu ASC;",
+  "EX4-Q1": "SELECT COUNT(*) AS NbEmployes FROM Employe E, Service S WHERE E.NumService = S.NumService AND S.LibService = 'Sécurité';",
+  "EX4-Q2": "SELECT AVG(MontPrime) AS MoyennePrimes FROM Prime WHERE AnneePrime = 2021;",
+  "EX4-Q3": "SELECT MatEmp, SUM(MontPrime) AS TotalPrimes FROM Prime GROUP BY MatEmp;",
+  "EX4-Q4": "SELECT MatEmp, NomEmp, DateRecrut FROM Employe WHERE DateRecrut >= '2021-01-01' AND DateRecrut <= '2021-12-31' ORDER BY DateRecrut DESC;",
+  "EX4-Q5": "UPDATE Prime SET MontPrime = 660.000 WHERE AnneePrime = 2022 AND MatEmp = 'E01';",
+  "EX4-Q6": "DELETE FROM Prime WHERE AnneePrime < 2015;"
+}

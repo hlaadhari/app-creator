@@ -4,6 +4,9 @@
  */
 
 import type { WrittenExamManifest } from "@/lib/evaluator/written/written-exam-evaluator";
+import bac2022ControleManifest from "../../../content/exam-bac2022-controle-ecrit/manifest.json";
+
+export const examBac2022Controle = bac2022ControleManifest as unknown as WrittenExamManifest;
 
 export const sampleWrittenExam: WrittenExamManifest = {
   id: "written-bac-demo",
@@ -188,6 +191,7 @@ INSERT INTO Employe VALUES
 
 const writtenExamsRegistry: Map<string, WrittenExamManifest> = new Map([
   [sampleWrittenExam.id, sampleWrittenExam],
+  [examBac2022Controle.id, examBac2022Controle],
 ]);
 
 export function registerWrittenExam(manifest: WrittenExamManifest): void {

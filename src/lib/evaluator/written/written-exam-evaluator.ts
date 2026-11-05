@@ -35,6 +35,7 @@ export interface WrittenModelingQuestion {
   prompt: string;
   points: number;
   type: "representation" | "ddl" | "text";
+  initialSql?: string;
   expectedDdl?: string;
   expectedKeywords?: string[];
   expectedPattern?: string;
@@ -54,6 +55,8 @@ export interface WrittenSqlQuestion {
     table: string;
     where?: Record<string, unknown>;
     minCount?: number;
+    maxCount?: number;
+    exactCount?: number;
   };
   verificationSql?: string;
   explanation?: string;
@@ -146,6 +149,21 @@ export function normaliserTexte(txt: string): string {
 }
 
 /**
+ * Normalise une ligne de résultat SQL en extrayant les noms de colonnes projetées
+ * sans préfixe de table interne (ex: "j.codejeu" -> "codejeu").
+ */
+export function normaliserLigneSql(row: Record<string, unknown>): Record<string, unknown> {
+  const normalized: Record<string, unknown> = {};
+  for (const [k, v] of Object.entries(row)) {
+    const bareKey = k.includes(".") ? k.split(".").pop()!.toLowerCase() : k.toLowerCase();
+    if (!(bareKey in normalized)) {
+      normalized[bareKey] = v;
+    }
+  }
+  return normalized;
+}
+
+/**
  * Compare deux listes d'enregistrements indépendamment de l'ordre des colonnes ou lignes
  */
 export function comparerLignesResultats(
@@ -155,11 +173,14 @@ export function comparerLignesResultats(
   if (actual.length !== expected.length) return false;
   if (actual.length === 0) return true;
 
+  const actualNorm = actual.map(normaliserLigneSql);
+  const expectedNorm = expected.map(normaliserLigneSql);
+
   // Comparaison par valeur pour chaque ligne
-  const actualSorted = [...actual].sort((a, b) =>
+  const actualSorted = [...actualNorm].sort((a, b) =>
     JSON.stringify(a).localeCompare(JSON.stringify(b)),
   );
-  const expectedSorted = [...expected].sort((a, b) =>
+  const expectedSorted = [...expectedNorm].sort((a, b) =>
     JSON.stringify(a).localeCompare(JSON.stringify(b)),
   );
 
@@ -167,19 +188,14 @@ export function comparerLignesResultats(
     const rowAct = actualSorted[i]!;
     const rowExp = expectedSorted[i]!;
 
-    const keysAct = Object.keys(rowAct)
-      .map((k) => k.toLowerCase())
-      .sort();
-    const keysExp = Object.keys(rowExp)
-      .map((k) => k.toLowerCase())
-      .sort();
+    const keysAct = Object.keys(rowAct).sort();
+    const keysExp = Object.keys(rowExp).sort();
 
     if (keysAct.length !== keysExp.length) return false;
 
-    for (const k of Object.keys(rowExp)) {
-      const actKey = Object.keys(rowAct).find((ak) => ak.toLowerCase() === k.toLowerCase());
-      if (!actKey) return false;
-      if (String(rowAct[actKey]) !== String(rowExp[k])) return false;
+    for (const k of keysExp) {
+      if (!(k in rowAct)) return false;
+      if (String(rowAct[k]) !== String(rowExp[k])) return false;
     }
   }
 
@@ -275,8 +291,11 @@ export function evaluerModeling(
   // Si c'est du DDL, essayer d'exécuter la commande
   if (question.type === "ddl") {
     try {
-      const clonedEngine = new RelationalDatabaseEngine();
-      const execRes = clonedEngine.executeScript(repStr);
+      const ddlEngine = engine ?? new RelationalDatabaseEngine();
+      if (!engine && question.initialSql) {
+        ddlEngine.executeScript(question.initialSql);
+      }
+      const execRes = ddlEngine.executeScript(repStr);
       if (!execRes.success || execRes.errors.length > 0) {
         return {
           questionId: question.id,
@@ -284,7 +303,7 @@ export function evaluerModeling(
           pointsEarned: 0,
           pointsMax,
           isCorrect: false,
-          feedback: `Erreur d'exécution SQL DDL : ${execRes.errors[0] || clonedEngine.getLastError()}`,
+          feedback: `Erreur d'exécution SQL DDL : ${execRes.errors[0] || ddlEngine.getLastError()}`,
           studentAnswer: reponse,
         };
       }
@@ -501,6 +520,28 @@ export function evaluerSql(
           studentAnswer: reponse,
         };
       }
+      if (exp.maxCount !== undefined && rows.length > exp.maxCount) {
+        return {
+          questionId: question.id,
+          sectionId,
+          pointsEarned: 0,
+          pointsMax,
+          isCorrect: false,
+          feedback: `La table '${exp.table}' contient ${rows.length} ligne(s), attendu au plus ${exp.maxCount}.`,
+          studentAnswer: reponse,
+        };
+      }
+      if (exp.exactCount !== undefined && rows.length !== exp.exactCount) {
+        return {
+          questionId: question.id,
+          sectionId,
+          pointsEarned: 0,
+          pointsMax,
+          isCorrect: false,
+          feedback: `La table '${exp.table}' contient ${rows.length} ligne(s), attendu exactement ${exp.exactCount}.`,
+          studentAnswer: reponse,
+        };
+      }
       if (exp.where) {
         const match = rows.some((r) =>
           Object.entries(exp.where!).every(([k, v]) => {
@@ -526,14 +567,14 @@ export function evaluerSql(
     // Exécution d'une requête de contrôle personnalisée si spécifiée
     if (question.verificationSql) {
       const verifRes = engine.query(question.verificationSql);
-      if (verifRes.error || verifRes.rows.length === 0) {
+      if (verifRes.error) {
         return {
           questionId: question.id,
           sectionId,
           pointsEarned: 0,
           pointsMax,
           isCorrect: false,
-          feedback: `La vérification de cohérence de la base a échoué.`,
+          feedback: `Erreur lors de la vérification SQL : ${verifRes.error}`,
           studentAnswer: reponse,
         };
       }
@@ -654,15 +695,18 @@ export function evaluerCodeAnalysis(
 export async function evaluerCopieEcrite(
   manifest: WrittenExamManifest,
   reponses: Record<string, unknown>,
+  initSqlOverride?: string,
 ): Promise<WrittenExamEvaluationResult> {
   const sectionsResults: WrittenSectionResult[] = [];
   let totalPointsEarned = 0;
   let totalPointsMax = 0;
 
+  const baseSql = initSqlOverride ?? manifest.initialSql;
+
   // Création du moteur pour l'ensemble des validations SQL si un schéma de base existe
   const sharedEngine = new RelationalDatabaseEngine();
-  if (manifest.initialSql) {
-    sharedEngine.executeScript(manifest.initialSql);
+  if (baseSql) {
+    sharedEngine.executeScript(baseSql);
   }
 
   for (const section of manifest.sections) {
@@ -682,7 +726,7 @@ export async function evaluerCopieEcrite(
           itemRes = evaluerModeling(q as WrittenModelingQuestion, ans, section.id, sharedEngine);
           break;
         case "sql":
-          itemRes = evaluerSql(q as WrittenSqlQuestion, ans, section.id, manifest.initialSql || "");
+          itemRes = evaluerSql(q as WrittenSqlQuestion, ans, section.id, baseSql || "");
           break;
         case "code_analysis":
           itemRes = evaluerCodeAnalysis(q as WrittenCodeAnalysisQuestion, ans, section.id);
