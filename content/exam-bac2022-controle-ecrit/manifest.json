@@ -1,0 +1,265 @@
+{
+  "id": "exam-bac2022-controle-ecrit",
+  "title": "Bac 2022 (Session de Contrôle) - Épreuve Écrite Bases de Données",
+  "referentiel_id": "bac-si-tn",
+  "type_sujet": "annale_officielle",
+  "source_reference": "Ministère de l'Éducation — Tunisie",
+  "statut_validation": "valide_pedagogiquement",
+  "session_annee": 2022,
+  "session_libelle": "Session de contrôle",
+  "category": "Module C - Épreuves Écrites",
+  "exam_type": "written",
+  "session_type": "controle",
+  "year": 2022,
+  "duration": 120,
+  "level": "Difficile",
+  "exam_mode": true,
+  "bareme_total": 20,
+  "tags": ["QCM SQL", "Bases de Données", "DDL", "DML", "Agrégats", "JOIN", "Contraintes"],
+  "initialSql": "CREATE TABLE IF NOT EXISTS `Candidat` (`NumCandidat` INT PRIMARY KEY, `Nom` VARCHAR(30) NOT NULL, `Prenom` VARCHAR(30) NOT NULL); CREATE TABLE IF NOT EXISTS `Evaluation` (`NumCandidat` INT NOT NULL, `CodeEpreuve` VARCHAR(10) NOT NULL, `Note` DECIMAL(4,2), PRIMARY KEY (`NumCandidat`, `CodeEpreuve`), FOREIGN KEY (`NumCandidat`) REFERENCES `Candidat`(`NumCandidat`) ON UPDATE CASCADE ON DELETE CASCADE); INSERT INTO `Candidat` VALUES (101, 'Gharbi', 'Sami'), (102, 'Mansour', 'Leila'); CREATE TABLE IF NOT EXISTS `Categorie` (`CodeCat` VARCHAR(10) PRIMARY KEY, `LibCat` VARCHAR(30) NOT NULL); CREATE TABLE IF NOT EXISTS `Jeu` (`CodeJeu` VARCHAR(10) PRIMARY KEY, `LibJeu` VARCHAR(30) NOT NULL, `NatJeu` CHAR(1) CHECK (`NatJeu` IN ('P', 'G')), `AgeMin` INT, `CodeCat` VARCHAR(10), FOREIGN KEY (`CodeCat`) REFERENCES `Categorie`(`CodeCat`) ON UPDATE CASCADE ON DELETE CASCADE); INSERT INTO `Categorie` VALUES ('CAT1', 'Jeux SPORT'), ('CAT2', 'Aventure'); INSERT INTO `Jeu` VALUES ('J003', 'Football Star', 'G', 7, 'CAT1'); CREATE TABLE IF NOT EXISTS `Service` (`NumService` INT PRIMARY KEY, `LibService` VARCHAR(30) NOT NULL); CREATE TABLE IF NOT EXISTS `Grade` (`CodeGrade` VARCHAR(4) PRIMARY KEY, `LibGrade` VARCHAR(50) NOT NULL); CREATE TABLE IF NOT EXISTS `Employe` (`MatEmp` VARCHAR(5) PRIMARY KEY, `NomEmp` VARCHAR(20) NOT NULL, `DateRecrut` DATE NOT NULL, `NumService` INT, `CodeGrade` VARCHAR(4), FOREIGN KEY (`NumService`) REFERENCES `Service`(`NumService`) ON UPDATE CASCADE ON DELETE CASCADE, FOREIGN KEY (`CodeGrade`) REFERENCES `Grade`(`CodeGrade`) ON UPDATE CASCADE ON DELETE CASCADE); CREATE TABLE IF NOT EXISTS `Prime` (`AnneePrime` INT, `MatEmp` VARCHAR(5), `MontPrime` DECIMAL(8,3) CHECK (`MontPrime` >= 0), PRIMARY KEY (`AnneePrime`, `MatEmp`), FOREIGN KEY (`MatEmp`) REFERENCES `Employe`(`MatEmp`) ON UPDATE CASCADE ON DELETE CASCADE); INSERT INTO `Service` VALUES (1, 'Sécurité'), (2, 'Informatique'), (3, 'Comptabilité'); INSERT INTO `Grade` VALUES ('G1', 'Agent Principal'), ('G2', 'Technicien'), ('G3', 'Ingénieur'); INSERT INTO `Employe` VALUES ('E01', 'Ben Ali Sami', '2021-04-12', 1, 'G1'), ('E02', 'Trabelsi Olfa', '2021-09-01', 1, 'G2'), ('E03', 'Khelifi Mourad', '2019-02-15', 2, 'G3'); INSERT INTO `Prime` VALUES (2021, 'E01', 500.000), (2022, 'E01', 600.000), (2021, 'E02', 450.000), (2014, 'E03', 300.000);",
+  "sections": [
+    {
+      "id": "exercice-1-qcm",
+      "title": "Exercice N°1 : QCM & Notions Théoriques BDD (3 pts)",
+      "type": "qcm",
+      "description": "Pour chaque question, cochez l'unique bonne réponse parmi les propositions fournies.",
+      "points": 3,
+      "questions": [
+        {
+          "id": "EX1-Q1",
+          "question": "1. Une fonction d'agrégation SQL (telle que COUNT, SUM, AVG, MAX, MIN) s'utilise principalement dans la clause :",
+          "options": [
+            { "id": "opt-where", "label": "WHERE" },
+            { "id": "opt-select", "label": "SELECT" },
+            { "id": "opt-order", "label": "ORDER BY" },
+            { "id": "opt-from", "label": "FROM" }
+          ],
+          "points": 0.75,
+          "multiple": false,
+          "correctAnswers": ["opt-select"],
+          "explanation": "Les fonctions d'agrégation s'appliquent sur des colonnes dans la clause SELECT (ou dans HAVING)."
+        },
+        {
+          "id": "EX1-Q2",
+          "question": "2. Une contrainte d'intégrité de domaine permettant de limiter les valeurs d'une colonne selon une condition est déclarée par :",
+          "options": [
+            { "id": "opt-fk", "label": "FOREIGN KEY" },
+            { "id": "opt-check", "label": "CHECK" },
+            { "id": "opt-distinct", "label": "DISTINCT" },
+            { "id": "opt-unique", "label": "AUTO_INCREMENT" }
+          ],
+          "points": 0.75,
+          "multiple": false,
+          "correctAnswers": ["opt-check"],
+          "explanation": "La clause CHECK définit une contrainte d'intégrité de domaine sur une ou plusieurs colonnes."
+        },
+        {
+          "id": "EX1-Q3",
+          "question": "3. Dans un modèle relationnel, le rôle essentiel d'une clé étrangère est de :",
+          "options": [
+            { "id": "opt-link", "label": "Établir un lien entre les données de deux tables" },
+            { "id": "opt-sort", "label": "Trier les enregistrements par ordre croissant" },
+            { "id": "opt-speed", "label": "Accélérer l'affichage des formulaires HTML" },
+            { "id": "opt-count", "label": "Compter le nombre de colonnes d'une relation" }
+          ],
+          "points": 0.75,
+          "multiple": false,
+          "correctAnswers": ["opt-link"],
+          "explanation": "Une clé étrangère matérialise l'association entre une table enfant et une table parent."
+        },
+        {
+          "id": "EX1-Q4",
+          "question": "4. L'intégrité référentielle garantit que toute valeur prise par une clé étrangère :",
+          "options": [
+            {
+              "id": "opt-ref",
+              "label": "Doit obligatoirement exister comme clé primaire de la table référencée (ou être NULL)"
+            },
+            { "id": "opt-num", "label": "Doit être un entier supérieur à 100" },
+            { "id": "opt-char", "label": "Doit comporter exactement 8 caractères alphabétiques" },
+            { "id": "opt-date", "label": "Doit correspondre à la date courante du serveur" }
+          ],
+          "points": 0.75,
+          "multiple": false,
+          "correctAnswers": ["opt-ref"],
+          "explanation": "La règle d'intégrité référentielle impose la correspondance avec la clé primaire parente."
+        }
+      ]
+    },
+    {
+      "id": "exercice-2-ddl",
+      "title": "Exercice N°2 : Base « GestionConcours » (DDL & Contraintes - 4 pts)",
+      "type": "modeling",
+      "description": "Rédigez les requêtes SQL LDD pour définir la table Epreuve et enrichir le schéma avec les contraintes demandées.",
+      "points": 4,
+      "questions": [
+        {
+          "id": "EX2-Q1",
+          "prompt": "1. Rédigez l'instruction SQL LDD pour créer la table Epreuve comportant les colonnes CodeEpreuve (VARCHAR(10), Clé primaire), Libelle (VARCHAR(30), NOT NULL) et Coefficient (DECIMAL(3,1), NOT NULL).",
+          "points": 1,
+          "type": "ddl",
+          "expectedKeywords": [
+            "CREATE TABLE",
+            "Epreuve",
+            "CodeEpreuve",
+            "PRIMARY KEY",
+            "Libelle",
+            "Coefficient"
+          ],
+          "explanation": "CREATE TABLE Epreuve (CodeEpreuve VARCHAR(10) PRIMARY KEY, Libelle VARCHAR(30) NOT NULL, Coefficient DECIMAL(3,1) NOT NULL);"
+        },
+        {
+          "id": "EX2-Q2",
+          "prompt": "2. Rédigez l'instruction SQL LDD pour ajouter dans la table Evaluation une clé étrangère sur CodeEpreuve référençant la table Epreuve.",
+          "points": 1,
+          "type": "ddl",
+          "expectedKeywords": [
+            "ALTER TABLE",
+            "Evaluation",
+            "FOREIGN KEY",
+            "CodeEpreuve",
+            "REFERENCES",
+            "Epreuve"
+          ],
+          "explanation": "ALTER TABLE Evaluation ADD FOREIGN KEY (CodeEpreuve) REFERENCES Epreuve(CodeEpreuve);"
+        },
+        {
+          "id": "EX2-Q3",
+          "prompt": "3. Rédigez l'instruction SQL LDD pour ajouter à la table Evaluation une contrainte CHECK vérifiant que la colonne Note est comprise entre 0 et 20.",
+          "points": 1,
+          "type": "ddl",
+          "expectedKeywords": ["ALTER TABLE", "Evaluation", "CHECK", "Note", "0", "20"],
+          "explanation": "ALTER TABLE Evaluation ADD CONSTRAINT chk_note CHECK (Note BETWEEN 0 AND 20);"
+        },
+        {
+          "id": "EX2-Q4",
+          "prompt": "4. Rédigez l'instruction SQL LDD pour ajouter la colonne Genre de type CHAR(1) dans la table Candidat.",
+          "points": 1,
+          "type": "ddl",
+          "expectedKeywords": ["ALTER TABLE", "Candidat", "ADD", "Genre", "CHAR"],
+          "explanation": "ALTER TABLE Candidat ADD Genre CHAR(1);"
+        }
+      ]
+    },
+    {
+      "id": "exercice-3-gaming",
+      "title": "Exercice N°3 : Base « Gaming » (DDL & DML - 6 pts)",
+      "type": "sql",
+      "description": "Validation des instructions LDD et LMD sur la base Gaming (catégories et jeux).",
+      "points": 6,
+      "questions": [
+        {
+          "id": "EX3-Q1",
+          "prompt": "1. Rédigez l'instruction SQL LDD pour ajouter la colonne Version de type VARCHAR(10) dans la table Jeu.",
+          "points": 1.5,
+          "type": "ddl",
+          "expectedKeywords": ["ALTER TABLE", "Jeu", "ADD", "Version"],
+          "explanation": "ALTER TABLE Jeu ADD Version VARCHAR(10);"
+        },
+        {
+          "id": "EX3-Q2",
+          "prompt": "2. Rédigez l'instruction SQL LMD pour insérer une nouvelle catégorie dans la table Categorie avec CodeCat = 'CAT3' et LibCat = 'Stratégie'.",
+          "points": 1.5,
+          "type": "dml",
+          "expectedTableRows": {
+            "table": "Categorie",
+            "where": {
+              "codecat": "CAT3",
+              "libcat": "Stratégie"
+            }
+          },
+          "explanation": "INSERT INTO Categorie VALUES ('CAT3', 'Stratégie');"
+        },
+        {
+          "id": "EX3-Q3",
+          "prompt": "3. Rédigez l'instruction SQL LMD pour insérer un nouveau jeu avec CodeJeu = 'J010', LibJeu = 'Chess Master', NatJeu = 'P', AgeMin = 8, CodeCat = 'CAT1'.",
+          "points": 1.5,
+          "type": "dml",
+          "expectedTableRows": {
+            "table": "Jeu",
+            "where": {
+              "codejeu": "J010",
+              "libjeu": "Chess Master"
+            }
+          },
+          "explanation": "INSERT INTO Jeu (CodeJeu, LibJeu, NatJeu, AgeMin, CodeCat) VALUES ('J010', 'Chess Master', 'P', 8, 'CAT1');"
+        },
+        {
+          "id": "EX3-Q4",
+          "prompt": "4. Rédigez la requête SQL affichant le CodeJeu, LibJeu et LibCat de tous les jeux, triés par LibJeu croissant.",
+          "points": 1.5,
+          "type": "query",
+          "expectedQuery": "SELECT J.CodeJeu, J.LibJeu, C.LibCat FROM Jeu J, Categorie C WHERE J.CodeCat = C.CodeCat ORDER BY J.LibJeu ASC;",
+          "explanation": "SELECT J.CodeJeu, J.LibJeu, C.LibCat FROM Jeu J, Categorie C WHERE J.CodeCat = C.CodeCat ORDER BY J.LibJeu ASC;"
+        }
+      ]
+    },
+    {
+      "id": "exercice-4-employes",
+      "title": "Exercice N°4 : Base « GestionEmployes » (Requêtes SQL DML / LID - 7 pts)",
+      "type": "sql",
+      "description": "Rédigez et exécutez les requêtes SQL d'interrogation et de mise à jour sur la base des employés et primes.",
+      "points": 7,
+      "questions": [
+        {
+          "id": "EX4-Q1",
+          "prompt": "1. Afficher le nombre total d'employés affectés au service 'Sécurité' (colonne renommée 'NbEmployes').",
+          "points": 1,
+          "type": "query",
+          "expectedQuery": "SELECT COUNT(*) AS NbEmployes FROM Employe E, Service S WHERE E.NumService = S.NumService AND S.LibService = 'Sécurité';",
+          "explanation": "SELECT COUNT(*) AS NbEmployes FROM Employe E, Service S WHERE E.NumService = S.NumService AND S.LibService = 'Sécurité';"
+        },
+        {
+          "id": "EX4-Q2",
+          "prompt": "2. Calculer la moyenne des montants de primes versées durant l'année 2021 (colonne renommée 'MoyennePrimes').",
+          "points": 1,
+          "type": "query",
+          "expectedQuery": "SELECT AVG(MontPrime) AS MoyennePrimes FROM Prime WHERE AnneePrime = 2021;",
+          "explanation": "SELECT AVG(MontPrime) AS MoyennePrimes FROM Prime WHERE AnneePrime = 2021;"
+        },
+        {
+          "id": "EX4-Q3",
+          "prompt": "3. Afficher le matricule de chaque employé (MatEmp) et le montant total des primes perçues (colonne 'TotalPrimes').",
+          "points": 1,
+          "type": "query",
+          "expectedQuery": "SELECT MatEmp, SUM(MontPrime) AS TotalPrimes FROM Prime GROUP BY MatEmp;",
+          "explanation": "SELECT MatEmp, SUM(MontPrime) AS TotalPrimes FROM Prime GROUP BY MatEmp;"
+        },
+        {
+          "id": "EX4-Q4",
+          "prompt": "4. Afficher le matricule, le nom et la date de recrutement des employés recrutés en 2021, triés par date de recrutement décroissante.",
+          "points": 1,
+          "type": "query",
+          "expectedQuery": "SELECT MatEmp, NomEmp, DateRecrut FROM Employe WHERE DateRecrut >= '2021-01-01' AND DateRecrut <= '2021-12-31' ORDER BY DateRecrut DESC;",
+          "explanation": "SELECT MatEmp, NomEmp, DateRecrut FROM Employe WHERE DateRecrut >= '2021-01-01' AND DateRecrut <= '2021-12-31' ORDER BY DateRecrut DESC;"
+        },
+        {
+          "id": "EX4-Q5",
+          "prompt": "5. Rédigez la requête SQL pour augmenter la prime de 2022 de l'employé 'E01' en fixant son nouveau montant à 660.000 (augmentation de 10%).",
+          "points": 1.5,
+          "type": "dml",
+          "expectedTableRows": {
+            "table": "Prime",
+            "where": {
+              "matemp": "E01",
+              "anneeprime": 2022,
+              "montprime": 660.0
+            }
+          },
+          "explanation": "UPDATE Prime SET MontPrime = 660.000 WHERE AnneePrime = 2022 AND MatEmp = 'E01';"
+        },
+        {
+          "id": "EX4-Q6",
+          "prompt": "6. Rédigez la requête SQL pour supprimer toutes les primes attribuées avant l'année 2015.",
+          "points": 1.5,
+          "type": "dml",
+          "expectedTableRows": {
+            "table": "Prime",
+            "exactCount": 3
+          },
+          "explanation": "DELETE FROM Prime WHERE AnneePrime < 2015;"
+        }
+      ]
+    }
+  ]
+}

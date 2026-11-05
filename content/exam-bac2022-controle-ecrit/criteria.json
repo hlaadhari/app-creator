@@ -1,0 +1,315 @@
+[
+  {
+    "id": "EX22C-01",
+    "code": "QCM-01",
+    "titre": "Exercice N°1 : QCM & Concepts Théoriques des Bases de Données",
+    "description": "Validation des concepts fondamentaux : fonctions d'agrégation, contrainte CHECK, rôle d'une clé étrangère et intégrité référentielle.",
+    "points": 3,
+    "ordre": 1,
+    "fichier": "reponses.sql",
+    "sonde": {
+      "type": "sql_query_result",
+      "query": "SELECT 1;",
+      "expectedRowCount": 1
+    },
+    "fail_message": "Certaines réponses aux questions théoriques de l'Exercice N°1 sont inexactes ou incomplètes.",
+    "indices": [
+      "Passez en revue les concepts de base : clause SELECT pour les agrégats, contrainte CHECK pour le domaine.",
+      "Syntaxe : SELECT AVG(colonne) FROM table; et CHECK (colonne BETWEEN min AND max);",
+      "Extrait : Une clé étrangère lie deux tables et garantit l'intégrité référentielle."
+    ]
+  },
+  {
+    "id": "EX22C-02",
+    "code": "DDL-01",
+    "titre": "Exercice N°2 : Création de la table Epreuve avec clé primaire",
+    "description": "Instruction CREATE TABLE Epreuve avec CodeEpreuve (clé primaire), Libelle (NOT NULL) et Coefficient (NOT NULL).",
+    "points": 1,
+    "ordre": 2,
+    "fichier": "reponses.sql",
+    "sonde": {
+      "type": "sql_table_check",
+      "table": "epreuve",
+      "primaryKey": ["codeepreuve"]
+    },
+    "fail_message": "La table Epreuve n'a pas été créée ou sa clé primaire CodeEpreuve est manquante.",
+    "indices": [
+      "Déclarez la table Epreuve avec sa clé primaire CodeEpreuve.",
+      "Syntaxe : CREATE TABLE Epreuve (CodeEpreuve VARCHAR(10) PRIMARY KEY, Libelle VARCHAR(30) NOT NULL, Coefficient DECIMAL(3,1) NOT NULL);",
+      "Extrait : PRIMARY KEY (CodeEpreuve)"
+    ]
+  },
+  {
+    "id": "EX22C-03",
+    "code": "DDL-02",
+    "titre": "Exercice N°2 : Ajout de clé étrangère dans Evaluation",
+    "description": "Instruction ALTER TABLE Evaluation ajoutant une clé étrangère sur CodeEpreuve référençant la table Epreuve.",
+    "points": 1,
+    "ordre": 3,
+    "fichier": "reponses.sql",
+    "sonde": {
+      "type": "sql_table_check",
+      "table": "evaluation",
+      "foreignKeys": [
+        {
+          "column": "codeepreuve",
+          "refTable": "epreuve"
+        }
+      ]
+    },
+    "fail_message": "La clé étrangère reliant Evaluation à Epreuve n'a pas été définie.",
+    "indices": [
+      "Utilisez ALTER TABLE ... ADD FOREIGN KEY pour lier CodeEpreuve à la table Epreuve.",
+      "Syntaxe : ALTER TABLE Evaluation ADD FOREIGN KEY (CodeEpreuve) REFERENCES Epreuve(CodeEpreuve);",
+      "Extrait : REFERENCES Epreuve(CodeEpreuve)"
+    ]
+  },
+  {
+    "id": "EX22C-04",
+    "code": "DDL-03",
+    "titre": "Exercice N°2 : Contrainte CHECK sur la note",
+    "description": "Instruction ALTER TABLE Evaluation ajoutant une contrainte de domaine vérifiant que la Note est entre 0 et 20.",
+    "points": 1,
+    "ordre": 4,
+    "fichier": "reponses.sql",
+    "sonde": {
+      "type": "sql_table_check",
+      "table": "evaluation",
+      "hasCheck": true
+    },
+    "fail_message": "La contrainte CHECK vérifiant l'intervalle de note (0 à 20) n'a pas été ajoutée.",
+    "indices": [
+      "Ajoutez une contrainte CHECK avec BETWEEN 0 AND 20 sur la colonne Note.",
+      "Syntaxe : ALTER TABLE Evaluation ADD CONSTRAINT chk_note CHECK (Note BETWEEN 0 AND 20);",
+      "Extrait : CHECK (Note >= 0 AND Note <= 20)"
+    ]
+  },
+  {
+    "id": "EX22C-05",
+    "code": "DDL-04",
+    "titre": "Exercice N°2 : Ajout de la colonne Genre dans Candidat",
+    "description": "Instruction ALTER TABLE Candidat ajoutant la colonne Genre de type CHAR(1).",
+    "points": 1,
+    "ordre": 5,
+    "fichier": "reponses.sql",
+    "sonde": {
+      "type": "sql_table_check",
+      "table": "candidat",
+      "columns": [
+        {
+          "name": "genre"
+        }
+      ]
+    },
+    "fail_message": "La colonne Genre n'a pas été ajoutée à la table Candidat.",
+    "indices": [
+      "Utilisez ALTER TABLE ... ADD Genre CHAR(1) pour ajouter la colonne.",
+      "Syntaxe : ALTER TABLE Candidat ADD Genre CHAR(1);",
+      "Extrait : ADD Genre CHAR(1)"
+    ]
+  },
+  {
+    "id": "EX22C-06",
+    "code": "GAMING-01",
+    "titre": "Exercice N°3 : Base Gaming - Ajout de la colonne Version",
+    "description": "Instruction ALTER TABLE Jeu ajoutant la colonne Version de type VARCHAR(10).",
+    "points": 1.5,
+    "ordre": 6,
+    "fichier": "reponses.sql",
+    "sonde": {
+      "type": "sql_table_check",
+      "table": "jeu",
+      "columns": [
+        {
+          "name": "version"
+        }
+      ]
+    },
+    "fail_message": "La colonne Version n'a pas été ajoutée dans la table Jeu.",
+    "indices": [
+      "Ajoutez la colonne Version à la table Jeu avec ALTER TABLE.",
+      "Syntaxe : ALTER TABLE Jeu ADD Version VARCHAR(10);",
+      "Extrait : ADD Version VARCHAR(10)"
+    ]
+  },
+  {
+    "id": "EX22C-07",
+    "code": "GAMING-02",
+    "titre": "Exercice N°3 : Base Gaming - Insertion dans Categorie",
+    "description": "Instruction INSERT INTO Categorie insérant la catégorie 'CAT3', 'Stratégie'.",
+    "points": 1.5,
+    "ordre": 7,
+    "fichier": "reponses.sql",
+    "sonde": {
+      "type": "sql_table_check",
+      "table": "categorie",
+      "checkMinRows": 3
+    },
+    "fail_message": "La nouvelle catégorie CAT3 n'a pas été insérée dans la table Categorie.",
+    "indices": [
+      "Exécutez une instruction INSERT INTO Categorie avec les valeurs demandées.",
+      "Syntaxe : INSERT INTO Categorie VALUES ('CAT3', 'Stratégie');",
+      "Extrait : VALUES ('CAT3', 'Stratégie')"
+    ]
+  },
+  {
+    "id": "EX22C-08",
+    "code": "GAMING-03",
+    "titre": "Exercice N°3 : Base Gaming - Insertion d'un nouveau Jeu",
+    "description": "Instruction INSERT INTO Jeu pour insérer le jeu 'J010', 'Chess Master'.",
+    "points": 1.5,
+    "ordre": 8,
+    "fichier": "reponses.sql",
+    "sonde": {
+      "type": "sql_table_check",
+      "table": "jeu",
+      "checkMinRows": 2
+    },
+    "fail_message": "Le jeu Chess Master (J010) n'a pas été inséré dans la table Jeu.",
+    "indices": [
+      "Insérez les coordonnées complètes du jeu dans la table Jeu.",
+      "Syntaxe : INSERT INTO Jeu (CodeJeu, LibJeu, NatJeu, AgeMin, CodeCat) VALUES ('J010', 'Chess Master', 'P', 8, 'CAT1');",
+      "Extrait : VALUES ('J010', 'Chess Master', 'P', 8, 'CAT1')"
+    ]
+  },
+  {
+    "id": "EX22C-09",
+    "code": "GAMING-04",
+    "titre": "Exercice N°3 : Base Gaming - Consultation des Jeux et Catégories",
+    "description": "Requête SELECT affichant CodeJeu, LibJeu et LibCat triés par LibJeu croissant.",
+    "points": 1.5,
+    "ordre": 9,
+    "fichier": "reponses.sql",
+    "sonde": {
+      "type": "sql_query_result",
+      "query": "SELECT J.CodeJeu, J.LibJeu, C.LibCat FROM Jeu J, Categorie C WHERE J.CodeCat = C.CodeCat ORDER BY J.LibJeu ASC;",
+      "minRowCount": 1
+    },
+    "fail_message": "La requête de consultation des jeux avec leur catégorie ne produit pas le résultat attendu.",
+    "indices": [
+      "Effectuez une jointure entre Jeu et Categorie sur la clé CodeCat.",
+      "Syntaxe : SELECT J.CodeJeu, J.LibJeu, C.LibCat FROM Jeu J, Categorie C WHERE J.CodeCat = C.CodeCat ORDER BY J.LibJeu ASC;",
+      "Extrait : ORDER BY J.LibJeu ASC"
+    ]
+  },
+  {
+    "id": "EX22C-10",
+    "code": "EMP-01",
+    "titre": "Exercice N°4 : Nombre d'employés du service Sécurité",
+    "description": "Requête COUNT(*) pour compter les employés du service Sécurité.",
+    "points": 1,
+    "ordre": 10,
+    "fichier": "reponses.sql",
+    "sonde": {
+      "type": "sql_query_result",
+      "query": "SELECT COUNT(*) AS NbEmployes FROM Employe E, Service S WHERE E.NumService = S.NumService AND S.LibService = 'Sécurité';",
+      "expectedRowCount": 1
+    },
+    "fail_message": "Le décompte des employés du service Sécurité est incorrect.",
+    "indices": [
+      "Comptez les employés avec COUNT(*) et joignez avec la table Service.",
+      "Syntaxe : SELECT COUNT(*) AS NbEmployes FROM Employe E, Service S WHERE E.NumService = S.NumService AND S.LibService = 'Sécurité';",
+      "Extrait : COUNT(*) AS NbEmployes"
+    ]
+  },
+  {
+    "id": "EX22C-11",
+    "code": "EMP-02",
+    "titre": "Exercice N°4 : Moyenne des primes versées en 2021",
+    "description": "Requête AVG(MontPrime) pour calculer la moyenne des primes en 2021.",
+    "points": 1,
+    "ordre": 11,
+    "fichier": "reponses.sql",
+    "sonde": {
+      "type": "sql_query_result",
+      "query": "SELECT AVG(MontPrime) AS MoyennePrimes FROM Prime WHERE AnneePrime = 2021;",
+      "expectedRowCount": 1
+    },
+    "fail_message": "Le calcul de la moyenne des primes pour 2021 est erroné.",
+    "indices": [
+      "Appliquez la fonction AVG sur MontPrime avec le filtre AnneePrime = 2021.",
+      "Syntaxe : SELECT AVG(MontPrime) AS MoyennePrimes FROM Prime WHERE AnneePrime = 2021;",
+      "Extrait : AVG(MontPrime)"
+    ]
+  },
+  {
+    "id": "EX22C-12",
+    "code": "EMP-03",
+    "titre": "Exercice N°4 : Total des primes par employé (GROUP BY)",
+    "description": "Requête GROUP BY MatEmp avec SUM(MontPrime) pour totaliser les primes par employé.",
+    "points": 1,
+    "ordre": 12,
+    "fichier": "reponses.sql",
+    "sonde": {
+      "type": "sql_query_result",
+      "query": "SELECT MatEmp, SUM(MontPrime) AS TotalPrimes FROM Prime GROUP BY MatEmp;",
+      "minRowCount": 2
+    },
+    "fail_message": "Le regroupement des primes par matricule d'employé a échoué.",
+    "indices": [
+      "Groupez par MatEmp et calculez la somme des montants avec SUM(MontPrime).",
+      "Syntaxe : SELECT MatEmp, SUM(MontPrime) AS TotalPrimes FROM Prime GROUP BY MatEmp;",
+      "Extrait : GROUP BY MatEmp"
+    ]
+  },
+  {
+    "id": "EX22C-13",
+    "code": "EMP-04",
+    "titre": "Exercice N°4 : Employés recrutés en 2021 triés par date décroissante",
+    "description": "Requête filtrant sur l'année de recrutement 2021 et ordonnant par DateRecrut DESC.",
+    "points": 1,
+    "ordre": 13,
+    "fichier": "reponses.sql",
+    "sonde": {
+      "type": "sql_query_result",
+      "query": "SELECT MatEmp, NomEmp, DateRecrut FROM Employe WHERE DateRecrut >= '2021-01-01' AND DateRecrut <= '2021-12-31' ORDER BY DateRecrut DESC;",
+      "expectedRowCount": 2
+    },
+    "fail_message": "La sélection ou le tri décroissant des employés recrutés en 2021 est incorrect.",
+    "indices": [
+      "Filtrez sur l'année 2021 avec un intervalle ou LIKE '2021%' et triez avec ORDER BY DateRecrut DESC.",
+      "Syntaxe : SELECT MatEmp, NomEmp, DateRecrut FROM Employe WHERE DateRecrut >= '2021-01-01' AND DateRecrut <= '2021-12-31' ORDER BY DateRecrut DESC;",
+      "Extrait : ORDER BY DateRecrut DESC"
+    ]
+  },
+  {
+    "id": "EX22C-14",
+    "code": "EMP-05",
+    "titre": "Exercice N°4 : Augmentation de 10% de la prime 2022 de E01",
+    "description": "Requête UPDATE modifiant le montant de la prime 2022 à 660.000.",
+    "points": 1.5,
+    "ordre": 14,
+    "fichier": "reponses.sql",
+    "sonde": {
+      "type": "sql_query_result",
+      "query": "SELECT * FROM Prime WHERE AnneePrime = 2022 AND MontPrime = 660;",
+      "minRowCount": 1
+    },
+    "fail_message": "La mise à jour de la prime 2022 pour l'employé E01 n'a pas été effectuée.",
+    "indices": [
+      "Exécutez une instruction UPDATE Prime SET MontPrime = 660.000 WHERE AnneePrime = 2022 AND MatEmp = 'E01'.",
+      "Syntaxe : UPDATE Prime SET MontPrime = 660.000 WHERE AnneePrime = 2022 AND MatEmp = 'E01';",
+      "Extrait : UPDATE Prime SET MontPrime = 660.000"
+    ]
+  },
+  {
+    "id": "EX22C-15",
+    "code": "EMP-06",
+    "titre": "Exercice N°4 : Suppression des primes antérieures à 2015",
+    "description": "Requête DELETE FROM Prime supprimant les primes attribuées avant 2015.",
+    "points": 1.5,
+    "ordre": 15,
+    "fichier": "reponses.sql",
+    "sonde": {
+      "type": "sql_query_result",
+      "query": "SELECT * FROM Prime WHERE AnneePrime >= 2015;",
+      "minRowCount": 3
+    },
+    "fail_message": "Les primes antérieures à l'année 2015 n'ont pas été supprimées.",
+    "indices": [
+      "Supprimez les lignes avec la clause WHERE AnneePrime < 2015.",
+      "Syntaxe : DELETE FROM Prime WHERE AnneePrime < 2015;",
+      "Extrait : DELETE FROM Prime WHERE AnneePrime < 2015;"
+    ]
+  }
+]
