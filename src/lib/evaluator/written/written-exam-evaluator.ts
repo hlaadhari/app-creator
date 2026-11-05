@@ -71,6 +71,7 @@ export interface WrittenCodeAnalysisQuestion {
   expectedAnswer?: string;
   expectedRegex?: string;
   keywords?: string[];
+  expectedKeywords?: string[];
   forbiddenKeywords?: string[];
   explanation?: string;
 }
@@ -403,10 +404,16 @@ export function evaluerSql(
     };
   }
 
-  const engine = new RelationalDatabaseEngine();
-  const baseSql = (question.initialSql || initialSql).trim();
+  const activeEngine = new RelationalDatabaseEngine();
+  const baseSql = (
+    question.initialSql && question.initialSql !== initialSql
+      ? initialSql
+        ? `${initialSql};\n${question.initialSql}`
+        : question.initialSql
+      : question.initialSql || initialSql
+  ).trim();
   if (baseSql) {
-    const initRes = engine.executeScript(baseSql);
+    const initRes = activeEngine.executeScript(baseSql);
     if (!initRes.success || initRes.errors.length > 0) {
       return {
         questionId: question.id,
@@ -414,7 +421,7 @@ export function evaluerSql(
         pointsEarned: 0,
         pointsMax,
         isCorrect: false,
-        feedback: `Erreur d'initialisation de la base : ${initRes.errors[0] || engine.getLastError()}`,
+        feedback: `Erreur d'initialisation de la base : ${initRes.errors[0] || activeEngine.getLastError()}`,
         studentAnswer: reponse,
       };
     }
@@ -422,7 +429,7 @@ export function evaluerSql(
 
   if (question.type === "query") {
     // Exécution de la requête de l'élève
-    const res = engine.query(sqlQuery);
+    const res = activeEngine.query(sqlQuery);
     if (res.error) {
       return {
         questionId: question.id,
@@ -481,7 +488,7 @@ export function evaluerSql(
   } else {
     // DDL ou DML (INSERT, UPDATE, DELETE, CREATE, ALTER)
     try {
-      const exec = engine.executeScript(sqlQuery);
+      const exec = activeEngine.executeScript(sqlQuery);
       if (!exec.success || exec.errors.length > 0) {
         return {
           questionId: question.id,
@@ -489,7 +496,7 @@ export function evaluerSql(
           pointsEarned: 0,
           pointsMax,
           isCorrect: false,
-          feedback: `Erreur d'exécution de la requête DDL/DML : ${exec.errors[0] || engine.getLastError()}`,
+          feedback: `Erreur d'exécution de la requête DDL/DML : ${exec.errors[0] || activeEngine.getLastError()}`,
           studentAnswer: reponse,
         };
       }
@@ -508,7 +515,7 @@ export function evaluerSql(
     // Vérification de l'état des tables
     if (question.expectedTableRows) {
       const exp = question.expectedTableRows;
-      const rows = engine.getTableRows(exp.table);
+      const rows = activeEngine.getTableRows(exp.table);
       if (exp.minCount !== undefined && rows.length < exp.minCount) {
         return {
           questionId: question.id,
@@ -566,7 +573,7 @@ export function evaluerSql(
 
     // Exécution d'une requête de contrôle personnalisée si spécifiée
     if (question.verificationSql) {
-      const verifRes = engine.query(question.verificationSql);
+      const verifRes = activeEngine.query(question.verificationSql);
       if (verifRes.error) {
         return {
           questionId: question.id,
@@ -647,8 +654,9 @@ export function evaluerCodeAnalysis(
   }
 
   // Mots-clés obligatoires
-  if (question.keywords && question.keywords.length > 0) {
-    const manque = question.keywords.find((kw) => !new RegExp(kw, "i").test(repStr));
+  const kws = question.keywords || question.expectedKeywords;
+  if (kws && kws.length > 0) {
+    const manque = kws.find((kw) => !new RegExp(kw, "i").test(repStr));
     if (manque) {
       return {
         questionId: question.id,
@@ -723,7 +731,15 @@ export async function evaluerCopieEcrite(
           itemRes = evaluerQcm(q as WrittenQcmQuestion, ans, section.id);
           break;
         case "modeling":
-          itemRes = evaluerModeling(q as WrittenModelingQuestion, ans, section.id, sharedEngine);
+          if ((q as { type?: string }).type === "code_analysis") {
+            itemRes = evaluerCodeAnalysis(
+              q as unknown as WrittenCodeAnalysisQuestion,
+              ans,
+              section.id,
+            );
+          } else {
+            itemRes = evaluerModeling(q as WrittenModelingQuestion, ans, section.id, sharedEngine);
+          }
           break;
         case "sql":
           if ((q as { type?: string }).type === "representation") {
@@ -732,6 +748,12 @@ export async function evaluerCopieEcrite(
               ans,
               section.id,
               sharedEngine,
+            );
+          } else if ((q as { type?: string }).type === "code_analysis") {
+            itemRes = evaluerCodeAnalysis(
+              q as unknown as WrittenCodeAnalysisQuestion,
+              ans,
+              section.id,
             );
           } else {
             itemRes = evaluerSql(q as WrittenSqlQuestion, ans, section.id, baseSql || "");

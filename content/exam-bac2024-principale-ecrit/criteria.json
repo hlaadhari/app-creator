@@ -1,0 +1,142 @@
+[
+  {
+    "id": "EX24P-01",
+    "code": "QCM-01",
+    "titre": "Exercice N°1 : QCM Notions Web & Programmation",
+    "description": "Validation des concepts fondamentaux : attributs HTML, transtypage PHP, cardinalité de tableau, sélecteurs CSS3, transformations 2D, concaténation JS, objets Date et parseFloat.",
+    "points": 2,
+    "ordre": 1,
+    "fichier": "reponses.sql",
+    "sonde": {
+      "type": "sql_query_result",
+      "query": "SELECT 1;",
+      "expectedRowCount": 1
+    },
+    "fail_message": "Certaines réponses aux questions théoriques de l'Exercice N°1 sont inexactes.",
+    "indices": [
+      "Revoyez la signification des attributs HTML (href), le transtypage entier en PHP ((int)), la fonction count() et les sélecteurs d'identifiant CSS (#cercle).",
+      "Syntaxe : transform: rotate(45deg), alert('1' + '2'), getFullYear(), parseFloat('12.5').",
+      "Extrait : un attribut, 2, count, sélecteur, transform rotate, 12, getFullYear, 12.5."
+    ]
+  },
+  {
+    "id": "EX24P-02",
+    "code": "HIPPIQUE-VF-CI",
+    "titre": "Exercice N°2 (Partie 1) : Modèle Relationnel & Contraintes d'Intégrité",
+    "description": "Validation des assertions Vrai/Faux sur le schéma HippieTeams et identification des contraintes d'intégrité (référentielle, domaine, clé primaire).",
+    "points": 4,
+    "ordre": 2,
+    "fichier": "reponses.sql",
+    "sonde": {
+      "type": "sql_query_result",
+      "query": "SELECT 1;",
+      "expectedRowCount": 1
+    },
+    "fail_message": "Erreurs dans l'analyse des cardinalités ou dans la formulation des contraintes d'intégrité.",
+    "indices": [
+      "Analysez les cardinalités du modèle conceptuel : un propriétaire possède plusieurs chevaux, une course appartient à une seule compétition.",
+      "Identifiez les contraintes : intégrité référentielle sur idProp, domaine sur rang (rang > 0), clé primaire composite sur (idCourse, idCheval).",
+      "Extrait : Vrai/Faux (V, F, F, F, V), contrainte référentielle, rang strictement positif, clé primaire."
+    ]
+  },
+  {
+    "id": "EX24P-03",
+    "code": "HIPPIQUE-EXT",
+    "titre": "Exercice N°2 (Partie 2) : Extension & Évolution du Schéma Relationnel",
+    "description": "Représentations textuelles normalisées pour la gestion de la copropriété de chevaux (relation N:M) et de l'intégrité temporelle des courses.",
+    "points": 1,
+    "ordre": 3,
+    "fichier": "reponses.sql",
+    "sonde": {
+      "type": "sql_query_result",
+      "query": "SELECT 1;",
+      "expectedRowCount": 1
+    },
+    "fail_message": "La modélisation de la copropriété ou la gestion des horaires de courses ne respecte pas les règles imposées.",
+    "indices": [
+      "La copropriété impose une table d'association Copropriete(#idCheval, #idProp, dateProp).",
+      "Pour que les courses d'une même compétition aient des horaires distincts, (idComp#, heureCourse) doit former une clé unique.",
+      "Extrait : Copropriete(#idCheval, #idProp, dateProp), Course(#idCourse, heureCourse, distance, #idComp)."
+    ]
+  },
+  {
+    "id": "EX24P-04",
+    "code": "BARRAGE-INTERPRETATION",
+    "titre": "Exercice N°3 (Partie 1 - I) : Interprétation de Requêtes & Sous-requêtes SQL",
+    "description": "Interprétation du résultat et du rôle de la requête imbriquée avec clause IN et réécriture équivalente avec jointure.",
+    "points": 1.5,
+    "ordre": 4,
+    "fichier": "reponses.sql",
+    "sonde": {
+      "type": "sql_query_result",
+      "query": "SELECT 1;",
+      "expectedRowCount": 1
+    },
+    "fail_message": "L'interprétation de la sous-requête IN ou sa réécriture avec jointure est incorrecte.",
+    "indices": [
+      "La sous-requête sélectionne les idVan des capteurs commençant par 'D' : 102 et 103.",
+      "La requête principale retourne (102, 0) et (103, 1).",
+      "Réécriture : SELECT DISTINCT V.idVan, etatVan FROM Vanne V, Capteur C WHERE V.idVan = C.idVan AND refCapt LIKE 'D%';."
+    ]
+  },
+  {
+    "id": "EX24P-05",
+    "code": "BARRAGE-SQL-LID",
+    "titre": "Exercice N°3 (Partie 1 - II-A) : Requêtes d'Interrogation SQL (LID)",
+    "description": "Rédaction des requêtes d'interrogation LID : vannes ouvertes, alertes critiques, comptage par barrage, détection de risque de crue et capteurs par date maximale.",
+    "points": 3,
+    "ordre": 5,
+    "fichier": "reponses.sql",
+    "sonde": {
+      "type": "sql_query_result",
+      "query": "SELECT 1;",
+      "expectedRowCount": 1
+    },
+    "fail_message": "Certaines requêtes SQL d'interrogation produisent des résultats discordants sur le jeu de test.",
+    "indices": [
+      "Crue : SELECT DISTINCT B.idBar, nomBar FROM Barrage B, NiveauEau N WHERE B.idBar = N.idBar AND niveau > 0.9 * hauteur AND YEAR(dateNiv) = 2024;",
+      "Dernière mesure : GROUP BY idCapt, refCapt HAVING MAX(dateMes) < '2024-02-15';",
+      "Jointure critique : WHERE C.idCapt = M.idCapt AND M.idMes = A.idMes AND degAlert = 3 AND statAlert != 'R'."
+    ]
+  },
+  {
+    "id": "EX24P-06",
+    "code": "BARRAGE-SQL-LDD-LMD",
+    "titre": "Exercice N°3 (Partie 1 - II-B) : Requêtes LDD / LMD & Contraintes",
+    "description": "Rédaction des requêtes de suppression DELETE, mise à jour UPDATE, création de table CREATE TABLE Categorie et ajout de contraintes CHECK et FOREIGN KEY.",
+    "points": 3,
+    "ordre": 6,
+    "fichier": "reponses.sql",
+    "sonde": {
+      "type": "sql_query_result",
+      "query": "SELECT 1;",
+      "expectedRowCount": 1
+    },
+    "fail_message": "Certaines instructions SQL de mise à jour (LMD) ou de définition (LDD) sont invalides.",
+    "indices": [
+      "Suppression : DELETE FROM Alerte WHERE statAlert = 'R';",
+      "Mise à jour : UPDATE Mesure SET valMes = valMes - 2 WHERE idCapt = 4 AND dateMes BETWEEN '2024-01-29' AND '2024-02-02';",
+      "Contrainte CHECK : ALTER TABLE Categorie ADD CONSTRAINT chk_nomCat CHECK (nomCat IN ('débit', 'pression', 'température'));"
+    ]
+  },
+  {
+    "id": "EX24P-07",
+    "code": "BARRAGE-WEB",
+    "titre": "Exercice N°3 (Partie 2) : Cartographie Interactive & Scripts Web",
+    "description": "Analyse du code HTML5 (événements, attributs), CSS3 (pastilles circulaires, positionnement), JavaScript (portée, indexOf, substr, DOM) et PHP serveur (require, str_replace, or die, mysqli_fetch_array).",
+    "points": 5.5,
+    "ordre": 7,
+    "fichier": "reponses.sql",
+    "sonde": {
+      "type": "sql_query_result",
+      "query": "SELECT 1;",
+      "expectedRowCount": 1
+    },
+    "fail_message": "Erreurs dans les réponses d'analyse de code HTML, CSS, JavaScript ou PHP.",
+    "indices": [
+      "HTML/CSS : onload, onmouseover, target='_blank', hidden, display: inline-block, border-radius: 50%, font-weight: bold.",
+      "JS : portée locale, recherche du dièse (indexOf), extraction substr(), innerHTML.",
+      "PHP : require bloque avec erreur fatale, str_replace('_', ' ', ...), die affiche l'erreur, mysqli_fetch_array fournit indices numériques et associatifs."
+    ]
+  }
+]

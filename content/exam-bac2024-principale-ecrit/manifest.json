@@ -1,0 +1,518 @@
+{
+  "id": "exam-bac2024-principale-ecrit",
+  "title": "Bac 2024 (Session Principale) - Épreuve Écrite Systèmes & Technologies de l'Informatique",
+  "referentiel_id": "bac-si-tn",
+  "type_sujet": "annale_officielle",
+  "source_reference": "Ministère de l'Éducation — Tunisie",
+  "statut_validation": "valide_pedagogiquement",
+  "session_annee": 2024,
+  "session_libelle": "Session principale",
+  "category": "Module C - Épreuves Écrites",
+  "exam_type": "written",
+  "session_type": "principale",
+  "year": 2024,
+  "duration": 180,
+  "level": "Difficile",
+  "exam_mode": true,
+  "bareme_total": 20,
+  "tags": [
+    "QCM Web & Programmation",
+    "BDR Hippique",
+    "Gestion_Barrage",
+    "Smart Water",
+    "Console SQL WASM",
+    "Sous-requêtes IN",
+    "Détection de Crue",
+    "Cartographie Web",
+    "DOM & Manipulation Chaînes"
+  ],
+  "initialSql": "CREATE TABLE IF NOT EXISTS `Barrage` (`idBar` INT PRIMARY KEY, `nomBar` VARCHAR(40) NOT NULL, `volume` DECIMAL(10,2) NOT NULL, `hauteur` DECIMAL(6,2) NOT NULL, `superficie` DECIMAL(8,2) NOT NULL); CREATE TABLE IF NOT EXISTS `NiveauEau` (`dateNiv` DATETIME NOT NULL, `idBar` INT NOT NULL, `niveau` DECIMAL(6,2) NOT NULL, PRIMARY KEY (`dateNiv`, `idBar`), FOREIGN KEY (`idBar`) REFERENCES `Barrage`(`idBar`) ON UPDATE CASCADE ON DELETE CASCADE); CREATE TABLE IF NOT EXISTS `Vanne` (`idVan` INT PRIMARY KEY, `etatVan` TINYINT(1) NOT NULL DEFAULT 0, `idBar` INT, FOREIGN KEY (`idBar`) REFERENCES `Barrage`(`idBar`) ON UPDATE CASCADE ON DELETE CASCADE); CREATE TABLE IF NOT EXISTS `Capteur` (`idCapt` INT PRIMARY KEY, `refCapt` VARCHAR(30) NOT NULL UNIQUE, `idVan` INT, FOREIGN KEY (`idVan`) REFERENCES `Vanne`(`idVan`) ON UPDATE CASCADE ON DELETE CASCADE); CREATE TABLE IF NOT EXISTS `Mesure` (`idMes` INT PRIMARY KEY, `valMes` DECIMAL(8,2) NOT NULL, `dateMes` DATETIME NOT NULL, `idCapt` INT, FOREIGN KEY (`idCapt`) REFERENCES `Capteur`(`idCapt`) ON UPDATE CASCADE ON DELETE CASCADE); CREATE TABLE IF NOT EXISTS `Alerte` (`idAlert` INT PRIMARY KEY, `degAlert` INT NOT NULL CHECK (`degAlert` IN (1, 2, 3)), `statAlert` CHAR(1) NOT NULL, `idMes` INT, FOREIGN KEY (`idMes`) REFERENCES `Mesure`(`idMes`) ON UPDATE CASCADE ON DELETE CASCADE); INSERT INTO `Barrage` VALUES (1, 'Sidi Salem', 555.00, 57.00, 4300.00), (2, 'Bou Heurtma', 112.00, 42.00, 850.00), (3, 'Joumine', 118.00, 38.00, 780.00), (5, 'Sejnane', 134.00, 45.00, 1100.00); INSERT INTO `NiveauEau` VALUES ('2024-05-10 08:00:00', 1, 52.50), ('2024-05-12 09:30:00', 2, 25.00), ('2024-05-15 11:00:00', 5, 41.50); INSERT INTO `Vanne` VALUES (101, 1, 1), (102, 0, 2), (103, 1, 1), (104, 0, 3), (105, 1, 5), (106, 0, 5); INSERT INTO `Capteur` VALUES (1, 'CapteurDeFlux-500', 101), (2, 'AquaSense-2000', 102), (3, 'DeltaNiveau-2000', 103), (4, 'SmartFlowMeter-600', 104), (5, 'DébitMètre-800', 102); INSERT INTO `Mesure` VALUES (1, 14.50, '2024-01-30 08:00:00', 4), (2, 16.00, '2024-02-01 12:00:00', 4), (3, 8.20, '2024-02-10 10:15:00', 1), (4, 25.00, '2024-03-01 09:00:00', 3); INSERT INTO `Alerte` VALUES (10, 3, 'A', 3), (11, 1, 'R', 1), (12, 2, 'E', 2);",
+  "sections": [
+    {
+      "id": "exercice-1-qcm",
+      "title": "Exercice N°1 : QCM Notions Web & Programmation (2 pts)",
+      "type": "qcm",
+      "description": "Pour chaque question, cochez l'unique bonne réponse parmi les propositions fournies.",
+      "points": 2,
+      "questions": [
+        {
+          "id": "EX1-Q1",
+          "question": "1. En HTML, quelle est la signification du mot href dans l'exemple <a href=\"http://www.programming.info\"> Suivez le lien </a> ?",
+          "options": [
+            { "id": "opt-attribut", "label": "Un attribut" },
+            { "id": "opt-valeur", "label": "Une valeur" },
+            { "id": "opt-element", "label": "Un élément" }
+          ],
+          "points": 0.25,
+          "multiple": false,
+          "correctAnswers": ["opt-attribut"],
+          "explanation": "href est un attribut de la balise HTML <a>."
+        },
+        {
+          "id": "EX1-Q2",
+          "question": "2. En PHP, quelle sera la valeur de la variable $X après exécution de l'instruction $X = (int)2.99; ?",
+          "options": [
+            { "id": "opt-null", "label": "NULL" },
+            { "id": "opt-2", "label": "2" },
+            { "id": "opt-3", "label": "3" }
+          ],
+          "points": 0.25,
+          "multiple": false,
+          "correctAnswers": ["opt-2"],
+          "explanation": "Le transtypage explicite (int) tronque la partie décimale sans arrondi, donnant 2."
+        },
+        {
+          "id": "EX1-Q3",
+          "question": "3. En PHP, quelle est l'instruction qui permet d'afficher le nombre d'éléments d'un tableau d'entiers nommé $A ?",
+          "options": [
+            { "id": "opt-count", "label": "echo(count($A));" },
+            { "id": "opt-num-rows", "label": "echo(num_rows($A));" },
+            { "id": "opt-array", "label": "echo(array($A));" }
+          ],
+          "points": 0.25,
+          "multiple": false,
+          "correctAnswers": ["opt-count"],
+          "explanation": "count($A) retourne le nombre d'éléments dans un tableau PHP."
+        },
+        {
+          "id": "EX1-Q4",
+          "question": "4. En CSS, que représente #cercle dans la règle #cercle { color: green; } ?",
+          "options": [
+            { "id": "opt-propriete", "label": "une propriété" },
+            { "id": "opt-valeur", "label": "une valeur" },
+            { "id": "opt-selecteur", "label": "un sélecteur" }
+          ],
+          "points": 0.25,
+          "multiple": false,
+          "correctAnswers": ["opt-selecteur"],
+          "explanation": "#cercle est un sélecteur d'identifiant en CSS."
+        },
+        {
+          "id": "EX1-Q5",
+          "question": "5. En CSS, quelle est la déclaration qui permet de faire pivoter un élément de 45 degrés ?",
+          "options": [
+            { "id": "opt-translate", "label": "translate : rotate(45deg);" },
+            { "id": "opt-transform", "label": "transform : rotate(45deg);" },
+            { "id": "opt-rotate", "label": "rotate : transform(45deg);" }
+          ],
+          "points": 0.25,
+          "multiple": false,
+          "correctAnswers": ["opt-transform"],
+          "explanation": "La propriété CSS3 est transform avec la fonction rotate(45deg)."
+        },
+        {
+          "id": "EX1-Q6",
+          "question": "6. En JavaScript, qu'affiche l'instruction alert(\"1\" + \"2\") ?",
+          "options": [
+            { "id": "opt-3", "label": "3" },
+            { "id": "opt-12", "label": "12" },
+            { "id": "opt-err", "label": "erreur" }
+          ],
+          "points": 0.25,
+          "multiple": false,
+          "correctAnswers": ["opt-12"],
+          "explanation": "L'opérateur + concatène les deux chaînes de caractères, produisant '12'."
+        },
+        {
+          "id": "EX1-Q7",
+          "question": "7. En JavaScript, quelle est l'instruction qui permet d'afficher l'année sur 4 chiffres d'un objet D de type Date ?",
+          "options": [
+            { "id": "opt-getdate", "label": "alert(D.getDate())" },
+            { "id": "opt-setfullyear", "label": "alert(D.setFullYear())" },
+            { "id": "opt-getfullyear", "label": "alert(D.getFullYear())" }
+          ],
+          "points": 0.25,
+          "multiple": false,
+          "correctAnswers": ["opt-getfullyear"],
+          "explanation": "getFullYear() retourne l'année à 4 chiffres d'une date en JavaScript."
+        },
+        {
+          "id": "EX1-Q8",
+          "question": "8. En JavaScript, que renvoie parseFloat(\"12.5\") ?",
+          "options": [
+            { "id": "opt-12", "label": "12" },
+            { "id": "opt-12_5", "label": "12.5" },
+            { "id": "opt-nan", "label": "NaN" }
+          ],
+          "points": 0.25,
+          "multiple": false,
+          "correctAnswers": ["opt-12_5"],
+          "explanation": "parseFloat('12.5') convertit la chaîne en nombre décimal 12.5."
+        }
+      ]
+    },
+    {
+      "id": "exercice-2-hippique",
+      "title": "Exercice N°2 : Base HippieTeams — Courses Hippiques (5 pts)",
+      "type": "modeling",
+      "description": "Analysez le modèle relationnel, spécifiez les contraintes d'intégrité et proposez les extensions demandées.",
+      "points": 5,
+      "questions": [
+        {
+          "id": "EX2-VF-A",
+          "prompt": "1.a. Un propriétaire peut posséder plusieurs chevaux.",
+          "points": 0.5,
+          "type": "code_analysis",
+          "expectedAnswer": "Vrai",
+          "expectedRegex": "^(Vrai|V|True)$",
+          "explanation": "La cardinalité Propriétaire 1 - ∞ Cheval permet à un propriétaire d'avoir plusieurs chevaux."
+        },
+        {
+          "id": "EX2-VF-B",
+          "prompt": "1.b. Une course peut être associée à plusieurs compétitions.",
+          "points": 0.5,
+          "type": "code_analysis",
+          "expectedAnswer": "Faux",
+          "expectedRegex": "^(Faux|F|False)$",
+          "explanation": "Une course est associée à une seule compétition (clé étrangère idComp# dans Course)."
+        },
+        {
+          "id": "EX2-VF-C",
+          "prompt": "1.c. Les courses d'une compétition peuvent se dérouler à des dates différentes.",
+          "points": 0.5,
+          "type": "code_analysis",
+          "expectedAnswer": "Faux",
+          "expectedRegex": "^(Faux|F|False)$",
+          "explanation": "La date est un attribut de Competition, toutes les courses d'une compétition ont lieu le même jour."
+        },
+        {
+          "id": "EX2-VF-D",
+          "prompt": "1.d. Un cheval participe uniquement à une seule compétition.",
+          "points": 0.5,
+          "type": "code_analysis",
+          "expectedAnswer": "Faux",
+          "expectedRegex": "^(Faux|F|False)$",
+          "explanation": "Un cheval peut participer à plusieurs courses (relation N:M Resultat), donc à plusieurs compétitions."
+        },
+        {
+          "id": "EX2-VF-E",
+          "prompt": "1.e. Le rang d'un cheval, enregistré dans la table Resultat, correspond à son classement dans une course.",
+          "points": 0.5,
+          "type": "code_analysis",
+          "expectedAnswer": "Vrai",
+          "expectedRegex": "^(Vrai|V|True)$",
+          "explanation": "Le rang correspond bien au classement du cheval dans la course spécifiée."
+        },
+        {
+          "id": "EX2-CI-A",
+          "prompt": "2.a. Donnez le type de contrainte d'intégrité et le champ concerné qui garantit que chaque cheval est associé à un propriétaire.",
+          "points": 0.5,
+          "type": "code_analysis",
+          "expectedKeywords": ["référentielle", "idProp"],
+          "expectedAnswer": "Contrainte d'intégrité référentielle (idProp)",
+          "explanation": "Contrainte d'intégrité référentielle sur la clé étrangère idProp dans Cheval."
+        },
+        {
+          "id": "EX2-CI-B",
+          "prompt": "2.b. Donnez la description de la contrainte de domaine appliquée sur le champ rang de la table Resultat.",
+          "points": 0.5,
+          "type": "code_analysis",
+          "expectedKeywords": ["positif", "rang"],
+          "expectedAnswer": "Contrainte qui garantit que le rang est un entier strictement positif (rang > 0)",
+          "explanation": "Le rang doit être un entier strictement positif (CHECK rang > 0)."
+        },
+        {
+          "id": "EX2-CI-C",
+          "prompt": "2.c. Donnez le type de contrainte d'intégrité et le champ concerné qui garantit qu'un cheval ne peut avoir qu'un seul résultat par course.",
+          "points": 0.5,
+          "type": "code_analysis",
+          "expectedKeywords": ["primaire", "idCourse", "idCheval"],
+          "expectedAnswer": "Contrainte d'intégrité de clé primaire composite (idCourse, idCheval)",
+          "explanation": "Contrainte d'intégrité de clé primaire composite sur (idCourse, idCheval) dans Resultat."
+        },
+        {
+          "id": "EX2-EXT-1",
+          "prompt": "3. Proposez une représentation textuelle des tables Proprietaire, Cheval et de toute nouvelle table indispensable pour gérer la copropriété de chevaux à une date donnée.",
+          "points": 0.5,
+          "type": "representation",
+          "expectedKeywords": [
+            "Proprietaire",
+            "Cheval",
+            "Copropriete",
+            "idCheval",
+            "idProp",
+            "dateProp"
+          ],
+          "explanation": "Proprietaire(#idProp, nomProp, telProp), Cheval(#idCheval, nomCheval), Copropriete(#idCheval, #idProp, dateProp)."
+        },
+        {
+          "id": "EX2-EXT-2",
+          "prompt": "4. Proposez une représentation textuelle des tables Course et Resultat permettant de faire respecter la règle R (les courses d'une même compétition commencent à des horaires différents).",
+          "points": 0.5,
+          "type": "representation",
+          "expectedKeywords": ["Course", "idComp", "heureCourse"],
+          "explanation": "Course(#idCourse, heureCourse, distance, #idComp) avec clé alternative (#idComp, heureCourse) ou clé primaire composite."
+        }
+      ]
+    },
+    {
+      "id": "exercice-3-bdd-barrage",
+      "title": "Exercice N°3 (Partie 1) : Base « Gestion_Barrage » (Smart Water) - Exploitation SQL (7.5 pts)",
+      "type": "sql",
+      "description": "Analysez et rédigez les requêtes SQL sur la base Gestion_Barrage (vannes, capteurs, alertes, crues).",
+      "points": 7.5,
+      "questions": [
+        {
+          "id": "EX3-BDD-R1",
+          "prompt": "I.1. Donnez le résultat de l'exécution de la requête R : SELECT idVan, etatVan FROM Vanne WHERE idVan IN (SELECT idVan FROM Capteur WHERE refCapt LIKE 'D%');",
+          "points": 0.5,
+          "type": "code_analysis",
+          "expectedKeywords": ["102", "103"],
+          "expectedAnswer": "(102, 0) et (103, 1)",
+          "explanation": "Les capteurs commençant par 'D' sont DeltaNiveau-2000 (idVan=103, etatVan=1) et DébitMètre-800 (idVan=102, etatVan=0)."
+        },
+        {
+          "id": "EX3-BDD-R2",
+          "prompt": "I.2. En déduire le rôle de la requête R.",
+          "points": 0.5,
+          "type": "code_analysis",
+          "expectedKeywords": ["vanne", "capteur", "D"],
+          "expectedAnswer": "Afficher l'identifiant et l'état des vannes associées aux capteurs dont la référence commence par la lettre D.",
+          "explanation": "Affiche idVan et etatVan des vannes équipées d'un capteur dont refCapt commence par 'D'."
+        },
+        {
+          "id": "EX3-BDD-R3",
+          "prompt": "I.3. Donnez une requête SQL équivalente à la requête R, sans utiliser l'opérateur IN.",
+          "points": 0.5,
+          "type": "query",
+          "expectedQuery": "SELECT DISTINCT V.idVan, etatVan FROM Vanne V, Capteur C WHERE V.idVan = C.idVan AND refCapt LIKE 'D%';",
+          "explanation": "SELECT DISTINCT V.idVan, etatVan FROM Vanne V JOIN Capteur C ON V.idVan = C.idVan WHERE refCapt LIKE 'D%';"
+        },
+        {
+          "id": "EX3-SQL-LID-1",
+          "prompt": "II-A.1. Quelles sont les vannes ouvertes du barrage d'identifiant 5 ? On affichera le champ idVan.",
+          "points": 0.6,
+          "type": "query",
+          "expectedQuery": "SELECT idVan FROM Vanne WHERE idBar = 5 AND etatVan = 1;",
+          "explanation": "SELECT idVan FROM Vanne WHERE idBar = 5 AND etatVan = 1;"
+        },
+        {
+          "id": "EX3-SQL-LID-2",
+          "prompt": "II-A.2. Quels sont les capteurs qui ont généré des alertes ayant un degré critique et dont le statut est non résolu ? On affichera les champs idCapt et refCapt.",
+          "points": 0.6,
+          "type": "query",
+          "expectedQuery": "SELECT DISTINCT C.idCapt, refCapt FROM Capteur C, Mesure M, Alerte A WHERE C.idCapt = M.idCapt AND M.idMes = A.idMes AND degAlert = 3 AND statAlert != 'R';",
+          "explanation": "Jointure triple Capteur-Mesure-Alerte avec degAlert = 3 et statAlert != 'R'."
+        },
+        {
+          "id": "EX3-SQL-LID-3",
+          "prompt": "II-A.3. Quel est le nombre de vannes par barrage ? On affichera les champs idBar, nomBar ainsi que le nombre de vannes.",
+          "points": 0.6,
+          "type": "query",
+          "expectedQuery": "SELECT B.idBar, nomBar, COUNT(idVan) AS nbVannes FROM Barrage B LEFT JOIN Vanne V ON B.idBar = V.idBar GROUP BY B.idBar, nomBar;",
+          "explanation": "SELECT B.idBar, nomBar, COUNT(idVan) FROM Barrage B LEFT JOIN Vanne V ON B.idBar = V.idBar GROUP BY B.idBar, nomBar;"
+        },
+        {
+          "id": "EX3-SQL-LID-4",
+          "prompt": "II-A.4. Quels sont les barrages susceptibles de subir une crue (niveau d'eau supérieur à 90% de la hauteur du barrage), pendant le mois en cours de l'année 2024 ? On affichera, sans répétition, les champs idBar et nomBar.",
+          "points": 0.6,
+          "type": "query",
+          "expectedQuery": "SELECT DISTINCT B.idBar, nomBar FROM Barrage B, NiveauEau N WHERE B.idBar = N.idBar AND niveau > 0.9 * hauteur AND YEAR(dateNiv) = 2024;",
+          "explanation": "SELECT DISTINCT B.idBar, nomBar FROM Barrage B JOIN NiveauEau N ON B.idBar = N.idBar WHERE niveau > 0.9 * hauteur AND YEAR(dateNiv) = 2024;"
+        },
+        {
+          "id": "EX3-SQL-LID-5",
+          "prompt": "II-A.5. Quels sont les capteurs dont la dernière date de mesure est effectuée avant le 15 février 2024 ? On affichera les champs idCapt, refCapt et la dernière date de mesure effectuée.",
+          "points": 0.6,
+          "type": "query",
+          "expectedQuery": "SELECT C.idCapt, refCapt, MAX(dateMes) FROM Capteur C, Mesure M WHERE C.idCapt = M.idCapt GROUP BY C.idCapt, refCapt HAVING MAX(dateMes) < '2024-02-15';",
+          "explanation": "SELECT C.idCapt, refCapt, MAX(dateMes) FROM Capteur C JOIN Mesure M USING(idCapt) GROUP BY C.idCapt, refCapt HAVING MAX(dateMes) < '2024-02-15';"
+        },
+        {
+          "id": "EX3-SQL-LMD-1",
+          "prompt": "II-B.1. Pour alléger la base de données, on se propose de supprimer les alertes dont le statut est 'R'.",
+          "points": 0.6,
+          "type": "dml",
+          "expectedKeywords": ["DELETE", "FROM", "Alerte", "statAlert", "'R'"],
+          "explanation": "DELETE FROM Alerte WHERE statAlert = 'R';"
+        },
+        {
+          "id": "EX3-SQL-LMD-2",
+          "prompt": "II-B.2. En raison d'un dysfonctionnement du capteur d'identifiant 4, on se propose de diminuer de 2 unités les mesures enregistrées entre le 29 janvier 2024 et le 02 février 2024.",
+          "points": 0.6,
+          "type": "dml",
+          "expectedKeywords": ["UPDATE", "Mesure", "valMes", "valMes - 2", "idCapt = 4", "BETWEEN"],
+          "explanation": "UPDATE Mesure SET valMes = valMes - 2 WHERE idCapt = 4 AND dateMes BETWEEN '2024-01-29' AND '2024-02-02';"
+        },
+        {
+          "id": "EX3-SQL-LDD-3",
+          "prompt": "II-B.3. Pour classer les capteurs selon leurs catégories, on se propose d'ajouter une nouvelle table nommée Categorie (idCat INT Clé primaire, nomCat VARCHAR(50)).",
+          "points": 0.6,
+          "type": "ddl",
+          "expectedKeywords": ["CREATE TABLE", "Categorie", "idCat", "nomCat"],
+          "explanation": "CREATE TABLE Categorie (idCat INT PRIMARY KEY, nomCat VARCHAR(50));"
+        },
+        {
+          "id": "EX3-SQL-LDD-4",
+          "prompt": "II-B.4. On se propose de restreindre les valeurs permises pour le champ nomCat de la table Categorie aux valeurs suivantes : 'débit', 'pression' et 'température'.",
+          "points": 0.6,
+          "type": "ddl",
+          "initialSql": "CREATE TABLE IF NOT EXISTS Categorie (idCat INT PRIMARY KEY, nomCat VARCHAR(50));",
+          "expectedKeywords": [
+            "ALTER TABLE",
+            "Categorie",
+            "CHECK",
+            "nomCat",
+            "débit",
+            "pression",
+            "température"
+          ],
+          "explanation": "ALTER TABLE Categorie ADD CONSTRAINT chk_nomCat CHECK (nomCat IN ('débit', 'pression', 'température'));"
+        },
+        {
+          "id": "EX3-SQL-LDD-5",
+          "prompt": "II-B.5. On se propose d'établir la relation entre les tables Capteur et Categorie en ajoutant le champ idCat comme clé étrangère dans la table Capteur.",
+          "points": 0.6,
+          "type": "ddl",
+          "initialSql": "CREATE TABLE IF NOT EXISTS Categorie (idCat INT PRIMARY KEY, nomCat VARCHAR(50));",
+          "expectedKeywords": [
+            "ALTER TABLE",
+            "Capteur",
+            "FOREIGN KEY",
+            "idCat",
+            "REFERENCES",
+            "Categorie"
+          ],
+          "explanation": "ALTER TABLE Capteur ADD idCat INT; ALTER TABLE Capteur ADD FOREIGN KEY (idCat) REFERENCES Categorie(idCat);"
+        }
+      ]
+    },
+    {
+      "id": "exercice-3-web-barrage",
+      "title": "Exercice N°3 (Partie 2) : Cartographie Interactive & Programmation Web (5.5 pts)",
+      "type": "code_analysis",
+      "description": "Analysez et complétez les extraits de code HTML5, CSS3, JavaScript et PHP du site de cartographie des barrages.",
+      "points": 5.5,
+      "questions": [
+        {
+          "id": "EX3-WEB-HTML-1",
+          "prompt": "I.1. À la ligne N° 9, par quel événement remplacer onclick pour que la fonction demarrage() soit appelée dès le chargement de la page ?",
+          "points": 0.3,
+          "expectedAnswer": "onload",
+          "expectedRegex": "^(onload|window\\.onload)$",
+          "explanation": "L'événement de chargement est onload."
+        },
+        {
+          "id": "EX3-WEB-HTML-2",
+          "prompt": "I.2. À la ligne N° 11, que représente le terme img de l'attribut src=\"img/tunisie.bmp\" ?",
+          "points": 0.3,
+          "expectedKeywords": ["dossier", "répertoire"],
+          "expectedAnswer": "Un sous-dossier (ou répertoire) contenant les images.",
+          "explanation": "img désigne le répertoire (dossier) dans lequel se trouve l'image tunisie.bmp."
+        },
+        {
+          "id": "EX3-WEB-HTML-3",
+          "prompt": "I.3. Quand se déclenche l'appel de la fonction barrage(1) figurant à la ligne N° 12 ?",
+          "points": 0.3,
+          "expectedKeywords": ["survol", "souris"],
+          "expectedAnswer": "Au survol du pointeur de la souris sur l'élément div b1 (onmouseover).",
+          "explanation": "L'attribut onmouseover déclenche la fonction dès que le pointeur de la souris survole la zone."
+        },
+        {
+          "id": "EX3-WEB-HTML-4",
+          "prompt": "I.4. À la ligne N° 16, quel est le rôle de l'expression target=\"_blank\" ?",
+          "points": 0.3,
+          "expectedKeywords": ["onglet", "fenêtre"],
+          "expectedAnswer": "Ouvrir la page cible dans un nouvel onglet ou une nouvelle fenêtre.",
+          "explanation": "target='_blank' charge le résultat dans un nouvel onglet de navigation."
+        },
+        {
+          "id": "EX3-WEB-HTML-5",
+          "prompt": "I.5. À la ligne N° 17, quel est le rôle de l'attribut hidden ?",
+          "points": 0.3,
+          "expectedKeywords": ["masquer", "invisible"],
+          "expectedAnswer": "Masquer l'élément de formulaire à l'affichage.",
+          "explanation": "L'attribut booléen hidden rend le champ invisible pour l'utilisateur."
+        },
+        {
+          "id": "EX3-WEB-CSS-1",
+          "prompt": "II.1. Dans mesStyles.css, quelle est la valeur permettant d'afficher les éléments de la classe carte conformément à leurs positions spécifiées ?",
+          "points": 0.33,
+          "expectedAnswer": "inline-block",
+          "expectedRegex": "^(inline-block|relative)$",
+          "explanation": "display: inline-block permet de respecter le flux et le positionnement."
+        },
+        {
+          "id": "EX3-WEB-CSS-2",
+          "prompt": "II.2. Dans mesStyles.css, quelle est la déclaration permettant d'afficher les boîtes de la classe zone sous forme circulaire ?",
+          "points": 0.33,
+          "expectedKeywords": ["border-radius", "50%"],
+          "expectedAnswer": "border-radius : 50%",
+          "explanation": "border-radius: 50% transforme une boîte carrée en cercle parfait."
+        },
+        {
+          "id": "EX3-WEB-CSS-3",
+          "prompt": "II.3. Dans mesStyles.css, quelle est la déclaration permettant d'afficher en gras le contenu de l'élément d'identifiant affichage ?",
+          "points": 0.34,
+          "expectedKeywords": ["font-weight", "bold"],
+          "expectedAnswer": "font-weight : bold",
+          "explanation": "font-weight: bold applique le style gras."
+        },
+        {
+          "id": "EX3-WEB-JS-1",
+          "prompt": "III.1. Dans controles.js, précisez la portée des variables debut et fin (locale ou globale).",
+          "points": 0.375,
+          "expectedKeywords": ["locale"],
+          "expectedAnswer": "Portée locale (variables internes à la fonction)",
+          "explanation": "Les variables debut et fin sont déclarées avec let dans la fonction, leur portée est donc locale."
+        },
+        {
+          "id": "EX3-WEB-JS-2",
+          "prompt": "III.2. Donner le rôle de l'instruction fin = lesBarrages.indexOf(\"#\", debut) figurant à la ligne N° 8.",
+          "points": 0.375,
+          "expectedKeywords": ["position", "dièse", "recherche"],
+          "expectedAnswer": "Rechercher la position du caractère séparateur '#' dans la chaîne à partir de l'indice debut.",
+          "explanation": "indexOf('#', debut) trouve le premier indice du caractère '#' à partir de debut."
+        },
+        {
+          "id": "EX3-WEB-JS-3",
+          "prompt": "III.3. Donner le rôle de l'instruction unBarrage = lesBarrages.substr(debut, fin - debut) figurant à la ligne N° 12.",
+          "points": 0.375,
+          "expectedKeywords": ["extraire", "sous-chaîne", "barrage"],
+          "expectedAnswer": "Extraire la sous-chaîne contenant le nom et les informations d'un barrage.",
+          "explanation": "substr(debut, fin - debut) extrait les informations du barrage sélectionné."
+        },
+        {
+          "id": "EX3-WEB-JS-4",
+          "prompt": "III.4. Donner le rôle de l'instruction document.getElementById(\"info2\").innerHTML = infoBarrage figurant à la ligne N° 18.",
+          "points": 0.375,
+          "expectedKeywords": ["contenu", "info2", "afficher"],
+          "expectedAnswer": "Modifier et afficher dynamiquement le contenu HTML du paragraphe d'id info2.",
+          "explanation": "innerHTML affecte le texte avec balises HTML à l'élément identifié par info2."
+        },
+        {
+          "id": "EX3-WEB-PHP-1",
+          "prompt": "IV.1. Quel est le comportement du script details.php dans le cas où le fichier 'connexion.php' appelé à la ligne N° 2 est inexistant ?",
+          "points": 0.375,
+          "expectedKeywords": ["erreur", "arrête"],
+          "expectedAnswer": "Une erreur fatale est générée et le script s'arrête.",
+          "explanation": "require génère une Fatal Error bloquante si le fichier inclus est introuvable."
+        },
+        {
+          "id": "EX3-WEB-PHP-2",
+          "prompt": "IV.2. Quelle instruction faut-il ajouter à la ligne N° 8 pour remplacer le caractère '_' de la variable $nomBarrage par un espace ?",
+          "points": 0.375,
+          "expectedKeywords": ["str_replace", "$nomBarrage"],
+          "expectedAnswer": "$nomBarrage = str_replace('_', ' ', $nomBarrage);",
+          "explanation": "str_replace('_', ' ', $nomBarrage) remplace tous les underscores par des espaces."
+        },
+        {
+          "id": "EX3-WEB-PHP-3",
+          "prompt": "IV.3. Quel est le comportement du script en cas d'erreur syntaxique dans la requête SQL de la ligne N° 9 ?",
+          "points": 0.375,
+          "expectedKeywords": ["Requête erronée", "arrête"],
+          "expectedAnswer": "Le script affiche le message 'Requête erronée' et s'arrête.",
+          "explanation": "La clause or die('Requête erronée') affiche le message d'erreur et termine l'exécution."
+        },
+        {
+          "id": "EX3-WEB-PHP-4",
+          "prompt": "IV.4. Quel est le comportement du script si on modifie l'instruction de la ligne N° 13 pour accéder par indices numériques ($lig[0] au lieu de $lig['idBar']) ?",
+          "points": 0.375,
+          "expectedKeywords": ["modifie pas", "identique"],
+          "expectedAnswer": "Le script ne modifie pas son comportement car mysqli_fetch_array retourne un tableau à la fois associatif et indicé numériquement.",
+          "explanation": "mysqli_fetch_array() avec le mode par défaut MYSQLI_BOTH fournit les deux indexations."
+        }
+      ]
+    }
+  ]
+}
