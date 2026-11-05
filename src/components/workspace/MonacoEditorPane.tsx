@@ -55,8 +55,15 @@ export function MonacoEditorPane({
     });
 
     // Configuration linguistique avancée
-    if (language === "html") {
-      monaco.languages.html.htmlDefaults.setOptions({
+    // L'espace de noms `languages.html` n'existe plus dans les builds Monaco récents :
+    // on le garde optionnel pour ne jamais faire planter le montage de l'éditeur.
+    const htmlDefaults = (
+      monaco.languages as unknown as {
+        html?: { htmlDefaults?: { setOptions: (options: object) => void } };
+      }
+    ).html?.htmlDefaults;
+    if (language === "html" && htmlDefaults) {
+      htmlDefaults.setOptions({
         format: {
           indentInnerHtml: true,
           wrapLineLength: 120,
