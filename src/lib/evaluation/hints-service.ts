@@ -31,20 +31,32 @@ export async function getNombreIndices(sujetId: string, options?: HintOptions): 
   }
 
   try {
-    const { data: v } = await supabase
-      .from("sujet_versions")
-      .select("id")
-      .eq("sujet_id", sujetId)
-      .eq("publiee", true)
-      .maybeSingle();
+    const supaPromise = async () => {
+      const { data: v } = await supabase
+        .from("sujet_versions")
+        .select("id")
+        .eq("sujet_id", sujetId)
+        .eq("publiee", true)
+        .maybeSingle();
 
-    if (v) {
-      const { data, error } = await supabase.rpc("nb_indices", {
-        _version_id: v.id,
-      });
-      if (!error && typeof data === "number") {
-        return data;
+      if (v) {
+        const { data, error } = await supabase.rpc("nb_indices", {
+          _version_id: v.id,
+        });
+        if (!error && typeof data === "number") {
+          return data;
+        }
       }
+      return null;
+    };
+
+    const count = await Promise.race([
+      supaPromise(),
+      new Promise<null>((_, reject) => setTimeout(() => reject(new Error("Timeout")), 1500)),
+    ]);
+
+    if (typeof count === "number") {
+      return count;
     }
   } catch {
     // Repli local
