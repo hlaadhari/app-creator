@@ -38,9 +38,15 @@ export async function seConnecter(page: Page, role: Role): Promise<void> {
   const id = identifiants(role);
   if (!id) throw new Error(`Identifiants E2E_${role}_* absents`);
   // Évite la boîte de bienvenue de la première visite, qui masque le reste de la page.
-  await page.addInitScript(() =>
-    window.localStorage.setItem("labo_sti_onboarding_completed", "true"),
-  );
+  // Le script s'exécute aussi dans l'iframe sandboxée (sans allow-same-origin), où le stockage
+  // est volontairement interdit : l'erreur y est attendue et ignorée.
+  await page.addInitScript(() => {
+    try {
+      window.localStorage.setItem("labo_sti_onboarding_completed", "true");
+    } catch {
+      // frame sandboxée
+    }
+  });
   await page.goto("/");
   // Le rendu serveur précède l'hydratation : on réessaie le clic jusqu'à l'ouverture du formulaire.
   await expect(async () => {
