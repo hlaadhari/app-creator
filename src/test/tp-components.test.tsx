@@ -131,6 +131,21 @@ describe("TP UI Components Rendering and Interactions (Issue #161)", () => {
       fireEvent.click(requestButton);
       expect(handleRequest).toHaveBeenCalledWith(4);
     });
+
+    it("affiche clairement le nom de l'élève qui occupe ou a demandé chaque poste", () => {
+      render(
+        <SeatPicker
+          session={dummySession}
+          seats={dummySeats}
+          onRequestReservation={vi.fn()}
+          onCancelReservation={vi.fn()}
+          onLaunchIde={vi.fn()}
+        />,
+      );
+
+      expect(screen.getByText("Camille Dupont")).toBeInTheDocument();
+      expect(screen.getByText("Lucas Bernard")).toBeInTheDocument();
+    });
   });
 
   describe("ApprovalList (Enseignant)", () => {
@@ -213,6 +228,32 @@ describe("TP UI Components Rendering and Interactions (Issue #161)", () => {
       expect(screen.getByText("Camille Dupont")).toBeInTheDocument();
       expect(screen.getByText("Lucas Bernard")).toBeInTheDocument();
       expect(screen.getByText(/Libre \(4\)/i)).toBeInTheDocument();
+    });
+
+    it("permet de valider, refuser ou libérer un poste directement depuis la carte du poste", () => {
+      const handleApproveSeat = vi.fn();
+      const handleRejectSeat = vi.fn();
+
+      render(
+        <SeatGridAdmin
+          session={dummySession}
+          seats={dummySeats}
+          onApproveSeat={handleApproveSeat}
+          onRejectSeat={handleRejectSeat}
+        />,
+      );
+
+      const validerPoste2 = screen.getByRole("button", {
+        name: /Valider directement le poste 2/i,
+      });
+      fireEvent.click(validerPoste2);
+      expect(handleApproveSeat).toHaveBeenCalledWith("res-2");
+
+      const libererPoste3 = screen.getByRole("button", {
+        name: /Libérer le poste 3/i,
+      });
+      fireEvent.click(libererPoste3);
+      expect(handleRejectSeat).toHaveBeenCalledWith("res-3");
     });
   });
 });

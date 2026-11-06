@@ -232,11 +232,19 @@ export function SeatPicker({
                   )}
                 </div>
 
-                <div className="mt-2 text-[11px] text-muted-foreground">
+                <div className="mt-2 text-[11px] text-muted-foreground truncate">
                   {seat.status === "libre" ? (
                     <span>Cliquer pour choisir</span>
+                  ) : seat.reservation?.studentName ? (
+                    <span
+                      className="flex items-center gap-1 font-medium text-foreground truncate"
+                      title={`Occupé / demandé par : ${seat.reservation.studentName}`}
+                    >
+                      <User className="h-3 w-3 shrink-0 text-primary" />
+                      <span className="truncate">{seat.reservation.studentName}</span>
+                    </span>
                   ) : (
-                    <span className="italic">Non disponible</span>
+                    <span className="italic">Poste réservé</span>
                   )}
                 </div>
               </button>
