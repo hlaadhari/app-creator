@@ -25,7 +25,7 @@ begin
   perform set_config('request.jwt.claim.role', 'authenticated', true);
   set local role authenticated;
 
-  v_id := public.deposer_contestation('ex-html-css-01', 'h1', 'Mon titre est bien présent dans la carte');
+  v_id := public.deposer_contestation('carte-profil', 'h1', 'Mon titre est bien présent dans la carte');
   perform test_helpers.assert_true(
     exists (select 1 from public.contestations where id = v_id and eleve_id = v_eleve and statut = 'en_attente'),
     '#185 : la contestation doit être créée pour l''élève authentifié, en attente'
@@ -34,7 +34,7 @@ begin
   -- Critère inconnu
   v_caught := false;
   begin
-    perform public.deposer_contestation('ex-html-css-01', 'inexistant', 'Texte suffisamment long ici');
+    perform public.deposer_contestation('carte-profil', 'inexistant', 'Texte suffisamment long ici');
   exception when others then
     v_caught := sqlerrm = 'critere_introuvable';
   end;
@@ -52,7 +52,7 @@ begin
   -- Motif trop court refusé par la contrainte de la table
   v_caught := false;
   begin
-    perform public.deposer_contestation('ex-html-css-01', 'h1', 'court');
+    perform public.deposer_contestation('carte-profil', 'h1', 'court');
   exception when check_violation then
     v_caught := true;
   end;
@@ -65,7 +65,7 @@ begin
   set local role anon;
   v_caught := false;
   begin
-    perform public.deposer_contestation('ex-html-css-01', 'h1', 'Texte suffisamment long ici');
+    perform public.deposer_contestation('carte-profil', 'h1', 'Texte suffisamment long ici');
   exception when insufficient_privilege then
     v_caught := true;
   end;
