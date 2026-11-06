@@ -53,21 +53,8 @@ export async function getOrCreateProjet(sujetId: string): Promise<string | null>
     });
 
     if (error) {
-      // Si la table projets existe en direct, tentative d'insertion de secours
-      const { data: directInsert, error: directErr } = await supabase
-        .from("projets")
-        .insert({
-          eleve_id: user.id,
-          version_id: v.id,
-          statut: "en_cours",
-        })
-        .select("id")
-        .maybeSingle();
-
-      if (!directErr && directInsert) {
-        return directInsert.id;
-      }
-
+      // Pas d'insertion de secours (#186) : elle créait un projet vide, sans fichiers de départ,
+      // et masquait l'erreur. L'élève garde son tampon local et la synchronisation reprendra.
       console.warn("[Projets] Erreur lors de l'initialisation du projet :", error.message);
       return null;
     }
