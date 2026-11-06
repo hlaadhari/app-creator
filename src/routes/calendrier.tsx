@@ -13,6 +13,7 @@ import {
   canAccessIde,
 } from "@/lib/tp/tp-reservation-service";
 import { SeatPicker } from "@/components/tp/SeatPicker";
+import { TpSessionManager } from "@/components/tp/TpSessionManager";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { SproutLogo } from "@/components/SproutLogo";
@@ -26,6 +27,8 @@ import {
   AlertCircle,
   GraduationCap,
   BookOpen,
+  ShieldCheck,
+  Users,
 } from "lucide-react";
 
 export const Route = createFileRoute("/calendrier")({
@@ -43,8 +46,10 @@ export const Route = createFileRoute("/calendrier")({
 });
 
 function CalendrierPage() {
-  const { user, profile } = useAuth();
+  const { user, profile, role } = useAuth();
   const navigate = useNavigate();
+  const isTeacherOrAdmin = role === "enseignant" || role === "admin";
+  const [viewMode, setViewMode] = useState<"supervision" | "eleve">("supervision");
 
   const [sessions, setSessions] = useState<TpSession[]>([]);
   const [selectedSessionId, setSelectedSessionId] = useState<string | null>(null);
@@ -206,6 +211,19 @@ function CalendrierPage() {
         </div>
 
         <div className="flex items-center gap-3">
+          {isTeacherOrAdmin && (
+            <Link to="/enseignant">
+              <Button
+                variant="outline"
+                size="sm"
+                className="gap-1.5 text-xs text-primary border-primary/30 hover:bg-primary/10"
+              >
+                <GraduationCap className="h-4 w-4" />
+                <span className="hidden sm:inline">Espace Enseignant</span>
+              </Button>
+            </Link>
+          )}
+
           <Link to="/cours">
             <Button
               variant="outline"
@@ -233,105 +251,166 @@ function CalendrierPage() {
       </header>
 
       {/* Contenu principal */}
-      <main className="flex-1 mx-auto max-w-5xl w-full px-6 py-8">
-        <div className="mb-6">
-          <div className="flex items-center gap-2">
-            <Calendar className="h-5 w-5 text-primary" />
-            <h1 className="text-2xl font-bold tracking-tight">
-              Réservation de Poste en Salle de TP
-            </h1>
-          </div>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Choisissez un poste informatique dans la salle de TP. L'accès à l'IDE d'épreuve est
-            définitivement débloqué une fois votre demande approuvée par votre enseignant.
-          </p>
-        </div>
-
-        {/* Message d'erreur s'il y a lieu */}
-        {errorMessage && (
-          <div className="mb-6 flex items-center gap-2 p-3 rounded-md bg-rose-500/10 border border-rose-500/20 text-rose-600 dark:text-rose-400 text-xs">
-            <AlertCircle className="h-4 w-4 shrink-0" />
-            <span>{errorMessage}</span>
-          </div>
-        )}
-
-        {/* Sélecteur de séances de TP */}
-        {sessions.length > 0 && selectedSession ? (
-          <div className="space-y-6">
-            {/* Barre de sélection de séance */}
-            <div className="p-4 rounded-lg border bg-card/60 flex flex-col md:flex-row md:items-center justify-between gap-4">
-              <div className="flex items-center gap-3 flex-wrap">
-                <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                  Séance :
-                </span>
-                <select
-                  value={selectedSession.id}
-                  onChange={(e) => handleSelectSession(e.target.value)}
-                  className="bg-background border rounded-md px-3 py-1.5 text-sm font-medium focus:ring-1 focus:ring-primary outline-hidden"
-                >
-                  {sessions.map((s) => (
-                    <option key={s.id} value={s.id}>
-                      {s.title} ({s.maxSeats} postes)
-                    </option>
-                  ))}
-                </select>
-
-                <Badge
-                  variant={
-                    selectedSession.status === "live"
-                      ? "default"
-                      : selectedSession.status === "scheduled"
-                        ? "outline"
-                        : "secondary"
-                  }
-                  className="text-xs font-mono capitalize"
-                >
-                  {selectedSession.status === "live"
-                    ? "🔴 Session En Direct"
-                    : selectedSession.status === "scheduled"
-                      ? "Session Planifiée"
-                      : "Session Clôturée"}
-                </Badge>
+      <main className="flex-1 mx-auto max-w-6xl w-full px-6 py-8">
+        {/* Bandeau de bascule Enseignant / Admin : Supervision & Validation vs Vue Élève */}
+        {isTeacherOrAdmin && (
+          <div className="mb-6 rounded-xl border border-primary/30 bg-primary/5 p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="flex items-start gap-3">
+              <div className="h-9 w-9 rounded-lg bg-primary/15 text-primary flex items-center justify-center shrink-0 mt-0.5">
+                <ShieldCheck className="h-5 w-5" />
               </div>
-
-              <div className="text-xs text-muted-foreground flex items-center gap-2">
-                <Clock className="h-4 w-4 text-primary" />
-                <span>
-                  {new Date(selectedSession.startTime).toLocaleTimeString("fr-FR", {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })}{" "}
-                  -{" "}
-                  {new Date(selectedSession.endTime).toLocaleTimeString("fr-FR", {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })}
-                </span>
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-bold text-foreground">
+                    Mode Supervision Enseignant / Admin
+                  </span>
+                  <Badge className="bg-primary/15 text-primary border border-primary/30 font-mono text-[10px]">
+                    Validation des postes TP
+                  </Badge>
+                </div>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  Visualisez quel élève occupe chaque poste, validez ou refusez les demandes
+                  d'inscription au TP en attente et gérez la capacité de la salle.
+                </p>
               </div>
             </div>
 
-            {/* Sélecteur de siège interactif */}
-            <SeatPicker
-              session={selectedSession}
-              seats={seatGrid}
-              myReservation={myReservation}
-              onRequestReservation={handleRequestReservation}
-              onCancelReservation={handleCancelReservation}
-              onLaunchIde={handleLaunchIde}
-              isSubmitting={isSubmitting}
-            />
+            <div className="flex items-center gap-1.5 bg-background/80 p-1 rounded-lg border shrink-0">
+              <button
+                type="button"
+                onClick={() => setViewMode("supervision")}
+                className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-colors cursor-pointer ${
+                  viewMode === "supervision"
+                    ? "bg-primary text-primary-foreground font-semibold shadow-2xs"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                <Monitor className="h-3.5 w-3.5" />
+                <span>Valider les demandes & Postes</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setViewMode("eleve");
+                  void refreshData();
+                }}
+                className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-colors cursor-pointer ${
+                  viewMode === "eleve"
+                    ? "bg-primary text-primary-foreground font-semibold shadow-2xs"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                <Users className="h-3.5 w-3.5" />
+                <span>Vue Élève</span>
+              </button>
+            </div>
           </div>
+        )}
+
+        {isTeacherOrAdmin && viewMode === "supervision" ? (
+          <TpSessionManager teacherId={user?.id} />
         ) : (
-          <div className="py-16 text-center text-sm text-muted-foreground">
-            {isLoading ? (
-              <div className="flex items-center justify-center gap-2">
-                <RefreshCw className="h-4 w-4 animate-spin text-primary" />
-                <span>Chargement du planning de TP...</span>
+          <>
+            <div className="mb-6">
+              <div className="flex items-center gap-2">
+                <Calendar className="h-5 w-5 text-primary" />
+                <h1 className="text-2xl font-bold tracking-tight">
+                  Réservation de Poste en Salle de TP
+                </h1>
+              </div>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Choisissez un poste informatique dans la salle de TP. L'accès à l'IDE d'épreuve est
+                définitivement débloqué une fois votre demande approuvée par votre enseignant.
+              </p>
+            </div>
+
+            {/* Message d'erreur s'il y a lieu */}
+            {errorMessage && (
+              <div className="mb-6 flex items-center gap-2 p-3 rounded-md bg-rose-500/10 border border-rose-500/20 text-rose-600 dark:text-rose-400 text-xs">
+                <AlertCircle className="h-4 w-4 shrink-0" />
+                <span>{errorMessage}</span>
+              </div>
+            )}
+
+            {/* Sélecteur de séances de TP */}
+            {sessions.length > 0 && selectedSession ? (
+              <div className="space-y-6">
+                {/* Barre de sélection de séance */}
+                <div className="p-4 rounded-lg border bg-card/60 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                  <div className="flex items-center gap-3 flex-wrap">
+                    <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                      Séance :
+                    </span>
+                    <select
+                      value={selectedSession.id}
+                      onChange={(e) => handleSelectSession(e.target.value)}
+                      className="bg-background border rounded-md px-3 py-1.5 text-sm font-medium focus:ring-1 focus:ring-primary outline-hidden"
+                    >
+                      {sessions.map((s) => (
+                        <option key={s.id} value={s.id}>
+                          {s.title} ({s.maxSeats} postes)
+                        </option>
+                      ))}
+                    </select>
+
+                    <Badge
+                      variant={
+                        selectedSession.status === "live"
+                          ? "default"
+                          : selectedSession.status === "scheduled"
+                            ? "outline"
+                            : "secondary"
+                      }
+                      className="text-xs font-mono capitalize"
+                    >
+                      {selectedSession.status === "live"
+                        ? "🔴 Session En Direct"
+                        : selectedSession.status === "scheduled"
+                          ? "Session Planifiée"
+                          : "Session Clôturée"}
+                    </Badge>
+                  </div>
+
+                  <div className="text-xs text-muted-foreground flex items-center gap-2">
+                    <Clock className="h-4 w-4 text-primary" />
+                    <span>
+                      {new Date(selectedSession.startTime).toLocaleTimeString("fr-FR", {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}{" "}
+                      -{" "}
+                      {new Date(selectedSession.endTime).toLocaleTimeString("fr-FR", {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Sélecteur de siège interactif */}
+                <SeatPicker
+                  session={selectedSession}
+                  seats={seatGrid}
+                  myReservation={myReservation}
+                  onRequestReservation={handleRequestReservation}
+                  onCancelReservation={handleCancelReservation}
+                  onLaunchIde={handleLaunchIde}
+                  isSubmitting={isSubmitting}
+                />
               </div>
             ) : (
-              <div>Aucune séance de TP programmée pour le moment.</div>
+              <div className="py-16 text-center text-sm text-muted-foreground">
+                {isLoading ? (
+                  <div className="flex items-center justify-center gap-2">
+                    <RefreshCw className="h-4 w-4 animate-spin text-primary" />
+                    <span>Chargement du planning de TP...</span>
+                  </div>
+                ) : (
+                  <div>Aucune séance de TP programmée pour le moment.</div>
+                )}
+              </div>
             )}
-          </div>
+          </>
         )}
       </main>
     </div>

@@ -477,7 +477,13 @@ export function TpSessionManager({ currentClassId, teacherId }: TpSessionManager
           </div>
 
           <div className="lg:col-span-6 space-y-6">
-            <SeatGridAdmin session={selectedSession} seats={seatGrid} />
+            <SeatGridAdmin
+              session={selectedSession}
+              seats={seatGrid}
+              onApproveSeat={handleApprove}
+              onRejectSeat={handleReject}
+              isProcessing={isProcessing}
+            />
           </div>
         </div>
       ) : (

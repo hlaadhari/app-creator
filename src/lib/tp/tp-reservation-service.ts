@@ -160,27 +160,26 @@ const dbClient = supabase as any;
  * Récupère la liste des séances de TP.
  */
 export async function getTpSessions(classId?: string | undefined): Promise<TpSession[]> {
+  const filterByClassOrGlobal = (list: TpSession[]) => {
+    if (!classId) return [...list];
+    const filtered = list.filter((s) => s.classId === classId || !s.classId);
+    return filtered.length > 0 ? filtered : [...list];
+  };
+
   if (isTestEnv) {
-    if (classId) {
-      return inMemorySessions.filter((s) => s.classId === classId);
-    }
-    return [...inMemorySessions];
+    return filterByClassOrGlobal(inMemorySessions);
   }
 
   try {
-    let query = dbClient.from("tp_sessions").select("*").order("start_time", { ascending: true });
-    if (classId) {
-      query = query.eq("class_id", classId);
-    }
-    const { data, error } = await query;
+    const { data, error } = await dbClient
+      .from("tp_sessions")
+      .select("*")
+      .order("start_time", { ascending: true });
     if (error || !data || data.length === 0) {
-      if (classId) {
-        return inMemorySessions.filter((s) => s.classId === classId);
-      }
-      return [...inMemorySessions];
+      return filterByClassOrGlobal(inMemorySessions);
     }
 
-    return (data as Array<Record<string, unknown>>).map((row) => ({
+    const mapped = (data as Array<Record<string, unknown>>).map((row) => ({
       id: String(row["id"]),
       title: String(row["title"]),
       description: row["description"] ? String(row["description"]) : undefined,
@@ -193,11 +192,9 @@ export async function getTpSessions(classId?: string | undefined): Promise<TpSes
       createdBy: row["created_by"] ? String(row["created_by"]) : undefined,
       createdAt: String(row["created_at"]),
     }));
+    return filterByClassOrGlobal(mapped);
   } catch {
-    if (classId) {
-      return inMemorySessions.filter((s) => s.classId === classId);
-    }
-    return [...inMemorySessions];
+    return filterByClassOrGlobal(inMemorySessions);
   }
 }
 
@@ -343,7 +340,7 @@ export async function getTpReservations(sessionId: string): Promise<TpReservatio
   try {
     const { data, error } = await dbClient
       .from("tp_reservations")
-      .select("*, student:student_id(nom, prenom, email)")
+      .select("*, student:student_id(nom, prenom)")
       .eq("session_id", sessionId);
 
     if (error || !data || data.length === 0) {
@@ -352,22 +349,30 @@ export async function getTpReservations(sessionId: string): Promise<TpReservatio
 
     return (data as Array<Record<string, unknown>>).map((row) => {
       const student = row["student"] as Record<string, unknown> | null;
-      const studentName = student
-        ? `${String(student["nom"] || "")} ${String(student["prenom"] || "")}`.trim()
-        : undefined;
-      const studentEmail = student?.["email"] ? String(student["email"]) : undefined;
+      const joinedName = student
+        ? `${String(student["prenom"] || "")} ${String(student["nom"] || "")}`.trim()
+        : "";
+      const rawNotes = row["notes"] ? String(row["notes"]).trim() : "";
+      const seatNum = Number(row["seat_number"]);
+      const studentIdStr = String(row["student_id"]);
+      const inMemMatch = inMemoryReservations.find(
+        (r) =>
+          r.sessionId === sessionId && (r.seatNumber === seatNum || r.studentId === studentIdStr),
+      );
+
+      const resolvedStudentName =
+        joinedName || inMemMatch?.studentName || rawNotes || `Élève (${studentIdStr.slice(0, 6)})`;
 
       const res: TpReservation = {
         id: String(row["id"]),
         sessionId: String(row["session_id"]),
-        studentId: String(row["student_id"]),
-        seatNumber: Number(row["seat_number"]),
+        studentId: studentIdStr,
+        seatNumber: seatNum,
         status: (row["status"] as TpReservationStatus) || "pending",
         createdAt: String(row["created_at"]),
+        studentName: resolvedStudentName,
       };
-      if (row["notes"]) res.notes = String(row["notes"]);
-      if (studentName) res.studentName = studentName;
-      if (studentEmail) res.studentEmail = studentEmail;
+      if (rawNotes) res.notes = rawNotes;
       return res;
     });
   } catch {
@@ -452,7 +457,7 @@ export async function requestSeatReservation(params: {
           student_id: newReservation.studentId,
           seat_number: newReservation.seatNumber,
           status: "pending",
-          notes: newReservation.notes,
+          notes: newReservation.notes ?? newReservation.studentName,
         })
         .select()
         .single();

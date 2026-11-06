@@ -24,6 +24,7 @@ export function ApprovalList({
   isProcessing = false,
 }: ApprovalListProps) {
   const pendingReservations = reservations.filter((r) => r.status === "pending");
+  const approvedReservations = reservations.filter((r) => r.status === "approved");
   const remainingCapacity = Math.max(0, maxSeats - approvedCount);
   const isFull = remainingCapacity <= 0;
 
@@ -162,6 +163,44 @@ export function ApprovalList({
               </div>
             );
           })}
+        </div>
+      )}
+
+      {/* Liste récapitulative des postes déjà confirmés / occupés */}
+      {approvedReservations.length > 0 && (
+        <div className="mt-5 pt-4 border-t">
+          <div className="flex items-center justify-between mb-2">
+            <h4 className="text-xs font-mono uppercase tracking-wider text-muted-foreground">
+              Postes confirmés & occupés ({approvedReservations.length})
+            </h4>
+          </div>
+          <div className="divide-y divide-border">
+            {approvedReservations.map((conf) => (
+              <div
+                key={conf.id}
+                className="py-2 flex items-center justify-between gap-3 text-xs px-2 rounded hover:bg-accent/20"
+              >
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <Badge className="bg-blue-600/15 text-blue-600 dark:text-blue-400 border border-blue-500/30 font-mono text-[11px] shrink-0">
+                    Poste {String(conf.seatNumber).padStart(2, "0")}
+                  </Badge>
+                  <span className="font-medium text-foreground truncate">
+                    {conf.studentName || `Élève (${conf.studentId.slice(0, 8)})`}
+                  </span>
+                </div>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => onReject(conf.id)}
+                  disabled={isProcessing}
+                  className="h-7 px-2 text-[11px] text-muted-foreground hover:text-rose-600 cursor-pointer shrink-0"
+                  aria-label={`Libérer le poste occupé ${conf.seatNumber}`}
+                >
+                  Libérer le poste
+                </Button>
+              </div>
+            ))}
+          </div>
         </div>
       )}
     </div>

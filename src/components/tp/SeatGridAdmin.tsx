@@ -1,12 +1,15 @@
 import React from "react";
 import type { SeatInfo, TpSession } from "@/lib/tp/tp-reservation-service";
-import { Monitor, User, Clock, CheckCircle2 } from "lucide-react";
+import { Monitor, User, Check, X, RotateCcw } from "lucide-react";
 
 interface SeatGridAdminProps {
   session: TpSession;
   seats: SeatInfo[];
   onSelectSeat?: ((seat: SeatInfo) => void) | undefined;
   selectedSeatNumber?: number | null | undefined;
+  onApproveSeat?: ((reservationId: string) => Promise<void> | void) | undefined;
+  onRejectSeat?: ((reservationId: string) => Promise<void> | void) | undefined;
+  isProcessing?: boolean | undefined;
 }
 
 export function SeatGridAdmin({
@@ -14,6 +17,9 @@ export function SeatGridAdmin({
   seats,
   onSelectSeat,
   selectedSeatNumber,
+  onApproveSeat,
+  onRejectSeat,
+  isProcessing = false,
 }: SeatGridAdminProps) {
   const getStatusColor = (status: SeatInfo["status"]) => {
     switch (status) {
@@ -98,14 +104,16 @@ export function SeatGridAdmin({
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 mt-4">
         {seats.map((seat) => {
           const isSelected = selectedSeatNumber === seat.seatNumber;
-          const studentName = seat.reservation?.studentName;
+          const studentName =
+            seat.reservation?.studentName ||
+            (seat.reservation ? `Élève (${seat.reservation.studentId.slice(0, 6)})` : undefined);
+          const reservationId = seat.reservation?.id;
 
           return (
-            <button
+            <div
               key={seat.seatNumber}
-              type="button"
               onClick={() => onSelectSeat?.(seat)}
-              className={`p-3 rounded-lg border text-left flex flex-col justify-between transition-all cursor-pointer ${getStatusColor(
+              className={`p-3 rounded-lg border text-left flex flex-col justify-between transition-all ${getStatusColor(
                 seat.status,
               )} ${isSelected ? "ring-2 ring-primary ring-offset-2" : ""}`}
               aria-label={`Poste ${seat.seatNumber} : statut ${seat.status}`}
@@ -117,17 +125,76 @@ export function SeatGridAdmin({
                 {getStatusBadge(seat.status)}
               </div>
 
-              <div className="mt-3 truncate">
+              <div className="mt-2.5 truncate">
                 {studentName ? (
-                  <div className="text-xs font-medium truncate flex items-center gap-1">
-                    <User className="h-3 w-3 shrink-0" />
+                  <div
+                    className="text-xs font-semibold truncate flex items-center gap-1 text-foreground"
+                    title={studentName}
+                  >
+                    <User className="h-3.5 w-3.5 shrink-0 text-primary" />
                     <span className="truncate">{studentName}</span>
                   </div>
                 ) : (
                   <div className="text-[11px] text-muted-foreground italic">Disponible</div>
                 )}
               </div>
-            </button>
+
+              {/* Actions rapides Enseignant directement sur la carte du poste */}
+              {seat.status === "pending" && reservationId && (onApproveSeat || onRejectSeat) && (
+                <div className="mt-2.5 pt-2 border-t border-amber-500/20 flex items-center gap-1.5">
+                  {onApproveSeat && (
+                    <button
+                      type="button"
+                      disabled={isProcessing}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        void onApproveSeat(reservationId);
+                      }}
+                      className="flex-1 inline-flex items-center justify-center gap-1 rounded bg-emerald-600 hover:bg-emerald-700 text-white py-1 px-1.5 text-[10px] font-semibold cursor-pointer disabled:opacity-50"
+                      aria-label={`Valider directement le poste ${seat.seatNumber}`}
+                    >
+                      <Check className="h-3 w-3" />
+                      <span>Valider</span>
+                    </button>
+                  )}
+                  {onRejectSeat && (
+                    <button
+                      type="button"
+                      disabled={isProcessing}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        void onRejectSeat(reservationId);
+                      }}
+                      className="inline-flex items-center justify-center rounded border border-rose-500/40 bg-rose-500/10 hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 py-1 px-1.5 text-[10px] font-semibold cursor-pointer disabled:opacity-50"
+                      title="Refuser et libérer le poste"
+                      aria-label={`Refuser directement le poste ${seat.seatNumber}`}
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  )}
+                </div>
+              )}
+
+              {(seat.status === "approved" || seat.status === "live") &&
+                reservationId &&
+                onRejectSeat && (
+                  <div className="mt-2.5 pt-2 border-t border-blue-500/20 flex items-center justify-end">
+                    <button
+                      type="button"
+                      disabled={isProcessing}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        void onRejectSeat(reservationId);
+                      }}
+                      className="w-full inline-flex items-center justify-center gap-1 rounded border border-border/80 bg-background/70 hover:bg-rose-500/10 hover:text-rose-500 hover:border-rose-500/30 text-muted-foreground py-1 px-1.5 text-[10px] font-medium transition-colors cursor-pointer disabled:opacity-50"
+                      aria-label={`Libérer le poste ${seat.seatNumber}`}
+                    >
+                      <RotateCcw className="h-2.5 w-2.5" />
+                      <span>Libérer</span>
+                    </button>
+                  </div>
+                )}
+            </div>
           );
         })}
       </div>
