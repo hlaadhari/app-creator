@@ -2,6 +2,7 @@
 begin;
 
 create schema if not exists test_helpers;
+grant usage on schema test_helpers to public, anon, authenticated, service_role;
 create or replace function test_helpers.assert_true(p_cond boolean, p_msg text)
 returns void language plpgsql as $$
 begin
@@ -10,6 +11,8 @@ begin
   end if;
 end;
 $$;
+
+grant execute on function test_helpers.assert_true(boolean, text) to public, anon, authenticated, service_role;
 
 do $$
 declare
