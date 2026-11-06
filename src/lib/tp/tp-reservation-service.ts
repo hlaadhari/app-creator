@@ -100,13 +100,30 @@ const demoReservations: TpReservation[] = [
   },
 ];
 
+/**
+ * Store mémoire initial. Les séances et élèves fictifs ne servent qu'aux tests : en production
+ * un store vide évite d'afficher de fausses données à un enseignant ou à un élève (#187).
+ */
+export function creerStoreInitial(modeTest: boolean): {
+  sessions: TpSession[];
+  reservations: TpReservation[];
+} {
+  if (!modeTest) return { sessions: [], reservations: [] };
+  return {
+    sessions: JSON.parse(JSON.stringify(demoSessions)) as TpSession[],
+    reservations: JSON.parse(JSON.stringify(demoReservations)) as TpReservation[],
+  };
+}
+
 // État mémoire modifiable
-let inMemorySessions: TpSession[] = JSON.parse(JSON.stringify(demoSessions));
-let inMemoryReservations: TpReservation[] = JSON.parse(JSON.stringify(demoReservations));
+const storeInitial = creerStoreInitial(isTestEnv);
+let inMemorySessions: TpSession[] = storeInitial.sessions;
+let inMemoryReservations: TpReservation[] = storeInitial.reservations;
 
 export function resetTpStoreForTesting() {
-  inMemorySessions = JSON.parse(JSON.stringify(demoSessions));
-  inMemoryReservations = JSON.parse(JSON.stringify(demoReservations));
+  const initial = creerStoreInitial(true);
+  inMemorySessions = initial.sessions;
+  inMemoryReservations = initial.reservations;
 }
 
 /**
