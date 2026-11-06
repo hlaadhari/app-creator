@@ -24,5 +24,7 @@
   ],
   "description": "Sujet officiel du Bac Pratique STI 2018 : évaluation de véhicules d'essai avec formulaire de notation multi-critères, validation JS, et enregistrement/calcul de moyenne en PHP/MySQLi.",
   "fichiers_attendus": ["evaluation.html", "mesStyles.css", "controle.js", "evaluer.php"],
-  "base_de_donnees": "db/init.sql"
+  "base_de_donnees": "db/init.sql",
+  "score_initial_attendu": 4,
+  "score_initial_justification": "EX18-01 (formulaire fourni) et EX18-02 (fieldset border-width > 0, style par défaut) passent sur le squelette. À réécrire (#190)."
 }

@@ -10,5 +10,7 @@
   "niveau": 1,
   "tags": ["JavaScript", "DOM", "RegExp"],
   "description": "Validation côté client d'un formulaire d'inscription : vérification de la présence, de la longueur exacte (8 chiffres) et du format numérique d'un numéro de Carte d'Identité Nationale (CIN).",
-  "fichiers_attendus": ["formulaire.html", "controle.js"]
+  "fichiers_attendus": ["formulaire.html", "controle.js"],
+  "score_initial_attendu": 4,
+  "score_initial_justification": "Consigne « déclaration de verif() » : le squelette fourni déclare déjà la fonction (1 critère sur 5, ≤ 20 %). Décision pédagogique à confirmer (#190)."
 }

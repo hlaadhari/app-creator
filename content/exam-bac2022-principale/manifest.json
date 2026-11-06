@@ -23,5 +23,7 @@
     "modifier.php",
     "excursion.php"
   ],
-  "base_de_donnees": "db/init.sql"
+  "base_de_donnees": "db/init.sql",
+  "score_initial_attendu": 2.5,
+  "score_initial_justification": "Le critère BAC22-04 (fieldset border-width > 0) passe sur le style par défaut du navigateur, sans travail de l'élève. À réécrire pour exiger une déclaration explicite (#190)."
 }

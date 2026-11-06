@@ -15,5 +15,7 @@
   "tags": ["Bac STI", "HTML5", "CSS3", "JavaScript", "PHP", "MySQLi", "Examen Blanc"],
   "description": "Sujet officiel du Bac Pratique STI 2023 : gestion de la location d'habits avec validation client, vérification de disponibilité, enregistrement SQL et mise à jour de stock.",
   "fichiers_attendus": ["location.html", "mesStyles.css", "controls.js", "location.php"],
-  "base_de_donnees": "db/init.sql"
+  "base_de_donnees": "db/init.sql",
+  "score_initial_attendu": 4,
+  "score_initial_justification": "EX23-01 (formulaire fourni) et EX23-02 (fieldset border-width > 0, style par défaut) passent sur le squelette. À réécrire (#190)."
 }
