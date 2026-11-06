@@ -79,3 +79,41 @@ jobs:
         env:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/labo_sti_test
         run: bash scripts/run-db-tests.sh
+
+  e2e:
+    name: E2E Playwright (parcours par rôle, app déployée)
+    runs-on: ubuntu-latest
+    # Les comptes de test sont des secrets : sans eux, les tests s'ignorent proprement.
+    env:
+      E2E_BASE_URL: ${{ vars.E2E_BASE_URL || 'https://app-creator-phi.vercel.app' }}
+      E2E_ELEVE_EMAIL: ${{ secrets.E2E_ELEVE_EMAIL }}
+      E2E_ELEVE_PASSWORD: ${{ secrets.E2E_ELEVE_PASSWORD }}
+      E2E_ENSEIGNANT_EMAIL: ${{ secrets.E2E_ENSEIGNANT_EMAIL }}
+      E2E_ENSEIGNANT_PASSWORD: ${{ secrets.E2E_ENSEIGNANT_PASSWORD }}
+      E2E_ADMIN_EMAIL: ${{ secrets.E2E_ADMIN_EMAIL }}
+      E2E_ADMIN_PASSWORD: ${{ secrets.E2E_ADMIN_PASSWORD }}
+      E2E_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+      E2E_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.VITE_SUPABASE_PUBLISHABLE_KEY }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile --registry https://registry.npmjs.org || bun install --registry https://registry.npmjs.org
+
+      - name: Install Chromium
+        run: bunx playwright install --with-deps chromium
+
+      - name: Run E2E
+        run: bun run e2e
+
+      - name: Upload Playwright traces on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-traces
+          path: test-results/

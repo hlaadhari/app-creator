@@ -1,0 +1,20 @@
+import { expect, test } from "@playwright/test";
+import { attendreAucuneAnomalie, identifiants, seConnecter, surveiller } from "./helpers";
+
+test.describe("Parcours élève (lecture seule)", () => {
+  test.skip(!identifiants("ELEVE"), "E2E_ELEVE_EMAIL / E2E_ELEVE_PASSWORD absents");
+
+  test("catalogue, cours et sujet sans erreur 4xx/5xx", async ({ page }) => {
+    const anomalies = surveiller(page);
+    await seConnecter(page, "ELEVE");
+    await expect(page.locator("body")).toContainText(/ex-|Exercice|Sujet/i);
+
+    await page.goto("/cours");
+    await expect(page.locator("main, body")).toBeVisible();
+
+    await page.goto("/sujet/ex-html-css-01");
+    await expect(page.locator(".monaco-editor").first()).toBeVisible({ timeout: 30_000 });
+
+    attendreAucuneAnomalie(anomalies);
+  });
+});
