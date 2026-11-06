@@ -1302,6 +1302,10 @@ export type Database = {
         Returns: { code: string; id: string; label: string }[];
       };
       debloquer_indice: { Args: { _version_id: string }; Returns: string };
+      deposer_contestation: {
+        Args: { p_critere_code: string; p_projet_id?: string; p_sujet_id: string; p_texte: string };
+        Returns: string;
+      };
       debloquer_solution: {
         Args: { p_motif?: string; p_version_id: string };
         Returns: {

@@ -14,5 +14,6 @@ done
 
 echo "==> [3/3] Exécution de la suite de tests négatifs SQL & RLS (T-01 à T-18)..."
 psql "$DB_URL" -v ON_ERROR_STOP=1 -f supabase/tests/01_rls_negative_tests.sql
+psql "$DB_URL" -v ON_ERROR_STOP=1 -f supabase/tests/02_deposer_contestation.sql
 
 echo "==> Tous les tests SQL PostgreSQL se sont terminés avec succès."
