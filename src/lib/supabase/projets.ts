@@ -1,5 +1,4 @@
 import { supabase } from "@/integrations/supabase/client";
-import type { Json } from "@/integrations/supabase/types";
 import type { Files } from "@/lib/exercises";
 
 export interface SyncResult {
@@ -16,50 +15,6 @@ export interface RemoteFileInfo {
   contenu: string;
   rev: number;
   updated_at: string;
-}
-
-/**
- * Enregistre une tentative d'évaluation dans Supabase si l'élève est connecté.
- */
-export async function enregistrerTentative(params: {
-  sujetId: string;
-  pointsObtenus: number;
-  pointsTotal: number;
-  note20: number;
-  details: Record<string, unknown>;
-}): Promise<void> {
-  try {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    if (!user) return; // Mode invité : persistance locale uniquement
-
-    // Récupérer la version active du sujet
-    const { data: v } = await supabase
-      .from("sujet_versions")
-      .select("id")
-      .eq("sujet_id", params.sujetId)
-      .eq("publiee", true)
-      .limit(1)
-      .maybeSingle();
-
-    if (!v) return;
-
-    await supabase.from("tentatives").insert({
-      eleve_id: user.id,
-      sujet_version_id: v.id,
-      points_obtenus: params.pointsObtenus,
-      points_total: params.pointsTotal,
-      note20: params.note20,
-      details: params.details as unknown as Json,
-      detail: params.details as unknown as Json,
-      max: params.pointsTotal,
-      score: params.pointsObtenus,
-      source: "client",
-    });
-  } catch (err) {
-    console.warn("[Tentatives] Erreur lors de l'enregistrement distant :", err);
-  }
 }
 
 /**

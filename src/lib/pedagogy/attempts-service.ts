@@ -121,6 +121,18 @@ export function calculerDeltaTentative(
   };
 }
 
+/** Identifiant de la version publiée d'un sujet, ou null si le sujet n'existe pas côté serveur. */
+async function resoudreVersionPubliee(sujetId: string): Promise<string | null> {
+  const { data } = await supabase
+    .from("sujet_versions")
+    .select("id")
+    .eq("sujet_id", sujetId)
+    .eq("publiee", true)
+    .limit(1)
+    .maybeSingle();
+  return data?.id ?? null;
+}
+
 /**
  * Enregistre une nouvelle tentative en local et tente la synchronisation Supabase.
  */
@@ -166,19 +178,25 @@ export async function enregistrerNouvelleTentative(params: {
     if (user) {
       record.eleveId = user.id;
 
-      await supabase.from("tentatives").insert({
-        eleve_id: user.id,
-        sujet_version_id: params.sujetVersionId ?? "00000000-0000-0000-0000-000000000000",
-        projet_id: params.projetId ?? null,
-        note20: params.note20,
-        points_obtenus: params.pointsObtenus,
-        points_total: params.pointsTotal,
-        details: params.criteres as unknown as Json,
-        detail: params.criteres as unknown as Json,
-        max: params.pointsTotal,
-        score: params.pointsObtenus,
-        source: "client",
-      });
+      // Point d'écriture unique (#184) : sans version publiée valide, on garde la
+      // tentative en local plutôt que d'envoyer un identifiant bidon (409 FK).
+      const versionId = params.sujetVersionId ?? (await resoudreVersionPubliee(params.sujetId));
+      if (versionId) {
+        record.sujetVersionId = versionId;
+        await supabase.from("tentatives").insert({
+          eleve_id: user.id,
+          sujet_version_id: versionId,
+          projet_id: params.projetId ?? null,
+          note20: params.note20,
+          points_obtenus: params.pointsObtenus,
+          points_total: params.pointsTotal,
+          details: params.criteres as unknown as Json,
+          detail: params.criteres as unknown as Json,
+          max: params.pointsTotal,
+          score: params.pointsObtenus,
+          source: "client",
+        });
+      }
     }
   } catch (err) {
     console.warn("[Tentatives] Synchronisation distante ignorée en local :", err);

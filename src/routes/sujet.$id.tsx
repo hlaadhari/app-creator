@@ -22,7 +22,6 @@ import { calculerCompteARebours, getTempsServeurSynchronise } from "@/lib/exam/s
 import type { EvaluationSummary } from "@/lib/evaluation/probe-runner";
 import { SproutLogo } from "@/components/SproutLogo";
 import { AuthModal } from "@/components/AuthModal";
-import { enregistrerTentative } from "@/lib/supabase/projets";
 import { enregistrerNouvelleTentative } from "@/lib/pedagogy/attempts-service";
 import { MonacoEditorPane } from "@/components/workspace/MonacoEditorPane";
 import { WorkspaceFileTree } from "@/components/workspace/WorkspaceFileTree";
@@ -294,14 +293,6 @@ function WorkspaceView({ ex }: { ex: Exercise }) {
       setSidebarTab("resultats");
 
       if (notable) {
-        enregistrerTentative({
-          sujetId: id,
-          pointsObtenus: sc.got,
-          pointsTotal: sc.total,
-          note20: sc.note20,
-          details: Object.fromEntries(r.map((c) => [c.id, { ok: c.ok, label: c.label }])),
-        });
-
         enregistrerNouvelleTentative({
           sujetId: id,
           note20: sc.note20,
