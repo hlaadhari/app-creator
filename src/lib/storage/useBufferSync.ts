@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import type { WorkspaceFile } from "@/components/workspace/types";
 import type { ProjectBuffer, BufferFile, SyncStatus, ConflictData } from "./types";
 import { getFromBuffer, saveToBuffer } from "./indexeddb";
+import { arbitrerRevisionDistante, createCoalescingQueue } from "./sync-utils";
 import {
   getOrCreateProjet,
   sauvegarderFichierDistant,
@@ -97,46 +98,76 @@ export function useBufferSync({ exerciseId, starterFiles }: UseBufferSyncOptions
   );
 
   // 2. Vérification distante lors de la connexion
-  const checkRemoteSync = useCallback(async (exId: string) => {
-    try {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      if (!user) return; // Mode invité
+  const checkRemoteSync = useCallback(
+    async (exId: string, localSnapshot?: Record<string, string>) => {
+      try {
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
+        if (!user) return; // Mode invité
 
-      const pId = await getOrCreateProjet(exId);
-      if (!pId) return;
-      projetIdRef.current = pId;
+        const pId = await getOrCreateProjet(exId);
+        if (!pId) return;
+        projetIdRef.current = pId;
 
-      // Charger les fichiers distants
-      const remoteFiles = await chargerFichiersDistants(pId);
-      if (remoteFiles && remoteFiles.length > 0) {
-        // Vérifier d'éventuelles différences
-        for (const rf of remoteFiles) {
-          const currentRev = fileRevs.current[rf.chemin] || 1;
-          if (rf.rev > currentRev) {
-            // Version distante plus récente
-            setConflict({
-              fileName: rf.chemin,
-              localContent: filesRef.current[rf.chemin]?.content || "",
+        // Charger les fichiers distants
+        const remoteFiles = await chargerFichiersDistants(pId);
+        if (remoteFiles && remoteFiles.length > 0) {
+          const adoptes: Record<string, string> = {};
+          for (const rf of remoteFiles) {
+            const currentRev = fileRevs.current[rf.chemin] || 1;
+            if (rf.rev <= currentRev) continue;
+
+            // Révision distante plus récente : conflit réel seulement si les deux côtés diffèrent (#201)
+            // Contenu local réellement chargé : filesRef peut ne pas être à jour juste après le chargement
+            // du tampon, et comparer au départ à tort écraserait du travail en silence.
+            const localContent =
+              localSnapshot?.[rf.chemin] ?? filesRef.current[rf.chemin]?.content ?? "";
+            const decision = arbitrerRevisionDistante({
+              localContent,
               remoteContent: rf.contenu,
-              localRev: currentRev,
-              remoteRev: rf.rev,
-              remoteUpdatedAt: rf.updated_at,
+              starterContent: starterFilesRef.current[rf.chemin],
             });
-            setSyncStatus("conflict");
-            return;
-          }
-        }
-        setSyncStatus("synced");
-      }
-    } catch {
-      // Ignorer si offline
-    }
-  }, []);
 
-  // 3. Synchronisation effective
-  const triggerSync = useCallback(async () => {
+            if (decision === "conflit") {
+              setConflict({
+                fileName: rf.chemin,
+                localContent,
+                remoteContent: rf.contenu,
+                localRev: currentRev,
+                remoteRev: rf.rev,
+                remoteUpdatedAt: rf.updated_at,
+              });
+              setSyncStatus("conflict");
+              return;
+            }
+
+            // identique ou départ intact : on adopte la révision distante sans rien perdre
+            fileRevs.current[rf.chemin] = rf.rev;
+            if (decision === "depart_intact") adoptes[rf.chemin] = rf.contenu;
+          }
+
+          if (Object.keys(adoptes).length > 0) {
+            setFiles((prev) => {
+              const next = { ...prev };
+              for (const [name, contenu] of Object.entries(adoptes)) {
+                const existing = next[name];
+                if (existing) next[name] = { ...existing, content: contenu };
+              }
+              return next;
+            });
+          }
+          setSyncStatus("synced");
+        }
+      } catch {
+        // Ignorer si offline
+      }
+    },
+    [],
+  );
+
+  // 3. Synchronisation effective (exécutée une à la fois, voir file d'attente ci-dessous)
+  const runSync = useCallback(async () => {
     if (typeof navigator !== "undefined" && !navigator.onLine) {
       setSyncStatus("offline");
       return;
@@ -207,6 +238,16 @@ export function useBufferSync({ exerciseId, starterFiles }: UseBufferSyncOptions
     }
   }, [exerciseId, files, persistToLocalBuffer, rev]);
 
+  // Une seule synchronisation à la fois : sinon deux écritures partent avec la même révision
+  // locale et la seconde prend la première pour une écriture concurrente (#201).
+  const runSyncRef = useRef(runSync);
+  runSyncRef.current = runSync;
+  const syncQueueRef = useRef<(() => Promise<void>) | null>(null);
+  if (!syncQueueRef.current) {
+    syncQueueRef.current = createCoalescingQueue(() => runSyncRef.current());
+  }
+  const triggerSync = useCallback(() => syncQueueRef.current!(), []);
+
   // 4. Déclenchement de la synchronisation asynchrone vers Supabase (avec debounce 1s)
   const scheduleRemoteSync = useCallback(() => {
     if (pendingSyncTimer.current) {
@@ -226,6 +267,7 @@ export function useBufferSync({ exerciseId, starterFiles }: UseBufferSyncOptions
       try {
         const local = await getFromBuffer(exerciseId);
         if (isCancelled) return;
+        const snapshot: Record<string, string> = {};
 
         if (local && local.files && Object.keys(local.files).length > 0) {
           const loadedFiles: Record<string, WorkspaceFile> = {};
@@ -242,6 +284,7 @@ export function useBufferSync({ exerciseId, starterFiles }: UseBufferSyncOptions
           }
 
           fileRevs.current = revs;
+          for (const [name, f] of Object.entries(loadedFiles)) snapshot[name] = f.content;
           setFiles(loadedFiles);
           setRev(local.rev || 1);
           setBestScore(local.bestScore);
@@ -263,6 +306,7 @@ export function useBufferSync({ exerciseId, starterFiles }: UseBufferSyncOptions
               updatedAt: Date.now(),
             };
             fileRevs.current[name] = 1;
+            snapshot[name] = content;
           }
 
           const newBuffer: ProjectBuffer = {
@@ -278,7 +322,7 @@ export function useBufferSync({ exerciseId, starterFiles }: UseBufferSyncOptions
         }
 
         // Vérifier si l'élève est connecté pour lier au cloud Supabase
-        await checkRemoteSync(exerciseId);
+        await checkRemoteSync(exerciseId, snapshot);
       } catch (err) {
         console.warn("[BufferSync] Erreur d'initialisation du tampon local :", err);
       } finally {
