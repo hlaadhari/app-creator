@@ -1,8 +1,9 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { CheckCircle2, Clock, XCircle } from "lucide-react";
+import { CheckCircle2, Clock, RefreshCw, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { useOptionalAuth } from "@/lib/supabase/auth";
 import {
   demanderAccesEnseignant,
   getMaDemandeEnseignant,
@@ -14,8 +15,10 @@ import {
  * Une demande en attente remplace le formulaire ; une demande refusée affiche le motif.
  */
 export function TeacherAccessRequest() {
+  const auth = useOptionalAuth();
   const [demande, setDemande] = useState<MaDemandeEnseignant | null>(null);
   const [chargement, setChargement] = useState(true);
+  const [actualisationDroits, setActualisationDroits] = useState(false);
   const [etablissement, setEtablissement] = useState("");
   const [message, setMessage] = useState("");
   const [envoi, setEnvoi] = useState(false);
@@ -34,6 +37,15 @@ export function TeacherAccessRequest() {
   useEffect(() => {
     void charger();
   }, [charger]);
+
+  const handleVerifierStatut = async () => {
+    setActualisationDroits(true);
+    try {
+      await Promise.all([charger(), auth ? auth.refreshProfile() : Promise.resolve()]);
+    } finally {
+      setActualisationDroits(false);
+    }
+  };
 
   const envoyer = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -56,7 +68,7 @@ export function TeacherAccessRequest() {
 
   if (demande?.statut === "en_attente") {
     return (
-      <div className="rounded-md border border-amber-500/30 bg-amber-500/5 p-3 text-left text-xs space-y-1">
+      <div className="rounded-md border border-amber-500/30 bg-amber-500/5 p-3 text-left text-xs space-y-2">
         <div className="flex items-center gap-2 font-semibold text-amber-600 dark:text-amber-400">
           <Clock className="w-4 h-4" />
           Demande en attente de validation
@@ -64,8 +76,19 @@ export function TeacherAccessRequest() {
         <p className="text-muted-foreground">
           Établissement : {demande.etablissement}. Envoyée le{" "}
           {new Date(demande.createdAt).toLocaleDateString()}. Un administrateur la traitera
-          prochainement ; reconnectez-vous ensuite.
+          prochainement.
         </p>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={() => void handleVerifierStatut()}
+          disabled={actualisationDroits}
+          className="h-7 text-xs gap-1.5"
+        >
+          <RefreshCw className={`w-3.5 h-3.5 ${actualisationDroits ? "animate-spin" : ""}`} />
+          {actualisationDroits ? "Vérification…" : "Vérifier le statut et actualiser mes droits"}
+        </Button>
       </div>
     );
   }
@@ -88,9 +111,22 @@ export function TeacherAccessRequest() {
         </div>
       )}
       {demande?.statut === "acceptee" && (
-        <div className="flex items-center gap-2 rounded-md border border-emerald-500/30 bg-emerald-500/5 p-3 text-xs text-emerald-600 dark:text-emerald-400">
-          <CheckCircle2 className="w-4 h-4" />
-          Demande acceptée : reconnectez-vous pour accéder à l'espace enseignant.
+        <div className="rounded-md border border-emerald-500/30 bg-emerald-500/5 p-3 text-xs text-emerald-600 dark:text-emerald-400 space-y-2">
+          <div className="flex items-center gap-2 font-semibold">
+            <CheckCircle2 className="w-4 h-4" />
+            <span>Demande acceptée : votre habilitation enseignant est validée.</span>
+          </div>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => void handleVerifierStatut()}
+            disabled={actualisationDroits}
+            className="h-7 text-xs gap-1.5 border-emerald-500/40 text-emerald-700 dark:text-emerald-300"
+          >
+            <RefreshCw className={`w-3.5 h-3.5 ${actualisationDroits ? "animate-spin" : ""}`} />
+            {actualisationDroits ? "Actualisation…" : "Actualiser mes droits maintenant"}
+          </Button>
         </div>
       )}
 

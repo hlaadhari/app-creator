@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import React, { useMemo } from "react";
 import { getWrittenExam, sampleWrittenExam } from "@/lib/content/written-subjects";
 import { WrittenExamEnvironment } from "@/components/exam/written/WrittenExamEnvironment";
+import { AuthModal } from "@/components/AuthModal";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, BookOpen, AlertCircle } from "lucide-react";
 
@@ -58,13 +59,14 @@ function ExamenEcritPage() {
 
   return (
     <div className="min-h-screen bg-background py-6">
-      <div className="max-w-5xl mx-auto px-4 mb-4">
+      <div className="max-w-5xl mx-auto px-4 mb-4 flex items-center justify-between gap-3">
         <Link
           to="/"
           className="inline-flex items-center text-xs text-muted-foreground hover:text-foreground transition-colors gap-1.5"
         >
           <ArrowLeft className="h-3.5 w-3.5" /> Quitter l'épreuve et revenir à l'accueil
         </Link>
+        <AuthModal />
       </div>
 
       <WrittenExamEnvironment manifest={manifest} />

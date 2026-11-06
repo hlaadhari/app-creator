@@ -28,11 +28,21 @@ import { BadgesShowcase } from "./BadgesShowcase";
 
 interface ProgressionModalProps {
   triggerButton?: React.ReactNode;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  hideTrigger?: boolean;
 }
 
-export function ProgressionModal({ triggerButton }: ProgressionModalProps) {
+export function ProgressionModal({
+  triggerButton,
+  open: controlledOpen,
+  onOpenChange: controlledOnOpenChange,
+  hideTrigger = false,
+}: ProgressionModalProps) {
   const { user } = useAuth();
-  const [open, setOpen] = useState(false);
+  const [internalOpen, setInternalOpen] = useState(false);
+  const open = controlledOpen !== undefined ? controlledOpen : internalOpen;
+  const setOpen = controlledOnOpenChange ?? setInternalOpen;
   const [report, setReport] = useState<StudentProgressionReport | null>(null);
   const [loading, setLoading] = useState(false);
   const [selectedCatFilter, setSelectedCatFilter] = useState<string>("all");
@@ -61,18 +71,20 @@ export function ProgressionModal({ triggerButton }: ProgressionModalProps) {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        {triggerButton || (
-          <Button
-            variant="outline"
-            size="sm"
-            className="gap-2 text-xs font-mono border-primary/30 text-primary hover:bg-primary/10 cursor-pointer"
-          >
-            <TrendingUp className="h-4 w-4" />
-            <span>Mon Bilan de Compétences</span>
-          </Button>
-        )}
-      </DialogTrigger>
+      {!hideTrigger && (
+        <DialogTrigger asChild>
+          {triggerButton || (
+            <Button
+              variant="outline"
+              size="sm"
+              className="gap-2 text-xs font-mono border-primary/30 text-primary hover:bg-primary/10 cursor-pointer"
+            >
+              <TrendingUp className="h-4 w-4" />
+              <span>Mon Bilan de Compétences</span>
+            </Button>
+          )}
+        </DialogTrigger>
+      )}
 
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>

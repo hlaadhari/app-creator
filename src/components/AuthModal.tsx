@@ -12,9 +12,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "@/lib/supabase/auth";
+import { UserProfileMenu } from "@/components/UserProfileMenu";
 
-export function AuthModal() {
-  const { user, profile, role, signOut, signInWithEmail, signUp } = useAuth();
+export interface AuthModalProps {
+  onClassesChanged?: (() => void) | undefined;
+}
+
+export function AuthModal({ onClassesChanged }: AuthModalProps = {}) {
+  const { user, signInWithEmail, signUp } = useAuth();
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -52,21 +57,7 @@ export function AuthModal() {
   };
 
   if (user) {
-    return (
-      <div className="flex items-center gap-3">
-        <span className="text-xs font-mono text-muted-foreground">
-          {profile?.prenom ? `${profile.prenom} ${profile.nom}` : user.email}
-          {role && (
-            <span className="ml-1.5 rounded bg-primary/10 text-primary px-1.5 py-0.5 text-[10px] uppercase font-semibold">
-              {role}
-            </span>
-          )}
-        </span>
-        <Button variant="outline" size="sm" onClick={() => signOut()}>
-          Déconnexion
-        </Button>
-      </div>
-    );
+    return <UserProfileMenu onClassesChanged={onClassesChanged} />;
   }
 
   return (

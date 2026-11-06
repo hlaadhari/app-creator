@@ -30,6 +30,7 @@ import {
   type DemandeEnseignant,
 } from "@/lib/supabase/teacher-requests";
 import { TeacherRequestsQueue } from "@/components/teacher/TeacherRequestsQueue";
+import { AuthModal } from "@/components/AuthModal";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -352,6 +353,7 @@ function AdminDashboardPage() {
             <RefreshCw className={`w-3.5 h-3.5 ${loadingData ? "animate-spin" : ""}`} />
             Actualiser
           </Button>
+          {!isDemo && <AuthModal />}
         </div>
       </header>
 

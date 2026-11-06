@@ -243,3 +243,38 @@ export async function getMesClasses(): Promise<ClassInfo[]> {
     return [];
   }
 }
+
+/**
+ * Permet à un élève connecté de quitter une classe active (en renseignant left_at).
+ */
+export async function quitterClasse(
+  classId: string,
+): Promise<{ success: boolean; error?: string }> {
+  if (!classId || !classId.trim()) {
+    return { success: false, error: "Identifiant de classe invalide." };
+  }
+  try {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) {
+      return { success: false, error: "Authentification requise." };
+    }
+
+    const { error } = await supabase
+      .from("class_members")
+      .update({ left_at: new Date().toISOString() })
+      .eq("class_id", classId)
+      .eq("eleve_id", user.id);
+
+    if (error) {
+      return { success: false, error: error.message };
+    }
+    return { success: true };
+  } catch (err) {
+    return {
+      success: false,
+      error: err instanceof Error ? err.message : "Impossible de quitter la classe.",
+    };
+  }
+}
