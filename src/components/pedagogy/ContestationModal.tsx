@@ -27,6 +27,7 @@ interface ContestationModalProps {
     maxPoints: number;
     message?: string | undefined;
   };
+  sujetId?: string | undefined;
   eleveId: string;
   eleveNom?: string | undefined;
   projetId?: string | null | undefined;
@@ -39,6 +40,7 @@ export function ContestationModal({
   isOpen,
   onClose,
   critere,
+  sujetId,
   eleveId,
   eleveNom,
   projetId,
@@ -60,6 +62,7 @@ export function ContestationModal({
     setErrorMessage(null);
 
     const submission: ContestationSubmission = {
+      sujetId,
       critereId: critere.id,
       critereCode: critere.code ?? critere.id.toUpperCase(),
       critereLabel: critere.label,
@@ -75,7 +78,14 @@ export function ContestationModal({
 
     if (res.success && res.contestation) {
       onContestationSubmitted?.(res.contestation);
-      onClose();
+      if (res.syncError) {
+        // Jamais d'échec silencieux : la contestation reste sur cet appareil et l'élève le sait.
+        setErrorMessage(
+          `Contestation enregistrée sur cet appareil mais non transmise à l'enseignant : ${res.syncError}`,
+        );
+      } else {
+        onClose();
+      }
     } else {
       setErrorMessage(res.error ?? "Erreur lors de la soumission de la contestation.");
     }

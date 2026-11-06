@@ -6,6 +6,8 @@ import { supabase } from "@/integrations/supabase/client";
 import type { ContestationRecord } from "@/lib/subjects/contestations-service";
 
 export interface ContestationSubmission {
+  /** Identifiant du sujet (slug du catalogue), nécessaire pour résoudre le critère côté serveur. */
+  sujetId?: string | undefined;
   critereId: string;
   eleveId: string;
   texte: string;
@@ -22,6 +24,15 @@ export interface ContestationResponse {
   success: boolean;
   contestation?: ContestationRecord;
   error?: string;
+  /** Renseigné quand la contestation est gardée en local mais n'a pas atteint le serveur (#185). */
+  syncError?: string;
+}
+
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+/** Vrai si la valeur est un UUID : un identifiant local (invité) n'est jamais envoyé au serveur. */
+export function estUuid(valeur: string | null | undefined): boolean {
+  return typeof valeur === "string" && UUID_RE.test(valeur);
 }
 
 const STORAGE_KEY = "labo_sti_contestations";
@@ -85,31 +96,37 @@ export async function soumettreContestation(
   filtered.push(newRecord);
   saveLocalContestations(filtered);
 
-  // 2. Persistance asynchrone Supabase si session disponible
-  try {
-    const { data, error } = await supabase
-      .from("contestations")
-      .insert({
-        critere_id: submission.critereId,
-        eleve_id: submission.eleveId,
-        projet_id: submission.projetId ?? null,
-        sujet_version_id: submission.sujetVersionId ?? null,
-        texte: trimmed,
-        statut: "en_attente",
-      })
-      .select()
-      .maybeSingle();
-
-    if (!error && data) {
-      newRecord.id = data.id;
+  // 2. Persistance Supabase : le critère et la version sont résolus côté serveur par la RPC.
+  let syncError: string | undefined;
+  if (!estUuid(submission.eleveId)) {
+    syncError = "Connectez-vous pour transmettre la contestation à votre enseignant.";
+  } else if (!submission.sujetId) {
+    syncError = "Sujet inconnu : contestation non transmise.";
+  } else {
+    try {
+      const { data, error } = await supabase.rpc("deposer_contestation", {
+        p_sujet_id: submission.sujetId,
+        p_critere_code: submission.critereId,
+        p_texte: trimmed,
+        ...(estUuid(submission.projetId) ? { p_projet_id: submission.projetId as string } : {}),
+      });
+      if (error) {
+        syncError = error.message;
+      } else if (typeof data === "string") {
+        newRecord.id = data;
+        saveLocalContestations(
+          getLocalContestations().map((c) => (c.id === id ? { ...c, id: data } : c)),
+        );
+      }
+    } catch (err) {
+      syncError = err instanceof Error ? err.message : "Serveur injoignable";
     }
-  } catch (err) {
-    console.warn("[Contestations] Persistance distante indisponible, conservé en local :", err);
   }
 
   return {
     success: true,
     contestation: newRecord,
+    ...(syncError ? { syncError } : {}),
   };
 }
 
@@ -121,6 +138,8 @@ export async function listerContestationsEleve(
   sujetVersionId?: string,
 ): Promise<ContestationRecord[]> {
   const local = getLocalContestations().filter((c) => c.eleve_id === eleveId);
+
+  if (!estUuid(eleveId)) return local;
 
   try {
     let query = supabase.from("contestations").select("*").eq("eleve_id", eleveId);

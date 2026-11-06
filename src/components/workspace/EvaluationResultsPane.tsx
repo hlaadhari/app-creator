@@ -17,6 +17,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import type { EvaluationSummary } from "@/lib/evaluation/probe-runner";
+import { supabase } from "@/integrations/supabase/client";
 import { ContestationModal } from "@/components/pedagogy/ContestationModal";
 import { AttemptsTimelineDrawer } from "@/components/pedagogy/AttemptsTimelineDrawer";
 import { ReferenceSolutionModal } from "@/components/pedagogy/ReferenceSolutionModal";
@@ -49,10 +50,23 @@ export function EvaluationResultsPane({
   sujetTitle,
   sujetVersionId,
   examMode = false,
-  eleveId = "eleve-courant",
+  eleveId: eleveIdProp,
   eleveNom,
   projetId,
 }: EvaluationResultsPaneProps) {
+  const [authUserId, setAuthUserId] = useState<string | null>(null);
+  useEffect(() => {
+    let actif = true;
+    supabase.auth
+      .getUser()
+      .then(({ data }) => actif && setAuthUserId(data.user?.id ?? null))
+      .catch(() => undefined);
+    return () => {
+      actif = false;
+    };
+  }, []);
+  // Identifiant réel de l'élève connecté ; « invite » n'est jamais envoyé au serveur (#185).
+  const eleveId = eleveIdProp ?? authUserId ?? "invite";
   const [historyOpen, setHistoryOpen] = useState(false);
   const [solutionOpen, setSolutionOpen] = useState(false);
   const [contestationTarget, setContestationTarget] = useState<{
@@ -525,6 +539,7 @@ export function EvaluationResultsPane({
           isOpen={!!contestationTarget}
           onClose={() => setContestationTarget(null)}
           critere={contestationTarget}
+          sujetId={sujetId}
           eleveId={eleveId}
           eleveNom={eleveNom}
           projetId={projetId}
