@@ -37,8 +37,16 @@ export function attendreAucuneAnomalie(a: Anomalies): void {
 export async function seConnecter(page: Page, role: Role): Promise<void> {
   const id = identifiants(role);
   if (!id) throw new Error(`Identifiants E2E_${role}_* absents`);
+  // Évite la boîte de bienvenue de la première visite, qui masque le reste de la page.
+  await page.addInitScript(() =>
+    window.localStorage.setItem("labo_sti_onboarding_completed", "true"),
+  );
   await page.goto("/");
-  await page.getByRole("button", { name: /Connexion \/ Inscription/ }).click();
+  // Le rendu serveur précède l'hydratation : on réessaie le clic jusqu'à l'ouverture du formulaire.
+  await expect(async () => {
+    await page.getByRole("button", { name: /Connexion \/ Inscription/ }).click({ timeout: 3_000 });
+    await expect(page.locator("#login-email")).toBeVisible({ timeout: 2_000 });
+  }).toPass({ timeout: 30_000 });
   await page.locator("#login-email").fill(id.email);
   await page.locator("#login-password").fill(id.password);
   await page.getByRole("button", { name: "Se connecter" }).click();
