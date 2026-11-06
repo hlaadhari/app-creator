@@ -92,8 +92,8 @@ jobs:
       E2E_ENSEIGNANT_PASSWORD: ${{ secrets.E2E_ENSEIGNANT_PASSWORD }}
       E2E_ADMIN_EMAIL: ${{ secrets.E2E_ADMIN_EMAIL }}
       E2E_ADMIN_PASSWORD: ${{ secrets.E2E_ADMIN_PASSWORD }}
-      E2E_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
-      E2E_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.VITE_SUPABASE_PUBLISHABLE_KEY }}
+      E2E_SUPABASE_URL: ${{ secrets.E2E_SUPABASE_URL }}
+      E2E_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.E2E_SUPABASE_PUBLISHABLE_KEY }}
 
     steps:
       - name: Checkout code
