@@ -276,7 +276,7 @@ function Index() {
 
           {user && <JoinClassModal onClassJoined={loadData} />}
 
-          <AuthModal />
+          <AuthModal onClassesChanged={loadData} />
         </div>
       </header>
 

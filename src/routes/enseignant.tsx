@@ -59,6 +59,7 @@ import {
 import { telechargerExportPronote } from "@/lib/export/pronote-export";
 import { SimilarityAnalysisTab } from "@/components/teacher/SimilarityAnalysisTab";
 import { TeacherAccessRequest } from "@/components/teacher/TeacherAccessRequest";
+import { AuthModal } from "@/components/AuthModal";
 import { estModeDemo } from "@/lib/demo-mode";
 import type { StudentCopyData } from "@/lib/similarity/types";
 
@@ -784,6 +785,7 @@ function TeacherDashboardPage() {
             <RefreshCw className={`w-3.5 h-3.5 ${loadingData ? "animate-spin" : ""}`} />
             Actualiser
           </Button>
+          {!isDemo && <AuthModal />}
         </div>
       </header>
 

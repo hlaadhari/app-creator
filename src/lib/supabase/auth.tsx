@@ -12,6 +12,83 @@ export interface Profile {
   prenom: string;
 }
 
+export interface RoleBadgeInfo {
+  label: string;
+  badgeClass: string;
+  description: string;
+}
+
+/**
+ * Retourne le nom d'affichage formaté de l'utilisateur (Prénom Nom ou e-mail de repli).
+ */
+export function getUserDisplayName(
+  profile: Profile | null,
+  user: { email?: string | null } | null,
+): string {
+  const prenom = profile?.prenom?.trim() ?? "";
+  const nom = profile?.nom?.trim() ?? "";
+  const full = `${prenom} ${nom}`.trim();
+  if (full.length > 0) return full;
+  if (user?.email && user.email.trim().length > 0) return user.email.trim();
+  return "Utilisateur connecté";
+}
+
+/**
+ * Calcule les initiales (1 à 2 lettres majuscules) à partir du profil ou de l'e-mail.
+ */
+export function getUserInitials(
+  profile: Profile | null,
+  user: { email?: string | null } | null,
+): string {
+  const prenom = profile?.prenom?.trim() ?? "";
+  const nom = profile?.nom?.trim() ?? "";
+  if (prenom && nom) {
+    return `${prenom.charAt(0)}${nom.charAt(0)}`.toUpperCase();
+  }
+  if (prenom) {
+    return prenom.slice(0, 2).toUpperCase();
+  }
+  if (nom) {
+    return nom.slice(0, 2).toUpperCase();
+  }
+  const email = user?.email?.trim() ?? "";
+  if (email.length >= 2) {
+    return email.slice(0, 2).toUpperCase();
+  }
+  return "STI";
+}
+
+/**
+ * Métadonnées visuelles et descriptives du rôle effectif (issu exclusivement de la base).
+ */
+export function getRoleBadgeInfo(role: AppRole | null): RoleBadgeInfo {
+  switch (role) {
+    case "admin":
+      return {
+        label: "Admin",
+        badgeClass: "bg-rose-500/10 text-rose-500 border-rose-500/30",
+        description:
+          "Super-administrateur : gestion des comptes, habilitations enseignants et audit de sécurité.",
+      };
+    case "enseignant":
+      return {
+        label: "Enseignant",
+        badgeClass: "bg-primary/10 text-primary border-primary/30",
+        description:
+          "Enseignant certifié : création et gestion de classes, studio de sujets, suivi des copies et séances TP.",
+      };
+    case "eleve":
+    default:
+      return {
+        label: "Élève",
+        badgeClass:
+          "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/30",
+        description:
+          "Compte élève : entraînement sur le catalogue Bac STI, sauvegarde automatique et adhésion aux classes.",
+      };
+  }
+}
+
 interface AuthContextType {
   user: User | null;
   session: Session | null;
@@ -29,6 +106,8 @@ interface AuthContextType {
   ) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
   refreshProfile: () => Promise<void>;
+  updateProfile: (nom: string, prenom: string) => Promise<{ error: Error | null }>;
+  updatePassword: (newPassword: string) => Promise<{ error: Error | null }>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -161,8 +240,69 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const refreshProfile = async () => {
+    utilisateurCharge.current = null;
     enCours.current = null;
     await fetchUserData(user);
+  };
+
+  const updateProfile = async (nom: string, prenom: string): Promise<{ error: Error | null }> => {
+    if (!user) {
+      return { error: new Error("Vous devez être connecté pour modifier votre profil.") };
+    }
+    const cleanNom = nom.trim();
+    const cleanPrenom = prenom.trim();
+    if (!cleanPrenom || !cleanNom) {
+      return { error: new Error("Le prénom et le nom sont obligatoires.") };
+    }
+    if (cleanPrenom.length > 100 || cleanNom.length > 100) {
+      return { error: new Error("Le prénom et le nom ne peuvent pas dépasser 100 caractères.") };
+    }
+
+    try {
+      const { error: dbError } = await supabase
+        .from("profiles")
+        .update({ nom: cleanNom, prenom: cleanPrenom })
+        .eq("id", user.id);
+
+      if (dbError) {
+        return { error: new Error(dbError.message) };
+      }
+
+      if (typeof supabase.auth.updateUser === "function") {
+        await supabase.auth.updateUser({
+          data: { nom: cleanNom, prenom: cleanPrenom },
+        });
+      }
+
+      setProfile({ id: user.id, nom: cleanNom, prenom: cleanPrenom });
+      return { error: null };
+    } catch (e) {
+      return {
+        error: e instanceof Error ? e : new Error("Impossible de mettre à jour le profil."),
+      };
+    }
+  };
+
+  const updatePassword = async (newPassword: string): Promise<{ error: Error | null }> => {
+    if (!user) {
+      return { error: new Error("Vous devez être connecté pour modifier votre mot de passe.") };
+    }
+    if (!newPassword || newPassword.length < 6) {
+      return {
+        error: new Error("Le nouveau mot de passe doit contenir au moins 6 caractères."),
+      };
+    }
+    try {
+      const { error } = await supabase.auth.updateUser({ password: newPassword });
+      if (error) {
+        return { error: new Error(error.message) };
+      }
+      return { error: null };
+    } catch (e) {
+      return {
+        error: e instanceof Error ? e : new Error("Impossible de modifier le mot de passe."),
+      };
+    }
   };
 
   return (
@@ -178,6 +318,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         signUp,
         signOut,
         refreshProfile,
+        updateProfile,
+        updatePassword,
       }}
     >
       {children}
@@ -191,4 +333,8 @@ export function useAuth() {
     throw new Error("useAuth doit être utilisé à l'intérieur d'un AuthProvider");
   }
   return context;
+}
+
+export function useOptionalAuth(): AuthContextType | undefined {
+  return useContext(AuthContext);
 }
