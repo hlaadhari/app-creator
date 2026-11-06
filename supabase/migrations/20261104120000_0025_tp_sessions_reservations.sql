@@ -50,6 +50,7 @@ alter table public.tp_sessions enable row level security;
 alter table public.tp_reservations enable row level security;
 
 -- Politiques RLS pour tp_sessions
+-- Lecture : membres et enseignant de la classe, créateur, admin ; séances sans classe visibles de tous.
 create policy "Lecture des sessions TP"
   on public.tp_sessions for select to authenticated
   using (
@@ -60,19 +61,28 @@ create policy "Lecture des sessions TP"
     or public.has_role(auth.uid(), 'admin')
   );
 
+-- Écriture : uniquement un enseignant sur ses propres séances ou celles de sa classe, ou un admin.
+-- Un élève ne peut jamais créer, modifier ni supprimer une séance (sinon il pourrait se déclarer
+-- « créateur » puis valider sa propre demande).
 create policy "Gestion des sessions TP par enseignant"
   on public.tp_sessions for all to authenticated
   using (
-    created_by = auth.uid()
-    or (class_id is not null and public.est_enseignant_classe(class_id))
-    or public.has_role(auth.uid(), 'enseignant')
-    or public.has_role(auth.uid(), 'admin')
+    public.has_role(auth.uid(), 'admin')
+    or (
+      public.has_role(auth.uid(), 'enseignant')
+      and (
+        created_by = auth.uid()
+        or (class_id is not null and public.est_enseignant_classe(class_id))
+      )
+    )
   )
   with check (
-    created_by = auth.uid()
-    or (class_id is not null and public.est_enseignant_classe(class_id))
-    or public.has_role(auth.uid(), 'enseignant')
-    or public.has_role(auth.uid(), 'admin')
+    public.has_role(auth.uid(), 'admin')
+    or (
+      public.has_role(auth.uid(), 'enseignant')
+      and created_by = auth.uid()
+      and (class_id is null or public.est_enseignant_classe(class_id))
+    )
   );
 
 -- Politiques RLS pour tp_reservations
@@ -92,11 +102,19 @@ create policy "Lecture des reservations TP"
     )
   );
 
+-- Un élève ne réserve que pour lui-même, en attente, sur une séance non terminée de sa classe
+-- (ou sans classe).
 create policy "Eleve demande reservation"
   on public.tp_reservations for insert to authenticated
   with check (
     student_id = auth.uid()
     and status = 'pending'
+    and exists (
+      select 1 from public.tp_sessions s
+      where s.id = session_id
+      and s.status <> 'completed'
+      and (s.class_id is null or public.est_membre_classe(s.class_id))
+    )
   );
 
 create policy "Eleve annule sa reservation en attente"
@@ -105,6 +123,8 @@ create policy "Eleve annule sa reservation en attente"
     student_id = auth.uid() and status = 'pending'
   );
 
+-- Validation / refus : seulement l'enseignant propriétaire de la séance ou de la classe, ou un admin.
+-- Aucune politique d'UPDATE pour les élèves : un élève ne valide jamais sa propre demande.
 create policy "Enseignant valide ou refuse reservation"
   on public.tp_reservations for update to authenticated
   using (
@@ -112,10 +132,14 @@ create policy "Enseignant valide ou refuse reservation"
       select 1 from public.tp_sessions s
       where s.id = session_id
       and (
-        s.created_by = auth.uid()
-        or (s.class_id is not null and public.est_enseignant_classe(s.class_id))
-        or public.has_role(auth.uid(), 'enseignant')
-        or public.has_role(auth.uid(), 'admin')
+        public.has_role(auth.uid(), 'admin')
+        or (
+          public.has_role(auth.uid(), 'enseignant')
+          and (
+            s.created_by = auth.uid()
+            or (s.class_id is not null and public.est_enseignant_classe(s.class_id))
+          )
+        )
       )
     )
   )
@@ -124,10 +148,14 @@ create policy "Enseignant valide ou refuse reservation"
       select 1 from public.tp_sessions s
       where s.id = session_id
       and (
-        s.created_by = auth.uid()
-        or (s.class_id is not null and public.est_enseignant_classe(s.class_id))
-        or public.has_role(auth.uid(), 'enseignant')
-        or public.has_role(auth.uid(), 'admin')
+        public.has_role(auth.uid(), 'admin')
+        or (
+          public.has_role(auth.uid(), 'enseignant')
+          and (
+            s.created_by = auth.uid()
+            or (s.class_id is not null and public.est_enseignant_classe(s.class_id))
+          )
+        )
       )
     )
   );
@@ -139,10 +167,14 @@ create policy "Enseignant supprime les reservations"
       select 1 from public.tp_sessions s
       where s.id = session_id
       and (
-        s.created_by = auth.uid()
-        or (s.class_id is not null and public.est_enseignant_classe(s.class_id))
-        or public.has_role(auth.uid(), 'enseignant')
-        or public.has_role(auth.uid(), 'admin')
+        public.has_role(auth.uid(), 'admin')
+        or (
+          public.has_role(auth.uid(), 'enseignant')
+          and (
+            s.created_by = auth.uid()
+            or (s.class_id is not null and public.est_enseignant_classe(s.class_id))
+          )
+        )
       )
     )
   );
