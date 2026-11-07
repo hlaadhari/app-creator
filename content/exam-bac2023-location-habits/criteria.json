@@ -3,16 +3,16 @@
     "id": "EX23-01",
     "code": "HTML-01",
     "titre": "Structure du formulaire de location (HTML5)",
-    "description": "Le formulaire location.html doit comporter les champs cin, id_habit, date_loc, duree et la méthode POST vers location.php.",
+    "description": "Le formulaire location.html doit comporter les champs obligatoires (required) cin, id_habit, date_loc, duree et la méthode POST vers location.php.",
     "points": 2,
     "ordre": 1,
     "fichier": "location.html",
     "sonde": {
       "type": "dom_selector",
-      "selector": "form[method=\"POST\" i][action=\"location.php\"] input#cin, form select#id_habit, form input#date_loc, form input#duree",
+      "selector": "form[method=\"POST\" i][action=\"location.php\"] input#cin[required], form select#id_habit[required], form input#date_loc[required], form input#duree[required]",
       "minCount": 4
     },
-    "fail_message": "Le formulaire location.html ne contient pas tous les champs requis (cin, id_habit, date_loc, duree) ou n'envoie pas en POST vers location.php."
+    "fail_message": "Le formulaire location.html ne contient pas tous les champs obligatoires (required : cin, id_habit, date_loc, duree) ou n'envoie pas en POST vers location.php."
   },
   {
     "id": "EX23-02",
@@ -25,10 +25,10 @@
     "sonde": {
       "type": "css_property",
       "selector": "fieldset",
-      "property": "border-width",
+      "property": "border-radius",
       "isGreaterThanZero": true
     },
-    "fail_message": "La feuille mesStyles.css n'applique pas les styles attendus sur le fieldset."
+    "fail_message": "La feuille mesStyles.css n'applique pas les styles attendus (border-radius > 0) sur le fieldset."
   },
   {
     "id": "EX23-03",

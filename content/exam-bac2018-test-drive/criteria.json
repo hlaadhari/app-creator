@@ -3,32 +3,32 @@
     "id": "EX18-01",
     "code": "HTML-01",
     "titre": "Formulaire d'évaluation d'essai (HTML5)",
-    "description": "Le formulaire evaluation.html doit comporter les champs cin, immatriculation, date_test, note_confort, note_conduite, note_securite et envoyer en POST vers evaluer.php.",
+    "description": "Le formulaire evaluation.html doit comporter les champs obligatoires (required) cin, immatriculation, date_test, note_confort, note_conduite, note_securite et envoyer en POST vers evaluer.php.",
     "points": 2,
     "ordre": 1,
     "fichier": "evaluation.html",
     "sonde": {
       "type": "dom_selector",
-      "selector": "form[method=\"POST\" i][action=\"evaluer.php\"] input#cin, form select#immatriculation, form input#date_test, form input#note_confort, form input#note_conduite, form input#note_securite",
+      "selector": "form[method=\"POST\" i][action=\"evaluer.php\"] input#cin[required], form select#immatriculation[required], form input#date_test[required], form input#note_confort[required], form input#note_conduite[required], form input#note_securite[required]",
       "minCount": 6
     },
-    "fail_message": "Le formulaire evaluation.html ne comporte pas l'ensemble des champs requis pour l'évaluation ou n'envoie pas en POST vers evaluer.php."
+    "fail_message": "Le formulaire evaluation.html ne comporte pas l'ensemble des champs obligatoires (required) pour l'évaluation ou n'envoie pas en POST vers evaluer.php."
   },
   {
     "id": "EX18-02",
     "code": "CSS-01",
     "titre": "Styles et mise en page Test Drive",
-    "description": "La feuille mesStyles.css doit appliquer des règles de présentation sur le fieldset et les boutons.",
+    "description": "La feuille mesStyles.css doit appliquer des règles de présentation (coins arrondis, bordures) sur le fieldset et les boutons.",
     "points": 2,
     "ordre": 2,
     "fichier": "evaluation.html",
     "sonde": {
       "type": "css_property",
       "selector": "fieldset",
-      "property": "border-width",
+      "property": "border-radius",
       "isGreaterThanZero": true
     },
-    "fail_message": "La feuille mesStyles.css n'applique pas les styles attendus sur le formulaire d'évaluation."
+    "fail_message": "La feuille mesStyles.css n'applique pas les styles attendus (border-radius > 0) sur le formulaire d'évaluation."
   },
   {
     "id": "EX18-03",

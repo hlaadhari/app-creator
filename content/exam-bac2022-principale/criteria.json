@@ -64,21 +64,21 @@
     "id": "BAC22-04",
     "code": "CSS-01",
     "titre": "Mise en page et liaison CSS externe (mesStyles.css)",
-    "description": "La feuille de style mesStyles.css doit appliquer des bordures et une mise en forme structurée sur le fieldset du formulaire.",
+    "description": "La feuille de style mesStyles.css doit appliquer des bordures arrondies et une mise en forme structurée sur le fieldset du formulaire.",
     "points": 2.5,
     "ordre": 4,
     "fichier": "modifier.html",
     "sonde": {
       "type": "css_property",
       "selector": "fieldset",
-      "property": "border-width",
+      "property": "border-radius",
       "isGreaterThanZero": true
     },
-    "fail_message": "La feuille de style externe mesStyles.css n'applique pas les styles requis sur le conteneur fieldset.",
+    "fail_message": "La feuille de style externe mesStyles.css n'applique pas les styles requis (border-radius > 0) sur le conteneur fieldset.",
     "indices": [
       "Assurez-vous que modifier.html est lié à mesStyles.css via une balise <link rel=\"stylesheet\">.",
       "Syntaxe : fieldset { border: 2px solid #0056b3; border-radius: 8px; padding: 20px; }",
-      "Extrait : border-width: 2px;"
+      "Extrait : border-radius: 8px;"
     ]
   },
   {
