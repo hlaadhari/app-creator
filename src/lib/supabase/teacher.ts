@@ -121,13 +121,19 @@ export async function getTeacherClasses(teacherId: string): Promise<TeacherClass
 }
 
 /**
- * Crée une nouvelle classe d'enseignement (PRD F-01)
+ * Crée une nouvelle classe d'enseignement et génère son premier code d'invitation (PRD F-01, #193)
  */
 export async function createTeacherClass(
   teacherId: string,
   nom: string,
   annee: string = "2026-2027",
-): Promise<{ success: boolean; classId?: string; error?: string }> {
+): Promise<{
+  success: boolean;
+  classId?: string;
+  classe?: TeacherClass;
+  invitation?: ClassInvitationRecord;
+  error?: string;
+}> {
   try {
     const cleanNom = nom.trim();
     if (!cleanNom || cleanNom.length < 2) {
@@ -141,14 +147,39 @@ export async function createTeacherClass(
         annee,
         enseignant_id: teacherId,
       })
-      .select("id")
+      .select("id, nom, annee, archivee, created_at")
       .single();
 
     if (error || !data) {
       return { success: false, error: error?.message || "Impossible de créer la classe." };
     }
 
-    return { success: true, classId: data.id };
+    const row = data as {
+      id: string;
+      nom?: string;
+      annee?: string;
+      archivee?: boolean;
+      created_at?: string;
+    };
+
+    const classe: TeacherClass = {
+      id: row.id,
+      nom: row.nom ?? cleanNom,
+      annee: row.annee ?? annee,
+      archivee: Boolean(row.archivee),
+      created_at: row.created_at ?? new Date().toISOString(),
+      members_count: 0,
+      assigned_subjects_count: 0,
+    };
+
+    const invRes = await createClassInvitation(row.id);
+
+    return {
+      success: true,
+      classId: row.id,
+      classe,
+      ...(invRes.success && invRes.invitation ? { invitation: invRes.invitation } : {}),
+    };
   } catch (err) {
     return { success: false, error: String(err) };
   }

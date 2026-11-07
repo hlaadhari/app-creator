@@ -8,6 +8,7 @@ import {
   type StudentFile,
   getTeacherClasses,
   createTeacherClass,
+  genererCodeInvitationFormat,
   getClassStudentsProgress,
   getClassInvitations,
   getStudentCopyFiles,
@@ -483,7 +484,7 @@ monFormulaire.addEventListener("submit", function(e) {
   },
 ];
 
-function TeacherDashboardPage() {
+export function TeacherDashboardPage() {
   const { user, profile, role, authError, loading: authLoading } = useAuth();
   const navigate = useNavigate();
 
@@ -510,7 +511,7 @@ function TeacherDashboardPage() {
   const [loadingCopy, setLoadingCopy] = useState(false);
 
   // Charger les classes de l'enseignant
-  const loadClasses = async () => {
+  const loadClasses = async (preferredClassId?: string) => {
     if (isDemo) {
       setClasses(DEMO_CLASSES);
       if (!selectedClassId) setSelectedClassId("demo-cls-1");
@@ -524,10 +525,24 @@ function TeacherDashboardPage() {
     setErreurChargement(null);
     try {
       const cls = await getTeacherClasses(user.id);
-      setClasses(cls);
-      if (cls.length > 0 && !selectedClassId) {
-        const firstId = cls[0]?.id;
-        if (firstId) setSelectedClassId(firstId);
+      let nextClasses = cls;
+      setClasses((prev) => {
+        const merged = [...cls];
+        for (const p of prev) {
+          if (!merged.some((c) => c.id === p.id)) {
+            merged.unshift(p);
+          }
+        }
+        nextClasses = merged;
+        return merged;
+      });
+      const targetId =
+        preferredClassId ??
+        (selectedClassId && nextClasses.some((c) => c.id === selectedClassId)
+          ? selectedClassId
+          : nextClasses[0]?.id);
+      if (targetId) {
+        setSelectedClassId(targetId);
       }
     } catch (e) {
       setErreurChargement(e instanceof Error ? e.message : "Chargement des classes impossible.");
@@ -561,7 +576,10 @@ function TeacherDashboardPage() {
         getClassStudentCopies(classId),
       ]);
       setStudents(progress);
-      setInvitations(invs);
+      setInvitations((prev) => {
+        if (invs.length > 0) return invs;
+        return prev.filter((i) => i.class_id === classId);
+      });
       setContestations(conts);
       setStudentAttempts(attempts);
       setRealCopies(copies);
@@ -574,19 +592,19 @@ function TeacherDashboardPage() {
 
   useEffect(() => {
     if (isDemo || (user && (role === "enseignant" || role === "admin"))) {
-      loadClasses();
+      void loadClasses();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user, role, isDemo]);
+  }, [user?.id, role, isDemo]);
 
   useEffect(() => {
     if (selectedClassId) {
-      loadClassDetails(selectedClassId);
+      void loadClassDetails(selectedClassId);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedClassId, isDemo]);
 
-  // Création d'une nouvelle classe
+  // Création d'une nouvelle classe (#193 : mise à jour immédiate de l'état, sélection et code d'invitation)
   const handleCreateClass = async (e: React.FormEvent) => {
     e.preventDefault();
     if (isDemo) {
@@ -599,8 +617,19 @@ function TeacherDashboardPage() {
         members_count: 0,
         assigned_subjects_count: 0,
       };
-      setClasses([...classes, newCls]);
+      const newInv: ClassInvitationRecord = {
+        id: `demo-inv-${Date.now()}`,
+        class_id: newCls.id,
+        code: genererCodeInvitationFormat(),
+        expire_le: new Date(Date.now() + 86400000 * 30).toISOString(),
+        utilisations_max: 35,
+        nb_utilisations: 0,
+        revoque: false,
+        created_at: new Date().toISOString(),
+      };
+      setClasses((prev) => [newCls, ...prev]);
       setSelectedClassId(newCls.id);
+      setInvitations([newInv]);
       setNewClassName("");
       setIsCreatingClass(false);
       return;
@@ -611,10 +640,23 @@ function TeacherDashboardPage() {
 
     const res = await createTeacherClass(user.id, newClassName);
     if (res.success && res.classId) {
+      const nouvelleClasse: TeacherClass = res.classe ?? {
+        id: res.classId,
+        nom: newClassName.trim(),
+        annee: "2026-2027",
+        archivee: false,
+        created_at: new Date().toISOString(),
+        members_count: 0,
+        assigned_subjects_count: 0,
+      };
       setNewClassName("");
       setIsCreatingClass(false);
-      await loadClasses();
-      setSelectedClassId(res.classId);
+      setClasses((prev) => [nouvelleClasse, ...prev.filter((c) => c.id !== nouvelleClasse.id)]);
+      setSelectedClassId(nouvelleClasse.id);
+      if (res.invitation) {
+        setInvitations([res.invitation]);
+      }
+      await loadClasses(nouvelleClasse.id);
     } else {
       setNewClassError(res.error || "Impossible de créer la classe.");
     }
@@ -636,7 +678,7 @@ function TeacherDashboardPage() {
 
   // Export CSV Standard
   const handleExportCsv = () => {
-    const activeClass = classes.find((c) => c.id === selectedClassId);
+    const activeClass = classes.find((c) => c.id === selectedClassId) ?? classes[0];
     const nomClasse = activeClass?.nom || "classe";
     const csvData = exporterResultatsCsv(students, nomClasse);
 
@@ -652,7 +694,7 @@ function TeacherDashboardPage() {
 
   // Export CSV Normalisé Pronote / ENT
   const handleExportPronote = () => {
-    const activeClass = classes.find((c) => c.id === selectedClassId);
+    const activeClass = classes.find((c) => c.id === selectedClassId) ?? classes[0];
     const nomClasse = activeClass?.nom || "classe";
     telechargerExportPronote(students, nomClasse);
   };
@@ -710,7 +752,14 @@ function TeacherDashboardPage() {
     );
   }
 
-  const activeClass = classes.find((c) => c.id === selectedClassId);
+  const activeClass = classes.find((c) => c.id === selectedClassId) ?? classes[0];
+  const activeInvitation = invitations.find(
+    (inv) =>
+      (!activeClass || inv.class_id === activeClass.id) &&
+      !inv.revoque &&
+      new Date(inv.expire_le) >= new Date() &&
+      inv.nb_utilisations < inv.utilisations_max,
+  );
 
   // Calcul des métriques globales
   const totalEleves = students.length;
@@ -835,6 +884,19 @@ function TeacherDashboardPage() {
               Nouvelle classe
             </Button>
           </div>
+
+          {activeClass && activeInvitation && (
+            <div
+              data-testid="active-class-invitation-code"
+              className="flex items-center gap-2 text-xs bg-primary/5 border border-primary/20 rounded-lg px-3 py-1.5"
+            >
+              <KeyRound className="w-3.5 h-3.5 text-primary shrink-0" />
+              <span className="text-muted-foreground">Code d'invitation :</span>
+              <strong className="font-mono text-primary tracking-wider">
+                {activeInvitation.code}
+              </strong>
+            </div>
+          )}
         </div>
 
         {/* Modal / Formulaire de création de classe */}
