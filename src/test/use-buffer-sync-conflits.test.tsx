@@ -156,6 +156,8 @@ describe("useBufferSync : conflits de révision (#201)", () => {
     const { result } = monter();
     await waitFor(() => expect(result.current.syncStatus).toBe("synced"));
     expect(result.current.conflict).toBeNull();
-    expect(result.current.files["repare.html"]?.content).toBe("<h1>fichier de départ restauré</h1>");
+    expect(result.current.files["repare.html"]?.content).toBe(
+      "<h1>fichier de départ restauré</h1>",
+    );
   });
 });
