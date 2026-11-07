@@ -45,9 +45,20 @@ export async function getOrCreateProjet(sujetId: string): Promise<string | null>
       .eq("version_id", v.id)
       .maybeSingle();
 
-    if (proj) return proj.id;
+    if (proj) {
+      // Issue #212 : si le projet existe mais a été créé vide (ancien repli #186),
+      // on ne le renvoie directement que s'il possède au moins un fichier.
+      const { data: existingFile } = await supabase
+        .from("projet_fichiers")
+        .select("chemin")
+        .eq("projet_id", proj.id)
+        .limit(1)
+        .maybeSingle();
 
-    // Initialiser le projet via RPC sécurisée
+      if (existingFile) return proj.id;
+    }
+
+    // Initialiser le projet (ou réparer un projet existant vide) via RPC sécurisée
     const { data: newId, error } = await supabase.rpc("initialiser_projet", {
       _version_id: v.id,
     });

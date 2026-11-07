@@ -143,4 +143,19 @@ describe("useBufferSync : conflits de révision (#201)", () => {
     expect(result.current.conflict?.remoteContent).toBe("<h1>version distante</h1>");
     expect(result.current.files["index.html"]?.content).toBe("<h1>version locale</h1>");
   });
+
+  it("adopte les fichiers distants (rev 1) absents localement après réparation d'un projet vide (#212)", async () => {
+    mocks.distants = [
+      {
+        chemin: "repare.html",
+        contenu: "<h1>fichier de départ restauré</h1>",
+        rev: 1,
+        updated_at: "2026-11-07",
+      },
+    ];
+    const { result } = monter();
+    await waitFor(() => expect(result.current.syncStatus).toBe("synced"));
+    expect(result.current.conflict).toBeNull();
+    expect(result.current.files["repare.html"]?.content).toBe("<h1>fichier de départ restauré</h1>");
+  });
 });
