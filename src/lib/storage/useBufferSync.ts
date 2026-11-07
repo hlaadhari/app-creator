@@ -115,6 +115,14 @@ export function useBufferSync({ exerciseId, starterFiles }: UseBufferSyncOptions
         if (remoteFiles && remoteFiles.length > 0) {
           const adoptes: Record<string, string> = {};
           for (const rf of remoteFiles) {
+            const hasLocal =
+              (localSnapshot !== undefined && rf.chemin in localSnapshot) ||
+              rf.chemin in filesRef.current;
+            if (!hasLocal) {
+              fileRevs.current[rf.chemin] = rf.rev;
+              adoptes[rf.chemin] = rf.contenu;
+              continue;
+            }
             const currentRev = fileRevs.current[rf.chemin] || 1;
             if (rf.rev <= currentRev) continue;
 
@@ -152,7 +160,14 @@ export function useBufferSync({ exerciseId, starterFiles }: UseBufferSyncOptions
               const next = { ...prev };
               for (const [name, contenu] of Object.entries(adoptes)) {
                 const existing = next[name];
-                if (existing) next[name] = { ...existing, content: contenu };
+                next[name] = existing
+                  ? { ...existing, content: contenu }
+                  : {
+                      name,
+                      content: contenu,
+                      type: "text",
+                      language: detectLanguage(name),
+                    };
               }
               return next;
             });
