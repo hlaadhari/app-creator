@@ -73,35 +73,52 @@ async function evaluerSujet(id: string, fichiers: Fichiers) {
   };
 }
 
-describe("Garde du code de départ : initial/ ne doit pas gagner de points non documentés (#190)", () => {
+describe("Garde du code de départ : initial/ obtient 0 et les corrigés valident le barème (#190)", () => {
   for (const s of contentSubjects) {
-    it(`${s.id} : le squelette obtient exactement le minimum documenté`, async () => {
+    it(`${s.id} : initial = 0, solutions valides = max, solution invalide < max`, async () => {
       const manifest = JSON.parse(
         fs.readFileSync(path.join(CONTENT_DIR, s.id, "manifest.json"), "utf-8"),
       ) as { score_initial_attendu?: number; score_initial_justification?: string };
       const attendu = manifest.score_initial_attendu ?? 0;
+      expect(attendu, `${s.id} : score_initial_attendu doit être 0 (#190)`).toBe(0);
 
-      const fichiers = lireDossier(path.join(CONTENT_DIR, s.id, "initial"));
-      expect(Object.keys(fichiers).length, `${s.id} : dossier initial/ manquant`).toBeGreaterThan(
-        0,
+      const fichiersInit = lireDossier(path.join(CONTENT_DIR, s.id, "initial"));
+      expect(
+        Object.keys(fichiersInit).length,
+        `${s.id} : dossier initial/ manquant`,
+      ).toBeGreaterThan(0);
+
+      const resInit = await evaluerSujet(s.id, fichiersInit);
+      expect(
+        resInit.got,
+        `${s.id} : le code de départ obtient ${resInit.got} point(s) (critères : ${resInit.reussis.join(", ") || "aucun"}), attendu 0 (#190).`,
+      ).toBe(0);
+
+      // Solution officielle = max vérifiable
+      const fichiersSol = lireDossier(path.join(CONTENT_DIR, s.id, "solution"));
+      const resSol = await evaluerSujet(s.id, fichiersSol);
+      expect(resSol.verifiable, `${s.id} : aucun point vérifiable`).toBeGreaterThan(0);
+      expect(resSol.got, `${s.id} : solution/ doit obtenir le max vérifiable`).toBe(
+        resSol.verifiable,
       );
 
-      const res = await evaluerSujet(s.id, fichiers);
-      expect(
-        res.got,
-        `${s.id} : le code de départ obtient ${res.got} point(s) (critères : ${res.reussis.join(", ") || "aucun"}), ` +
-          `le minimum documenté est ${attendu}. Corrigez les critères ou documentez score_initial_attendu.`,
-      ).toBe(attendu);
+      // Solution alternative = max vérifiable
+      const fichiersAlt = lireDossier(path.join(CONTENT_DIR, s.id, "solution-alt"));
+      if (Object.keys(fichiersAlt).length > 0) {
+        const resAlt = await evaluerSujet(s.id, fichiersAlt);
+        expect(resAlt.got, `${s.id} : solution-alt/ doit obtenir le max vérifiable`).toBe(
+          resAlt.verifiable,
+        );
+      }
 
-      if (attendu > 0) {
+      // Solution invalide < max vérifiable
+      const fichiersInv = lireDossier(path.join(CONTENT_DIR, s.id, "solution-invalide"));
+      if (Object.keys(fichiersInv).length > 0) {
+        const resInv = await evaluerSujet(s.id, fichiersInv);
         expect(
-          manifest.score_initial_justification,
-          `${s.id} : un score de départ non nul doit être justifié (score_initial_justification)`,
-        ).toBeTruthy();
-        expect(
-          res.got / res.total,
-          `${s.id} : le départ ne doit pas dépasser 20 %`,
-        ).toBeLessThanOrEqual(0.2);
+          resInv.got,
+          `${s.id} : solution-invalide/ doit obtenir strictement moins que le max`,
+        ).toBeLessThan(resInv.verifiable);
       }
     });
   }

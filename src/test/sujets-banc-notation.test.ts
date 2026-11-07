@@ -75,10 +75,10 @@ describe("Banc de test de la notation : ex-js-01 (JavaScript)", () => {
     expect(r.echoues).toEqual([]);
   });
 
-  it("le code de départ ne gagne qu'une consigne sur cinq (la déclaration de verif)", async () => {
+  it("le code de départ ne gagne aucun point (#190)", async () => {
     const r = await evaluer(ID, lireVariante(ID, "initial"));
-    expect(r.reussis).toEqual(["c1_verif_exists"]);
-    expect(r.got / r.total).toBeLessThanOrEqual(0.2);
+    expect(r.got).toBe(0);
+    expect(r.reussis).toEqual([]);
   });
 
   it("une deuxième solution valide, par expression régulière, obtient tous les points", async () => {
@@ -266,14 +266,13 @@ describe("Banc de test de la notation : examens à plusieurs pages", () => {
   );
 
   it.each(ANCIENS)(
-    "%s : le corrigé gagne les points vérifiables ; le code fourni en donne au plus 20 %",
+    "%s : le corrigé gagne tous les points vérifiables ; le code fourni n'en gagne aucun (#190)",
     async (id) => {
       const solution = await evaluer(id, lireVariante(id, "solution"));
       expect(solution.got).toBe(solution.verifiable);
 
       const depart = await evaluer(id, lireVariante(id, "initial"));
-      // Le formulaire et le style sont déjà fournis : ces points sont donnés par l'énoncé.
-      expect(depart.got / depart.total).toBeLessThanOrEqual(0.2);
+      expect(depart.got).toBe(0);
     },
   );
 
@@ -557,9 +556,10 @@ describe("Banc de test de la notation : tp-fs-01 (Full-stack formulaire de don)"
     expect(r.echoues).toEqual([]);
   });
 
-  it("le squelette initial obtient moins de 50 % des points", async () => {
+  it("le squelette initial obtient 0/20 (#190)", async () => {
     const r = await evaluer(ID, lireVariante(ID, "initial"));
-    expect(r.got / r.total).toBeLessThan(0.5);
+    expect(r.got).toBe(0);
+    expect(r.reussis).toEqual([]);
     expect(r.verifiable).toBe(20);
   });
 });

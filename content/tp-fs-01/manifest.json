@@ -11,7 +11,5 @@
   "tags": ["HTML5", "CSS3", "JavaScript", "PHP", "MySQLi"],
   "description": "TP de synthèse Full-Stack : conception d'une interface de don matériel pour les lycées techniques, validation et calcul dynamique en JavaScript, traitement et insertion sécurisée dans une base de données MySQL via PHP 8.2.",
   "fichiers_attendus": ["Don.html", "mesStyles.css", "controles.js", "enregistrer.php"],
-  "base_de_donnees": "db/init.sql",
-  "score_initial_attendu": 3,
-  "score_initial_justification": "Le formulaire #fDon est fourni dans le squelette : le critère de structure du formulaire est déjà satisfait. À revoir avec l'enseignant (#190)."
+  "base_de_donnees": "db/init.sql"
 }

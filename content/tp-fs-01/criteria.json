@@ -4,10 +4,10 @@
     "titre": "Structure du formulaire HTML5 et fieldset",
     "points": 3,
     "fichier": "Don.html",
-    "fail_message": "Le formulaire doit avoir id='fDon', action='enregistrer.php', method='post' et comporter un <fieldset>.",
+    "fail_message": "Le formulaire doit avoir id='fDon', action='enregistrer.php', method='post' et comporter dans un <fieldset> les champs obligatoires (required) #nom, #lycee et #article.",
     "sonde": {
       "type": "dom_selector",
-      "selector": "form#fDon fieldset input#nom, form#fDon select#lycee, form#fDon select#article",
+      "selector": "form#fDon fieldset input#nom[required], form#fDon select#lycee[required], form#fDon select#article[required]",
       "minCount": 3
     }
   },
