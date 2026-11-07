@@ -8,6 +8,34 @@ import { messageErreurAdmin } from "@/lib/supabase/admin";
 
 export type StatutDemande = "en_attente" | "acceptee" | "refusee";
 
+export type EtatEffectifDemandeEnseignant =
+  "aucune" | "en_attente" | "refusee" | "habilite" | "acceptee_role_manquant" | "incoherence_role";
+
+/**
+ * Dérive l'état effectif à afficher à partir de la dernière demande et du rôle réel issu de `user_roles` (#200).
+ * Un compte dont le rôle réel dans `user_roles` est `eleve` ne doit jamais voir « habilitation validée »
+ * même si une ligne `demandes_enseignant` antérieure porte le statut `acceptee`.
+ */
+export function deriverEtatDemandeEnseignant(
+  demande: MaDemandeEnseignant | null,
+  roleReel: "eleve" | "enseignant" | "admin" | null | undefined,
+  resyncTente = false,
+): EtatEffectifDemandeEnseignant {
+  if (roleReel === "enseignant" || roleReel === "admin") {
+    return "habilite";
+  }
+  if (!demande) {
+    return "aucune";
+  }
+  if (demande.statut === "en_attente") {
+    return "en_attente";
+  }
+  if (demande.statut === "refusee") {
+    return "refusee";
+  }
+  return resyncTente ? "incoherence_role" : "acceptee_role_manquant";
+}
+
 export interface DemandeEnseignant {
   id: string;
   userId: string;

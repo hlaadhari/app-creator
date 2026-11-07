@@ -21,6 +21,7 @@ import {
   adminListerDemandesEnseignant,
   adminTraiterDemandeEnseignant,
   demanderAccesEnseignant,
+  deriverEtatDemandeEnseignant,
   getMaDemandeEnseignant,
   type DemandeEnseignant,
 } from "@/lib/supabase/teacher-requests";
@@ -193,6 +194,54 @@ describe("Demande d'accès enseignant (issue #65, T-03)", () => {
       render(<TeacherAccessRequest />);
       expect(await screen.findByText(/Compte non vérifiable/)).toBeTruthy();
       expect(screen.getByLabelText("Établissement")).toBeTruthy();
+    });
+
+    it("n'affiche jamais « habilitation validée » si le rôle user_roles est élève (#200)", async () => {
+      derniereDemande.mockResolvedValue({
+        data: {
+          id: "d1",
+          etablissement: "Lycée Menzah 6",
+          statut: "acceptee",
+          motif_refus: null,
+          created_at: "2026-10-21T10:00:00Z",
+        },
+        error: null,
+      });
+      render(<TeacherAccessRequest />);
+
+      expect(
+        await screen.findByText(/Synchronisation requise : votre rôle actuel dans user_roles/i),
+      ).toBeTruthy();
+      expect(
+        screen.queryByText(/Demande acceptée : votre habilitation enseignant est validée/i),
+      ).toBeNull();
+
+      // Après clic sur « Resynchroniser mes droits » sans changement de rôle dans user_roles,
+      // l'incohérence est explicitement signalée et l'élève peut redéposer une demande.
+      fireEvent.click(screen.getByRole("button", { name: /Resynchroniser mes droits/i }));
+      expect(
+        await screen.findByText(
+          /Incohérence détectée : votre rôle effectif est toujours « élève »/i,
+        ),
+      ).toBeTruthy();
+      expect(screen.getByLabelText("Établissement")).toBeTruthy();
+    });
+
+    it("dérive l'état effectif en cohérence stricte avec user_roles (#200)", () => {
+      const demAcceptee = {
+        id: "d1",
+        etablissement: "Lycée",
+        statut: "acceptee" as const,
+        motifRefus: null,
+        createdAt: "2026-10-21T10:00:00Z",
+      };
+      expect(deriverEtatDemandeEnseignant(demAcceptee, "eleve", false)).toBe(
+        "acceptee_role_manquant",
+      );
+      expect(deriverEtatDemandeEnseignant(demAcceptee, "eleve", true)).toBe("incoherence_role");
+      expect(deriverEtatDemandeEnseignant(demAcceptee, "enseignant", false)).toBe("habilite");
+      expect(deriverEtatDemandeEnseignant(null, "admin", false)).toBe("habilite");
+      expect(deriverEtatDemandeEnseignant(null, "eleve", false)).toBe("aucune");
     });
   });
 
