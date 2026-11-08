@@ -7,9 +7,11 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft, BookOpen, AlertCircle } from "lucide-react";
 
 export const Route = createFileRoute("/examen-ecrit/$id")({
-  head: () => ({
+  head: ({ params }) => ({
     meta: [
-      { title: "Épreuve Écrite Théorique – Labo STI" },
+      {
+        title: `${getWrittenExamPublic(params.id)?.title ?? "Épreuve écrite"} – Labo STI`,
+      },
       {
         name: "description",
         content: "Environnement d'épreuve écrite théorique standardisée pour le Baccalauréat STI.",

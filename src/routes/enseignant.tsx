@@ -67,6 +67,7 @@ import { estModeDemo } from "@/lib/demo-mode";
 import type { StudentCopyData } from "@/lib/similarity/types";
 
 export const Route = createFileRoute("/enseignant")({
+  head: () => ({ meta: [{ title: "Espace Enseignant – Labo STI" }] }),
   component: TeacherDashboardPage,
 });
 
