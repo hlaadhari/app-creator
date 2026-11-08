@@ -6,6 +6,49 @@ import { roleEffectif } from "@/lib/supabase/roles";
 
 type AppRole = Database["public"]["Enums"]["app_role"];
 
+export const ROLE_PREVIEW_STORAGE_KEY = "labo_sti_admin_preview_role";
+export const ROLE_PREVIEW_ALLOW_WRITES_KEY = "labo_sti_admin_preview_allow_writes";
+
+/**
+ * Normalise une valeur brute de prévisualisation de rôle.
+ * Seuls 'eleve' et 'enseignant' constituent une surcharge de simulation pour un admin ;
+ * 'admin' ou toute autre valeur ramène au rôle réel (null).
+ */
+export function normalizePreviewRole(raw: unknown): Exclude<AppRole, "admin"> | null {
+  if (raw === "eleve" || raw === "enseignant") {
+    return raw;
+  }
+  return null;
+}
+
+export function getStoredPreviewRole(): Exclude<AppRole, "admin"> | null {
+  if (typeof window === "undefined") return null;
+  try {
+    return normalizePreviewRole(window.sessionStorage.getItem(ROLE_PREVIEW_STORAGE_KEY));
+  } catch {
+    return null;
+  }
+}
+
+export function getStoredPreviewAllowWrites(): boolean {
+  if (typeof window === "undefined") return false;
+  try {
+    return window.sessionStorage.getItem(ROLE_PREVIEW_ALLOW_WRITES_KEY) === "true";
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Indique si les écritures en base doivent être bloquées car l'administrateur
+ * simule actuellement un autre rôle sans avoir explicitement autorisé les écritures (#189).
+ */
+export function isSimulationWriteBlocked(): boolean {
+  const preview = getStoredPreviewRole();
+  if (!preview) return false;
+  return !getStoredPreviewAllowWrites();
+}
+
 export interface Profile {
   id: string;
   nom: string;
@@ -93,7 +136,20 @@ interface AuthContextType {
   user: User | null;
   session: Session | null;
   profile: Profile | null;
+  /** Rôle effectif côté interface (suit `previewRole` si l'admin simule un rôle, sinon `realRole`). */
   role: AppRole | null;
+  /** Rôle réel issu exclusivement de `public.user_roles` en base. */
+  realRole: AppRole | null;
+  /** Rôle simulé par l'administrateur ('eleve' | 'enseignant' | null), mémorisé en sessionStorage. */
+  previewRole: Exclude<AppRole, "admin"> | null;
+  /** Vrai lorsque l'administrateur prévisualise l'interface sous un autre rôle. */
+  isRoleSimulated: boolean;
+  /** Indique si les écritures en base sont autorisées pendant la simulation de rôle. */
+  allowSimulationWrites: boolean;
+  /** Définit ou quitte le rôle de prévisualisation (réservé au rôle réel 'admin'). */
+  setPreviewRole: (targetRole: AppRole | null) => void;
+  /** Active ou désactive l'accord explicite d'écriture en base pendant une simulation. */
+  setAllowSimulationWrites: (allow: boolean) => void;
   /** Message d'erreur si le profil ou le rôle n'ont pas pu être lus (le rôle reste alors null). */
   authError: string | null;
   loading: boolean;
@@ -116,9 +172,57 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
-  const [role, setRole] = useState<AppRole | null>(null);
+  const [realRole, setRealRole] = useState<AppRole | null>(null);
+  const [previewRoleState, setPreviewRoleState] = useState<Exclude<AppRole, "admin"> | null>(() =>
+    getStoredPreviewRole(),
+  );
+  const [allowSimulationWrites, setAllowSimulationWritesState] = useState<boolean>(() =>
+    getStoredPreviewAllowWrites(),
+  );
   const [authError, setAuthError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+
+  const setPreviewRole = (targetRole: AppRole | null) => {
+    if (realRole !== "admin") {
+      return;
+    }
+    const normalized = normalizePreviewRole(targetRole);
+    setPreviewRoleState(normalized);
+    if (typeof window !== "undefined") {
+      try {
+        if (normalized) {
+          window.sessionStorage.setItem(ROLE_PREVIEW_STORAGE_KEY, normalized);
+        } else {
+          window.sessionStorage.removeItem(ROLE_PREVIEW_STORAGE_KEY);
+          window.sessionStorage.removeItem(ROLE_PREVIEW_ALLOW_WRITES_KEY);
+          setAllowSimulationWritesState(false);
+        }
+      } catch {
+        // Ignorer
+      }
+    }
+  };
+
+  const setAllowSimulationWrites = (allow: boolean) => {
+    if (realRole !== "admin") return;
+    setAllowSimulationWritesState(allow);
+    if (typeof window !== "undefined") {
+      try {
+        if (allow) {
+          window.sessionStorage.setItem(ROLE_PREVIEW_ALLOW_WRITES_KEY, "true");
+        } else {
+          window.sessionStorage.removeItem(ROLE_PREVIEW_ALLOW_WRITES_KEY);
+        }
+      } catch {
+        // Ignorer
+      }
+    }
+  };
+
+  const activePreviewRole: Exclude<AppRole, "admin"> | null =
+    realRole === "admin" ? previewRoleState : null;
+  const isRoleSimulated = realRole === "admin" && activePreviewRole !== null;
+  const role: AppRole | null = isRoleSimulated ? activePreviewRole : realRole;
 
   // Un seul chargement par utilisateur : pas de doublon entre la session initiale et les
   // événements d'authentification (SIGNED_IN au retour sur l'onglet, renouvellement de jeton…).
@@ -135,14 +239,30 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (profRes.error) throw new Error(profRes.error.message);
       if (rolesRes.error) throw new Error(rolesRes.error.message);
 
-      setProfile(profRes.data ?? null);
-      setRole(roleEffectif((rolesRes.data ?? []).map((r) => r.role)));
+      const resolvedRole = roleEffectif((rolesRes.data ?? []).map((r) => r.role));
+      const resolvedProfile = profRes.data ?? null;
+
+      setProfile(resolvedProfile);
+      setRealRole(resolvedRole);
       setAuthError(null);
       utilisateurCharge.current = userId;
+
+      if (resolvedRole !== "admin") {
+        setPreviewRoleState(null);
+        setAllowSimulationWritesState(false);
+        if (typeof window !== "undefined") {
+          try {
+            window.sessionStorage.removeItem(ROLE_PREVIEW_STORAGE_KEY);
+            window.sessionStorage.removeItem(ROLE_PREVIEW_ALLOW_WRITES_KEY);
+          } catch {
+            // Ignorer
+          }
+        }
+      }
     } catch (e) {
       // Moindre privilège : sans lecture fiable des droits, aucun rôle n'est attribué.
       console.warn("[Auth] Erreur de récupération du profil/rôle :", e);
-      setRole(null);
+      setRealRole(null);
       utilisateurCharge.current = null;
       setAuthError(e instanceof Error ? e.message : "Impossible de vérifier vos droits.");
     } finally {
@@ -155,7 +275,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       utilisateurCharge.current = null;
       enCours.current = null;
       setProfile(null);
-      setRole(null);
+      setRealRole(null);
       setAuthError(null);
       setLoading(false);
       return Promise.resolve();
@@ -233,10 +353,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setUser(null);
     setSession(null);
     setProfile(null);
-    setRole(null);
+    setRealRole(null);
+    setPreviewRoleState(null);
+    setAllowSimulationWritesState(false);
     setAuthError(null);
     utilisateurCharge.current = null;
     enCours.current = null;
+    if (typeof window !== "undefined") {
+      try {
+        window.sessionStorage.removeItem(ROLE_PREVIEW_STORAGE_KEY);
+        window.sessionStorage.removeItem(ROLE_PREVIEW_ALLOW_WRITES_KEY);
+      } catch {
+        // Ignorer
+      }
+    }
   };
 
   const refreshProfile = async () => {
@@ -312,6 +442,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         session,
         profile,
         role,
+        realRole,
+        previewRole: activePreviewRole,
+        isRoleSimulated,
+        allowSimulationWrites,
+        setPreviewRole,
+        setAllowSimulationWrites,
         authError,
         loading,
         signInWithEmail,
