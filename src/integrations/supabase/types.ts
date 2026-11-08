@@ -852,6 +852,8 @@ export type Database = {
       projets: {
         Row: {
           created_at: string;
+          debut_examen_serveur: string | null;
+          echeance_serveur: string | null;
           eleve_id: string;
           id: string;
           statut: string;
@@ -860,6 +862,8 @@ export type Database = {
         };
         Insert: {
           created_at?: string;
+          debut_examen_serveur?: string | null;
+          echeance_serveur?: string | null;
           eleve_id: string;
           id?: string;
           statut?: string;
@@ -868,6 +872,8 @@ export type Database = {
         };
         Update: {
           created_at?: string;
+          debut_examen_serveur?: string | null;
+          echeance_serveur?: string | null;
           eleve_id?: string;
           id?: string;
           statut?: string;
@@ -1335,6 +1341,10 @@ export type Database = {
       };
       lancer_coup_denvoi_examen: {
         Args: { p_session_id: string };
+        Returns: Json;
+      };
+      demarrer_examen_pratique: {
+        Args: { _sujet_id: string; _duree_min?: number | null };
         Returns: Json;
       };
       demarrer_passage: {

@@ -6,7 +6,12 @@
  */
 
 import { supabase } from "@/integrations/supabase/client";
-import { calculerCompteARebours, getTempsServeurSynchronise } from "./server-clock";
+import { isSimulationWriteBlocked } from "@/lib/supabase/auth";
+import {
+  calculerCompteARebours,
+  getTempsServeurSynchronise,
+  setServerOffsetMs,
+} from "./server-clock";
 import type {
   ExamPassage,
   ExamSecurityRestrictions,
@@ -14,6 +19,206 @@ import type {
   StatutPassageExamen,
   StatutSessionExamen,
 } from "./types";
+
+const EXAM_DISPLAY_CACHE_PREFIX = "labo_sti_exam_cache_";
+const LEGACY_EXAM_START_PREFIX = "bacsti_exam_start_";
+
+export interface ExamDisplayCacheEntry {
+  sujetId: string;
+  projetId?: string | null;
+  versionId?: string | null;
+  debutExamenServeur: string;
+  echeanceServeur: string;
+  statut?: string;
+  cachedAt: number;
+}
+
+/**
+ * Supprime l'ancienne clé client `bacsti_exam_start_<sujet>` qui verrouillait à tort l'éditeur
+ * ou permettait de relancer le chrono en vidant le stockage (#198).
+ */
+export function purgerAncienChronoLocal(sujetId: string): void {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.removeItem(`${LEGACY_EXAM_START_PREFIX}${sujetId}`);
+  } catch {
+    // Stockage indisponible
+  }
+}
+
+/**
+ * Lit uniquement le cache d'affichage de l'échéance serveur depuis `localStorage` (#198).
+ * Ce cache n'est jamais la source de vérité : il est systématiquement écrasé par la réponse serveur.
+ */
+export function lireCacheChronometreExamen(sujetId: string): ExamDisplayCacheEntry | null {
+  if (typeof window === "undefined") return null;
+  purgerAncienChronoLocal(sujetId);
+  try {
+    const raw = window.localStorage.getItem(`${EXAM_DISPLAY_CACHE_PREFIX}${sujetId}`);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as Partial<ExamDisplayCacheEntry>;
+    if (
+      !parsed ||
+      typeof parsed.echeanceServeur !== "string" ||
+      Number.isNaN(new Date(parsed.echeanceServeur).getTime())
+    ) {
+      return null;
+    }
+    return {
+      sujetId,
+      projetId: parsed.projetId ?? null,
+      versionId: parsed.versionId ?? null,
+      debutExamenServeur: parsed.debutExamenServeur ?? new Date().toISOString(),
+      echeanceServeur: parsed.echeanceServeur,
+      statut: parsed.statut ?? "en_cours",
+      cachedAt: typeof parsed.cachedAt === "number" ? parsed.cachedAt : Date.now(),
+    };
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Met à jour le cache d'affichage local à partir de l'échéance officielle du serveur (#198).
+ */
+export function ecrireCacheChronometreExamen(entry: ExamDisplayCacheEntry): void {
+  if (typeof window === "undefined") return;
+  purgerAncienChronoLocal(entry.sujetId);
+  try {
+    window.localStorage.setItem(
+      `${EXAM_DISPLAY_CACHE_PREFIX}${entry.sujetId}`,
+      JSON.stringify(entry),
+    );
+  } catch {
+    // Stockage indisponible
+  }
+}
+
+/**
+ * Vide le cache d'affichage d'un examen pratique.
+ */
+export function purgerCacheChronometreExamen(sujetId: string): void {
+  if (typeof window === "undefined") return;
+  purgerAncienChronoLocal(sujetId);
+  try {
+    window.localStorage.removeItem(`${EXAM_DISPLAY_CACHE_PREFIX}${sujetId}`);
+  } catch {
+    // Stockage indisponible
+  }
+}
+
+/**
+ * Démarre ou récupère l'état du chronomètre d'un examen pratique auprès du serveur (#198).
+ * - Si l'examen a déjà été ouvert par l'élève, la base renvoie la même `echeance_serveur`
+ *   (effacer `localStorage` ne réinitialise jamais l'échéance).
+ * - Le `localStorage` n'est utilisé que comme cache d'affichage.
+ */
+export async function demarrerOuRecupererExamenPratique(
+  sujetId: string,
+  dureeMin: number = 90,
+): Promise<{
+  success: boolean;
+  state: ExamDisplayCacheEntry;
+  source: "serveur" | "cache_local";
+  error?: string;
+}> {
+  purgerAncienChronoLocal(sujetId);
+  const cached = lireCacheChronometreExamen(sujetId);
+
+  if (!isSimulationWriteBlocked()) {
+    try {
+      const t0 = Date.now();
+      const { data, error } = await supabase.rpc("demarrer_examen_pratique", {
+        _sujet_id: sujetId,
+        _duree_min: dureeMin,
+      });
+      const t1 = Date.now();
+
+      if (!error && data && typeof data === "object" && !Array.isArray(data)) {
+        const payload = data as Record<string, unknown>;
+        const echeanceServeur =
+          typeof payload.echeance_serveur === "string" ? payload.echeance_serveur : null;
+        const debutServeur =
+          typeof payload.debut_examen_serveur === "string"
+            ? payload.debut_examen_serveur
+            : new Date().toISOString();
+        const horlogeServeur =
+          typeof payload.horloge_serveur === "string" ? payload.horloge_serveur : null;
+
+        if (horlogeServeur) {
+          const serverMs = new Date(horlogeServeur).getTime();
+          if (!Number.isNaN(serverMs)) {
+            const clientMidpoint = t0 + Math.max(0, Math.round((t1 - t0) / 2));
+            setServerOffsetMs(serverMs - clientMidpoint);
+          }
+        }
+
+        if (echeanceServeur) {
+          const entry: ExamDisplayCacheEntry = {
+            sujetId,
+            projetId: typeof payload.projet_id === "string" ? payload.projet_id : null,
+            versionId: typeof payload.version_id === "string" ? payload.version_id : null,
+            debutExamenServeur: debutServeur,
+            echeanceServeur,
+            statut: typeof payload.statut === "string" ? payload.statut : "en_cours",
+            cachedAt: Date.now(),
+          };
+          ecrireCacheChronometreExamen(entry);
+          return {
+            success: true,
+            state: entry,
+            source: "serveur",
+          };
+        }
+      }
+
+      if (error && cached) {
+        return {
+          success: false,
+          state: cached,
+          source: "cache_local",
+          error: error.message,
+        };
+      }
+    } catch (err) {
+      if (cached) {
+        return {
+          success: false,
+          state: cached,
+          source: "cache_local",
+          error: err instanceof Error ? err.message : String(err),
+        };
+      }
+    }
+  }
+
+  if (cached) {
+    return {
+      success: true,
+      state: cached,
+      source: "cache_local",
+    };
+  }
+
+  // Repli d'affichage hors-ligne / mode invité ou simulation admin sans écriture
+  const nowServeur = getTempsServeurSynchronise();
+  const fallbackDeadline = new Date(nowServeur.getTime() + dureeMin * 60 * 1000);
+  const fallbackEntry: ExamDisplayCacheEntry = {
+    sujetId,
+    projetId: null,
+    versionId: null,
+    debutExamenServeur: nowServeur.toISOString(),
+    echeanceServeur: fallbackDeadline.toISOString(),
+    statut: "en_cours",
+    cachedAt: Date.now(),
+  };
+  ecrireCacheChronometreExamen(fallbackEntry);
+  return {
+    success: true,
+    state: fallbackEntry,
+    source: "cache_local",
+  };
+}
 
 /**
  * Calcule les restrictions de sécurité actives pour un passage d'examen
