@@ -349,7 +349,83 @@ export async function updateTpSessionStatus(
 }
 
 /**
+ * Masque l'identité (nom, email, notes, identifiant) des réservations appartenant
+ * aux autres élèves pour garantir la confidentialité côté élève (#199).
+ */
+export function anonymiserReservationsPourEleve(
+  reservations: TpReservation[],
+  currentStudentId?: string | null | undefined,
+): TpReservation[] {
+  return reservations.map((r) => {
+    if (currentStudentId && r.studentId === currentStudentId) {
+      return { ...r };
+    }
+    return {
+      id: r.id,
+      sessionId: r.sessionId,
+      studentId: `anonyme-poste-${r.seatNumber}`,
+      seatNumber: r.seatNumber,
+      status: r.status,
+      createdAt: r.createdAt,
+    };
+  });
+}
+
+/**
+ * Traduit une erreur Supabase/PostgreSQL lors d'une demande de réservation TP
+ * en un message explicite en français pour l'élève (#199).
+ */
+export function traduireErreurReservationTp(err: unknown): string {
+  if (!err || typeof err !== "object") {
+    return "Impossible d'enregistrer votre demande de réservation. Veuillez réessayer.";
+  }
+
+  const record = err as Record<string, unknown>;
+  const code = typeof record["code"] === "string" ? record["code"] : "";
+  const message = typeof record["message"] === "string" ? record["message"] : "";
+  const details = typeof record["details"] === "string" ? record["details"] : "";
+  const combined = `${code} ${message} ${details}`.toLowerCase();
+
+  if (code === "23505" || combined.includes("duplicate key")) {
+    if (combined.includes("student_id")) {
+      return "Vous avez déjà une demande de réservation pour cette séance de TP.";
+    }
+    return "Ce poste vient d'être réservé par un autre élève. Veuillez choisir un autre poste libre.";
+  }
+
+  if (
+    code === "42501" ||
+    combined.includes("row-level security") ||
+    combined.includes("permission denied")
+  ) {
+    return "Réservation refusée : vérifiez que vous êtes bien connecté et inscrit dans la classe associée à cette séance de TP.";
+  }
+
+  if (code === "22P02" || combined.includes("invalid input syntax for type uuid")) {
+    return "Veuillez vous connecter avec votre compte élève pour réserver un poste de TP.";
+  }
+
+  if (
+    code === "PGRST205" ||
+    code === "42P01" ||
+    combined.includes("tp_reservations") ||
+    combined.includes("404") ||
+    combined.includes("not found")
+  ) {
+    return "Le service de réservation de postes TP est temporairement indisponible. Veuillez réessayer ou prévenir votre enseignant.";
+  }
+
+  if (message.trim().length > 0) {
+    return message.trim();
+  }
+
+  return "Impossible d'enregistrer votre demande de réservation. Veuillez réessayer.";
+}
+
+/**
  * Récupère les réservations d'une séance.
+ * Utilise en priorité la RPC `lister_occupation_postes_tp` (#199) qui anonymise
+ * les identités des autres élèves côté serveur lorsque l'appelant est un élève.
  */
 export async function getTpReservations(sessionId: string): Promise<TpReservation[]> {
   if (isTestEnv) {
@@ -357,6 +433,43 @@ export async function getTpReservations(sessionId: string): Promise<TpReservatio
   }
 
   try {
+    const rpcResult = await dbClient.rpc("lister_occupation_postes_tp", {
+      _session_id: sessionId,
+    });
+
+    if (!rpcResult.error && Array.isArray(rpcResult.data)) {
+      const mapped = (rpcResult.data as Array<Record<string, unknown>>).map((row) => {
+        const seatNum = Number(row["seat_number"]);
+        const rawStudentId = row["student_id"] ? String(row["student_id"]) : "";
+        const studentIdStr = rawStudentId || `anonyme-poste-${seatNum}`;
+        const rawStudentName = row["student_name"] ? String(row["student_name"]).trim() : "";
+        const rawNotes = row["notes"] ? String(row["notes"]).trim() : "";
+
+        const res: TpReservation = {
+          id: String(row["id"]),
+          sessionId: String(row["session_id"]),
+          studentId: studentIdStr,
+          seatNumber: seatNum,
+          status: (row["status"] as TpReservationStatus) || "pending",
+          createdAt: String(row["created_at"]),
+        };
+        if (rawStudentName) {
+          res.studentName = rawStudentName;
+        } else if (rawStudentId) {
+          res.studentName = rawNotes || `Élève (${rawStudentId.slice(0, 6)})`;
+        }
+        if (rawNotes) res.notes = rawNotes;
+        return res;
+      });
+
+      const localOnly = inMemoryReservations.filter(
+        (r) =>
+          r.sessionId === sessionId &&
+          !mapped.some((m) => m.id === r.id || m.seatNumber === r.seatNumber),
+      );
+      return [...mapped, ...localOnly];
+    }
+
     const { data, error } = await dbClient
       .from("tp_reservations")
       .select("*, student:student_id(nom, prenom)")
@@ -366,7 +479,7 @@ export async function getTpReservations(sessionId: string): Promise<TpReservatio
       return inMemoryReservations.filter((r) => r.sessionId === sessionId);
     }
 
-    return (data as Array<Record<string, unknown>>).map((row) => {
+    const mapped = (data as Array<Record<string, unknown>>).map((row) => {
       const student = row["student"] as Record<string, unknown> | null;
       const joinedName = student
         ? `${String(student["prenom"] || "")} ${String(student["nom"] || "")}`.trim()
@@ -394,6 +507,13 @@ export async function getTpReservations(sessionId: string): Promise<TpReservatio
       if (rawNotes) res.notes = rawNotes;
       return res;
     });
+
+    const localOnly = inMemoryReservations.filter(
+      (r) =>
+        r.sessionId === sessionId &&
+        !mapped.some((m) => m.id === r.id || m.seatNumber === r.seatNumber),
+    );
+    return [...mapped, ...localOnly];
   } catch {
     return inMemoryReservations.filter((r) => r.sessionId === sessionId);
   }
@@ -402,6 +522,7 @@ export async function getTpReservations(sessionId: string): Promise<TpReservatio
 /**
  * Formule une demande de réservation de siège par un élève.
  * Le siège passe initialement à l'état 'pending' (en attente de validation enseignant).
+ * En cas d'échec de persistance Supabase, retourne une erreur explicite au lieu d'échouer en silence (#199).
  */
 export async function requestSeatReservation(params: {
   sessionId: string;
@@ -409,6 +530,9 @@ export async function requestSeatReservation(params: {
   studentId: string;
   studentName?: string | undefined;
   notes?: string | undefined;
+  insertOverride?: (
+    payload: Record<string, unknown>,
+  ) => Promise<{ data?: Record<string, unknown> | null; error?: unknown }>;
 }): Promise<{
   success: boolean;
   reservation?: TpReservation | undefined;
@@ -417,6 +541,16 @@ export async function requestSeatReservation(params: {
   const session = await getTpSessionById(params.sessionId);
   if (!session) {
     return { success: false, error: "Séance de TP introuvable." };
+  }
+
+  if (
+    (!isTestEnv || params.insertOverride) &&
+    (!params.studentId || params.studentId === "demo-s1")
+  ) {
+    return {
+      success: false,
+      error: "Veuillez vous connecter avec votre compte élève pour réserver un poste de TP.",
+    };
   }
 
   // 1. Vérification de la capacité limite
@@ -467,25 +601,35 @@ export async function requestSeatReservation(params: {
   if (params.studentName) newReservation.studentName = params.studentName;
   if (params.notes) newReservation.notes = params.notes;
 
-  if (!isTestEnv) {
-    try {
-      const { data, error } = await dbClient
-        .from("tp_reservations")
-        .insert({
-          session_id: newReservation.sessionId,
-          student_id: newReservation.studentId,
-          seat_number: newReservation.seatNumber,
-          status: "pending",
-          notes: newReservation.notes ?? newReservation.studentName,
-        })
-        .select()
-        .single();
+  const insertPayload: Record<string, unknown> = {
+    session_id: newReservation.sessionId,
+    student_id: newReservation.studentId,
+    seat_number: newReservation.seatNumber,
+    status: "pending",
+    notes: newReservation.notes ?? newReservation.studentName,
+  };
 
-      if (!error && data) {
-        newReservation.id = String((data as Record<string, unknown>)["id"]);
+  if (params.insertOverride || !isTestEnv) {
+    try {
+      const { data, error } = params.insertOverride
+        ? await params.insertOverride(insertPayload)
+        : await dbClient.from("tp_reservations").insert(insertPayload).select().single();
+
+      if (error) {
+        return {
+          success: false,
+          error: traduireErreurReservationTp(error),
+        };
       }
-    } catch {
-      // Continue with in-memory
+
+      if (data && data["id"]) {
+        newReservation.id = String(data["id"]);
+      }
+    } catch (err) {
+      return {
+        success: false,
+        error: traduireErreurReservationTp(err),
+      };
     }
   }
 

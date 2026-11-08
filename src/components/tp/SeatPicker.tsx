@@ -198,6 +198,11 @@ export function SeatPicker({
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 mt-4">
           {seats.map((seat) => {
             const isSelected = selectedSeatNumber === seat.seatNumber;
+            const isMySeat = Boolean(
+              myReservation &&
+              myReservation.status !== "rejected" &&
+              myReservation.seatNumber === seat.seatNumber,
+            );
             const isClickable = seat.status === "libre" && !isApproved && !isPending;
 
             return (
@@ -235,16 +240,18 @@ export function SeatPicker({
                 <div className="mt-2 text-[11px] text-muted-foreground truncate">
                   {seat.status === "libre" ? (
                     <span>Cliquer pour choisir</span>
-                  ) : seat.reservation?.studentName ? (
+                  ) : isMySeat ? (
                     <span
-                      className="flex items-center gap-1 font-medium text-foreground truncate"
-                      title={`Occupé / demandé par : ${seat.reservation.studentName}`}
+                      className="flex items-center gap-1 font-medium truncate"
+                      title="Votre demande de poste"
                     >
-                      <User className="h-3 w-3 shrink-0 text-primary" />
-                      <span className="truncate">{seat.reservation.studentName}</span>
+                      <User className="h-3 w-3 shrink-0" />
+                      <span className="truncate">Votre poste</span>
                     </span>
+                  ) : seat.status === "pending" ? (
+                    <span className="italic">Demande en cours</span>
                   ) : (
-                    <span className="italic">Poste réservé</span>
+                    <span className="italic">Poste occupé</span>
                   )}
                 </div>
               </button>

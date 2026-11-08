@@ -139,19 +139,34 @@ describe("TP UI Components Rendering and Interactions (Issue #161)", () => {
       expect(handleRequest).toHaveBeenCalledWith(4);
     });
 
-    it("affiche clairement le nom de l'élève qui occupe ou a demandé chaque poste", () => {
+    it("masque l'identité des autres élèves sur les postes occupés et n'identifie que 'Votre poste' (#199)", () => {
+      const myPendingRes: TpReservation = {
+        id: "res-2",
+        sessionId: "session-ui-1",
+        studentId: "s2",
+        seatNumber: 2,
+        status: "pending",
+        studentName: "Camille Dupont",
+        createdAt: new Date().toISOString(),
+      };
+
       render(
         <SeatPicker
           session={dummySession}
           seats={dummySeats}
+          myReservation={myPendingRes}
           onRequestReservation={vi.fn()}
           onCancelReservation={vi.fn()}
           onLaunchIde={vi.fn()}
         />,
       );
 
-      expect(screen.getByText("Camille Dupont")).toBeInTheDocument();
-      expect(screen.getByText("Lucas Bernard")).toBeInTheDocument();
+      // Le nom des autres élèves ne doit jamais être exposé côté élève (#199)
+      expect(screen.queryByText("Lucas Bernard")).toBeNull();
+      expect(screen.queryByText("Camille Dupont")).toBeNull();
+      // Le poste de l'élève connecté est identifié par "Votre poste" et celui d'un tiers par "Poste occupé"
+      expect(screen.getByText("Votre poste")).toBeInTheDocument();
+      expect(screen.getByText("Poste occupé")).toBeInTheDocument();
     });
   });
 
