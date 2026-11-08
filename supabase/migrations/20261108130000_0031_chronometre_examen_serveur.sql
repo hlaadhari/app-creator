@@ -303,6 +303,8 @@ begin
     _echeance := _projet.echeance_serveur;
   end if;
 
+  perform set_config('app.examen_projet_rpc', '', true);
+
   return jsonb_build_object(
     'projet_id', _projet.id,
     'version_id', _version_id,

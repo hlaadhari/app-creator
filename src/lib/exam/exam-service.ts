@@ -135,7 +135,14 @@ export async function demarrerOuRecupererExamenPratique(
       const t1 = Date.now();
 
       if (!error && data && typeof data === "object" && !Array.isArray(data)) {
-        const payload = data as Record<string, unknown>;
+        const payload = data as {
+          projet_id?: unknown;
+          version_id?: unknown;
+          debut_examen_serveur?: unknown;
+          echeance_serveur?: unknown;
+          horloge_serveur?: unknown;
+          statut?: unknown;
+        };
         const echeanceServeur =
           typeof payload.echeance_serveur === "string" ? payload.echeance_serveur : null;
         const debutServeur =
