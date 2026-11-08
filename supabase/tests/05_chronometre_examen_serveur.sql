@@ -183,21 +183,21 @@ begin
   perform set_config('request.jwt.claim.sub', '', true);
   perform set_config('request.jwt.claim.role', 'postgres', true);
 
-  insert into public.classes (nom, annee_scolaire, enseignant_id, code_invitation)
-  values ('4SI-Chrono', '2025-2026', v_prof, 'CHR188')
+  insert into public.classes (nom, enseignant_id)
+  values ('4SI-Chrono', v_prof)
   returning id into v_classe_id;
 
-  insert into public.classe_membres (classe_id, eleve_id)
+  insert into public.class_members (class_id, eleve_id)
   values (v_classe_id, v_eleve);
 
   insert into public.sessions_examen (
-    classe_id, version_id, enseignant_id, titre, duree_min, statut, debut_serveur, echeance_serveur
+    class_id, version_id, titre, debut_prevu, duree_min, statut, debut_serveur, echeance_serveur
   )
   values (
     v_classe_id,
     v_version,
-    v_prof,
     'Examen Officiel Bac STI',
+    clock_timestamp() - interval '100 minutes',
     90,
     'en_cours',
     clock_timestamp() - interval '100 minutes',
