@@ -1347,6 +1347,14 @@ export type Database = {
         Args: { _sujet_id: string; _duree_min?: number | null };
         Returns: Json;
       };
+      relancer_entrainement_examen: {
+        Args: {
+          _sujet_id: string;
+          _duree_min?: number | null;
+          _reinitialiser_fichiers?: boolean | null;
+        };
+        Returns: Json;
+      };
       demarrer_passage: {
         Args: { _session_id: string; _projet_id?: string | null };
         Returns: Database["public"]["Tables"]["passages_examen"]["Row"];
