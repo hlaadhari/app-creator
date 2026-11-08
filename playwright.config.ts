@@ -5,6 +5,9 @@ import { defineConfig } from "@playwright/test";
  * et la base Supabase correspondante. Les tests sont en lecture seule et
  * utilisent des comptes dédiés fournis par variables d'environnement.
  */
+const baseURL = process.env["E2E_BASE_URL"] || "https://app-creator-phi.vercel.app";
+const useLocalServer = /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?/i.test(baseURL);
+
 export default defineConfig({
   testDir: "./e2e",
   timeout: 60_000,
@@ -12,7 +15,17 @@ export default defineConfig({
   workers: 1,
   reporter: process.env["CI"] ? [["github"], ["list"]] : "list",
   use: {
-    baseURL: process.env["E2E_BASE_URL"] || "https://app-creator-phi.vercel.app",
+    baseURL,
     trace: "retain-on-failure",
   },
+  ...(useLocalServer
+    ? {
+        webServer: {
+          command: "bunx vite preview --port 4173 --host 127.0.0.1",
+          url: "http://127.0.0.1:4173",
+          reuseExistingServer: !process.env["CI"],
+          timeout: 60_000,
+        },
+      }
+    : {}),
 });
