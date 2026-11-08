@@ -38,9 +38,9 @@ declare
   _uid uuid := auth.uid();
   _is_rpc boolean := coalesce(current_setting('app.examen_projet_rpc', true), '') = 'on'
                   or coalesce(current_setting('app.passage_rpc', true), '') = 'on';
-  _is_privileged boolean := false;
+  _is_privileged boolean := current_user in ('postgres', 'service_role');
 begin
-  if _uid is not null then
+  if not _is_privileged and _uid is not null then
     _is_privileged := public.has_role(_uid, 'admin')
       or public.est_eleve_de_enseignant(coalesce(new.eleve_id, old.eleve_id));
   end if;

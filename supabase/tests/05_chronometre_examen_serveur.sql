@@ -68,6 +68,8 @@ begin
 
   -- 4. Expiration de l'échéance côté serveur : écritures dans projet_fichiers et tentatives refusées
   reset role;
+  perform set_config('request.jwt.claim.sub', '', true);
+  perform set_config('request.jwt.claim.role', 'postgres', true);
   update public.projets
   set
     debut_examen_serveur = clock_timestamp() - interval '95 minutes',
