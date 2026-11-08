@@ -1,10 +1,17 @@
 import { describe, it, expect, vi } from "vitest";
 import React from "react";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { SeatPicker } from "@/components/tp/SeatPicker";
 import { ApprovalList } from "@/components/tp/ApprovalList";
 import { SeatGridAdmin } from "@/components/tp/SeatGridAdmin";
-import type { TpSession, SeatInfo, TpReservation } from "@/lib/tp/tp-reservation-service";
+import { TpSessionManager } from "@/components/tp/TpSessionManager";
+import {
+  getTpSessions,
+  resetTpStoreForTesting,
+  type TpSession,
+  type SeatInfo,
+  type TpReservation,
+} from "@/lib/tp/tp-reservation-service";
 
 describe("TP UI Components Rendering and Interactions (Issue #161)", () => {
   const dummySession: TpSession = {
@@ -254,6 +261,57 @@ describe("TP UI Components Rendering and Interactions (Issue #161)", () => {
       });
       fireEvent.click(libererPoste3);
       expect(handleRejectSeat).toHaveBeenCalledWith("res-3");
+    });
+  });
+
+  describe("TpSessionManager (Créneau TP daté et rattaché à une classe, #195)", () => {
+    it("n'affiche aucune séance ni élève de démo pour une classe vide et permet de créer un créneau daté lié à la classe", async () => {
+      resetTpStoreForTesting();
+
+      render(
+        <TpSessionManager
+          currentClassId="cls-vide-195"
+          classes={[
+            { id: "cls-vide-195", nom: "4ème SI - Groupe B" },
+            { id: "cls-autre-195", nom: "4ème SI - Groupe C" },
+          ]}
+          teacherId="prof-1"
+        />,
+      );
+
+      expect(
+        await screen.findByText(/Aucune séance de TP configurée pour cette classe/i),
+      ).toBeInTheDocument();
+      expect(screen.queryByText("Bernard Lucas")).toBeNull();
+
+      fireEvent.click(screen.getByRole("button", { name: /Créer un créneau TP/i }));
+
+      const titleInput = screen.getByLabelText(/Titre de la séance TP/i);
+      const classSelect = screen.getByLabelText(/Classe concernée/i) as HTMLSelectElement;
+      const startInput = screen.getByLabelText(/Date et heure de début/i);
+      const durationInput = screen.getByLabelText(/Durée \(minutes\)/i);
+
+      expect(classSelect.value).toBe("cls-vide-195");
+
+      fireEvent.change(titleInput, { target: { value: "TP Bac 2025 - Salle B12" } });
+      fireEvent.change(startInput, { target: { value: "2026-11-15T09:00" } });
+      fireEvent.change(durationInput, { target: { value: "90" } });
+
+      fireEvent.click(screen.getByRole("button", { name: /^Créer la séance$/i }));
+
+      await waitFor(() => {
+        expect(screen.queryByText(/Aucune séance de TP configurée pour cette classe/i)).toBeNull();
+      });
+
+      const classSessions = await getTpSessions("cls-vide-195");
+      expect(classSessions).toHaveLength(1);
+      expect(classSessions[0]?.title).toBe("TP Bac 2025 - Salle B12");
+      expect(classSessions[0]?.classId).toBe("cls-vide-195");
+      const diffMinutes =
+        (new Date(classSessions[0]!.endTime).getTime() -
+          new Date(classSessions[0]!.startTime).getTime()) /
+        60_000;
+      expect(diffMinutes).toBe(90);
     });
   });
 });

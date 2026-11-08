@@ -275,5 +275,23 @@ describe("TP Seat Reservation with Teacher Approval & Capacity Limit (Issue #161
       const gridLive = buildSeatGrid(session, reservations);
       expect(gridLive[1]!.status).toBe("live"); // Poste 2 passe en "live"
     });
+
+    it("filtre strictement les séances par classe et renvoie une liste vide pour une classe sans TP (#195)", async () => {
+      const emptyClassSessions = await getTpSessions("classe-sans-tp");
+      expect(emptyClassSessions).toEqual([]);
+
+      const created = await createTpSession({
+        title: "TP Classe A",
+        classId: "classe-a-195",
+        maxSeats: 16,
+        startTime: "2026-11-10T08:00:00.000Z",
+        endTime: "2026-11-10T10:00:00.000Z",
+      });
+
+      const classASessions = await getTpSessions("classe-a-195");
+      expect(classASessions).toHaveLength(1);
+      expect(classASessions[0]!.id).toBe(created.id);
+      expect(await getTpSessions("classe-sans-tp")).toEqual([]);
+    });
   });
 });

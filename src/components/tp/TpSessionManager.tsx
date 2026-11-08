@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import {
   type TpSession,
   type TpReservation,
@@ -22,30 +22,68 @@ import {
   Monitor,
   Plus,
   RefreshCw,
-  Users,
   Calendar,
+  Clock,
   AlertTriangle,
   Play,
   CheckSquare,
-  Settings,
 } from "lucide-react";
 
-interface TpSessionManagerProps {
-  currentClassId?: string | undefined;
-  teacherId?: string | undefined;
+export interface TpClassOption {
+  id: string;
+  nom: string;
 }
 
-export function TpSessionManager({ currentClassId, teacherId }: TpSessionManagerProps) {
+export interface TpSessionManagerProps {
+  currentClassId?: string | undefined;
+  classes?: TpClassOption[] | undefined;
+  teacherId?: string | undefined;
+  loadTimeoutMs?: number | undefined;
+}
+
+function defaultDateTimeLocal(): string {
+  const d = new Date(Date.now() + 15 * 60_000);
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
+function avecDelaiBorne<T>(promesse: Promise<T>, timeoutMs: number): Promise<T> {
+  return new Promise<T>((resolve, reject) => {
+    const timer = setTimeout(() => {
+      reject(new Error("Délai de chargement dépassé. Vérifiez votre connexion et réessayez."));
+    }, timeoutMs);
+    promesse
+      .then((val) => {
+        clearTimeout(timer);
+        resolve(val);
+      })
+      .catch((err) => {
+        clearTimeout(timer);
+        reject(err);
+      });
+  });
+}
+
+export function TpSessionManager({
+  currentClassId,
+  classes,
+  teacherId,
+  loadTimeoutMs = 4000,
+}: TpSessionManagerProps) {
   const [sessions, setSessions] = useState<TpSession[]>([]);
   const [selectedSessionId, setSelectedSessionId] = useState<string | null>(null);
   const [reservations, setReservations] = useState<TpReservation[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
 
-  // Formulaire création
+  // Formulaire création (#195 : titre, classe, date/heure de début, durée, capacité, sujet)
   const [newTitle, setNewTitle] = useState("");
   const [newDescription, setNewDescription] = useState("");
+  const [newClassId, setNewClassId] = useState(currentClassId ?? classes?.[0]?.id ?? "");
+  const [newStartTime, setNewStartTime] = useState(defaultDateTimeLocal);
+  const [newDurationMinutes, setNewDurationMinutes] = useState(120);
   const [newMaxSeats, setNewMaxSeats] = useState(18);
   const [newSujetId, setNewSujetId] = useState("bac2025_sujet");
 
@@ -53,29 +91,54 @@ export function TpSessionManager({ currentClassId, teacherId }: TpSessionManager
   const [isEditingCapacity, setIsEditingCapacity] = useState(false);
   const [editedCapacity, setEditedCapacity] = useState(18);
 
-  const refreshData = async () => {
+  useEffect(() => {
+    if (currentClassId) {
+      setNewClassId(currentClassId);
+    } else if (classes && classes.length > 0 && !newClassId) {
+      setNewClassId(classes[0]?.id ?? "");
+    }
+  }, [currentClassId, classes, newClassId]);
+
+  const classOptions = useMemo<TpClassOption[]>(() => {
+    if (classes && classes.length > 0) return classes;
+    if (currentClassId) return [{ id: currentClassId, nom: `Classe active (${currentClassId})` }];
+    return [];
+  }, [classes, currentClassId]);
+
+  const refreshData = useCallback(async () => {
     setIsLoading(true);
+    setLoadError(null);
     try {
-      const sess = await getTpSessions(currentClassId);
+      const sess = await avecDelaiBorne(getTpSessions(currentClassId), loadTimeoutMs);
       setSessions(sess);
       if (sess.length > 0) {
         const active = sess.find((s) => s.id === selectedSessionId) || sess[0];
         if (active) {
           setSelectedSessionId(active.id);
           setEditedCapacity(active.maxSeats);
-          const res = await getTpReservations(active.id);
+          const res = await avecDelaiBorne(getTpReservations(active.id), loadTimeoutMs);
           setReservations(res);
         }
+      } else {
+        setSelectedSessionId(null);
+        setReservations([]);
       }
+    } catch (err) {
+      setLoadError(
+        err instanceof Error
+          ? err.message
+          : "Impossible de charger les séances de TP. Veuillez réessayer.",
+      );
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [currentClassId, loadTimeoutMs, selectedSessionId]);
 
   useEffect(() => {
     let isMounted = true;
     setIsLoading(true);
-    getTpSessions(currentClassId)
+    setLoadError(null);
+    avecDelaiBorne(getTpSessions(currentClassId), loadTimeoutMs)
       .then(async (sess) => {
         if (!isMounted) return;
         setSessions(sess);
@@ -84,10 +147,21 @@ export function TpSessionManager({ currentClassId, teacherId }: TpSessionManager
           if (active) {
             setSelectedSessionId(active.id);
             setEditedCapacity(active.maxSeats);
-            const res = await getTpReservations(active.id);
+            const res = await avecDelaiBorne(getTpReservations(active.id), loadTimeoutMs);
             if (isMounted) setReservations(res);
           }
+        } else {
+          setSelectedSessionId(null);
+          setReservations([]);
         }
+      })
+      .catch((err) => {
+        if (!isMounted) return;
+        setLoadError(
+          err instanceof Error
+            ? err.message
+            : "Impossible de charger les séances de TP. Veuillez réessayer.",
+        );
       })
       .finally(() => {
         if (isMounted) setIsLoading(false);
@@ -95,7 +169,7 @@ export function TpSessionManager({ currentClassId, teacherId }: TpSessionManager
     return () => {
       isMounted = false;
     };
-  }, [currentClassId]);
+  }, [currentClassId, loadTimeoutMs]);
 
   const selectedSession = useMemo(
     () => sessions.find((s) => s.id === selectedSessionId) ?? sessions[0] ?? null,
@@ -128,20 +202,28 @@ export function TpSessionManager({ currentClassId, teacherId }: TpSessionManager
 
     setIsProcessing(true);
     try {
+      const parsedStart = newStartTime ? new Date(newStartTime) : new Date();
+      const validStart = Number.isNaN(parsedStart.getTime()) ? new Date() : parsedStart;
+      const durationMin = Math.max(15, Math.min(360, Number(newDurationMinutes) || 120));
+      const endDate = new Date(validStart.getTime() + durationMin * 60_000);
+      const targetClassId = (newClassId || currentClassId)?.trim() || undefined;
+
       const created = await createTpSession({
         title: newTitle.trim(),
         description: newDescription.trim() || undefined,
-        classId: currentClassId,
+        classId: targetClassId,
         sujetId: newSujetId,
         maxSeats: Number(newMaxSeats) || 18,
-        startTime: new Date().toISOString(),
-        endTime: new Date(Date.now() + 3 * 3600000).toISOString(),
+        startTime: validStart.toISOString(),
+        endTime: endDate.toISOString(),
         createdBy: teacherId,
       });
 
-      setSessions((prev) => [created, ...prev]);
-      setSelectedSessionId(created.id);
-      setReservations([]);
+      if (!currentClassId || created.classId === currentClassId) {
+        setSessions((prev) => [created, ...prev]);
+        setSelectedSessionId(created.id);
+        setReservations([]);
+      }
       setShowCreateModal(false);
       setNewTitle("");
       setNewDescription("");
@@ -248,7 +330,7 @@ export function TpSessionManager({ currentClassId, teacherId }: TpSessionManager
           <Button
             variant="outline"
             size="sm"
-            onClick={refreshData}
+            onClick={() => void refreshData()}
             disabled={isLoading || isProcessing}
             className="gap-1.5 text-xs cursor-pointer"
           >
@@ -267,6 +349,29 @@ export function TpSessionManager({ currentClassId, teacherId }: TpSessionManager
         </div>
       </div>
 
+      {/* Alerte d'erreur bornée avec bouton Réessayer (#195) */}
+      {loadError && (
+        <div
+          role="alert"
+          className="rounded-lg border border-destructive/40 bg-destructive/10 p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-destructive"
+        >
+          <div className="flex items-center gap-2">
+            <AlertTriangle className="h-4 w-4 shrink-0" />
+            <span>{loadError}</span>
+          </div>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => void refreshData()}
+            className="h-7 text-xs gap-1.5 border-destructive/40 text-destructive shrink-0"
+          >
+            <RefreshCw className="h-3.5 w-3.5" />
+            <span>Réessayer</span>
+          </Button>
+        </div>
+      )}
+
       {/* Sélecteur de session active */}
       {sessions.length > 0 && selectedSession && (
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-4 rounded-lg border bg-card">
@@ -277,7 +382,7 @@ export function TpSessionManager({ currentClassId, teacherId }: TpSessionManager
               </span>
               <select
                 value={selectedSession.id}
-                onChange={(e) => handleSelectSession(e.target.value)}
+                onChange={(e) => void handleSelectSession(e.target.value)}
                 className="bg-background border rounded-md px-2.5 py-1 text-sm font-medium focus:ring-1 focus:ring-primary outline-hidden"
               >
                 {sessions.map((s) => (
@@ -304,9 +409,25 @@ export function TpSessionManager({ currentClassId, teacherId }: TpSessionManager
                     : "Terminée"}
               </Badge>
             </div>
-            {selectedSession.description && (
-              <p className="text-xs text-muted-foreground mt-1">{selectedSession.description}</p>
-            )}
+            <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground mt-1">
+              <span className="inline-flex items-center gap-1">
+                <Calendar className="h-3.5 w-3.5 text-primary" />
+                {new Date(selectedSession.startTime).toLocaleDateString("fr-FR")}
+              </span>
+              <span className="inline-flex items-center gap-1">
+                <Clock className="h-3.5 w-3.5 text-primary" />
+                {new Date(selectedSession.startTime).toLocaleTimeString("fr-FR", {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })}{" "}
+                –{" "}
+                {new Date(selectedSession.endTime).toLocaleTimeString("fr-FR", {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })}
+              </span>
+              {selectedSession.description && <span>• {selectedSession.description}</span>}
+            </div>
           </div>
 
           {/* Configuration Capacité Limite & Statut Direct */}
@@ -377,15 +498,20 @@ export function TpSessionManager({ currentClassId, teacherId }: TpSessionManager
           <div className="bg-card border rounded-lg max-w-md w-full p-6 shadow-xl animate-in fade-in zoom-in-95">
             <h3 className="text-lg font-bold text-foreground mb-1">Créer une Séance de TP</h3>
             <p className="text-xs text-muted-foreground mb-4">
-              Fixez le titre, le sujet et la capacité limite de postes pour vos élèves.
+              Fixez le titre, la classe, l'horaire, le sujet et la capacité limite de postes pour
+              vos élèves.
             </p>
 
             <form onSubmit={handleCreateSession} className="space-y-4">
               <div>
-                <label className="text-xs font-medium text-foreground block mb-1">
+                <label
+                  htmlFor="tp-session-title"
+                  className="text-xs font-medium text-foreground block mb-1"
+                >
                   Titre de la séance TP *
                 </label>
                 <Input
+                  id="tp-session-title"
                   required
                   placeholder="Ex: TP Bac STI 2025 - Épreuve Pratique B12"
                   value={newTitle}
@@ -394,11 +520,87 @@ export function TpSessionManager({ currentClassId, teacherId }: TpSessionManager
               </div>
 
               <div>
-                <label className="text-xs font-medium text-foreground block mb-1">
+                <label
+                  htmlFor="tp-session-class"
+                  className="text-xs font-medium text-foreground block mb-1"
+                >
+                  Classe concernée *
+                </label>
+                {classOptions.length > 0 ? (
+                  <select
+                    id="tp-session-class"
+                    aria-label="Classe concernée"
+                    value={newClassId}
+                    onChange={(e) => setNewClassId(e.target.value)}
+                    className="w-full bg-background border rounded-md px-2.5 py-2 text-xs focus:ring-1 focus:ring-primary outline-hidden"
+                    required
+                  >
+                    {classOptions.map((c) => (
+                      <option key={c.id} value={c.id}>
+                        {c.nom}
+                      </option>
+                    ))}
+                  </select>
+                ) : (
+                  <Input
+                    id="tp-session-class"
+                    aria-label="Classe concernée"
+                    placeholder="Identifiant de la classe"
+                    value={newClassId}
+                    onChange={(e) => setNewClassId(e.target.value)}
+                  />
+                )}
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label
+                    htmlFor="tp-session-start"
+                    className="text-xs font-medium text-foreground block mb-1"
+                  >
+                    Date et heure de début *
+                  </label>
+                  <Input
+                    id="tp-session-start"
+                    type="datetime-local"
+                    required
+                    value={newStartTime}
+                    onChange={(e) => setNewStartTime(e.target.value)}
+                    className="text-xs"
+                  />
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="tp-session-duration"
+                    className="text-xs font-medium text-foreground block mb-1"
+                  >
+                    Durée (minutes) *
+                  </label>
+                  <Input
+                    id="tp-session-duration"
+                    type="number"
+                    min={15}
+                    max={360}
+                    step={15}
+                    required
+                    value={newDurationMinutes}
+                    onChange={(e) => setNewDurationMinutes(Number(e.target.value))}
+                    className="text-xs"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label
+                  htmlFor="tp-session-description"
+                  className="text-xs font-medium text-foreground block mb-1"
+                >
                   Description / Consignes de salle
                 </label>
                 <Input
-                  placeholder="Ex: Salle Informatique B12 - Durée 1h30"
+                  id="tp-session-description"
+                  placeholder="Ex: Salle Informatique B12 - Durée 2h"
                   value={newDescription}
                   onChange={(e) => setNewDescription(e.target.value)}
                 />
@@ -406,10 +608,14 @@ export function TpSessionManager({ currentClassId, teacherId }: TpSessionManager
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-xs font-medium text-foreground block mb-1">
+                  <label
+                    htmlFor="tp-session-seats"
+                    className="text-xs font-medium text-foreground block mb-1"
+                  >
                     Nombre max de sièges *
                   </label>
                   <Input
+                    id="tp-session-seats"
                     type="number"
                     min={1}
                     max={50}
@@ -423,10 +629,14 @@ export function TpSessionManager({ currentClassId, teacherId }: TpSessionManager
                 </div>
 
                 <div>
-                  <label className="text-xs font-medium text-foreground block mb-1">
+                  <label
+                    htmlFor="tp-session-subject"
+                    className="text-xs font-medium text-foreground block mb-1"
+                  >
                     Sujet support
                   </label>
                   <select
+                    id="tp-session-subject"
                     value={newSujetId}
                     onChange={(e) => setNewSujetId(e.target.value)}
                     className="w-full bg-background border rounded-md px-2.5 py-2 text-xs focus:ring-1 focus:ring-primary outline-hidden"
@@ -434,6 +644,11 @@ export function TpSessionManager({ currentClassId, teacherId }: TpSessionManager
                     <option value="bac2025_sujet">Bac 2025 (AgVoy)</option>
                     <option value="bac2024_sujet">Bac 2024 (Locations)</option>
                     <option value="bac2023_sujet">Bac 2023 (Véhicules)</option>
+                    <option value="exam-bac2022-principale">Bac 2022 Principale (AgVoy)</option>
+                    <option value="exam-bac2023-location-habits">Bac 2023 (Location Habits)</option>
+                    <option value="exam-bac2018-test-drive">Bac 2018 (Test Drive)</option>
+                    <option value="tp-fs-01">TP Synthèse Don Lycée</option>
+                    <option value="tp-fs-02">TP Synthèse Météo</option>
                   </select>
                 </div>
               </div>
@@ -488,7 +703,8 @@ export function TpSessionManager({ currentClassId, teacherId }: TpSessionManager
         </div>
       ) : (
         <div className="py-12 text-center text-sm text-muted-foreground">
-          Aucune séance de TP configurée. Cliquez sur "Créer un créneau TP" pour débuter.
+          Aucune séance de TP configurée pour cette classe. Cliquez sur "Créer un créneau TP" pour
+          débuter.
         </div>
       )}
     </div>

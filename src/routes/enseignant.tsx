@@ -1117,7 +1117,11 @@ export function TeacherDashboardPage() {
               </TabsContent>
 
               <TabsContent value="tp">
-                <TpSessionManager currentClassId={activeClass.id} teacherId={user?.id} />
+                <TpSessionManager
+                  currentClassId={activeClass.id}
+                  classes={classes}
+                  teacherId={user?.id}
+                />
               </TabsContent>
 
               <TabsContent value="invitations">

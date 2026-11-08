@@ -175,25 +175,27 @@ const dbClient = supabase as any;
 
 /**
  * Récupère la liste des séances de TP.
+ * Lorsqu'un `classId` est fourni, filtre strictement les séances de cette classe (#195) :
+ * une classe sans séance ne doit jamais afficher les séances d'une autre classe ou de démo.
  */
 export async function getTpSessions(classId?: string | undefined): Promise<TpSession[]> {
-  const filterByClassOrGlobal = (list: TpSession[]) => {
+  const filterByClass = (list: TpSession[]) => {
     if (!classId) return [...list];
-    const filtered = list.filter((s) => s.classId === classId || !s.classId);
-    return filtered.length > 0 ? filtered : [...list];
+    return list.filter((s) => s.classId === classId);
   };
 
   if (isTestEnv) {
-    return filterByClassOrGlobal(inMemorySessions);
+    return filterByClass(inMemorySessions);
   }
 
   try {
-    const { data, error } = await dbClient
-      .from("tp_sessions")
-      .select("*")
-      .order("start_time", { ascending: true });
-    if (error || !data || data.length === 0) {
-      return filterByClassOrGlobal(inMemorySessions);
+    let query = dbClient.from("tp_sessions").select("*").order("start_time", { ascending: true });
+    if (classId) {
+      query = query.eq("class_id", classId);
+    }
+    const { data, error } = await query;
+    if (error || !data) {
+      return filterByClass(inMemorySessions);
     }
 
     const mapped = (data as Array<Record<string, unknown>>).map((row) => ({
@@ -209,9 +211,9 @@ export async function getTpSessions(classId?: string | undefined): Promise<TpSes
       createdBy: row["created_by"] ? String(row["created_by"]) : undefined,
       createdAt: String(row["created_at"]),
     }));
-    return filterByClassOrGlobal(mapped);
+    return filterByClass(mapped);
   } catch {
-    return filterByClassOrGlobal(inMemorySessions);
+    return filterByClass(inMemorySessions);
   }
 }
 
