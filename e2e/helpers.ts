@@ -14,8 +14,12 @@ export interface Anomalies {
   console: string[];
 }
 
-// Réponses attendues (ex. consultation anonyme avant connexion).
-const IGNOREES = [/\/auth\/v1\/(token|user)\b.*\b401\b/, /favicon/];
+// Réponses attendues (ex. consultation anonyme avant connexion, sonde Vercel Analytics hors Vercel).
+const IGNOREES = [
+  /\/auth\/v1\/(token|user)\b.*\b401\b/,
+  /favicon/,
+  /\/_vercel\/insights\/script\.js\b.*\b404\b/,
+];
 
 export function surveiller(page: Page): Anomalies {
   const a: Anomalies = { http: [], console: [] };
