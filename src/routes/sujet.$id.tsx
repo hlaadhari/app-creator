@@ -18,6 +18,10 @@ import { SubjectStatement } from "@/components/workspace/SubjectStatement";
 import { evaluerCopie } from "@/lib/evaluation/evaluation-par-page";
 import { evaluateurFrame } from "@/lib/evaluation/iframe-evaluation";
 import { debloquerNiveauIndice, type UnlockedHint } from "@/lib/evaluation/hints-service";
+import {
+  demarrerOuRecupererExamenPratique,
+  lireCacheChronometreExamen,
+} from "@/lib/exam/exam-service";
 import { calculerCompteARebours, getTempsServeurSynchronise } from "@/lib/exam/server-clock";
 import type { EvaluationSummary } from "@/lib/evaluation/probe-runner";
 import { SproutLogo } from "@/components/SproutLogo";
@@ -190,42 +194,67 @@ function WorkspaceView({ ex }: { ex: Exercise }) {
 
   const isExamMode = Boolean(ex.examMode);
 
-  // Synchronisation du compte à rebours officiel d'examen (PRD F-48, F-50, T-06)
+  // Synchronisation du compte à rebours officiel d'examen avec l'horloge et l'échéance serveur (#198, PRD F-48, F-50, T-06).
+  // Le localStorage n'est utilisé que comme cache d'affichage initial ; la base de données fait foi.
+  const [examDeadline, setExamDeadline] = useState<string | null>(() => {
+    if (!isExamMode) return null;
+    return lireCacheChronometreExamen(id)?.echeanceServeur ?? null;
+  });
+  const [examProjetId, setExamProjetId] = useState<string | null>(() => {
+    if (!isExamMode) return null;
+    return lireCacheChronometreExamen(id)?.projetId ?? null;
+  });
+  const [examVersionId, setExamVersionId] = useState<string | null>(() => {
+    if (!isExamMode) return null;
+    return lireCacheChronometreExamen(id)?.versionId ?? null;
+  });
+
   const [countdown, setCountdown] = useState(() => {
     if (!isExamMode) return null;
-    const durationMs = (ex.dureeMinutes || 90) * 60 * 1000;
-    const storageKey = `bacsti_exam_start_${id}`;
-    let startTimestamp = typeof window !== "undefined" ? localStorage.getItem(storageKey) : null;
-    if (!startTimestamp) {
-      startTimestamp = Date.now().toString();
-      if (typeof window !== "undefined") {
-        localStorage.setItem(storageKey, startTimestamp);
-      }
-    }
-    const deadline = new Date(Number(startTimestamp) + durationMs);
-    return calculerCompteARebours(deadline, getTempsServeurSynchronise());
+    const cached = lireCacheChronometreExamen(id);
+    if (!cached) return null;
+    return calculerCompteARebours(cached.echeanceServeur, getTempsServeurSynchronise());
   });
 
   useEffect(() => {
-    if (!isExamMode) return;
-    const durationMs = (ex.dureeMinutes || 90) * 60 * 1000;
-    const storageKey = `bacsti_exam_start_${id}`;
-    let startTimestamp = localStorage.getItem(storageKey);
-    if (!startTimestamp) {
-      startTimestamp = Date.now().toString();
-      localStorage.setItem(storageKey, startTimestamp);
+    if (!isExamMode) {
+      setExamDeadline(null);
+      setCountdown(null);
+      return;
     }
-    const deadline = new Date(Number(startTimestamp) + durationMs);
+
+    let cancelled = false;
+    const cached = lireCacheChronometreExamen(id);
+    if (cached) {
+      setExamDeadline(cached.echeanceServeur);
+      setExamProjetId(cached.projetId ?? null);
+      setExamVersionId(cached.versionId ?? null);
+    }
+
+    void demarrerOuRecupererExamenPratique(id, ex.dureeMinutes || 90).then((res) => {
+      if (cancelled) return;
+      setExamDeadline(res.state.echeanceServeur);
+      setExamProjetId(res.state.projetId ?? null);
+      setExamVersionId(res.state.versionId ?? null);
+      setCountdown(calculerCompteARebours(res.state.echeanceServeur, getTempsServeurSynchronise()));
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [id, isExamMode, ex.dureeMinutes]);
+
+  useEffect(() => {
+    if (!isExamMode || !examDeadline) return;
 
     const updateTimer = () => {
-      const cd = calculerCompteARebours(deadline, getTempsServeurSynchronise());
-      setCountdown(cd);
+      setCountdown(calculerCompteARebours(examDeadline, getTempsServeurSynchronise()));
     };
 
     updateTimer();
     const interval = setInterval(updateTimer, 1000);
     return () => clearInterval(interval);
-  }, [id, isExamMode, ex.dureeMinutes]);
+  }, [isExamMode, examDeadline]);
 
   const isExamExpired = isExamMode && Boolean(countdown?.isExpired);
 
@@ -295,6 +324,8 @@ function WorkspaceView({ ex }: { ex: Exercise }) {
       if (notable) {
         enregistrerNouvelleTentative({
           sujetId: id,
+          sujetVersionId: examVersionId,
+          projetId: examProjetId,
           note20: sc.note20,
           pointsObtenus: sc.got,
           pointsTotal: sc.total,

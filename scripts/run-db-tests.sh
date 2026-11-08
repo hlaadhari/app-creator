@@ -17,5 +17,6 @@ psql "$DB_URL" -v ON_ERROR_STOP=1 -f supabase/tests/01_rls_negative_tests.sql
 psql "$DB_URL" -v ON_ERROR_STOP=1 -f supabase/tests/02_deposer_contestation.sql
 psql "$DB_URL" -v ON_ERROR_STOP=1 -f supabase/tests/03_initialiser_projet.sql
 psql "$DB_URL" -v ON_ERROR_STOP=1 -f supabase/tests/04_tp_reservations.sql
+psql "$DB_URL" -v ON_ERROR_STOP=1 -f supabase/tests/05_chronometre_examen_serveur.sql
 
 echo "==> Tous les tests SQL PostgreSQL se sont terminés avec succès."
