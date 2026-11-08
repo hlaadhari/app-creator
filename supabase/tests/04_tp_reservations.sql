@@ -139,6 +139,45 @@ begin
   select status into v_statut from public.tp_reservations where id = v_res;
   perform test_helpers.assert_true(v_statut = 'approved', '#187 : la demande doit être approuvée');
 
+  -- 8b. Confidentialité entre élèves (#199) : un autre élève de la même classe ne lit pas
+  -- directement la ligne tp_reservations d'un camarade, et la RPC d'occupation masque son identité.
+  perform test_helpers.as_user('authenticated', v_eleve_a2);
+  select count(*) into v_n from public.tp_reservations where id = v_res;
+  perform test_helpers.assert_true(v_n = 0, '#199 : un élève ne doit pas lire directement la réservation d''un autre élève');
+
+  select count(*) into v_n
+  from public.lister_occupation_postes_tp(v_sess_a)
+  where seat_number = 3
+    and status = 'approved'
+    and is_mine = false
+    and student_id is null
+    and student_name is null
+    and notes is null;
+  perform test_helpers.assert_true(v_n = 1, '#199 : la RPC doit retourner le poste occupé de façon anonyme pour les autres élèves');
+
+  -- L'élève propriétaire voit sa propre réservation identifiée via la RPC
+  perform test_helpers.as_user('authenticated', v_eleve_a);
+  select count(*) into v_n
+  from public.lister_occupation_postes_tp(v_sess_a)
+  where seat_number = 3
+    and is_mine = true
+    and student_id = v_eleve_a;
+  perform test_helpers.assert_true(v_n = 1, '#199 : l''élève propriétaire doit reconnaître son propre poste');
+
+  -- L'enseignant de la classe voit l'identité complète de l'élève via la RPC
+  perform test_helpers.as_user('authenticated', v_prof_a);
+  select count(*) into v_n
+  from public.lister_occupation_postes_tp(v_sess_a)
+  where seat_number = 3
+    and student_id = v_eleve_a
+    and student_name is not null;
+  perform test_helpers.assert_true(v_n = 1, '#199 : l''enseignant de la classe doit voir le nom de l''élève sur le poste');
+
+  -- Un élève d'une autre classe ne voit aucune occupation sur la séance A
+  perform test_helpers.as_user('authenticated', v_eleve_b);
+  select count(*) into v_n from public.lister_occupation_postes_tp(v_sess_a);
+  perform test_helpers.assert_true(v_n = 0, '#199 : un élève d''une autre classe ne doit pas voir l''occupation d''une séance tierce');
+
   -- 9. Un enseignant ne crée pas de séance pour la classe d'un autre enseignant
   perform test_helpers.as_user('authenticated', v_prof_a);
   v_caught := false;

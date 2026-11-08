@@ -13,6 +13,7 @@ import {
   cancelReservation,
   buildSeatGrid,
   canAccessIde,
+  anonymiserReservationsPourEleve,
   resetTpStoreForTesting,
   type TpSession,
 } from "@/lib/tp/tp-reservation-service";
@@ -292,6 +293,65 @@ describe("TP Seat Reservation with Teacher Approval & Capacity Limit (Issue #161
       expect(classASessions).toHaveLength(1);
       expect(classASessions[0]!.id).toBe(created.id);
       expect(await getTpSessions("classe-sans-tp")).toEqual([]);
+    });
+
+    it("anonymise les réservations des autres élèves côté élève tout en conservant sa propre réservation (#199)", async () => {
+      const allDemoRes = await getTpReservations("demo-tp-1");
+      expect(allDemoRes.length).toBeGreaterThanOrEqual(2);
+
+      const anonymized = anonymiserReservationsPourEleve(allDemoRes, "demo-s1");
+      const mine = anonymized.find((r) => r.seatNumber === 3);
+      const other = anonymized.find((r) => r.seatNumber === 5);
+
+      expect(mine?.studentId).toBe("demo-s1");
+      expect(mine?.studentName).toBe("Bernard Lucas");
+
+      expect(other?.studentId).toBe("anonyme-poste-5");
+      expect(other?.studentName).toBeUndefined();
+      expect(other?.notes).toBeUndefined();
+    });
+
+    it("retourne une erreur explicite et n'enregistre aucun poste fantôme si la persistance échoue (#199)", async () => {
+      const session = await createTpSession({
+        title: "TP Test Erreur Persistance",
+        classId: "cls-199",
+        maxSeats: 12,
+        startTime: new Date().toISOString(),
+        endTime: new Date(Date.now() + 3600000).toISOString(),
+      });
+
+      const failed404 = await requestSeatReservation({
+        sessionId: session.id,
+        seatNumber: 4,
+        studentId: "eleve-uuid-1",
+        studentName: "Alice Martin",
+        insertOverride: async () => ({
+          data: null,
+          error: { code: "PGRST205", message: "Could not find the table public.tp_reservations" },
+        }),
+      });
+
+      expect(failed404.success).toBe(false);
+      expect(failed404.error).toMatch(
+        /service de réservation de postes TP est temporairement indisponible/i,
+      );
+
+      const currentReservations = await getTpReservations(session.id);
+      expect(currentReservations).toHaveLength(0);
+
+      const failedRls = await requestSeatReservation({
+        sessionId: session.id,
+        seatNumber: 4,
+        studentId: "eleve-uuid-1",
+        insertOverride: async () => ({
+          data: null,
+          error: { code: "42501", message: "new row violates row-level security policy" },
+        }),
+      });
+
+      expect(failedRls.success).toBe(false);
+      expect(failedRls.error).toMatch(/Réservation refusée/i);
+      expect(await getTpReservations(session.id)).toHaveLength(0);
     });
   });
 });

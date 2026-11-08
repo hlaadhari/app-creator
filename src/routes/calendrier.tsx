@@ -11,6 +11,8 @@ import {
   cancelReservation,
   buildSeatGrid,
   canAccessIde,
+  anonymiserReservationsPourEleve,
+  traduireErreurReservationTp,
 } from "@/lib/tp/tp-reservation-service";
 import { SeatPicker } from "@/components/tp/SeatPicker";
 import { TpSessionManager } from "@/components/tp/TpSessionManager";
@@ -112,52 +114,79 @@ function CalendrierPage() {
     [sessions, selectedSessionId],
   );
 
+  const currentUserId = user?.id ?? null;
+
   const myReservation = useMemo(() => {
-    if (!selectedSession) return null;
-    const currentUserId = user?.id || "demo-s1"; // Mode démo / visiteur
+    if (!selectedSession || !currentUserId) return null;
     return (
       reservations.find(
         (r) => r.sessionId === selectedSession.id && r.studentId === currentUserId,
       ) ?? null
     );
-  }, [selectedSession, reservations, user]);
+  }, [selectedSession, reservations, currentUserId]);
 
   const seatGrid: SeatInfo[] = useMemo(() => {
     if (!selectedSession) return [];
-    return buildSeatGrid(selectedSession, reservations);
-  }, [selectedSession, reservations]);
+    return buildSeatGrid(
+      selectedSession,
+      anonymiserReservationsPourEleve(reservations, currentUserId),
+    );
+  }, [selectedSession, reservations, currentUserId]);
 
   const handleSelectSession = async (sessionId: string) => {
     setSelectedSessionId(sessionId);
     setErrorMessage(null);
-    const res = await getTpReservations(sessionId);
-    setReservations(res);
+    try {
+      const res = await getTpReservations(sessionId);
+      setReservations(res);
+    } catch {
+      setErrorMessage("Impossible de charger l'occupation des postes pour cette séance.");
+    }
   };
 
   const handleRequestReservation = async (seatNumber: number) => {
     if (!selectedSession) return;
+    if (!currentUserId) {
+      setErrorMessage(
+        "Veuillez vous connecter avec votre compte élève pour réserver un poste de TP.",
+      );
+      return;
+    }
+
     setIsSubmitting(true);
     setErrorMessage(null);
 
-    const studentId = user?.id || "demo-s1";
     const studentName = profile
       ? `${profile.prenom || ""} ${profile.nom || ""}`.trim()
-      : user?.email || "Élève Invité";
+      : user?.email || undefined;
 
     try {
       const result = await requestSeatReservation({
         sessionId: selectedSession.id,
         seatNumber,
-        studentId,
+        studentId: currentUserId,
         studentName,
       });
 
       if (result.success) {
         const res = await getTpReservations(selectedSession.id);
-        setReservations(res);
-      } else if (result.error) {
-        setErrorMessage(result.error);
+        const created = result.reservation;
+        if (
+          created &&
+          !res.some((r) => r.id === created.id || r.seatNumber === created.seatNumber)
+        ) {
+          setReservations([...res, created]);
+        } else {
+          setReservations(res);
+        }
+      } else {
+        setErrorMessage(
+          result.error ||
+            "Impossible d'enregistrer votre demande de réservation. Veuillez réessayer.",
+        );
       }
+    } catch (err) {
+      setErrorMessage(traduireErreurReservationTp(err));
     } finally {
       setIsSubmitting(false);
     }
@@ -169,13 +198,15 @@ function CalendrierPage() {
     setErrorMessage(null);
 
     try {
-      const result = await cancelReservation(reservationId, user?.id);
+      const result = await cancelReservation(reservationId, currentUserId ?? undefined);
       if (result.success) {
         const res = await getTpReservations(selectedSession.id);
-        setReservations(res);
-      } else if (result.error) {
-        setErrorMessage(result.error);
+        setReservations(res.filter((r) => r.id !== reservationId));
+      } else {
+        setErrorMessage(result.error || "Impossible d'annuler la demande de réservation.");
       }
+    } catch (err) {
+      setErrorMessage(traduireErreurReservationTp(err));
     } finally {
       setIsSubmitting(false);
     }
@@ -326,7 +357,11 @@ function CalendrierPage() {
 
             {/* Message d'erreur s'il y a lieu */}
             {errorMessage && (
-              <div className="mb-6 flex items-center gap-2 p-3 rounded-md bg-rose-500/10 border border-rose-500/20 text-rose-600 dark:text-rose-400 text-xs">
+              <div
+                role="alert"
+                data-testid="tp-reservation-error"
+                className="mb-6 flex items-center gap-2 p-3 rounded-md bg-rose-500/10 border border-rose-500/20 text-rose-600 dark:text-rose-400 text-xs"
+              >
                 <AlertCircle className="h-4 w-4 shrink-0" />
                 <span>{errorMessage}</span>
               </div>
