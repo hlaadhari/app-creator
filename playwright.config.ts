@@ -21,7 +21,12 @@ export default defineConfig({
   ...(useLocalServer
     ? {
         webServer: {
-          command: "bunx vite preview --port 4173 --host 127.0.0.1",
+          command: "node .output/server/index.mjs",
+          env: {
+            ...process.env,
+            NITRO_PORT: "4173",
+            NITRO_HOST: "127.0.0.1",
+          },
           url: "http://127.0.0.1:4173",
           reuseExistingServer: !process.env["CI"],
           timeout: 60_000,

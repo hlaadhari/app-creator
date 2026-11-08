@@ -111,6 +111,8 @@ jobs:
 
       - name: Build application for E2E preview
         if: ${{ !vars.E2E_BASE_URL }}
+        env:
+          NITRO_PRESET: node-server
         run: bun run build
 
       - name: Install Chromium
