@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { AlertCircle, Clock, Lock, ShieldAlert } from "lucide-react";
+import { AlertCircle, CheckCircle2, Clock, Lock, ShieldAlert } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { calculerCompteARebours, getTempsServeurSynchronise } from "@/lib/exam/server-clock";
 import type { ExamCountdownState } from "@/lib/exam/types";
@@ -8,6 +8,7 @@ export interface ExamCountdownBannerProps {
   echeance: string | Date;
   titre?: string;
   isLocked?: boolean;
+  motifCloture?: "remise_volontaire" | "temps_ecoule" | null;
   onExpired?: () => void;
   className?: string;
 }
@@ -16,6 +17,7 @@ export function ExamCountdownBanner({
   echeance,
   titre = "Épreuve Pratique du Baccalauréat STI",
   isLocked = false,
+  motifCloture = null,
   onExpired,
   className = "",
 }: ExamCountdownBannerProps) {
@@ -23,7 +25,12 @@ export function ExamCountdownBanner({
     calculerCompteARebours(echeance, getTempsServeurSynchronise()),
   );
 
+  const isVoluntarySubmit = isLocked && motifCloture === "remise_volontaire";
+  const isTimeExpired = countdown.isExpired || (isLocked && motifCloture !== "remise_volontaire");
+
   useEffect(() => {
+    if (isLocked) return;
+
     const interval = setInterval(() => {
       const current = calculerCompteARebours(echeance, getTempsServeurSynchronise());
       setCountdown(current);
@@ -34,11 +41,14 @@ export function ExamCountdownBanner({
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [echeance, onExpired]);
+  }, [echeance, isLocked, onExpired]);
 
-  // Styles visuels selon l'urgence
+  // Styles visuels selon l'urgence ou le motif de clôture (#197)
   const getBannerColor = () => {
-    if (isLocked || countdown.isExpired) {
+    if (isVoluntarySubmit) {
+      return "bg-emerald-500/15 border-emerald-500/40 text-emerald-800 dark:text-emerald-200";
+    }
+    if (isTimeExpired) {
       return "bg-destructive/15 border-destructive/40 text-destructive";
     }
     if (countdown.isCritical) {
@@ -56,7 +66,9 @@ export function ExamCountdownBanner({
     >
       <div className="flex items-center gap-2.5">
         <div className="flex h-7 w-7 items-center justify-center rounded-full bg-background/80 shadow-xs">
-          {isLocked || countdown.isExpired ? (
+          {isVoluntarySubmit ? (
+            <CheckCircle2 className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+          ) : isTimeExpired ? (
             <Lock className="h-4 w-4 text-destructive" />
           ) : countdown.isCritical ? (
             <ShieldAlert className="h-4 w-4 text-rose-600 dark:text-rose-400" />
@@ -73,9 +85,11 @@ export function ExamCountdownBanner({
             </Badge>
           </div>
           <p className="text-[11px] opacity-80">
-            {isLocked || countdown.isExpired
-              ? "Échéance serveur atteinte : dépôt verrouillé (T-06). Toute nouvelle écriture est refusée."
-              : "Horloge serveur certifiée • Indices masqués • Corrigés inaccessibles"}
+            {isVoluntarySubmit
+              ? "Remise volontaire effectuée : votre copie est scellée sur le serveur et transmise pour correction."
+              : isTimeExpired
+                ? "Échéance serveur atteinte : dépôt verrouillé (T-06). Toute nouvelle écriture est refusée."
+                : "Horloge serveur certifiée • Indices masqués • Corrigés inaccessibles"}
           </p>
         </div>
       </div>
@@ -83,14 +97,14 @@ export function ExamCountdownBanner({
       <div className="flex items-center gap-3">
         <div className="text-right">
           <div className="text-[10px] uppercase font-bold tracking-wider opacity-75">
-            Temps Restant
+            {isVoluntarySubmit ? "Statut de la copie" : "Temps Restant"}
           </div>
           <div className="text-lg font-mono font-bold tracking-tight">
-            {isLocked || countdown.isExpired ? "00:00" : countdown.formatted}
+            {isVoluntarySubmit ? "Copie remise" : isTimeExpired ? "00:00" : countdown.formatted}
           </div>
         </div>
 
-        {countdown.isCritical && !countdown.isExpired && (
+        {countdown.isCritical && !countdown.isExpired && !isLocked && (
           <div className="flex items-center gap-1 text-[11px] font-semibold text-rose-600 dark:text-rose-400">
             <AlertCircle className="h-3.5 w-3.5" />
             <span>Dernières minutes !</span>

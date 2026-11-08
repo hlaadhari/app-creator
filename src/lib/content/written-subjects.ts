@@ -3,7 +3,13 @@
  * PRD §8, Issue #165 & #163.
  */
 
-import type { WrittenExamManifest } from "@/lib/evaluator/written/written-exam-evaluator";
+import type {
+  WrittenExamManifest,
+  WrittenQcmQuestion,
+  WrittenModelingQuestion,
+  WrittenSqlQuestion,
+  WrittenCodeAnalysisQuestion,
+} from "@/lib/evaluator/written/written-exam-evaluator";
 import bac2022ControleManifest from "../../../content/exam-bac2022-controle-ecrit/manifest.json";
 import bac2023ControleManifest from "../../../content/exam-bac2023-controle-ecrit/manifest.json";
 import bac2023PrincipaleManifest from "../../../content/exam-bac2023-principale-ecrit/manifest.json";
@@ -209,6 +215,85 @@ export function registerWrittenExam(manifest: WrittenExamManifest): void {
 
 export function getWrittenExam(id: string): WrittenExamManifest | undefined {
   return writtenExamsRegistry.get(id);
+}
+
+/**
+ * Masque l'ensemble des corrigés et réponses attendues d'un manifeste d'épreuve écrite
+ * avant la clôture de l'épreuve côté client (#197, T-01).
+ */
+export function masquerCorrigeManifestEcrit(manifest: WrittenExamManifest): WrittenExamManifest {
+  return {
+    ...manifest,
+    sections: manifest.sections.map((section) => {
+      if (section.type === "qcm") {
+        return {
+          ...section,
+          questions: section.questions.map((q) => {
+            const { explanation: _exp, ...rest } = q as WrittenQcmQuestion;
+            return {
+              ...rest,
+              correctAnswers: [],
+            };
+          }),
+        };
+      }
+      if (section.type === "modeling") {
+        return {
+          ...section,
+          questions: section.questions.map((q) => {
+            const {
+              expectedPattern: _p,
+              expectedKeywords: _k,
+              expectedDdl: _d,
+              explanation: _exp,
+              ...rest
+            } = q as WrittenModelingQuestion;
+            return rest;
+          }),
+        };
+      }
+      if (section.type === "sql") {
+        return {
+          ...section,
+          questions: section.questions.map((q) => {
+            const {
+              expectedQuery: _q,
+              expectedOutput: _o,
+              expectedTableRows: _t,
+              verificationSql: _v,
+              explanation: _exp,
+              ...rest
+            } = q as WrittenSqlQuestion;
+            return rest;
+          }),
+        };
+      }
+      return {
+        ...section,
+        questions: section.questions.map((q) => {
+          const {
+            expectedAnswer: _a,
+            expectedRegex: _r,
+            keywords: _k,
+            explanation: _exp,
+            ...rest
+          } = q as WrittenCodeAnalysisQuestion;
+          return rest;
+        }),
+      };
+    }),
+  };
+}
+
+/**
+ * Retourne un sujet d'épreuve écrite expurgé de ses corrigés pour l'interface élève (#197).
+ */
+export function getWrittenExamPublic(id: string): WrittenExamManifest | undefined {
+  const found =
+    writtenExamsRegistry.get(id) ??
+    (id === "demo" || id === "written-bac-demo" ? sampleWrittenExam : undefined);
+  if (!found) return undefined;
+  return masquerCorrigeManifestEcrit(found);
 }
 
 export function getAllWrittenExams(): WrittenExamManifest[] {

@@ -1355,6 +1355,26 @@ export type Database = {
         };
         Returns: Json;
       };
+      demarrer_copie_examen_ecrit: {
+        Args: { _exam_id: string; _duree_min?: number | null };
+        Returns: Json;
+      };
+      sauvegarder_brouillon_examen_ecrit: {
+        Args: { _exam_id: string; _reponses: Json };
+        Returns: Json;
+      };
+      remettre_copie_examen_ecrit: {
+        Args: { _exam_id: string; _reponses?: Json | null; _motif?: string | null };
+        Returns: Json;
+      };
+      noter_copie_examen_ecrit: {
+        Args: { _copie_id: string; _notes_ouvertes: Json; _commentaire?: string | null };
+        Returns: Json;
+      };
+      lister_copies_examen_ecrit_enseignant: {
+        Args: { _class_id?: string | null };
+        Returns: Json;
+      };
       demarrer_passage: {
         Args: { _session_id: string; _projet_id?: string | null };
         Returns: Database["public"]["Tables"]["passages_examen"]["Row"];
