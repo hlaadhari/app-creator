@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import React, { useMemo } from "react";
-import { getWrittenExam, sampleWrittenExam } from "@/lib/content/written-subjects";
+import { getWrittenExamPublic } from "@/lib/content/written-subjects";
 import { WrittenExamEnvironment } from "@/components/exam/written/WrittenExamEnvironment";
 import { AuthModal } from "@/components/AuthModal";
 import { Button } from "@/components/ui/button";
@@ -23,11 +23,7 @@ function ExamenEcritPage() {
   const { id } = Route.useParams();
 
   const manifest = useMemo(() => {
-    const found = getWrittenExam(id);
-    if (found) return found;
-    // Repli sur le sujet démo si l'ID est 'demo' ou 'written-bac-demo'
-    if (id === "demo" || id === "written-bac-demo") return sampleWrittenExam;
-    return undefined;
+    return getWrittenExamPublic(id);
   }, [id]);
 
   if (!manifest) {

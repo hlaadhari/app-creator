@@ -14,6 +14,7 @@ import {
   type WrittenCodeAnalysisQuestion,
 } from "@/lib/evaluator/written/written-exam-evaluator";
 import { sampleWrittenExam } from "@/lib/content/written-subjects";
+import * as writtenExamService from "@/lib/exam/written-exam-service";
 
 describe("Written Exam Environment UI & Security (Issue #165 & #163)", () => {
   beforeEach(() => {
@@ -180,7 +181,78 @@ describe("Written Exam Environment UI & Security (Issue #165 & #163)", () => {
       expect(onSubmitManual).toHaveBeenCalled();
     });
 
-    it("soumission complète : évalue la copie et affiche le relevé de notes", async () => {
+    it("soumission complète : remet la copie au serveur et affiche le relevé de notes", async () => {
+      const now = new Date().toISOString();
+      const echeance = new Date(Date.now() + 7200_000).toISOString();
+      vi.spyOn(writtenExamService, "demarrerOuRecupererCopieExamenEcrit").mockResolvedValue({
+        copieId: "copie-test-1",
+        examId: sampleWrittenExam.id,
+        statut: "en_cours",
+        motifCloture: null,
+        startedAt: now,
+        echeanceServeur: echeance,
+        submittedAt: null,
+        serverNow: now,
+        reponses: {},
+        scoreQcm: null,
+        maxQcm: 4,
+        scoreOuvert: null,
+        maxOuvert: 16,
+        noteFinale: null,
+        baremeTotal: 20,
+        evaluationDetail: null,
+        notesEnseignant: {},
+        commentaireEnseignant: null,
+        hashSha256: null,
+        isLocked: false,
+        persistedOnServer: true,
+      });
+
+      vi.spyOn(writtenExamService, "remettreCopieExamenEcrit").mockResolvedValue({
+        copieId: "copie-test-1",
+        examId: sampleWrittenExam.id,
+        statut: "remise",
+        motifCloture: "remise_volontaire",
+        startedAt: now,
+        echeanceServeur: echeance,
+        submittedAt: now,
+        serverNow: now,
+        reponses: {},
+        scoreQcm: 4,
+        maxQcm: 4,
+        scoreOuvert: null,
+        maxOuvert: 16,
+        noteFinale: null,
+        baremeTotal: 20,
+        evaluationDetail: {
+          examId: sampleWrittenExam.id,
+          totalScore: 4,
+          baremeTotal: 20,
+          percentage: 20,
+          passed: false,
+          scoreQcm: 4,
+          maxQcm: 4,
+          scoreOuvert: null,
+          maxOuvert: 16,
+          attenteCorrectionEnseignant: true,
+          sections: [
+            {
+              sectionId: "partie-1-qcm",
+              title: "Partie I : QCM & Concepts Théoriques (4 pts)",
+              type: "qcm",
+              pointsEarned: 4,
+              pointsMax: 4,
+              items: [],
+            },
+          ],
+        },
+        notesEnseignant: {},
+        commentaireEnseignant: null,
+        hashSha256: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        isLocked: true,
+        persistedOnServer: true,
+      });
+
       const onCompleted = vi.fn();
       render(
         <WrittenExamEnvironment manifest={sampleWrittenExam} onEvaluationCompleted={onCompleted} />,
@@ -196,7 +268,7 @@ describe("Written Exam Environment UI & Security (Issue #165 & #163)", () => {
       await waitFor(() => {
         expect(screen.getByText(/Relevé de Notes & Bilan par Exercice/i)).toBeInTheDocument();
         expect(screen.getByText(/Note Finale Officielle/i)).toBeInTheDocument();
-        expect(screen.getByText(/Épreuve Clôturée & Verrouillée/i)).toBeInTheDocument();
+        expect(screen.getByText(/Copie Scellée \(Remise volontaire\)/i)).toBeInTheDocument();
       });
 
       expect(onCompleted).toHaveBeenCalled();

@@ -9,6 +9,7 @@ export interface ExamSecurityManagerProps {
   durationMinutes: number;
   echeance: string | Date;
   isLocked: boolean;
+  motifCloture?: "remise_volontaire" | "temps_ecoule" | null;
   onAutoSubmit: () => void;
   onSubmitManual: () => void;
   totalQuestions: number;
@@ -21,6 +22,7 @@ export const ExamSecurityManager: React.FC<ExamSecurityManagerProps> = ({
   durationMinutes,
   echeance,
   isLocked,
+  motifCloture = null,
   onAutoSubmit,
   onSubmitManual,
   totalQuestions,
@@ -54,6 +56,7 @@ export const ExamSecurityManager: React.FC<ExamSecurityManagerProps> = ({
         echeance={echeance}
         titre={examTitle}
         isLocked={isLocked}
+        motifCloture={motifCloture}
         onExpired={onAutoSubmit}
       />
 
@@ -79,9 +82,18 @@ export const ExamSecurityManager: React.FC<ExamSecurityManagerProps> = ({
 
         <div className="flex items-center gap-2">
           {isLocked ? (
-            <Badge variant="destructive" className="flex items-center gap-1.5 text-xs">
-              <Lock className="h-3.5 w-3.5" /> Épreuve Clôturée & Verrouillée
-            </Badge>
+            motifCloture === "remise_volontaire" ? (
+              <Badge
+                variant="secondary"
+                className="flex items-center gap-1.5 text-xs border-emerald-500/30 bg-emerald-500/15 text-emerald-700 dark:text-emerald-300"
+              >
+                <CheckCircle2 className="h-3.5 w-3.5" /> Copie Scellée (Remise volontaire)
+              </Badge>
+            ) : (
+              <Badge variant="destructive" className="flex items-center gap-1.5 text-xs">
+                <Lock className="h-3.5 w-3.5" /> Épreuve Clôturée & Verrouillée
+              </Badge>
+            )
           ) : (
             <Button
               size="sm"

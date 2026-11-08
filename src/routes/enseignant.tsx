@@ -27,6 +27,7 @@ import { InvitationsManager } from "@/components/teacher/InvitationsManager";
 import { SubjectStudioTab } from "@/components/teacher/SubjectStudioTab";
 import { ContestationsManager } from "@/components/teacher/ContestationsManager";
 import { ClassAnalyticsDashboard } from "@/components/teacher/ClassAnalyticsDashboard";
+import { WrittenExamCopiesTab } from "@/components/teacher/WrittenExamCopiesTab";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
@@ -51,6 +52,7 @@ import {
   MessageSquareWarning,
   PenTool,
   Monitor,
+  FileText,
 } from "lucide-react";
 import { TpSessionManager } from "@/components/tp/TpSessionManager";
 import {
@@ -1085,6 +1087,14 @@ export function TeacherDashboardPage() {
                     <span>Studio Sujets</span>
                     <span className="hidden md:inline">& Immuabilité</span>
                   </TabsTrigger>
+                  <TabsTrigger
+                    value="copies-ecrites"
+                    className="text-xs flex items-center gap-1.5 shrink-0 px-3 py-1.5"
+                  >
+                    <FileText className="w-3.5 h-3.5" />
+                    <span>Copies Écrites</span>
+                    <span className="hidden md:inline">(#197)</span>
+                  </TabsTrigger>
                 </TabsList>
               </div>
 
@@ -1144,6 +1154,10 @@ export function TeacherDashboardPage() {
 
               <TabsContent value="studio">
                 <SubjectStudioTab />
+              </TabsContent>
+
+              <TabsContent value="copies-ecrites">
+                <WrittenExamCopiesTab classId={activeClass.id} className={activeClass.nom} />
               </TabsContent>
             </Tabs>
           </div>
