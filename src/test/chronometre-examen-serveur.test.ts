@@ -3,6 +3,7 @@ import {
   demarrerOuRecupererExamenPratique,
   lireCacheChronometreExamen,
   purgerCacheChronometreExamen,
+  relancerEntrainementExamen,
 } from "@/lib/exam/exam-service";
 import { calculerCompteARebours, getTempsServeurSynchronise } from "@/lib/exam/server-clock";
 
@@ -105,5 +106,55 @@ describe("Chronomètre d'examen pratique piloté par le serveur (#198)", () => {
 
     purgerCacheChronometreExamen(sujetId);
     expect(lireCacheChronometreExamen(sujetId)).toBeNull();
+  });
+
+  it("permet de relancer le chronomètre en mode entraînement mais refuse en examen officiel (#188)", async () => {
+    const serverNow = new Date("2026-11-08T15:00:00.000Z");
+    const renewedDeadline = new Date("2026-11-08T16:30:00.000Z");
+
+    rpcMock.mockResolvedValueOnce({
+      data: {
+        projet_id: "proj-train",
+        version_id: "ver-train",
+        debut_examen_serveur: serverNow.toISOString(),
+        echeance_serveur: renewedDeadline.toISOString(),
+        horloge_serveur: serverNow.toISOString(),
+        statut: "en_cours",
+        est_expire: false,
+        cadre: "entrainement",
+        relancable: true,
+      },
+      error: null,
+    });
+
+    const relance = await relancerEntrainementExamen(sujetId, 90, false);
+    expect(relance.success).toBe(true);
+    expect(relance.state?.cadre).toBe("entrainement");
+    expect(relance.state?.relancable).toBe(true);
+    expect(relance.state?.echeanceServeur).toBe(renewedDeadline.toISOString());
+
+    // Si le sujet est gouverné par une session d'examen officielle, la relance est refusée
+    rpcMock.mockResolvedValueOnce({
+      data: {
+        projet_id: "proj-off",
+        version_id: "ver-off",
+        debut_examen_serveur: "2026-11-08T12:00:00.000Z",
+        echeance_serveur: "2026-11-08T13:30:00.000Z",
+        horloge_serveur: serverNow.toISOString(),
+        statut: "rendu",
+        est_expire: true,
+        cadre: "officiel",
+        relancable: false,
+      },
+      error: null,
+    });
+
+    const officiel = await demarrerOuRecupererExamenPratique(sujetId, 90);
+    expect(officiel.state.cadre).toBe("officiel");
+    expect(officiel.state.relancable).toBe(false);
+
+    const tentativeRelanceOfficiel = await relancerEntrainementExamen(sujetId, 90, false);
+    expect(tentativeRelanceOfficiel.success).toBe(false);
+    expect(tentativeRelanceOfficiel.error).toContain("Relance interdite");
   });
 });

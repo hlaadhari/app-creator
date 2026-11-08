@@ -21,7 +21,10 @@ import { debloquerNiveauIndice, type UnlockedHint } from "@/lib/evaluation/hints
 import {
   demarrerOuRecupererExamenPratique,
   lireCacheChronometreExamen,
+  relancerEntrainementExamen,
+  type CadreExamenPratique,
 } from "@/lib/exam/exam-service";
+import { ReferenceSolutionModal } from "@/components/pedagogy/ReferenceSolutionModal";
 import { calculerCompteARebours, getTempsServeurSynchronise } from "@/lib/exam/server-clock";
 import type { EvaluationSummary } from "@/lib/evaluation/probe-runner";
 import { SproutLogo } from "@/components/SproutLogo";
@@ -208,6 +211,12 @@ function WorkspaceView({ ex }: { ex: Exercise }) {
     if (!isExamMode) return null;
     return lireCacheChronometreExamen(id)?.versionId ?? null;
   });
+  const [examCadre, setExamCadre] = useState<CadreExamenPratique>(() => {
+    if (!isExamMode) return "entrainement";
+    return lireCacheChronometreExamen(id)?.cadre ?? "entrainement";
+  });
+  const [restartingExam, setRestartingExam] = useState(false);
+  const [showSolutionModal, setShowSolutionModal] = useState(false);
 
   const [countdown, setCountdown] = useState(() => {
     if (!isExamMode) return null;
@@ -229,6 +238,7 @@ function WorkspaceView({ ex }: { ex: Exercise }) {
       setExamDeadline(cached.echeanceServeur);
       setExamProjetId(cached.projetId ?? null);
       setExamVersionId(cached.versionId ?? null);
+      setExamCadre(cached.cadre ?? "entrainement");
     }
 
     void demarrerOuRecupererExamenPratique(id, ex.dureeMinutes || 90).then((res) => {
@@ -236,6 +246,7 @@ function WorkspaceView({ ex }: { ex: Exercise }) {
       setExamDeadline(res.state.echeanceServeur);
       setExamProjetId(res.state.projetId ?? null);
       setExamVersionId(res.state.versionId ?? null);
+      setExamCadre(res.state.cadre ?? "entrainement");
       setCountdown(calculerCompteARebours(res.state.echeanceServeur, getTempsServeurSynchronise()));
     });
 
@@ -243,6 +254,25 @@ function WorkspaceView({ ex }: { ex: Exercise }) {
       cancelled = true;
     };
   }, [id, isExamMode, ex.dureeMinutes]);
+
+  const handleRestartExam = useCallback(async () => {
+    if (!isExamMode || examCadre === "officiel") return;
+    setRestartingExam(true);
+    try {
+      const res = await relancerEntrainementExamen(id, ex.dureeMinutes || 90, false);
+      if (res.success && res.state) {
+        setExamDeadline(res.state.echeanceServeur);
+        setExamProjetId(res.state.projetId ?? null);
+        setExamVersionId(res.state.versionId ?? null);
+        setExamCadre(res.state.cadre ?? "entrainement");
+        setCountdown(
+          calculerCompteARebours(res.state.echeanceServeur, getTempsServeurSynchronise()),
+        );
+      }
+    } finally {
+      setRestartingExam(false);
+    }
+  }, [id, isExamMode, examCadre, ex.dureeMinutes]);
 
   useEffect(() => {
     if (!isExamMode || !examDeadline) return;
@@ -359,6 +389,7 @@ function WorkspaceView({ ex }: { ex: Exercise }) {
   };
 
   const handleReset = async () => {
+    if (isExamExpired && examCadre === "officiel") return;
     if (!confirm("Réinitialiser le sujet aux fichiers de départ ? Votre code local sera effacé."))
       return;
     await deleteFromBuffer(id);
@@ -370,9 +401,22 @@ function WorkspaceView({ ex }: { ex: Exercise }) {
       resetFiles[name] = { name, content, type: "text", language: lang };
     }
     setFiles(resetFiles);
-    setActiveFileName("index.html");
+    setActiveFileName(Object.keys(ex.starter)[0] ?? "index.html");
     setEvaluationSummary(null);
     setUnlockedHints([]);
+
+    if (isExamMode && examCadre !== "officiel") {
+      const res = await relancerEntrainementExamen(id, ex.dureeMinutes || 90, true);
+      if (res.success && res.state) {
+        setExamDeadline(res.state.echeanceServeur);
+        setExamProjetId(res.state.projetId ?? null);
+        setExamVersionId(res.state.versionId ?? null);
+        setExamCadre(res.state.cadre ?? "entrainement");
+        setCountdown(
+          calculerCompteARebours(res.state.echeanceServeur, getTempsServeurSynchronise()),
+        );
+      }
+    }
   };
 
   // Raccourci clavier global Ctrl+Entrée / Cmd+Entrée pour lancer l'évaluation (Item 5)
@@ -744,7 +788,13 @@ function WorkspaceView({ ex }: { ex: Exercise }) {
                 verifying={verifying}
                 sujetId={id}
                 sujetTitle={ex.title}
+                sujetVersionId={examVersionId}
+                projetId={examProjetId}
                 examMode={ex.examMode}
+                examLocked={isExamExpired}
+                examCadre={examCadre}
+                onRestartExam={handleRestartExam}
+                restartingExam={restartingExam}
               />
             )}
 
@@ -834,9 +884,13 @@ function WorkspaceView({ ex }: { ex: Exercise }) {
 
               <button
                 onClick={handleReset}
-                disabled={isExamExpired}
+                disabled={isExamExpired && examCadre === "officiel"}
                 className="flex items-center gap-1.5 rounded border bg-background/60 px-2.5 py-1 text-xs text-muted-foreground hover:text-foreground hover:bg-accent transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
-                title="Réinitialiser le fichier à l'état de départ"
+                title={
+                  isExamExpired && examCadre === "officiel"
+                    ? "Réinitialisation verrouillée : examen officiel clôturé par l'échéance serveur"
+                    : "Réinitialiser le fichier à l'état de départ"
+                }
                 aria-label="Réinitialiser le fichier à l'état de départ"
               >
                 <RotateCcw className="h-3 w-3" />
@@ -847,7 +901,13 @@ function WorkspaceView({ ex }: { ex: Exercise }) {
                 onClick={handleVerify}
                 disabled={verifying || isExamExpired}
                 className="flex items-center gap-1.5 rounded bg-emerald-600 hover:bg-emerald-500 text-white font-medium px-3 py-1 shadow-xs transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-                title="Vérifier mon code (Ctrl + Entrée)"
+                title={
+                  isExamExpired
+                    ? examCadre === "officiel"
+                      ? "Vérification verrouillée : l'échéance serveur de l'examen officiel est dépassée"
+                      : "Vérification en pause : relancez le chronomètre d'entraînement pour vérifier votre code"
+                    : "Vérifier mon code (Ctrl + Entrée)"
+                }
                 aria-label="Vérifier mon code"
               >
                 <Play className="h-3 w-3 fill-current" />
@@ -859,14 +919,39 @@ function WorkspaceView({ ex }: { ex: Exercise }) {
             </div>
           </div>
 
-          {/* Bannière de verrouillage en cas d'échéance d'examen (PRD F-50, T-06) */}
+          {/* Bannière de verrouillage en cas d'échéance d'examen (PRD F-50, T-06, #188) */}
           {isExamExpired && (
-            <div className="bg-rose-500/15 border-b border-rose-500/30 px-3 py-1.5 text-xs text-rose-500 font-medium flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Lock className="h-3.5 w-3.5" />
+            <div className="bg-rose-500/15 border-b border-rose-500/30 px-3 py-2 text-xs text-rose-500 font-medium flex flex-wrap items-center justify-between gap-2">
+              <div className="flex items-center gap-2 min-w-0">
+                <Lock className="h-3.5 w-3.5 shrink-0" />
                 <span>
-                  Temps réglementaire d'examen écoulé : éditeur scellé en lecture seule (T-06).
+                  {examCadre === "officiel"
+                    ? "Examen officiel clôturé (echeance_serveur) : copie scellée en lecture seule (T-06). La vérification et la réinitialisation sont verrouillées."
+                    : "Temps réglementaire d'entraînement écoulé : l'édition et la vérification sont mises en pause tant que le chronomètre n'est pas relancé."}
                 </span>
+              </div>
+              <div className="flex items-center gap-2 shrink-0">
+                {examCadre !== "officiel" && (
+                  <button
+                    type="button"
+                    onClick={handleRestartExam}
+                    disabled={restartingExam}
+                    className="inline-flex items-center gap-1.5 rounded bg-primary px-2.5 py-1 text-[11px] font-semibold text-primary-foreground hover:bg-primary/90 transition-colors cursor-pointer disabled:opacity-50"
+                  >
+                    <RotateCcw className="h-3 w-3" />
+                    <span>
+                      {restartingExam ? "Relance..." : "Nouvelle tentative / Relancer le chrono"}
+                    </span>
+                  </button>
+                )}
+                <button
+                  type="button"
+                  onClick={() => setShowSolutionModal(true)}
+                  className="inline-flex items-center gap-1.5 rounded border border-rose-500/40 bg-background/80 px-2.5 py-1 text-[11px] font-semibold text-foreground hover:bg-accent transition-colors cursor-pointer"
+                >
+                  <BookOpen className="h-3 w-3 text-primary" />
+                  <span>Accéder au corrigé de référence</span>
+                </button>
               </div>
             </div>
           )}
@@ -990,6 +1075,16 @@ function WorkspaceView({ ex }: { ex: Exercise }) {
         onOpenChange={setShowCourseDrawer}
         onInsertCode={handleInsertCourseCode}
         activeFileName={activeFileName}
+      />
+
+      {/* Modale de consultation du corrigé officiel après clôture (#188) */}
+      <ReferenceSolutionModal
+        isOpen={showSolutionModal}
+        onClose={() => setShowSolutionModal(false)}
+        sujetId={id}
+        sujetTitle={ex.title}
+        sujetVersionId={examVersionId}
+        examMode={Boolean(isExamMode && !isExamExpired)}
       />
     </div>
   );

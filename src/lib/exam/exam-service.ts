@@ -23,6 +23,8 @@ import type {
 const EXAM_DISPLAY_CACHE_PREFIX = "labo_sti_exam_cache_";
 const LEGACY_EXAM_START_PREFIX = "bacsti_exam_start_";
 
+export type CadreExamenPratique = "entrainement" | "officiel";
+
 export interface ExamDisplayCacheEntry {
   sujetId: string;
   projetId?: string | null;
@@ -30,6 +32,9 @@ export interface ExamDisplayCacheEntry {
   debutExamenServeur: string;
   echeanceServeur: string;
   statut?: string;
+  cadre?: CadreExamenPratique;
+  relancable?: boolean;
+  corrigeDisponible?: boolean;
   cachedAt: number;
 }
 
@@ -71,6 +76,10 @@ export function lireCacheChronometreExamen(sujetId: string): ExamDisplayCacheEnt
       debutExamenServeur: parsed.debutExamenServeur ?? new Date().toISOString(),
       echeanceServeur: parsed.echeanceServeur,
       statut: parsed.statut ?? "en_cours",
+      cadre: parsed.cadre === "officiel" ? "officiel" : "entrainement",
+      relancable:
+        typeof parsed.relancable === "boolean" ? parsed.relancable : parsed.cadre !== "officiel",
+      corrigeDisponible: Boolean(parsed.corrigeDisponible),
       cachedAt: typeof parsed.cachedAt === "number" ? parsed.cachedAt : Date.now(),
     };
   } catch {
@@ -142,6 +151,9 @@ export async function demarrerOuRecupererExamenPratique(
           echeance_serveur?: unknown;
           horloge_serveur?: unknown;
           statut?: unknown;
+          cadre?: unknown;
+          relancable?: unknown;
+          corrige_disponible?: unknown;
         };
         const echeanceServeur =
           typeof payload.echeance_serveur === "string" ? payload.echeance_serveur : null;
@@ -161,6 +173,8 @@ export async function demarrerOuRecupererExamenPratique(
         }
 
         if (echeanceServeur) {
+          const cadre: CadreExamenPratique =
+            payload.cadre === "officiel" ? "officiel" : "entrainement";
           const entry: ExamDisplayCacheEntry = {
             sujetId,
             projetId: typeof payload.projet_id === "string" ? payload.projet_id : null,
@@ -168,6 +182,12 @@ export async function demarrerOuRecupererExamenPratique(
             debutExamenServeur: debutServeur,
             echeanceServeur,
             statut: typeof payload.statut === "string" ? payload.statut : "en_cours",
+            cadre,
+            relancable:
+              typeof payload.relancable === "boolean"
+                ? payload.relancable
+                : cadre === "entrainement",
+            corrigeDisponible: Boolean(payload.corrige_disponible),
             cachedAt: Date.now(),
           };
           ecrireCacheChronometreExamen(entry);
@@ -217,12 +237,137 @@ export async function demarrerOuRecupererExamenPratique(
     debutExamenServeur: nowServeur.toISOString(),
     echeanceServeur: fallbackDeadline.toISOString(),
     statut: "en_cours",
+    cadre: "entrainement",
+    relancable: true,
+    corrigeDisponible: false,
     cachedAt: Date.now(),
   };
   ecrireCacheChronometreExamen(fallbackEntry);
   return {
     success: true,
     state: fallbackEntry,
+    source: "cache_local",
+  };
+}
+
+/**
+ * Relance une nouvelle tentative d'entraînement sur une annale d'examen pratique (#188).
+ * Strictement refusé par le serveur et le client si le sujet relève d'une session officielle (`cadre === "officiel"`).
+ */
+export async function relancerEntrainementExamen(
+  sujetId: string,
+  dureeMin: number = 90,
+  reinitialiserFichiers: boolean = false,
+): Promise<{
+  success: boolean;
+  state?: ExamDisplayCacheEntry;
+  source: "serveur" | "cache_local";
+  error?: string;
+}> {
+  purgerAncienChronoLocal(sujetId);
+  const cached = lireCacheChronometreExamen(sujetId);
+
+  if (cached?.cadre === "officiel" || cached?.relancable === false) {
+    return {
+      success: false,
+      source: "cache_local",
+      error:
+        "Relance interdite : cet examen fait l'objet d'une session officielle scellée par le serveur (T-06).",
+    };
+  }
+
+  if (!isSimulationWriteBlocked()) {
+    try {
+      const t0 = Date.now();
+      const { data, error } = await supabase.rpc("relancer_entrainement_examen", {
+        _sujet_id: sujetId,
+        _duree_min: dureeMin,
+        _reinitialiser_fichiers: reinitialiserFichiers,
+      });
+      const t1 = Date.now();
+
+      if (error) {
+        if (error.message.includes("Relance interdite") || error.message.includes("officielle")) {
+          return {
+            success: false,
+            source: "serveur",
+            error: error.message,
+          };
+        }
+      }
+
+      if (!error && data && typeof data === "object" && !Array.isArray(data)) {
+        const payload = data as {
+          projet_id?: unknown;
+          version_id?: unknown;
+          debut_examen_serveur?: unknown;
+          echeance_serveur?: unknown;
+          horloge_serveur?: unknown;
+          statut?: unknown;
+          cadre?: unknown;
+          relancable?: unknown;
+        };
+        const echeanceServeur =
+          typeof payload.echeance_serveur === "string" ? payload.echeance_serveur : null;
+        const debutServeur =
+          typeof payload.debut_examen_serveur === "string"
+            ? payload.debut_examen_serveur
+            : new Date().toISOString();
+        const horlogeServeur =
+          typeof payload.horloge_serveur === "string" ? payload.horloge_serveur : null;
+
+        if (horlogeServeur) {
+          const serverMs = new Date(horlogeServeur).getTime();
+          if (!Number.isNaN(serverMs)) {
+            const clientMidpoint = t0 + Math.max(0, Math.round((t1 - t0) / 2));
+            setServerOffsetMs(serverMs - clientMidpoint);
+          }
+        }
+
+        if (echeanceServeur) {
+          const entry: ExamDisplayCacheEntry = {
+            sujetId,
+            projetId: typeof payload.projet_id === "string" ? payload.projet_id : null,
+            versionId: typeof payload.version_id === "string" ? payload.version_id : null,
+            debutExamenServeur: debutServeur,
+            echeanceServeur,
+            statut: typeof payload.statut === "string" ? payload.statut : "en_cours",
+            cadre: "entrainement",
+            relancable: true,
+            corrigeDisponible: false,
+            cachedAt: Date.now(),
+          };
+          ecrireCacheChronometreExamen(entry);
+          return {
+            success: true,
+            state: entry,
+            source: "serveur",
+          };
+        }
+      }
+    } catch {
+      // Repli local uniquement en mode entraînement hors-ligne / invité
+    }
+  }
+
+  const nowServeur = getTempsServeurSynchronise();
+  const nextDeadline = new Date(nowServeur.getTime() + dureeMin * 60 * 1000);
+  const nextEntry: ExamDisplayCacheEntry = {
+    sujetId,
+    projetId: cached?.projetId ?? null,
+    versionId: cached?.versionId ?? null,
+    debutExamenServeur: nowServeur.toISOString(),
+    echeanceServeur: nextDeadline.toISOString(),
+    statut: "en_cours",
+    cadre: "entrainement",
+    relancable: true,
+    corrigeDisponible: false,
+    cachedAt: Date.now(),
+  };
+  ecrireCacheChronometreExamen(nextEntry);
+  return {
+    success: true,
+    state: nextEntry,
     source: "cache_local",
   };
 }

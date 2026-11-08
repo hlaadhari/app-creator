@@ -13,6 +13,7 @@ import {
   TrendingDown,
   Equal,
   Info,
+  RotateCcw,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -37,6 +38,10 @@ interface EvaluationResultsPaneProps {
   sujetTitle?: string | undefined;
   sujetVersionId?: string | null | undefined;
   examMode?: boolean | undefined;
+  examLocked?: boolean | undefined;
+  examCadre?: "entrainement" | "officiel" | undefined;
+  onRestartExam?: (() => void) | undefined;
+  restartingExam?: boolean | undefined;
   eleveId?: string | undefined;
   eleveNom?: string | undefined;
   projetId?: string | null | undefined;
@@ -50,10 +55,16 @@ export function EvaluationResultsPane({
   sujetTitle,
   sujetVersionId,
   examMode = false,
+  examLocked = false,
+  examCadre = "entrainement",
+  onRestartExam,
+  restartingExam = false,
   eleveId: eleveIdProp,
   eleveNom,
   projetId,
 }: EvaluationResultsPaneProps) {
+  const isSolutionBlockedByActiveExam = Boolean(examMode && !examLocked);
+  const isOfficialExam = examCadre === "officiel";
   const [authUserId, setAuthUserId] = useState<string | null>(null);
   useEffect(() => {
     let actif = true;
@@ -107,27 +118,77 @@ export function EvaluationResultsPane({
   if (!summary) {
     return (
       <div className="p-6 flex flex-col items-center justify-center text-center h-full space-y-4">
-        <div className="p-4 rounded-full bg-primary/10 border border-primary/20">
-          <Sparkles className="h-8 w-8 text-primary" />
+        <div
+          className={`p-4 rounded-full border ${
+            examLocked
+              ? "bg-rose-500/10 border-rose-500/30 text-rose-500"
+              : "bg-primary/10 border-primary/20 text-primary"
+          }`}
+        >
+          {examLocked ? <Lock className="h-8 w-8" /> : <Sparkles className="h-8 w-8" />}
         </div>
         <div>
           <h3 className="font-semibold text-base text-foreground">
-            Évaluation Formative Instantanée
+            {examLocked
+              ? isOfficialExam
+                ? "Épreuve Officielle Clôturée"
+                : "Temps d'Entraînement Écoulé"
+              : "Évaluation Formative Instantanée"}
           </h3>
-          <p className="text-xs text-muted-foreground mt-1 max-w-xs">
-            Testez votre code directement dans le bac à sable pour obtenir votre score sur 20 et des
-            retours critère par critère.
+          <p className="text-xs text-muted-foreground mt-1 max-w-xs leading-relaxed">
+            {examLocked
+              ? isOfficialExam
+                ? "L'échéance officielle du serveur (echeance_serveur) est atteinte : votre copie est scellée en lecture seule. La vérification et la modification sont verrouillées afin de préserver l'intégrité de votre copie, mais le corrigé de référence est désormais accessible."
+                : "Le chronomètre de votre simulation d'examen est arrivé à 00:00 : la vérification du code et l'édition sont suspendues tant que le chronomètre n'est pas relancé."
+              : "Testez votre code directement dans le bac à sable pour obtenir votre score sur 20 et des retours critère par critère."}
           </p>
         </div>
         <div className="flex flex-col gap-2 w-full max-w-xs">
+          {examLocked && !isOfficialExam && onRestartExam && (
+            <Button
+              onClick={onRestartExam}
+              disabled={restartingExam}
+              className="gap-2 text-xs font-medium w-full"
+            >
+              <RotateCcw className="h-3.5 w-3.5" />
+              <span>
+                {restartingExam
+                  ? "Relance du chronomètre..."
+                  : "Nouvelle tentative / Relancer le chrono"}
+              </span>
+            </Button>
+          )}
+
           <Button
             onClick={onVerify}
-            disabled={verifying}
+            disabled={verifying || examLocked}
+            variant={examLocked ? "secondary" : "default"}
             className="gap-2 text-xs font-medium w-full"
           >
-            <Play className="h-3.5 w-3.5 fill-current" />
-            <span>Lancer la vérification</span>
+            {examLocked ? (
+              <>
+                <Lock className="h-3.5 w-3.5" />
+                <span>Vérification verrouillée (échéance atteinte)</span>
+              </>
+            ) : (
+              <>
+                <Play className="h-3.5 w-3.5 fill-current" />
+                <span>Lancer la vérification</span>
+              </>
+            )}
           </Button>
+
+          {sujetId && (!isSolutionBlockedByActiveExam || examLocked) && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setSolutionOpen(true)}
+              className="gap-2 text-xs w-full text-primary hover:text-primary/90"
+            >
+              <BookOpen className="h-3.5 w-3.5" />
+              <span>Accéder au corrigé de référence</span>
+            </Button>
+          )}
 
           {sujetId && latestAttempts.length > 0 && (
             <Button
@@ -150,6 +211,17 @@ export function EvaluationResultsPane({
             onClose={() => setHistoryOpen(false)}
             sujetId={sujetId}
             sujetTitle={sujetTitle}
+          />
+        )}
+
+        {sujetId && (
+          <ReferenceSolutionModal
+            isOpen={solutionOpen}
+            onClose={() => setSolutionOpen(false)}
+            sujetId={sujetId}
+            sujetTitle={sujetTitle}
+            sujetVersionId={sujetVersionId}
+            examMode={isSolutionBlockedByActiveExam}
           />
         )}
       </div>
@@ -176,19 +248,55 @@ export function EvaluationResultsPane({
         </Button>
 
         <Button
-          variant={examMode ? "secondary" : "outline"}
+          variant={isSolutionBlockedByActiveExam ? "secondary" : "outline"}
           size="sm"
           onClick={() => setSolutionOpen(true)}
           className={`h-7 text-xs gap-1.5 ${
-            examMode
+            isSolutionBlockedByActiveExam
               ? "opacity-60 cursor-not-allowed text-muted-foreground"
               : "text-primary hover:text-primary/90"
           }`}
         >
-          {examMode ? <Lock className="h-3 w-3" /> : <BookOpen className="h-3 w-3" />}
-          <span>{examMode ? "Corrigé (Examen)" : "Corrigé de référence"}</span>
+          {isSolutionBlockedByActiveExam ? (
+            <Lock className="h-3 w-3" />
+          ) : (
+            <BookOpen className="h-3 w-3" />
+          )}
+          <span>{isSolutionBlockedByActiveExam ? "Corrigé (Examen)" : "Corrigé de référence"}</span>
         </Button>
       </div>
+
+      {/* Explication explicite du verrouillage post-échéance (#188) */}
+      {examLocked && (
+        <div className="rounded-lg border border-rose-500/30 bg-rose-500/10 p-3 text-xs space-y-2">
+          <div className="flex items-center gap-1.5 font-semibold text-rose-500">
+            <Lock className="h-3.5 w-3.5 shrink-0" />
+            <span>
+              {isOfficialExam
+                ? "Examen officiel clôturé (copie scellée)"
+                : "Temps d'entraînement écoulé (vérification en pause)"}
+            </span>
+          </div>
+          <p className="text-[11px] text-muted-foreground leading-relaxed">
+            {isOfficialExam
+              ? "L'échéance serveur (echeance_serveur) est dépassée : la réévaluation et l'édition sont désactivées. Vous pouvez consulter le corrigé de référence ci-dessus."
+              : "La vérification ne s'exécute pas tant que le chronomètre d'entraînement est expiré. Relancez le chronomètre pour continuer à tester votre code."}
+          </p>
+          {!isOfficialExam && onRestartExam && (
+            <Button
+              size="sm"
+              onClick={onRestartExam}
+              disabled={restartingExam}
+              className="h-7 text-xs gap-1.5 w-full"
+            >
+              <RotateCcw className="h-3 w-3" />
+              <span>
+                {restartingExam ? "Relance en cours..." : "Nouvelle tentative / Relancer le chrono"}
+              </span>
+            </Button>
+          )}
+        </div>
+      )}
 
       {/* En-tête Score & Jauge */}
       <div className="rounded-xl border bg-card/60 p-4 text-center shadow-xs space-y-2">
@@ -270,11 +378,11 @@ export function EvaluationResultsPane({
             variant="ghost"
             size="sm"
             onClick={onVerify}
-            disabled={verifying}
+            disabled={verifying || examLocked}
             className="h-7 text-xs gap-1 text-primary hover:text-primary/80"
           >
-            <Play className="h-3 w-3 fill-current" />
-            Re-vérifier
+            {examLocked ? <Lock className="h-3 w-3" /> : <Play className="h-3 w-3 fill-current" />}
+            {examLocked ? "Verrouillé" : "Re-vérifier"}
           </Button>
         </div>
 
@@ -529,7 +637,7 @@ export function EvaluationResultsPane({
           sujetId={sujetId}
           sujetTitle={sujetTitle}
           sujetVersionId={sujetVersionId}
-          examMode={examMode}
+          examMode={isSolutionBlockedByActiveExam}
         />
       )}
 
