@@ -14,6 +14,7 @@ import { Analytics } from "@vercel/analytics/react";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { AuthProvider } from "@/lib/supabase/auth";
+import { RolePreviewBanner } from "@/components/RolePreviewBanner";
 import { registerOfflineServiceWorker } from "@/lib/storage/service-worker-register";
 
 function NotFoundComponent() {
@@ -133,6 +134,7 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
+        <RolePreviewBanner />
         {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
         <Outlet />
       </AuthProvider>

@@ -8,6 +8,7 @@ import {
   sauvegarderFichierDistant,
   chargerFichiersDistants,
 } from "@/lib/supabase/projets";
+import { isSimulationWriteBlocked } from "@/lib/supabase/auth";
 import { supabase } from "@/integrations/supabase/client";
 
 function detectLanguage(fileName: string): "html" | "css" | "javascript" | "php" | "sql" {
@@ -101,6 +102,10 @@ export function useBufferSync({ exerciseId, starterFiles }: UseBufferSyncOptions
   const checkRemoteSync = useCallback(
     async (exId: string, localSnapshot?: Record<string, string>) => {
       try {
+        if (isSimulationWriteBlocked()) {
+          setSyncStatus("local");
+          return;
+        }
         const {
           data: { user },
         } = await supabase.auth.getUser();
@@ -183,6 +188,11 @@ export function useBufferSync({ exerciseId, starterFiles }: UseBufferSyncOptions
 
   // 3. Synchronisation effective (exécutée une à la fois, voir file d'attente ci-dessous)
   const runSync = useCallback(async () => {
+    if (isSimulationWriteBlocked()) {
+      setSyncStatus("local");
+      return;
+    }
+
     if (typeof navigator !== "undefined" && !navigator.onLine) {
       setSyncStatus("offline");
       return;

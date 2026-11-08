@@ -22,6 +22,8 @@ import {
   RefreshCw,
   ChevronDown,
   LayoutGrid,
+  Eye,
+  Check,
 } from "lucide-react";
 import {
   useAuth,
@@ -37,7 +39,17 @@ export interface UserProfileMenuProps {
 }
 
 export function UserProfileMenu({ onClassesChanged }: UserProfileMenuProps) {
-  const { user, profile, role, signOut, refreshProfile } = useAuth();
+  const {
+    user,
+    profile,
+    role,
+    realRole,
+    isRoleSimulated,
+    setPreviewRole,
+    loading,
+    signOut,
+    refreshProfile,
+  } = useAuth();
   const [profileDialogOpen, setProfileDialogOpen] = useState(false);
   const [profileDialogTab, setProfileDialogTab] = useState<ProfileDialogTab>("profil");
   const [progressionOpen, setProgressionOpen] = useState(false);
@@ -47,7 +59,14 @@ export function UserProfileMenu({ onClassesChanged }: UserProfileMenuProps) {
 
   const displayName = getUserDisplayName(profile, user);
   const initials = getUserInitials(profile, user);
-  const roleInfo = getRoleBadgeInfo(role);
+  // Ne jamais afficher un badge « Élève » par défaut tant que le rôle n'est pas vérifié (#189).
+  const roleInfo = role
+    ? getRoleBadgeInfo(role)
+    : {
+        label: loading ? "…" : "Compte",
+        badgeClass: "bg-muted text-muted-foreground border-border",
+        description: "Vérification des droits en cours…",
+      };
 
   const openProfileTab = (tab: ProfileDialogTab) => {
     setProfileDialogTab(tab);
@@ -205,6 +224,54 @@ export function UserProfileMenu({ onClassesChanged }: UserProfileMenuProps) {
               </DropdownMenuItem>
             )}
           </DropdownMenuGroup>
+
+          {realRole === "admin" && (
+            <>
+              <DropdownMenuSeparator />
+              <DropdownMenuGroup data-testid="role-preview-section">
+                <DropdownMenuLabel className="flex items-center gap-1.5 text-[11px] font-semibold text-muted-foreground py-1">
+                  <Eye className="h-3.5 w-3.5 text-amber-500" />
+                  <span>Prévisualiser en tant que</span>
+                </DropdownMenuLabel>
+
+                <DropdownMenuItem
+                  data-testid="role-preview-option-eleve"
+                  onSelect={() => setPreviewRole("eleve")}
+                  className="text-xs gap-2 justify-between cursor-pointer"
+                >
+                  <span className="flex items-center gap-2">
+                    <span className="h-2 w-2 rounded-full bg-emerald-500" />
+                    <span>Élève</span>
+                  </span>
+                  {role === "eleve" && <Check className="h-3.5 w-3.5 text-emerald-500" />}
+                </DropdownMenuItem>
+
+                <DropdownMenuItem
+                  data-testid="role-preview-option-enseignant"
+                  onSelect={() => setPreviewRole("enseignant")}
+                  className="text-xs gap-2 justify-between cursor-pointer"
+                >
+                  <span className="flex items-center gap-2">
+                    <span className="h-2 w-2 rounded-full bg-primary" />
+                    <span>Enseignant</span>
+                  </span>
+                  {role === "enseignant" && <Check className="h-3.5 w-3.5 text-primary" />}
+                </DropdownMenuItem>
+
+                <DropdownMenuItem
+                  data-testid="role-preview-option-admin"
+                  onSelect={() => setPreviewRole(null)}
+                  className="text-xs gap-2 justify-between cursor-pointer"
+                >
+                  <span className="flex items-center gap-2">
+                    <span className="h-2 w-2 rounded-full bg-rose-500" />
+                    <span>Admin (rôle réel)</span>
+                  </span>
+                  {!isRoleSimulated && <Check className="h-3.5 w-3.5 text-rose-500" />}
+                </DropdownMenuItem>
+              </DropdownMenuGroup>
+            </>
+          )}
 
           <DropdownMenuSeparator />
 

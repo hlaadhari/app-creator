@@ -5,6 +5,7 @@
 
 import { supabase } from "@/integrations/supabase/client";
 import type { Json } from "@/integrations/supabase/types";
+import { isSimulationWriteBlocked } from "@/lib/supabase/auth";
 
 export interface CriterionAttemptResult {
   id: string;
@@ -180,7 +181,10 @@ export async function enregistrerNouvelleTentative(params: {
 
       // Point d'écriture unique (#184) : sans version publiée valide, on garde la
       // tentative en local plutôt que d'envoyer un identifiant bidon (409 FK).
-      const versionId = params.sujetVersionId ?? (await resoudreVersionPubliee(params.sujetId));
+      // En mode simulation de rôle sans accord explicite (#189), aucune écriture en base.
+      const versionId = isSimulationWriteBlocked()
+        ? null
+        : (params.sujetVersionId ?? (await resoudreVersionPubliee(params.sujetId)));
       if (versionId) {
         record.sujetVersionId = versionId;
         await supabase.from("tentatives").insert({
