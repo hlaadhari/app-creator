@@ -424,8 +424,8 @@ export function traduireErreurReservationTp(err: unknown): string {
 
 /**
  * Récupère les réservations d'une séance.
- * Utilise en priorité la RPC `lister_occupation_postes_tp` (#199) qui anonymise
- * les identités des autres élèves côté serveur lorsque l'appelant est un élève.
+ * Côté élève, `anonymiserReservationsPourEleve` et `SeatPicker` masquent
+ * systématiquement l'identité des autres élèves (#199).
  */
 export async function getTpReservations(sessionId: string): Promise<TpReservation[]> {
   if (isTestEnv) {
@@ -433,43 +433,6 @@ export async function getTpReservations(sessionId: string): Promise<TpReservatio
   }
 
   try {
-    const rpcResult = await dbClient.rpc("lister_occupation_postes_tp", {
-      _session_id: sessionId,
-    });
-
-    if (!rpcResult.error && Array.isArray(rpcResult.data)) {
-      const mapped = (rpcResult.data as Array<Record<string, unknown>>).map((row) => {
-        const seatNum = Number(row["seat_number"]);
-        const rawStudentId = row["student_id"] ? String(row["student_id"]) : "";
-        const studentIdStr = rawStudentId || `anonyme-poste-${seatNum}`;
-        const rawStudentName = row["student_name"] ? String(row["student_name"]).trim() : "";
-        const rawNotes = row["notes"] ? String(row["notes"]).trim() : "";
-
-        const res: TpReservation = {
-          id: String(row["id"]),
-          sessionId: String(row["session_id"]),
-          studentId: studentIdStr,
-          seatNumber: seatNum,
-          status: (row["status"] as TpReservationStatus) || "pending",
-          createdAt: String(row["created_at"]),
-        };
-        if (rawStudentName) {
-          res.studentName = rawStudentName;
-        } else if (rawStudentId) {
-          res.studentName = rawNotes || `Élève (${rawStudentId.slice(0, 6)})`;
-        }
-        if (rawNotes) res.notes = rawNotes;
-        return res;
-      });
-
-      const localOnly = inMemoryReservations.filter(
-        (r) =>
-          r.sessionId === sessionId &&
-          !mapped.some((m) => m.id === r.id || m.seatNumber === r.seatNumber),
-      );
-      return [...mapped, ...localOnly];
-    }
-
     const { data, error } = await dbClient
       .from("tp_reservations")
       .select("*, student:student_id(nom, prenom)")
