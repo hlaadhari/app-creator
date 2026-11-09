@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
 import { roleEffectif } from "@/lib/supabase/roles";
 
-type AppRole = Database["public"]["Enums"]["app_role"];
+export type AppRole = Database["public"]["Enums"]["app_role"];
 
 export const ROLE_PREVIEW_STORAGE_KEY = "labo_sti_admin_preview_role";
 export const ROLE_PREVIEW_ALLOW_WRITES_KEY = "labo_sti_admin_preview_allow_writes";

@@ -5,6 +5,8 @@ import {
   DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
@@ -16,14 +18,10 @@ import {
   Shield,
   Lock,
   TrendingUp,
-  BookOpen,
-  Calendar,
   LogOut,
   RefreshCw,
   ChevronDown,
-  LayoutGrid,
   Eye,
-  Check,
   Info,
 } from "lucide-react";
 import {
@@ -31,9 +29,17 @@ import {
   getUserDisplayName,
   getUserInitials,
   getRoleBadgeInfo,
+  type AppRole,
 } from "@/lib/supabase/auth";
 import { UserProfileDialog, type ProfileDialogTab } from "@/components/UserProfileDialog";
 import { ProgressionModal } from "@/components/competences/ProgressionModal";
+
+/** Vues proposées au switch de rôle de l'admin (#239). */
+const VUES_ROLE: ReadonlyArray<{ role: AppRole; label: string; dotClass: string }> = [
+  { role: "admin", label: "Admin (rôle réel)", dotClass: "bg-rose-500" },
+  { role: "enseignant", label: "Enseignant", dotClass: "bg-primary" },
+  { role: "eleve", label: "Élève", dotClass: "bg-emerald-500" },
+];
 
 export interface UserProfileMenuProps {
   onClassesChanged?: (() => void) | undefined;
@@ -100,11 +106,11 @@ export function UserProfileMenu({ onClassesChanged }: UserProfileMenuProps) {
             >
               {initials}
             </span>
-            <span className="font-mono text-xs text-foreground truncate max-w-[140px]">
+            <span className="hidden md:inline font-mono text-xs text-foreground truncate max-w-[140px]">
               {displayName}
             </span>
             <span
-              className={`rounded border px-1.5 py-0.5 text-[10px] font-mono uppercase font-semibold shrink-0 ${roleInfo.badgeClass}`}
+              className={`hidden sm:inline rounded border px-1.5 py-0.5 text-[10px] font-mono uppercase font-semibold shrink-0 ${roleInfo.badgeClass}`}
             >
               {roleInfo.label}
             </span>
@@ -137,9 +143,40 @@ export function UserProfileMenu({ onClassesChanged }: UserProfileMenuProps) {
             </div>
           </DropdownMenuLabel>
 
+          {/* Switch de vue : réservé à l'admin réel, juste sous l'identité (#239) */}
+          {realRole === "admin" && (
+            <>
+              <DropdownMenuSeparator />
+              <DropdownMenuGroup data-testid="role-preview-section">
+                <DropdownMenuLabel className="flex items-center gap-1.5 text-[11px] font-semibold text-muted-foreground py-1">
+                  <Eye className="h-3.5 w-3.5 text-amber-500" />
+                  <span>Vue active</span>
+                </DropdownMenuLabel>
+                <DropdownMenuRadioGroup
+                  value={role ?? "admin"}
+                  onValueChange={(valeur) =>
+                    setPreviewRole(valeur === "admin" ? null : (valeur as AppRole))
+                  }
+                >
+                  {VUES_ROLE.map((vue) => (
+                    <DropdownMenuRadioItem
+                      key={vue.role}
+                      value={vue.role}
+                      data-testid={`role-preview-option-${vue.role}`}
+                      className="text-xs gap-2 cursor-pointer"
+                    >
+                      <span className={`h-2 w-2 rounded-full ${vue.dotClass}`} />
+                      <span>{vue.label}</span>
+                    </DropdownMenuRadioItem>
+                  ))}
+                </DropdownMenuRadioGroup>
+              </DropdownMenuGroup>
+            </>
+          )}
+
           <DropdownMenuSeparator />
 
-          {/* Section 1 : Mon Compte & Pédagogie */}
+          {/* Mon compte */}
           <DropdownMenuGroup>
             <DropdownMenuItem
               onSelect={() => openProfileTab("profil")}
@@ -182,94 +219,26 @@ export function UserProfileMenu({ onClassesChanged }: UserProfileMenuProps) {
             </DropdownMenuItem>
           </DropdownMenuGroup>
 
-          <DropdownMenuSeparator />
-
-          {/* Section 2 : Navigation Rapide */}
-          <DropdownMenuGroup>
-            <DropdownMenuItem asChild className="text-xs gap-2 cursor-pointer">
-              <a href="/">
-                <LayoutGrid className="h-3.5 w-3.5 text-muted-foreground" />
-                <span>Catalogue des sujets</span>
-              </a>
-            </DropdownMenuItem>
-
-            <DropdownMenuItem asChild className="text-xs gap-2 cursor-pointer">
-              <a href="/cours">
-                <BookOpen className="h-3.5 w-3.5 text-muted-foreground" />
-                <span>Mémento & Cours STI</span>
-              </a>
-            </DropdownMenuItem>
-
-            <DropdownMenuItem asChild className="text-xs gap-2 cursor-pointer">
-              <a href="/calendrier">
-                <Calendar className="h-3.5 w-3.5 text-muted-foreground" />
-                <span>Planning & Postes TP</span>
-              </a>
-            </DropdownMenuItem>
-
-            {(role === "enseignant" || role === "admin") && (
-              <DropdownMenuItem asChild className="text-xs gap-2 cursor-pointer">
-                <a href="/enseignant">
-                  <GraduationCap className="h-3.5 w-3.5 text-primary" />
-                  <span className="font-medium text-primary">Espace Enseignant</span>
-                </a>
-              </DropdownMenuItem>
-            )}
-
-            {role === "admin" && (
-              <DropdownMenuItem asChild className="text-xs gap-2 cursor-pointer">
-                <a href="/admin">
-                  <Shield className="h-3.5 w-3.5 text-rose-500" />
-                  <span className="font-medium text-rose-500">Administration Centrale</span>
-                </a>
-              </DropdownMenuItem>
-            )}
-          </DropdownMenuGroup>
-
-          {realRole === "admin" && (
+          {/* Espaces réservés : seuls liens de navigation conservés (catalogue, cours et planning vivent dans la navigation principale) */}
+          {(role === "enseignant" || role === "admin") && (
             <>
               <DropdownMenuSeparator />
-              <DropdownMenuGroup data-testid="role-preview-section">
-                <DropdownMenuLabel className="flex items-center gap-1.5 text-[11px] font-semibold text-muted-foreground py-1">
-                  <Eye className="h-3.5 w-3.5 text-amber-500" />
-                  <span>Prévisualiser en tant que</span>
-                </DropdownMenuLabel>
-
-                <DropdownMenuItem
-                  data-testid="role-preview-option-eleve"
-                  onSelect={() => setPreviewRole("eleve")}
-                  className="text-xs gap-2 justify-between cursor-pointer"
-                >
-                  <span className="flex items-center gap-2">
-                    <span className="h-2 w-2 rounded-full bg-emerald-500" />
-                    <span>Élève</span>
-                  </span>
-                  {role === "eleve" && <Check className="h-3.5 w-3.5 text-emerald-500" />}
+              <DropdownMenuGroup>
+                <DropdownMenuItem asChild className="text-xs gap-2 cursor-pointer">
+                  <a href="/enseignant">
+                    <GraduationCap className="h-3.5 w-3.5 text-primary" />
+                    <span className="font-medium text-primary">Espace Enseignant</span>
+                  </a>
                 </DropdownMenuItem>
 
-                <DropdownMenuItem
-                  data-testid="role-preview-option-enseignant"
-                  onSelect={() => setPreviewRole("enseignant")}
-                  className="text-xs gap-2 justify-between cursor-pointer"
-                >
-                  <span className="flex items-center gap-2">
-                    <span className="h-2 w-2 rounded-full bg-primary" />
-                    <span>Enseignant</span>
-                  </span>
-                  {role === "enseignant" && <Check className="h-3.5 w-3.5 text-primary" />}
-                </DropdownMenuItem>
-
-                <DropdownMenuItem
-                  data-testid="role-preview-option-admin"
-                  onSelect={() => setPreviewRole(null)}
-                  className="text-xs gap-2 justify-between cursor-pointer"
-                >
-                  <span className="flex items-center gap-2">
-                    <span className="h-2 w-2 rounded-full bg-rose-500" />
-                    <span>Admin (rôle réel)</span>
-                  </span>
-                  {!isRoleSimulated && <Check className="h-3.5 w-3.5 text-rose-500" />}
-                </DropdownMenuItem>
+                {role === "admin" && (
+                  <DropdownMenuItem asChild className="text-xs gap-2 cursor-pointer">
+                    <a href="/admin">
+                      <Shield className="h-3.5 w-3.5 text-rose-500" />
+                      <span className="font-medium text-rose-500">Administration Centrale</span>
+                    </a>
+                  </DropdownMenuItem>
+                )}
               </DropdownMenuGroup>
             </>
           )}
@@ -283,7 +252,6 @@ export function UserProfileMenu({ onClassesChanged }: UserProfileMenuProps) {
             </a>
           </DropdownMenuItem>
 
-          {/* Section 3 : Rafraîchissement & Déconnexion */}
           <DropdownMenuItem
             onSelect={() => void handleRefresh()}
             disabled={refreshing}
