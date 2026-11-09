@@ -165,9 +165,25 @@ export function normaliserLigneSql(row: Record<string, unknown>): Record<string,
 }
 
 /**
- * Compare deux listes d'enregistrements indépendamment de l'ordre des colonnes ou lignes
+ * Compare deux listes d'enregistrements indépendamment de l'ordre des lignes.
+ * Les colonnes sont d'abord comparées par nom ; à défaut, par valeurs dans l'ordre de projection,
+ * car l'élève choisit librement l'alias d'un calcul (`AS nb`, `AS total`, sans alias...).
  */
 export function comparerLignesResultats(
+  actual: Record<string, unknown>[],
+  expected: Record<string, unknown>[],
+): boolean {
+  if (comparerParNomsDeColonnes(actual, expected)) return true;
+  if (actual.length !== expected.length || actual.length === 0) return false;
+
+  const versValeurs = (rows: Record<string, unknown>[]): string[] =>
+    rows.map((r) => JSON.stringify(Object.values(normaliserLigneSql(r)).map(String))).sort();
+  const a = versValeurs(actual);
+  const e = versValeurs(expected);
+  return a.every((ligne, i) => ligne === e[i]);
+}
+
+function comparerParNomsDeColonnes(
   actual: Record<string, unknown>[],
   expected: Record<string, unknown>[],
 ): boolean {

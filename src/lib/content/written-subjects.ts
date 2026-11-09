@@ -13,11 +13,13 @@ import type {
 import bac2022ControleManifest from "../../../content/exam-bac2022-controle-ecrit/manifest.json";
 import bac2023ControleManifest from "../../../content/exam-bac2023-controle-ecrit/manifest.json";
 import bac2023PrincipaleManifest from "../../../content/exam-bac2023-principale-ecrit/manifest.json";
+import bac2024ControleManifest from "../../../content/exam-bac2024-controle-ecrit/manifest.json";
 import bac2024PrincipaleManifest from "../../../content/exam-bac2024-principale-ecrit/manifest.json";
 
 export const examBac2022Controle = bac2022ControleManifest as unknown as WrittenExamManifest;
 export const examBac2023Controle = bac2023ControleManifest as unknown as WrittenExamManifest;
 export const examBac2023Principale = bac2023PrincipaleManifest as unknown as WrittenExamManifest;
+export const examBac2024Controle = bac2024ControleManifest as unknown as WrittenExamManifest;
 export const examBac2024Principale = bac2024PrincipaleManifest as unknown as WrittenExamManifest;
 
 export const sampleWrittenExam: WrittenExamManifest = {
@@ -206,6 +208,7 @@ const writtenExamsRegistry: Map<string, WrittenExamManifest> = new Map([
   [examBac2022Controle.id, examBac2022Controle],
   [examBac2023Controle.id, examBac2023Controle],
   [examBac2023Principale.id, examBac2023Principale],
+  [examBac2024Controle.id, examBac2024Controle],
   [examBac2024Principale.id, examBac2024Principale],
 ]);
 
