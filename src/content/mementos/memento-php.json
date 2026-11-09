@@ -53,6 +53,53 @@
           "code": "<?php\n// 1. Connexion BDD\n$cnx = mysqli_connect(\"localhost\", \"root\", \"\", \"bd_bac\")\n       or die(mysqli_error($cnx));\n\n// 2. Récupération des données postées\n$cin = trim($_POST['cin']);\n$nom = trim($_POST['nom']);\n$genre = $_POST['genre'];\n$section = $_POST['section'];\n\n// 3. Test d'unicité préalable (Le candidat existe-t-il déjà ?)\n$req_test = \"SELECT cin FROM candidat WHERE cin = '$cin'\";\n$res_test = mysqli_query($cnx, $req_test);\n\nif (mysqli_num_rows($res_test) > 0) {\n  echo \"<h3 style='color:red;'>Erreur : Ce candidat portant le CIN $cin est déjà enregistré !</h3>\";\n} else {\n  // 4. Insertion du nouvel enregistrement\n  $req_insert = \"INSERT INTO candidat (cin, nom, genre, section) \n                 VALUES ('$cin', '$nom', '$genre', '$section')\";\n  $res_insert = mysqli_query($cnx, $req_insert) or die(mysqli_error($cnx));\n  \n  if (mysqli_affected_rows($cnx) > 0) {\n    echo \"<h3 style='color:green;'>Succès : Candidat $nom enregistré avec succès !</h3>\";\n  }\n}\n\n// 5. Clôture de connexion\nmysqli_close($cnx);\n?>"
         }
       ]
+    },
+    {
+      "id": "php-annales",
+      "title": "6. Notions fréquentes des annales",
+      "description": "Notions de PHP qui reviennent dans les épreuves écrites : transtypage, tableaux, test de variable, inclusion de fichier, remplacement dans une chaîne, nombre de lignes d'un résultat.",
+      "keyPoints": [
+        "Piège : (int) tronque (2.99 donne 2), il n'arrondit pas.",
+        "Piège : require arrête le script si le fichier manque ; include continue avec un avertissement.",
+        "Piège : après un INSERT on teste mysqli_affected_rows, pas mysqli_num_rows.",
+        "Annale : Bac 2024 principale, exercice 1 et partie web (int, count, require, str_replace) — /examen-ecrit/exam-bac2024-principale-ecrit",
+        "Annale : Bac 2024 contrôle, exercice 1 (checkdate, isset) — /examen-ecrit/exam-bac2024-controle-ecrit",
+        "Annale : Bac 2025 principale, partie B exercice 4 (affected_rows, mysqli_error) — /examen-ecrit/exam-bac2025-principale-ecrit",
+        "Annale : Bac 2025 contrôle, partie B exercice 4 (mysqli_num_rows, count, strlen) — /examen-ecrit/exam-bac2025-controle-ecrit"
+      ],
+      "snippets": [
+        {
+          "title": "Transtypage et tableaux : (int), count, isset",
+          "language": "php",
+          "targetFile": "traitement.php",
+          "keywords": ["(int)", "count", "isset", "array", "$_POST", "transtypage"],
+          "code": "<?php\n$X = (int) 2.99;                       // 2 : la partie décimale est tronquée, pas arrondie\n$notes = array($_POST[\"serv1\"], $_POST[\"serv2\"]);\necho count($notes);                    // 2 : nombre d'éléments du tableau\nif (isset($_POST[\"manif\"])) {          // la variable existe et n'est pas NULL\n  $manif = $_POST[\"manif\"];\n}\n?>",
+          "explanation": "(int) convertit en entier en tronquant. count($t) donne le nombre d'éléments d'un tableau. isset teste qu'une variable est définie."
+        },
+        {
+          "title": "Inclusion et remplacement : require, str_replace",
+          "language": "php",
+          "targetFile": "traitement.php",
+          "keywords": ["require", "include", "str_replace", "chaîne", "connexion"],
+          "code": "<?php\nrequire(\"connexion.php\");              // erreur fatale (script arrêté) si le fichier est introuvable\n$nomBarrage = \"Sidi_Salem\";\n$nom = str_replace(\"_\", \" \", $nomBarrage); // \"Sidi Salem\" : tous les _ deviennent des espaces\necho $nom;\n?>",
+          "explanation": "require arrête le script si le fichier manque (include se contente d'un avertissement). str_replace(ancien, nouveau, chaîne) remplace toutes les occurrences."
+        },
+        {
+          "title": "Compter les lignes : mysqli_num_rows et mysqli_affected_rows",
+          "language": "php",
+          "targetFile": "traitement.php",
+          "keywords": [
+            "mysqli_num_rows",
+            "mysqli_affected_rows",
+            "mysqli_query",
+            "mysqli_error",
+            "select",
+            "insert"
+          ],
+          "code": "<?php\n$res = mysqli_query($cnx, \"SELECT * FROM barrage\") or die(\"Requête erronée\");\nif (mysqli_num_rows($res) == 0) {      // SELECT : nombre de lignes du résultat\n  echo \"Aucun résultat\";\n}\n$ok = mysqli_query($cnx, \"INSERT INTO tag (libelleTag) VALUES ('HTMX')\");\nif (mysqli_affected_rows($cnx) != 0) { // INSERT, UPDATE, DELETE : lignes touchées\n  echo \"Enregistré\";\n} else {\n  echo \"Échec : \" . mysqli_error($cnx);\n}\n?>",
+          "explanation": "mysqli_num_rows concerne le résultat d'un SELECT ; mysqli_affected_rows($con) concerne un INSERT, UPDATE ou DELETE ; mysqli_error($con) renvoie le message d'erreur."
+        }
+      ]
     }
   ]
 }

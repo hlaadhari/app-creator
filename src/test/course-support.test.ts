@@ -329,4 +329,114 @@ describe("Support de Cours Interactif & Mémento Bac STI (feat/course-support-ht
       expect(NOTEBOOK_QUIZZES.sql.length).toBeGreaterThanOrEqual(7);
     });
   });
+  describe("Notions Web des annales (#206)", () => {
+    const NOTIONS: Record<string, string[]> = {
+      html5: [
+        "figcaption",
+        "range",
+        "alt",
+        "title",
+        "<title",
+        "<hr",
+        "textarea",
+        "oninput",
+        "onfocus",
+      ],
+      css3: ["skew", "rotate", "border-radius", "font-weight", "<link", "text-transform"],
+      js: ["indexOf", "substr", "charAt", "toUpperCase", "innerHTML"],
+      php: ["(int)", "count(", "isset", "mysqli_num_rows", "require", "str_replace"],
+    };
+    const SECTIONS: Record<string, string> = {
+      html5: "html-annales",
+      css3: "css-annales",
+      js: "js-annales",
+      php: "php-annales",
+    };
+
+    it("chaque module a une section « notions des annales » dans le cours", () => {
+      for (const [mod, id] of Object.entries(SECTIONS)) {
+        const m = COURSE_MODULES.find((c) => c.id === mod)!;
+        expect(
+          m.sections.some((sec) => sec.id === id),
+          mod,
+        ).toBe(true);
+        expect(m.rawHtml, mod).toContain(`id="${id}"`);
+      }
+    });
+
+    it("chaque notion est trouvable par la recherche du mémento (titre, code, mots-clés ou explication)", async () => {
+      const { MEMENTO_CARDS } = await import("@/content/mementos");
+      const trouve = (q: string): boolean => {
+        const needle = q.toLowerCase();
+        return MEMENTO_CARDS.some((f) =>
+          f.sections.some((sec) =>
+            sec.snippets.some(
+              (sn) =>
+                sn.title.toLowerCase().includes(needle) ||
+                sn.code.toLowerCase().includes(needle) ||
+                sn.keywords.some((k) => k.toLowerCase().includes(needle)) ||
+                (sn.explanation ?? "").toLowerCase().includes(needle),
+            ),
+          ),
+        );
+      };
+      for (const [mod, notions] of Object.entries(NOTIONS)) {
+        for (const n of notions) expect(trouve(n), `${mod} : ${n}`).toBe(true);
+      }
+    });
+
+    it("chaque section du mémento donne un piège fréquent et renvoie à une annale du catalogue", async () => {
+      const { MEMENTO_CARDS } = await import("@/content/mementos");
+      const fs = await import("node:fs");
+      const path = await import("node:path");
+      for (const [mod, id] of Object.entries(SECTIONS)) {
+        const sec = MEMENTO_CARDS.find((f) => f.id === mod)!.sections.find((x) => x.id === id)!;
+        expect(sec, mod).toBeDefined();
+        const points = sec.keyPoints ?? [];
+        expect(
+          points.some((p) => p.startsWith("Piège")),
+          mod,
+        ).toBe(true);
+        const annales = points.filter((p) => p.startsWith("Annale"));
+        expect(annales.length, mod).toBeGreaterThanOrEqual(2);
+        for (const a of annales) {
+          const ref = a.split("/examen-ecrit/")[1];
+          expect(ref, a).toBeDefined();
+          expect(
+            fs.existsSync(path.resolve(process.cwd(), "content", ref!, "manifest.json")),
+            ref,
+          ).toBe(true);
+        }
+        for (const sn of sec.snippets) {
+          expect(sn.targetFile).toBeTruthy();
+          expect(sn.code.length).toBeGreaterThan(20);
+        }
+      }
+    });
+
+    it("le carnet propose flashcards, quiz et réponses du tuteur pour ces notions", async () => {
+      const { NOTEBOOK_FLASHCARDS, NOTEBOOK_QUIZZES, queryNotebookKnowledgeBase } =
+        await import("@/content/notebook-sti");
+      for (const id of ["fc-html-04", "fc-css-04", "fc-js-04", "fc-php-04"]) {
+        expect(
+          NOTEBOOK_FLASHCARDS.some((c) => c.id === id),
+          id,
+        ).toBe(true);
+      }
+      for (const [mod, qid] of [
+        ["html5", "qz-html-annales-1"],
+        ["css3", "qz-css-annales-1"],
+        ["js", "qz-js-annales-1"],
+        ["php", "qz-php-annales-1"],
+      ] as const) {
+        const q = NOTEBOOK_QUIZZES[mod].find((x) => x.id === qid);
+        expect(q, qid).toBeDefined();
+        expect(q!.notebookSource).toContain("exam-bac");
+      }
+      expect(queryNotebookKnowledgeBase("skew", "css3").id).toBe("kb-css-annales");
+      expect(queryNotebookKnowledgeBase("substr indexOf", "js").id).toBe("kb-js-annales");
+      expect(queryNotebookKnowledgeBase("str_replace", "php").id).toBe("kb-php-annales");
+      expect(queryNotebookKnowledgeBase("figcaption", "html5").id).toBe("kb-html-annales");
+    });
+  });
 });

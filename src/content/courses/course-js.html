@@ -382,4 +382,76 @@ function verif() {
 }</code></pre>
     </div>
   </article>
+
+  <article id="js-annales" class="course-section">
+    <h2>8. Notions fréquentes des annales</h2>
+    <p>
+      Notions de JavaScript qui reviennent dans les épreuves écrites : recherche et extraction dans
+      une chaîne, mise en majuscule, écriture dans le DOM.
+    </p>
+    <div class="code-card">
+      <div class="code-card-header">
+        <span>Extraire un mot : indexOf, substr, charAt</span>
+        <span class="lang-tag">JAVASCRIPT</span>
+      </div>
+      <pre><code class="language-javascript">let ch = "Tech#Robot#2025";
+let debut = ch.indexOf("#", 0);                  // 4 : premier # trouvé
+let fin = ch.indexOf("#", debut + 1);            // 10 : # suivant
+let mot = ch.substr(debut + 1, fin - debut - 1); // "Robot"
+let premiere = ch.charAt(0).toUpperCase();       // "T" </code></pre>
+    </div>
+    <p>
+      indexOf(texte, départ) donne la position de la première occurrence (-1 si absent).
+      substr(début, longueur) extrait une sous-chaîne. charAt(i) lit le caractère d'indice i.
+    </p>
+    <div class="code-card">
+      <div class="code-card-header">
+        <span>Mettre la première lettre en majuscule</span>
+        <span class="lang-tag">JAVASCRIPT</span>
+      </div>
+      <pre><code class="language-javascript">function formater(ch) {
+  ch = ch.trim();                      // retire les espaces aux extrémités
+  if (ch.length &gt; 0) {
+    ch = ch.toLowerCase();             // "bravo"
+    ch = ch.replace(ch.charAt(0), ch.charAt(0).toUpperCase()); // "Bravo"
+  }
+  return ch;
+}</code></pre>
+    </div>
+    <p>
+      replace remplace la première occurrence trouvée : ici la première lettre, convertie par
+      toUpperCase. trim supprime les espaces au début et à la fin.
+    </p>
+    <div class="code-card">
+      <div class="code-card-header">
+        <span>Écrire dans la page : innerHTML et value</span>
+        <span class="lang-tag">JAVASCRIPT</span>
+      </div>
+      <pre><code class="language-javascript">document.getElementById("total").innerHTML = "&lt;b&gt;" + total + "&lt;/b&gt;/20"; // balises interprétées
+document.getElementById("comment").value = "Merci";                      // contenu d'un champ de saisie</code></pre>
+    </div>
+    <p>
+      innerHTML affecte un contenu HTML (balises interprétées) à un élément comme span ou div. value
+      lit ou modifie le contenu d'un champ de saisie.
+    </p>
+    <ul>
+      <li>Piège : substr(début, longueur) n'est pas substring(début, fin).</li>
+      <li>Piège : indexOf renvoie -1 quand le texte est absent ; il ne renvoie jamais false.</li>
+      <li>Piège : innerHTML pour un conteneur (span, div) ; value pour un champ de saisie.</li>
+    </ul>
+    <ul>
+      <li>
+        Annale : Bac 2024 principale, partie web (indexOf, substr, innerHTML) —
+        /examen-ecrit/exam-bac2024-principale-ecrit
+      </li>
+      <li>
+        Annale : Bac 2024 contrôle, exercice 3 (charAt, toUpperCase, trim) —
+        /examen-ecrit/exam-bac2024-controle-ecrit
+      </li>
+      <li>
+        Annale : Bac 2025 contrôle, partie B exercice 3 (getElementsByName, checked) —
+        /examen-ecrit/exam-bac2025-controle-ecrit
+      </li>
+    </ul>
+  </article>
 </section>

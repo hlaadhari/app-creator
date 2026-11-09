@@ -68,6 +68,46 @@
           "code": "<p>\n  <input type=\"submit\" value=\"Enregistrer\">\n  <input type=\"reset\" value=\"Annuler\">\n</p>"
         }
       ]
+    },
+    {
+      "id": "html-annales",
+      "title": "8. Notions fréquentes des annales",
+      "description": "Notions d'HTML5 qui reviennent dans les épreuves écrites : légende de figure, textes alternatifs, titre de page, ligne de séparation, curseur, zone de texte et événements de saisie.",
+      "keyPoints": [
+        "Piège : <figcaption> légende une <figure> ; la légende d'un tableau est <caption>.",
+        "Piège : alt décrit l'image ; le texte affiché au survol est title.",
+        "Piège : onfocus = le champ devient actif ; onblur = il perd le focus.",
+        "Annale : Bac 2024 contrôle, exercice 1 (figcaption, onfocus) — /examen-ecrit/exam-bac2024-controle-ecrit",
+        "Annale : Bac 2025 contrôle, partie B exercice 1 (title) — /examen-ecrit/exam-bac2025-controle-ecrit",
+        "Annale : Bac 2025 principale, partie B exercice 1 (hr, range, alt) — /examen-ecrit/exam-bac2025-principale-ecrit",
+        "Annale : Bac 2023 principale (textarea, oninput) — /examen-ecrit/exam-bac2023-principale-ecrit"
+      ],
+      "snippets": [
+        {
+          "title": "Image légendée : figure, figcaption, alt et title",
+          "language": "html",
+          "targetFile": "index.html",
+          "keywords": ["figure", "figcaption", "alt", "title", "img", "légende"],
+          "code": "<figure>\n  <img src=\"robot.jpg\" alt=\"Robot humanoïde dans un atelier\" title=\"Notre robot\">\n  <figcaption>Figure 1 : le robot Tech@boot</figcaption>\n</figure>",
+          "explanation": "figcaption est la légende de l'élément figure. alt est la description alternative de l'image (lecteurs d'écran, image absente) ; title est l'infobulle affichée au survol."
+        },
+        {
+          "title": "Titre de page, ligne horizontale et curseur (range)",
+          "language": "html",
+          "targetFile": "index.html",
+          "keywords": ["title", "hr", "range", "min", "max", "onchange", "input"],
+          "code": "<head>\n  <title>Évaluation d'une manifestation</title>\n</head>\n<body>\n  <label for=\"serv1\">Accueil :</label>\n  <input type=\"range\" id=\"serv1\" name=\"serv1\" min=\"0\" max=\"5\" onchange=\"afficher(this.value)\">\n  <hr>\n  <p>Note : <span id=\"note\">0</span>/5</p>\n</body>",
+          "explanation": "title est le titre de la page (onglet du navigateur), pas celui d'un tableau (caption). hr trace une ligne horizontale. input type=range propose une valeur dans l'intervalle min-max."
+        },
+        {
+          "title": "Zone de texte et événements de saisie",
+          "language": "html",
+          "targetFile": "index.html",
+          "keywords": ["textarea", "oninput", "onfocus", "onblur", "rows", "cols"],
+          "code": "<textarea id=\"avis\" name=\"avis\" rows=\"3\" cols=\"30\"\n          onfocus=\"this.style.background='#ffc'\"\n          onblur=\"this.style.background='white'\"\n          oninput=\"document.getElementById('nb').innerHTML = this.value.length\"></textarea>\n<span id=\"nb\">0</span> caractères",
+          "explanation": "textarea est un champ multiligne. onfocus se déclenche quand le champ devient actif, onblur quand il le quitte, oninput à chaque modification de la valeur saisie."
+        }
+      ]
     }
   ]
 }

@@ -281,4 +281,94 @@ mysqli_close($cnx);
 ?&gt;</code></pre>
     </div>
   </article>
+
+  <article id="php-annales" class="course-section">
+    <h2>6. Notions fréquentes des annales</h2>
+    <p>
+      Notions de PHP qui reviennent dans les épreuves écrites : transtypage, tableaux, test de
+      variable, inclusion de fichier, remplacement dans une chaîne, nombre de lignes d'un résultat.
+    </p>
+    <div class="code-card">
+      <div class="code-card-header">
+        <span>Transtypage et tableaux : (int), count, isset</span>
+        <span class="lang-tag">PHP</span>
+      </div>
+      <pre><code class="language-php">&lt;?php
+$X = (int) 2.99;                       // 2 : la partie décimale est tronquée, pas arrondie
+$notes = array($_POST["serv1"], $_POST["serv2"]);
+echo count($notes);                    // 2 : nombre d'éléments du tableau
+if (isset($_POST["manif"])) {          // la variable existe et n'est pas NULL
+  $manif = $_POST["manif"];
+}
+?&gt;</code></pre>
+    </div>
+    <p>
+      (int) convertit en entier en tronquant. count($t) donne le nombre d'éléments d'un tableau.
+      isset teste qu'une variable est définie.
+    </p>
+    <div class="code-card">
+      <div class="code-card-header">
+        <span>Inclusion et remplacement : require, str_replace</span>
+        <span class="lang-tag">PHP</span>
+      </div>
+      <pre><code class="language-php">&lt;?php
+require("connexion.php");              // erreur fatale (script arrêté) si le fichier est introuvable
+$nomBarrage = "Sidi_Salem";
+$nom = str_replace("_", " ", $nomBarrage); // "Sidi Salem" : tous les _ deviennent des espaces
+echo $nom;
+?&gt;</code></pre>
+    </div>
+    <p>
+      require arrête le script si le fichier manque (include se contente d'un avertissement).
+      str_replace(ancien, nouveau, chaîne) remplace toutes les occurrences.
+    </p>
+    <div class="code-card">
+      <div class="code-card-header">
+        <span>Compter les lignes : mysqli_num_rows et mysqli_affected_rows</span>
+        <span class="lang-tag">PHP</span>
+      </div>
+      <pre><code class="language-php">&lt;?php
+$res = mysqli_query($cnx, "SELECT * FROM barrage") or die("Requête erronée");
+if (mysqli_num_rows($res) == 0) {      // SELECT : nombre de lignes du résultat
+  echo "Aucun résultat";
+}
+$ok = mysqli_query($cnx, "INSERT INTO tag (libelleTag) VALUES ('HTMX')");
+if (mysqli_affected_rows($cnx) != 0) { // INSERT, UPDATE, DELETE : lignes touchées
+  echo "Enregistré";
+} else {
+  echo "Échec : " . mysqli_error($cnx);
+}
+?&gt;</code></pre>
+    </div>
+    <p>
+      mysqli_num_rows concerne le résultat d'un SELECT ; mysqli_affected_rows($con) concerne un
+      INSERT, UPDATE ou DELETE ; mysqli_error($con) renvoie le message d'erreur.
+    </p>
+    <ul>
+      <li>Piège : (int) tronque (2.99 donne 2), il n'arrondit pas.</li>
+      <li>
+        Piège : require arrête le script si le fichier manque ; include continue avec un
+        avertissement.
+      </li>
+      <li>Piège : après un INSERT on teste mysqli_affected_rows, pas mysqli_num_rows.</li>
+    </ul>
+    <ul>
+      <li>
+        Annale : Bac 2024 principale, exercice 1 et partie web (int, count, require, str_replace) —
+        /examen-ecrit/exam-bac2024-principale-ecrit
+      </li>
+      <li>
+        Annale : Bac 2024 contrôle, exercice 1 (checkdate, isset) —
+        /examen-ecrit/exam-bac2024-controle-ecrit
+      </li>
+      <li>
+        Annale : Bac 2025 principale, partie B exercice 4 (affected_rows, mysqli_error) —
+        /examen-ecrit/exam-bac2025-principale-ecrit
+      </li>
+      <li>
+        Annale : Bac 2025 contrôle, partie B exercice 4 (mysqli_num_rows, count, strlen) —
+        /examen-ecrit/exam-bac2025-controle-ecrit
+      </li>
+    </ul>
+  </article>
 </section>
