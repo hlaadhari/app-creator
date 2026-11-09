@@ -93,7 +93,7 @@ export const SqlQueryResultProbeSchema = z
     query: z.string().min(1),
     expectedRowCount: z.number().int().optional(),
     minRowCount: z.number().int().optional(),
-    expectedValues: z.record(z.unknown()).optional(),
+    expectedValues: z.record(z.string(), z.unknown()).optional(),
   })
   .strict();
 
@@ -101,14 +101,14 @@ export const PhpMySqliCheckProbeSchema = z
   .object({
     type: z.literal("php_mysqli_check"),
     entrypoint: z.string().min(1).optional(),
-    postData: z.record(z.union([z.string(), z.number(), z.boolean()])).optional(),
+    postData: z.record(z.string(), z.union([z.string(), z.number(), z.boolean()])).optional(),
     expectedStdoutContains: z.string().optional(),
     expectedStdoutPattern: z.string().optional(),
     expectedTableRows: z
       .object({
         table: z.string().min(1),
         minCount: z.number().int().optional(),
-        where: z.record(z.unknown()).optional(),
+        where: z.record(z.string(), z.unknown()).optional(),
       })
       .strict()
       .optional(),
@@ -131,11 +131,11 @@ export const JsTestCaseSchema = z
   .object({
     input_cin: z.string().optional(),
     expected_return: z.boolean().optional(),
-    saisies: z.record(z.union([z.string(), z.boolean(), z.number()])).optional(),
+    saisies: z.record(z.string(), z.union([z.string(), z.boolean(), z.number()])).optional(),
     attendu: z.boolean().optional(),
     appel: z.string().optional(),
-    etat: z.record(z.union([z.string(), z.boolean(), z.number()])).optional(),
-    texte: z.record(z.string()).optional(),
+    etat: z.record(z.string(), z.union([z.string(), z.boolean(), z.number()])).optional(),
+    texte: z.record(z.string(), z.string()).optional(),
   })
   .strict();
 
@@ -171,12 +171,12 @@ export const CriterionJsonSchema = z
     function_name: z.string().optional(),
     input_cin: z.string().optional(),
     expected_return: z.boolean().optional(),
-    controle_positif: z.record(z.string()).optional(),
+    controle_positif: z.record(z.string(), z.string()).optional(),
     cas: z.array(JsTestCaseSchema).optional(),
     js_function: z.string().optional(),
 
     // Vérifications déclarées HTML / Form / Attributs
-    expected_attributes: z.record(z.string()).optional(),
+    expected_attributes: z.record(z.string(), z.string()).optional(),
 
     // Vérifications déclarées SQL / PHP (patterns LDD/LMD/MySQLi)
     sql_pattern: z.string().optional(),
