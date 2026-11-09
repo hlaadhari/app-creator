@@ -1427,7 +1427,7 @@ export class RelationalDatabaseEngine {
 
     // 1. IS NULL / IS NOT NULL
     const nullMatch = trimmed.match(
-      /^((?:YEAR|MONTH|DAY)\(\s*[`"']?[a-zA-Z0-9_.]+[`"']?\s*\)|[`"']?[a-zA-Z0-9_.]+[`"']?)\s+IS\s+(NOT\s+)?NULL$/i,
+      /^((?:YEAR|MONTH|DAY)\(\s*[`"']?[a-zA-Z0-9_.]+[`"']?\s*\)|DATEDIFF\(\s*[`"']?[a-zA-Z0-9_.]+[`"']?\s*,\s*[`"']?[a-zA-Z0-9_.]+[`"']?\s*\)|[`"']?[a-zA-Z0-9_.]+[`"']?)\s+IS\s+(NOT\s+)?NULL$/i,
     );
     if (nullMatch && nullMatch[1]) {
       const val = this.resolveValue(row, nullMatch[1]);
@@ -1437,7 +1437,7 @@ export class RelationalDatabaseEngine {
 
     // 2. BETWEEN val1 AND val2
     const betweenMatch = trimmed.match(
-      /^((?:YEAR|MONTH|DAY)\(\s*[`"']?[a-zA-Z0-9_.]+[`"']?\s*\)|[`"']?[a-zA-Z0-9_.]+[`"']?)\s+BETWEEN\s+('([^']*)'|"([^"]*)"|-?\d+(?:\.\d+)?)\s+AND\s+('([^']*)'|"([^"]*)"|-?\d+(?:\.\d+)?)$/i,
+      /^((?:YEAR|MONTH|DAY)\(\s*[`"']?[a-zA-Z0-9_.]+[`"']?\s*\)|DATEDIFF\(\s*[`"']?[a-zA-Z0-9_.]+[`"']?\s*,\s*[`"']?[a-zA-Z0-9_.]+[`"']?\s*\)|[`"']?[a-zA-Z0-9_.]+[`"']?)\s+BETWEEN\s+('([^']*)'|"([^"]*)"|-?\d+(?:\.\d+)?)\s+AND\s+('([^']*)'|"([^"]*)"|-?\d+(?:\.\d+)?)$/i,
     );
     if (betweenMatch && betweenMatch[1]) {
       const val = this.resolveValue(row, betweenMatch[1]);
@@ -1462,7 +1462,7 @@ export class RelationalDatabaseEngine {
 
     // 3. IN (val1, val2, ...) ou NOT IN
     const inMatch = trimmed.match(
-      /^((?:YEAR|MONTH|DAY)\(\s*[`"']?[a-zA-Z0-9_.]+[`"']?\s*\)|[`"']?[a-zA-Z0-9_.]+[`"']?)\s+(NOT\s+)?IN\s*\(([\s\S]+)\)$/i,
+      /^((?:YEAR|MONTH|DAY)\(\s*[`"']?[a-zA-Z0-9_.]+[`"']?\s*\)|DATEDIFF\(\s*[`"']?[a-zA-Z0-9_.]+[`"']?\s*,\s*[`"']?[a-zA-Z0-9_.]+[`"']?\s*\)|[`"']?[a-zA-Z0-9_.]+[`"']?)\s+(NOT\s+)?IN\s*\(([\s\S]+)\)$/i,
     );
     if (inMatch && inMatch[1] && inMatch[3]) {
       const val = this.resolveValue(row, inMatch[1]);
@@ -1473,7 +1473,7 @@ export class RelationalDatabaseEngine {
 
     // 4. LIKE (avec % et _)
     const likeMatch = trimmed.match(
-      /^((?:YEAR|MONTH|DAY)\(\s*[`"']?[a-zA-Z0-9_.]+[`"']?\s*\)|[`"']?[a-zA-Z0-9_.]+[`"']?)\s+(NOT\s+)?LIKE\s+('([^']*)'|"([^"]*)")$/i,
+      /^((?:YEAR|MONTH|DAY)\(\s*[`"']?[a-zA-Z0-9_.]+[`"']?\s*\)|DATEDIFF\(\s*[`"']?[a-zA-Z0-9_.]+[`"']?\s*,\s*[`"']?[a-zA-Z0-9_.]+[`"']?\s*\)|[`"']?[a-zA-Z0-9_.]+[`"']?)\s+(NOT\s+)?LIKE\s+('([^']*)'|"([^"]*)")$/i,
     );
     if (likeMatch && likeMatch[1]) {
       const val = String(this.resolveValue(row, likeMatch[1]) ?? "");
@@ -1492,7 +1492,7 @@ export class RelationalDatabaseEngine {
 
     // 5. Comparaisons directes : =, !=, <>, >=, <=, >, <
     const cmpMatch = trimmed.match(
-      /^((?:YEAR|MONTH|DAY)\(\s*[`"']?[a-zA-Z0-9_.]+[`"']?\s*\)|[`"']?[a-zA-Z0-9_.]+[`"']?)\s*(=|!=|<>|>=|<=|>|<)\s*([\s\S]+)$/i,
+      /^((?:YEAR|MONTH|DAY)\(\s*[`"']?[a-zA-Z0-9_.]+[`"']?\s*\)|DATEDIFF\(\s*[`"']?[a-zA-Z0-9_.]+[`"']?\s*,\s*[`"']?[a-zA-Z0-9_.]+[`"']?\s*\)|[`"']?[a-zA-Z0-9_.]+[`"']?)\s*(=|!=|<>|>=|<=|>|<)\s*([\s\S]+)$/i,
     );
     if (cmpMatch && cmpMatch[1] && cmpMatch[2] && cmpMatch[3]) {
       const leftKey = cmpMatch[1];
@@ -1518,7 +1518,10 @@ export class RelationalDatabaseEngine {
       return this.compareValues(leftVal, op, rightVal);
     }
 
-    return true;
+    // Condition non reconnue : une erreur explicite vaut mieux qu'un filtre ignoré en silence,
+    // qui validerait à tort n'importe quelle requête (voir #203).
+    this.setError(1064, `Condition non prise en charge : ${trimmed}`);
+    throw new Error(this.lastError);
   }
 
   private compareValues(lhs: unknown, op: string, rhs: unknown): boolean {
@@ -1589,6 +1592,21 @@ export class RelationalDatabaseEngine {
       if (inner) {
         const d = new Date(String(inner));
         if (!isNaN(d.getTime())) return d.getMonth() + 1;
+      }
+      return undefined;
+    }
+
+    // DATEDIFF(date1, date2) : nombre de jours entre les deux dates (date1 - date2), comme MySQL.
+    const diffMatch = clean.match(/^datediff\((.+),(.+)\)$/);
+    if (diffMatch && diffMatch[1] && diffMatch[2]) {
+      const a = this.resolveValue(row, diffMatch[1]);
+      const b = this.resolveValue(row, diffMatch[2]);
+      if (a && b) {
+        const d1 = new Date(String(a).slice(0, 10));
+        const d2 = new Date(String(b).slice(0, 10));
+        if (!isNaN(d1.getTime()) && !isNaN(d2.getTime())) {
+          return Math.round((d1.getTime() - d2.getTime()) / 86400000);
+        }
       }
       return undefined;
     }

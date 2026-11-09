@@ -1,0 +1,162 @@
+[
+  {
+    "id": "EX25P-01",
+    "code": "EXPO-SCHEMA",
+    "titre": "Partie A, exercice 1 : Interprétation de la base Gestion_Exposition",
+    "description": "Représentation textuelle d'après le schéma graphique, assertions Vrai/Faux sur les cardinalités et vocabulaire des clés et contraintes.",
+    "points": 3.0,
+    "ordre": 1,
+    "fichier": "reponses.sql",
+    "sonde": {
+      "type": "sql_query_result",
+      "query": "SELECT 1;",
+      "expectedRowCount": 1
+    },
+    "fail_message": "Erreurs dans la représentation textuelle ou l'interprétation des relations.",
+    "indices": [
+      "Lisez les cardinalités : le côté « 1 » donne la clé primaire, le côté « ∞ » porte la clé étrangère.",
+      "La table Location a une clé primaire composée (codeManif, codeStand) : un stand n'est loué qu'une fois par manifestation.",
+      "prix est un attribut de Location : il dépend de la manifestation."
+    ]
+  },
+  {
+    "id": "EX25P-02",
+    "code": "EXPO-REQUETES",
+    "titre": "Partie A, exercice 2 : Rôle de requêtes SQL",
+    "description": "INSERT, SELECT avec jointure, UPDATE, DELETE ... LIKE, ALTER TABLE ADD CHECK et MODIFY DEFAULT.",
+    "points": 1.5,
+    "ordre": 2,
+    "fichier": "reponses.sql",
+    "sonde": {
+      "type": "sql_query_result",
+      "query": "SELECT 1;",
+      "expectedRowCount": 1
+    },
+    "fail_message": "Un rôle de requête est mal associé.",
+    "indices": [
+      "LIKE '%3' : se termine par 3 ; LIKE '%3%' : contient 3.",
+      "ADD CHECK ajoute une contrainte de domaine ; MODIFY ... DEFAULT change la valeur par défaut.",
+      "Une jointure avec libType filtre sur le libellé du type, pas sur son code."
+    ]
+  },
+  {
+    "id": "EX25P-03",
+    "code": "EXPO-SQL",
+    "titre": "Partie A, exercice 3 : Requêtes sur la base",
+    "description": "Neuf requêtes : projection, DATEDIFF, UPDATE avec calcul, DISTINCT, ORDER BY, COUNT, HAVING SUM, NOT IN avec YEAR et sous-requête MAX.",
+    "points": 6.0,
+    "ordre": 3,
+    "fichier": "reponses.sql",
+    "sonde": {
+      "type": "sql_query_result",
+      "query": "SELECT 1;",
+      "expectedRowCount": 1
+    },
+    "fail_message": "Une ou plusieurs requêtes ne produisent pas le résultat attendu.",
+    "indices": [
+      "Une durée en jours se calcule avec DATEDIFF(dateFer, dateOuv).",
+      "Pour exclure des stands loués, utilisez NOT IN avec une sous-requête sur Location.",
+      "Le prix le plus élevé se trouve avec prix = (SELECT MAX(prix) FROM Location)."
+    ]
+  },
+  {
+    "id": "EX25P-04",
+    "code": "EXPO-EXTENSION",
+    "titre": "Partie A, exercice 4 : Extension de la structure",
+    "description": "Création d'une table Pays, règles de gestion R3 à R6 et représentation de Service, Evaluation et Note_Service.",
+    "points": 1.5,
+    "ordre": 4,
+    "fichier": "reponses.sql",
+    "sonde": {
+      "type": "sql_query_result",
+      "query": "SELECT 1;",
+      "expectedRowCount": 1
+    },
+    "fail_message": "La structure proposée ne respecte pas les règles de gestion.",
+    "indices": [
+      "Une donnée répétée (pays) devient une table référencée par une clé étrangère dans Client.",
+      "Note_Service a pour clé primaire le couple (codeEval, codeSer) : un service est noté une fois par évaluation.",
+      "codeManif se place dans Evaluation (R5), jamais dans Note_Service."
+    ]
+  },
+  {
+    "id": "EX25P-05",
+    "code": "WEB-HTML",
+    "titre": "Partie B, exercice 1 : Analyse du code HTML",
+    "description": "Numéros de ligne des balises de la page EvaluationManif.html, attribut method, balise hr, input range et attribut alt.",
+    "points": 2.5,
+    "ordre": 5,
+    "fichier": "reponses.sql",
+    "sonde": {
+      "type": "sql_query_result",
+      "query": "SELECT 1;",
+      "expectedRowCount": 1
+    },
+    "fail_message": "Erreurs d'analyse du code HTML de la page EvaluationManif.html.",
+    "indices": [
+      "Repérez meta charset, meta description, link, body onload, fieldset, select, span, submit.",
+      "method précise GET ou POST ; action donne l'adresse du traitement.",
+      "alt est le texte alternatif d'une image."
+    ]
+  },
+  {
+    "id": "EX25P-06",
+    "code": "WEB-CSS",
+    "titre": "Partie B, exercice 2 : Analyse du code CSS",
+    "description": "Sélecteurs legend et .labserv, propriétés color, font-size, font-weight, text-align, background-color, border, width, font-style, display, padding.",
+    "points": 1.5,
+    "ordre": 6,
+    "fichier": "reponses.sql",
+    "sonde": {
+      "type": "sql_query_result",
+      "query": "SELECT 1;",
+      "expectedRowCount": 1
+    },
+    "fail_message": "Erreurs dans le code CSS de la mise en forme demandée.",
+    "indices": [
+      "Un sélecteur de classe commence par un point : le label a class=\"labserv\".",
+      "Bordure hachée : dashed ; arrière-plan : background-color ; marge intérieure : padding.",
+      "Le titre d'un fieldset est une balise legend."
+    ]
+  },
+  {
+    "id": "EX25P-07",
+    "code": "WEB-JS",
+    "titre": "Partie B, exercice 3 : Analyse du code JavaScript",
+    "description": "selectedIndex, src d'un élément identifié par getElementById, validité des scripts de calcul et rôle de la fonction inconnue.",
+    "points": 2.0,
+    "ordre": 7,
+    "fichier": "reponses.sql",
+    "sonde": {
+      "type": "sql_query_result",
+      "query": "SELECT 1;",
+      "expectedRowCount": 1
+    },
+    "fail_message": "Erreurs d'analyse du code JavaScript (verif, imagenote, calcultotal, inconnue).",
+    "indices": [
+      "Une liste déroulante se teste avec selectedIndex.",
+      "getElementById renvoie un élément ; getElementsByName renvoie une liste.",
+      "Une constante ne peut pas être modifiée : const i avec i++ est une erreur."
+    ]
+  },
+  {
+    "id": "EX25P-08",
+    "code": "WEB-PHP",
+    "titre": "Partie B, exercice 4 : Analyse du code PHP",
+    "description": "$_POST, tableau indexé, date('Y-m-d'), connexion mysqli et die, mysqli_fetch_row, mysqli_affected_rows et mysqli_error.",
+    "points": 2.0,
+    "ordre": 8,
+    "fichier": "reponses.sql",
+    "sonde": {
+      "type": "sql_query_result",
+      "query": "SELECT 1;",
+      "expectedRowCount": 1
+    },
+    "fail_message": "Erreurs d'analyse du code PHP du fichier Evaluation.php.",
+    "indices": [
+      "Un champ de formulaire se récupère par son attribut name ; un <span> n'est pas envoyé.",
+      "date('Y-m-d') donne 2025-06-10.",
+      "Après un INSERT, mysqli_affected_rows($con) donne le nombre de lignes ajoutées."
+    ]
+  }
+]

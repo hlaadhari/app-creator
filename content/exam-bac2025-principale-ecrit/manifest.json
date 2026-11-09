@@ -1,0 +1,1093 @@
+{
+  "id": "exam-bac2025-principale-ecrit",
+  "title": "Bac 2025 (Session Principale) - Épreuve Écrite Systèmes & Technologies de l'Informatique",
+  "referentiel_id": "bac-si-tn",
+  "type_sujet": "annale_officielle",
+  "source_reference": "Ministère de l'Éducation — Tunisie (sujet transcrit du PDF « principale_2025 »)",
+  "statut_validation": "valide_pedagogiquement",
+  "session_annee": 2025,
+  "session_libelle": "Session principale",
+  "category": "Module C - Épreuves Écrites",
+  "exam_type": "written",
+  "session_type": "principale",
+  "year": 2025,
+  "duration": 180,
+  "level": "Difficile",
+  "exam_mode": true,
+  "bareme_total": 20,
+  "tags": [
+    "Gestion_Exposition",
+    "Dynamik Expo",
+    "Modélisation relationnelle",
+    "Jointures et agrégats",
+    "Sous-requêtes",
+    "DATEDIFF",
+    "HTML5 formulaire",
+    "CSS3",
+    "JavaScript DOM",
+    "PHP MySQLi"
+  ],
+  "initialSql": "CREATE TABLE IF NOT EXISTS `Type_Manif` ( `codeType` CHAR(3) PRIMARY KEY, `libType` VARCHAR(20) NOT NULL UNIQUE ); CREATE TABLE IF NOT EXISTS `Manifestation` ( `codeManif` CHAR(5) PRIMARY KEY, `nomManif` VARCHAR(50) NOT NULL UNIQUE, `dateOuv` DATE NOT NULL, `dateFer` DATE NOT NULL, `codeType` CHAR(3) NOT NULL, FOREIGN KEY (`codeType`) REFERENCES `Type_Manif`(`codeType`) ON UPDATE CASCADE ON DELETE CASCADE ); CREATE TABLE IF NOT EXISTS `Halle` ( `codeHalle` CHAR(3) PRIMARY KEY, `libHalle` VARCHAR(50) NOT NULL UNIQUE, `nbStandsMax` INT CHECK (`nbStandsMax` > 0) ); CREATE TABLE IF NOT EXISTS `Stand` ( `codeStand` CHAR(3) PRIMARY KEY, `designation` VARCHAR(50) NOT NULL, `superficie` INT CHECK (`superficie` BETWEEN 30 AND 100), `etat` CHAR(1) CHECK (`etat` IN ('L', 'O')), `codeHalle` CHAR(3) NOT NULL, FOREIGN KEY (`codeHalle`) REFERENCES `Halle`(`codeHalle`) ON UPDATE CASCADE ON DELETE CASCADE ); CREATE TABLE IF NOT EXISTS `Client` ( `codeCl` CHAR(5) PRIMARY KEY, `nomCl` VARCHAR(50) NOT NULL, `telCl` CHAR(8) NOT NULL UNIQUE, `emailCl` VARCHAR(50) NOT NULL UNIQUE, `pays` VARCHAR(50) NOT NULL ); CREATE TABLE IF NOT EXISTS `Location` ( `codeManif` CHAR(5) NOT NULL, `codeStand` CHAR(3) NOT NULL, `dateLoc` DATE NOT NULL, `prix` DECIMAL(8,2) NOT NULL CHECK (`prix` > 0), `codeCl` CHAR(5) NOT NULL, PRIMARY KEY (`codeManif`, `codeStand`), FOREIGN KEY (`codeManif`) REFERENCES `Manifestation`(`codeManif`) ON UPDATE CASCADE ON DELETE CASCADE, FOREIGN KEY (`codeStand`) REFERENCES `Stand`(`codeStand`) ON UPDATE CASCADE ON DELETE CASCADE, FOREIGN KEY (`codeCl`) REFERENCES `Client`(`codeCl`) ON UPDATE CASCADE ON DELETE CASCADE ); CREATE TABLE IF NOT EXISTS `Evaluation` ( `codeEval` INT AUTO_INCREMENT PRIMARY KEY, `dateEval` DATE NOT NULL, `noteAccueil` INT CHECK (`noteAccueil` BETWEEN 0 AND 5), `noteConfort` INT CHECK (`noteConfort` BETWEEN 0 AND 5), `noteSignal` INT CHECK (`noteSignal` BETWEEN 0 AND 5), `noteLogistique` INT CHECK (`noteLogistique` BETWEEN 0 AND 5), `codeManif` CHAR(5) NOT NULL, FOREIGN KEY (`codeManif`) REFERENCES `Manifestation`(`codeManif`) ON UPDATE CASCADE ON DELETE CASCADE ); INSERT INTO `Type_Manif` VALUES ('T01', 'Foire'), ('T02', 'Salon'), ('T03', 'Séminaire'); INSERT INTO `Manifestation` VALUES ('M0001', 'Foire du livre', '2025-03-10', '2025-03-22', 'T01'), ('M0002', 'Salon de l''Art', '2025-04-02', '2025-04-05', 'T02'), ('M0003', 'Séminaire des médecins', '2025-05-14', '2025-05-16', 'T03'), ('M0004', 'Foire de l''artisanat', '2024-10-01', '2024-10-10', 'T01'); INSERT INTO `Halle` VALUES ('H01', 'Halle A', 10), ('H02', 'Halle B', 8); INSERT INTO `Stand` VALUES ('S01', 'Stand Alpha', 40, 'L', 'H01'), ('S02', 'Stand Beta', 60, 'L', 'H01'), ('S03', 'Stand Gamma', 85, 'L', 'H01'), ('S04', 'Stand Delta', 50, 'O', 'H01'), ('S05', 'Stand Epsilon', 70, 'L', 'H02'), ('S06', 'Stand Zeta', 35, 'O', 'H02'), ('S07', 'Stand Eta', 90, 'L', 'H02'); INSERT INTO `Client` VALUES ('C0001', 'Ali ABIDI', '33556677', 'Ali.ABIDI@gmail.com', 'Tunisie'), ('C0002', 'Sonia Gharbi', '22334455', 'sonia.gharbi@mail.tn', 'Tunisie'), ('C0003', 'Pierre Martin', '44556677', 'pierre.martin@mail.fr', 'France'), ('C0004', 'Leila Trabelsi', '55667788', 'leila.trabelsi@mail.tn', 'Tunisie'); INSERT INTO `Location` VALUES ('M0001', 'S01', '2025-02-20', 3000.00, 'C0001'), ('M0001', 'S02', '2025-02-21', 4000.00, 'C0002'), ('M0001', 'S03', '2025-02-25', 5200.00, 'C0001'), ('M0002', 'S05', '2025-03-15', 2500.00, 'C0003'), ('M0002', 'S07', '2025-03-20', 3500.00, 'C0001'), ('M0003', 'S01', '2025-04-30', 1800.00, 'C0002'), ('M0004', 'S02', '2024-09-01', 3000.00, 'C0003'), ('M0004', 'S04', '2024-09-05', 2000.00, 'C0002'); INSERT INTO `Evaluation` VALUES (1, '2025-03-15', 4, 3, 5, 4, 'M0001'), (2, '2025-04-04', 5, 4, 4, 3, 'M0002');",
+  "sections": [
+    {
+      "id": "a-ex1-schema",
+      "title": "Partie A, exercice 1 : Interprétation de la base de données (3 pts)",
+      "type": "modeling",
+      "description": "Gestion_Exposition : Type_Manif (codeType, libType) ; Manifestation (codeManif, nomManif, dateOuv, dateFer, codeType#) ; Halle (codeHalle, libHalle, nbStandsMax) ; Stand (codeStand, designation, superficie, etat, codeHalle#) ; Client (codeCl, nomCl, telCl, emailCl, pays) ; Location (codeManif#, codeStand#, dateLoc, prix, codeCl#) ; Evaluation (codeEval, dateEval, noteAccueil, noteConfort, noteSignal, noteLogistique, codeManif#). Une manifestation a un type ; les halles se divisent en stands ; un client loue un stand pour une manifestation (Location).",
+      "points": 3.0,
+      "questions": [
+        {
+          "id": "A1-REP",
+          "prompt": "Partie A, exercice 1, question 1 : à partir de la représentation graphique de Gestion_Exposition, donnez la représentation textuelle de la base : nom de chaque table, champs, clé primaire (#) et clé(s) étrangère(s) (#).",
+          "points": 1.5,
+          "type": "representation",
+          "expectedKeywords": [
+            "Type_Manif",
+            "Manifestation",
+            "Halle",
+            "Stand",
+            "Client",
+            "Location",
+            "Evaluation",
+            "codeType",
+            "codeManif",
+            "codeHalle",
+            "codeStand",
+            "codeCl",
+            "codeEval",
+            "libType",
+            "nomManif",
+            "dateOuv",
+            "dateFer",
+            "libHalle",
+            "nbStandsMax",
+            "designation",
+            "superficie",
+            "etat",
+            "nomCl",
+            "telCl",
+            "emailCl",
+            "pays",
+            "dateLoc",
+            "prix",
+            "dateEval",
+            "noteAccueil",
+            "noteConfort",
+            "noteSignal",
+            "noteLogistique",
+            "Location\\s*\\(\\s*#?\\s*codeManif\\s*#?\\s*,\\s*#?\\s*codeStand"
+          ],
+          "explanation": "Type_Manif(#codeType, libType) ; Manifestation(#codeManif, nomManif, dateOuv, dateFer, codeType#) ; Halle(#codeHalle, libHalle, nbStandsMax) ; Stand(#codeStand, designation, superficie, etat, codeHalle#) ; Client(#codeCl, nomCl, telCl, emailCl, pays) ; Location(#codeManif#, #codeStand#, dateLoc, prix, codeCl#) ; Evaluation(#codeEval, dateEval, noteAccueil, noteConfort, noteSignal, noteLogistique, codeManif#)."
+        },
+        {
+          "id": "A1-VF-1",
+          "prompt": "Partie A, exercice 1, question 2 : « Une manifestation peut avoir plusieurs types. » (Vrai ou Faux)",
+          "points": 0.125,
+          "type": "code_analysis",
+          "expectedAnswer": "Faux",
+          "expectedRegex": "^(Faux|F|False)$",
+          "explanation": "Faux : codeType est une clé étrangère simple de Manifestation."
+        },
+        {
+          "id": "A1-VF-2",
+          "prompt": "Partie A, exercice 1, question 2 : « Une halle peut accueillir plusieurs clients dans une date donnée. » (Vrai ou Faux)",
+          "points": 0.125,
+          "type": "code_analysis",
+          "expectedAnswer": "Vrai",
+          "expectedRegex": "^(Vrai|V|True)$",
+          "explanation": "Vrai : une halle contient plusieurs stands, loués par des clients différents."
+        },
+        {
+          "id": "A1-VF-3",
+          "prompt": "Partie A, exercice 1, question 2 : « Un stand peut être loué par le même client à des manifestations différentes. » (Vrai ou Faux)",
+          "points": 0.125,
+          "type": "code_analysis",
+          "expectedAnswer": "Vrai",
+          "expectedRegex": "^(Vrai|V|True)$",
+          "explanation": "Vrai : la clé de Location est (codeManif, codeStand) ; un même client peut louer le même stand pour deux manifestations."
+        },
+        {
+          "id": "A1-VF-4",
+          "prompt": "Partie A, exercice 1, question 2 : « Un stand peut être loué par plusieurs clients pendant la même manifestation à des dates différentes. » (Vrai ou Faux)",
+          "points": 0.125,
+          "type": "code_analysis",
+          "expectedAnswer": "Faux",
+          "expectedRegex": "^(Faux|F|False)$",
+          "explanation": "Faux : la clé (codeManif, codeStand) autorise une seule location par stand et par manifestation."
+        },
+        {
+          "id": "A1-VF-5",
+          "prompt": "Partie A, exercice 1, question 2 : « Un client peut participer à une manifestation sans louer un stand. » (Vrai ou Faux)",
+          "points": 0.125,
+          "type": "code_analysis",
+          "expectedAnswer": "Faux",
+          "expectedRegex": "^(Faux|F|False)$",
+          "explanation": "Faux : le seul lien entre un client et une manifestation est la table Location."
+        },
+        {
+          "id": "A1-VF-6",
+          "prompt": "Partie A, exercice 1, question 2 : « Un client peut louer plusieurs stands pendant la même manifestation. » (Vrai ou Faux)",
+          "points": 0.125,
+          "type": "code_analysis",
+          "expectedAnswer": "Vrai",
+          "expectedRegex": "^(Vrai|V|True)$",
+          "explanation": "Vrai : plusieurs lignes de Location peuvent porter le même codeCl et le même codeManif avec des stands différents."
+        },
+        {
+          "id": "A1-VF-7",
+          "prompt": "Partie A, exercice 1, question 2 : « Le prix d'un stand est toujours le même quel que soit la manifestation. » (Vrai ou Faux)",
+          "points": 0.125,
+          "type": "code_analysis",
+          "expectedAnswer": "Faux",
+          "expectedRegex": "^(Faux|F|False)$",
+          "explanation": "Faux : prix est un attribut de Location, il dépend de la manifestation."
+        },
+        {
+          "id": "A1-MOT-A",
+          "prompt": "Partie A, exercice 1, question 3 : complétez avec le mot de la liste (composée, de domaine, fille, de table, primaire, référentielle, mère, simple, étrangère) : 3.a) La clé étrangère dans la table Stand assure l'intégrité ... avec la table Halle.",
+          "points": 0.15625,
+          "type": "code_analysis",
+          "expectedAnswer": "référentielle",
+          "expectedRegex": "^r[ée]f[ée]rentielle$",
+          "explanation": "codeHalle référence la clé primaire de Halle : intégrité référentielle."
+        },
+        {
+          "id": "A1-MOT-B",
+          "prompt": "Partie A, exercice 1, question 3 : complétez avec le mot de la liste (composée, de domaine, fille, de table, primaire, référentielle, mère, simple, étrangère) : 3.b) La table Location possède une clé primaire ...",
+          "points": 0.15625,
+          "type": "code_analysis",
+          "expectedAnswer": "composée",
+          "expectedRegex": "^compos[ée]e$",
+          "explanation": "La clé (codeManif, codeStand) est composée de deux champs."
+        },
+        {
+          "id": "A1-MOT-C",
+          "prompt": "Partie A, exercice 1, question 3 : complétez avec le mot de la liste (composée, de domaine, fille, de table, primaire, référentielle, mère, simple, étrangère) : 3.c) La contrainte d'intégrité ... permet de s'assurer que le champ prix de Location ne contient que des valeurs strictement positives.",
+          "points": 0.15625,
+          "type": "code_analysis",
+          "expectedAnswer": "de domaine",
+          "expectedRegex": "^(de\\s+)?domaine$",
+          "explanation": "CHECK (prix > 0) est une contrainte d'intégrité de domaine."
+        },
+        {
+          "id": "A1-MOT-D",
+          "prompt": "Partie A, exercice 1, question 3 : complétez avec les mots de la liste (composée, de domaine, fille, de table, primaire, référentielle, mère, simple, étrangère) : 3.d) Le champ codeCl dans la table Location est une clé ..., toutefois il est une clé ... dans la table Client.",
+          "points": 0.15625,
+          "type": "code_analysis",
+          "expectedKeywords": ["[ée]trang[èe]re", "primaire"],
+          "explanation": "codeCl est une clé étrangère dans Location, mais la clé primaire de Client."
+        }
+      ]
+    },
+    {
+      "id": "a-ex2-roles",
+      "title": "Partie A, exercice 2 : Interprétation des requêtes (1.5 pt)",
+      "type": "code_analysis",
+      "description": "Associez à chaque requête la lettre du rôle qui lui correspond.",
+      "points": 1.5,
+      "questions": [
+        {
+          "id": "A2-1",
+          "prompt": "Exercice 2 : choisissez, parmi la liste des rôles suivants, la lettre correspondant à la requête. Rôles : a) Supprimer toutes les manifestations dont le codeManif contient le caractère « 3 ». | b) Modifier la valeur par défaut d'un champ de la table Halle. | c) Afficher le nom et la date d'ouverture des manifestations ayant le code de type « Salon ». | d) Modifier le numéro de téléphone d'un client dont le code est spécifié. | e) Supprimer toutes les manifestations dont le codeManif se termine par le caractère « 3 ». | f) Ajouter un nouveau client avec des valeurs spécifiques. | g) Ajouter une contrainte de domaine sur un champ de la table Halle. | h) Supprimer un client ayant des valeurs spécifiques. | i) Afficher le nom et la date d'ouverture des manifestations ayant le libellé de type « Salon ». | j) Modifier le type du champ telCl de la table Client.. Requête : INSERT INTO Client VALUES ('C0001', 'Ali ABIDI', '33556677', 'Ali.ABIDI@gmail.com', 'Tunisie') ;",
+          "points": 0.25,
+          "type": "code_analysis",
+          "expectedAnswer": "f",
+          "expectedRegex": "^\\W*f\\W*$",
+          "explanation": "INSERT ajoute un client : rôle f."
+        },
+        {
+          "id": "A2-2",
+          "prompt": "Exercice 2 : choisissez, parmi la liste des rôles suivants, la lettre correspondant à la requête. Rôles : a) Supprimer toutes les manifestations dont le codeManif contient le caractère « 3 ». | b) Modifier la valeur par défaut d'un champ de la table Halle. | c) Afficher le nom et la date d'ouverture des manifestations ayant le code de type « Salon ». | d) Modifier le numéro de téléphone d'un client dont le code est spécifié. | e) Supprimer toutes les manifestations dont le codeManif se termine par le caractère « 3 ». | f) Ajouter un nouveau client avec des valeurs spécifiques. | g) Ajouter une contrainte de domaine sur un champ de la table Halle. | h) Supprimer un client ayant des valeurs spécifiques. | i) Afficher le nom et la date d'ouverture des manifestations ayant le libellé de type « Salon ». | j) Modifier le type du champ telCl de la table Client.. Requête : SELECT nomManif, dateOuv FROM Manifestation F, Type_Manif T WHERE ( F.codeType = T.codeType ) AND ( libType = 'Salon' ) ;",
+          "points": 0.25,
+          "type": "code_analysis",
+          "expectedAnswer": "i",
+          "expectedRegex": "^\\W*i\\W*$",
+          "explanation": "Jointure avec Type_Manif et filtre sur libType : rôle i (le code de type, rôle c, ne nécessiterait pas la jointure)."
+        },
+        {
+          "id": "A2-3",
+          "prompt": "Exercice 2 : choisissez, parmi la liste des rôles suivants, la lettre correspondant à la requête. Rôles : a) Supprimer toutes les manifestations dont le codeManif contient le caractère « 3 ». | b) Modifier la valeur par défaut d'un champ de la table Halle. | c) Afficher le nom et la date d'ouverture des manifestations ayant le code de type « Salon ». | d) Modifier le numéro de téléphone d'un client dont le code est spécifié. | e) Supprimer toutes les manifestations dont le codeManif se termine par le caractère « 3 ». | f) Ajouter un nouveau client avec des valeurs spécifiques. | g) Ajouter une contrainte de domaine sur un champ de la table Halle. | h) Supprimer un client ayant des valeurs spécifiques. | i) Afficher le nom et la date d'ouverture des manifestations ayant le libellé de type « Salon ». | j) Modifier le type du champ telCl de la table Client.. Requête : UPDATE Client SET telCl = '66333111' WHERE codeCl = 'C0023' ;",
+          "points": 0.25,
+          "type": "code_analysis",
+          "expectedAnswer": "d",
+          "expectedRegex": "^\\W*d\\W*$",
+          "explanation": "UPDATE du téléphone d'un client dont le code est donné : rôle d."
+        },
+        {
+          "id": "A2-4",
+          "prompt": "Exercice 2 : choisissez, parmi la liste des rôles suivants, la lettre correspondant à la requête. Rôles : a) Supprimer toutes les manifestations dont le codeManif contient le caractère « 3 ». | b) Modifier la valeur par défaut d'un champ de la table Halle. | c) Afficher le nom et la date d'ouverture des manifestations ayant le code de type « Salon ». | d) Modifier le numéro de téléphone d'un client dont le code est spécifié. | e) Supprimer toutes les manifestations dont le codeManif se termine par le caractère « 3 ». | f) Ajouter un nouveau client avec des valeurs spécifiques. | g) Ajouter une contrainte de domaine sur un champ de la table Halle. | h) Supprimer un client ayant des valeurs spécifiques. | i) Afficher le nom et la date d'ouverture des manifestations ayant le libellé de type « Salon ». | j) Modifier le type du champ telCl de la table Client.. Requête : DELETE FROM Manifestation WHERE codeManif Like '%3' ;",
+          "points": 0.25,
+          "type": "code_analysis",
+          "expectedAnswer": "e",
+          "expectedRegex": "^\\W*e\\W*$",
+          "explanation": "LIKE '%3' : le code se termine par 3 : rôle e (rôle a : « contient »)."
+        },
+        {
+          "id": "A2-5",
+          "prompt": "Exercice 2 : choisissez, parmi la liste des rôles suivants, la lettre correspondant à la requête. Rôles : a) Supprimer toutes les manifestations dont le codeManif contient le caractère « 3 ». | b) Modifier la valeur par défaut d'un champ de la table Halle. | c) Afficher le nom et la date d'ouverture des manifestations ayant le code de type « Salon ». | d) Modifier le numéro de téléphone d'un client dont le code est spécifié. | e) Supprimer toutes les manifestations dont le codeManif se termine par le caractère « 3 ». | f) Ajouter un nouveau client avec des valeurs spécifiques. | g) Ajouter une contrainte de domaine sur un champ de la table Halle. | h) Supprimer un client ayant des valeurs spécifiques. | i) Afficher le nom et la date d'ouverture des manifestations ayant le libellé de type « Salon ». | j) Modifier le type du champ telCl de la table Client.. Requête : ALTER TABLE Halle ADD CHECK ( nbStandsMax > 0 ) ;",
+          "points": 0.25,
+          "type": "code_analysis",
+          "expectedAnswer": "g",
+          "expectedRegex": "^\\W*g\\W*$",
+          "explanation": "ADD CHECK ajoute une contrainte de domaine : rôle g."
+        },
+        {
+          "id": "A2-6",
+          "prompt": "Exercice 2 : choisissez, parmi la liste des rôles suivants, la lettre correspondant à la requête. Rôles : a) Supprimer toutes les manifestations dont le codeManif contient le caractère « 3 ». | b) Modifier la valeur par défaut d'un champ de la table Halle. | c) Afficher le nom et la date d'ouverture des manifestations ayant le code de type « Salon ». | d) Modifier le numéro de téléphone d'un client dont le code est spécifié. | e) Supprimer toutes les manifestations dont le codeManif se termine par le caractère « 3 ». | f) Ajouter un nouveau client avec des valeurs spécifiques. | g) Ajouter une contrainte de domaine sur un champ de la table Halle. | h) Supprimer un client ayant des valeurs spécifiques. | i) Afficher le nom et la date d'ouverture des manifestations ayant le libellé de type « Salon ». | j) Modifier le type du champ telCl de la table Client.. Requête : ALTER TABLE Halle MODIFY nbStandsMax int DEFAULT 1 ;",
+          "points": 0.25,
+          "type": "code_analysis",
+          "expectedAnswer": "b",
+          "expectedRegex": "^\\W*b\\W*$",
+          "explanation": "MODIFY ... DEFAULT change la valeur par défaut : rôle b."
+        }
+      ]
+    },
+    {
+      "id": "a-ex3-sql",
+      "title": "Partie A, exercice 3 : Manipulation des données de la base (6 pts)",
+      "type": "sql",
+      "description": "Gestion_Exposition : Type_Manif (codeType, libType) ; Manifestation (codeManif, nomManif, dateOuv, dateFer, codeType#) ; Halle (codeHalle, libHalle, nbStandsMax) ; Stand (codeStand, designation, superficie, etat, codeHalle#) ; Client (codeCl, nomCl, telCl, emailCl, pays) ; Location (codeManif#, codeStand#, dateLoc, prix, codeCl#) ; Evaluation (codeEval, dateEval, noteAccueil, noteConfort, noteSignal, noteLogistique, codeManif#). Une manifestation a un type ; les halles se divisent en stands ; un client loue un stand pour une manifestation (Location).",
+      "points": 6.0,
+      "questions": [
+        {
+          "id": "A3-Q1",
+          "prompt": "Exercice 3, question 1 : quels sont les différents types de manifestations ? On affichera les champs codeType et libType.",
+          "points": 0.5,
+          "type": "query",
+          "expectedQuery": "SELECT codeType, libType FROM Type_Manif;",
+          "explanation": "Projection simple sur Type_Manif."
+        },
+        {
+          "id": "A3-Q2",
+          "prompt": "Exercice 3, question 2 : quelles sont les manifestations qui ont une durée strictement inférieure à 5 jours ? On affichera les champs codeManif, nomManif et dateOuv.",
+          "points": 0.5,
+          "type": "query",
+          "expectedQuery": "SELECT codeManif, nomManif, dateOuv FROM Manifestation WHERE DATEDIFF(dateFer, dateOuv) < 5;",
+          "explanation": "DATEDIFF(dateFer, dateOuv) donne la durée en jours."
+        },
+        {
+          "id": "A3-Q3",
+          "prompt": "Exercice 3, question 3 : comment réduire de 15 % les prix de location des stands de la manifestation ayant le code « M0001 » ?",
+          "points": 0.5,
+          "type": "dml",
+          "expectedTableRows": {
+            "table": "Location",
+            "where": {
+              "codeManif": "M0001",
+              "codeStand": "S01",
+              "prix": 2550
+            }
+          },
+          "verificationSql": "SELECT prix FROM Location WHERE codeManif = 'M0001' AND codeStand = 'S03';",
+          "explanation": "UPDATE Location SET prix = prix * 0.85 WHERE codeManif = 'M0001';"
+        },
+        {
+          "id": "A3-Q4",
+          "prompt": "Exercice 3, question 4 : quels sont les clients qui ont loué un ou plusieurs stands ? On affichera sans répétition les champs nomCl, telCl et emailCl.",
+          "points": 0.5,
+          "type": "query",
+          "expectedQuery": "SELECT DISTINCT nomCl, telCl, emailCl FROM Client C, Location L WHERE C.codeCl = L.codeCl;",
+          "explanation": "Jointure Client-Location et DISTINCT : un client peut louer plusieurs stands."
+        },
+        {
+          "id": "A3-Q5",
+          "prompt": "Exercice 3, question 5 : quels sont les stands libres dans la halle de libellé « Halle A », triés par superficie décroissante ? On affichera les champs codeStand, designation et superficie.",
+          "points": 0.5,
+          "type": "query",
+          "expectedQuery": "SELECT codeStand, designation, superficie FROM Stand S, Halle H WHERE S.codeHalle = H.codeHalle AND libHalle = 'Halle A' AND etat = 'L' ORDER BY superficie DESC;",
+          "explanation": "Jointure Stand-Halle, filtres libHalle et etat = 'L', ORDER BY superficie DESC."
+        },
+        {
+          "id": "A3-Q6",
+          "prompt": "Exercice 3, question 6 : quel est le nombre de manifestations pour chaque type ? On affichera les champs codeType et libType ainsi que le nombre de manifestations de chaque type.",
+          "points": 0.5,
+          "type": "query",
+          "expectedQuery": "SELECT T.codeType, libType, COUNT(codeManif) AS nbManifestations FROM Type_Manif T, Manifestation M WHERE T.codeType = M.codeType GROUP BY T.codeType, libType;",
+          "explanation": "Jointure Type_Manif-Manifestation, GROUP BY et COUNT."
+        },
+        {
+          "id": "A3-Q7",
+          "prompt": "Exercice 3, question 7 : quelles sont les manifestations dont le revenu total de location de stands dépasse strictement 10000 dinars ? On affichera les champs codeManif, nomManif ainsi que le total des revenus.",
+          "points": 1.0,
+          "type": "query",
+          "expectedQuery": "SELECT M.codeManif, nomManif, SUM(prix) AS totalRevenus FROM Manifestation M, Location L WHERE M.codeManif = L.codeManif GROUP BY M.codeManif, nomManif HAVING SUM(prix) > 10000;",
+          "explanation": "Jointure Manifestation-Location, SUM(prix) par manifestation et HAVING SUM(prix) > 10000."
+        },
+        {
+          "id": "A3-Q8",
+          "prompt": "Exercice 3, question 8 : quelles sont les désignations des stands qui n'ont pas été loués pendant l'année 2025 ? On affichera uniquement le champ designation.",
+          "points": 1.0,
+          "type": "query",
+          "expectedQuery": "SELECT designation FROM Stand WHERE codeStand NOT IN (SELECT codeStand FROM Location WHERE YEAR(dateLoc) = 2025);",
+          "explanation": "Sous-requête NOT IN sur les stands loués en 2025."
+        },
+        {
+          "id": "A3-Q9",
+          "prompt": "Exercice 3, question 9 : quels sont les stands ayant le prix de location le plus élevé ? On affichera les champs codeStand, designation et superficie.",
+          "points": 1.0,
+          "type": "query",
+          "expectedQuery": "SELECT S.codeStand, designation, superficie FROM Stand S, Location L WHERE S.codeStand = L.codeStand AND prix = (SELECT MAX(prix) FROM Location);",
+          "explanation": "Sous-requête avec MAX(prix) sur Location."
+        }
+      ]
+    },
+    {
+      "id": "a-ex4-extension",
+      "title": "Partie A, exercice 4 : Extension et modification de la structure (1.5 pt)",
+      "type": "modeling",
+      "description": "Indiquez à chaque représentation textuelle la clé primaire et la ou les clés étrangères de chaque table.",
+      "points": 1.5,
+      "questions": [
+        {
+          "id": "A4-Q1",
+          "prompt": "Exercice 4, question 1 : pour éliminer l'incohérence des données du champ pays de la table Client, en respectant R1 (un client appartient à un seul pays) et R2 (plusieurs clients peuvent provenir du même pays), proposez la représentation textuelle de Client et de toute nouvelle table indispensable.",
+          "points": 0.5,
+          "type": "representation",
+          "expectedKeywords": [
+            "Pays",
+            "Client",
+            "codePays",
+            "codeCl",
+            "nomCl",
+            "telCl",
+            "emailCl",
+            "nomPays|libPays|pays"
+          ],
+          "forbiddenKeywords": ["Client\\s*\\([^)]*\\bpays\\b"],
+          "explanation": "Pays(#codePays, nomPays) et Client(#codeCl, nomCl, telCl, emailCl, codePays#) : le pays devient une table, Client en porte la clé étrangère."
+        },
+        {
+          "id": "A4-R-1",
+          "prompt": "Exercice 4, question 2.a : représentation textuelle erronée « Service (codeSer, libSer) ; Evaluation (codeEval, dateEval) ; Note_Service (codeEval#, codeSer#, note, commentaire, codeManif#) ». Indiquez la règle de gestion non respectée (R3, R4, R5 ou R6). Règles : R3 une évaluation peut évaluer plusieurs services ; R4 un service peut être évalué plusieurs fois dans différentes évaluations ; R5 une évaluation concerne une seule manifestation ; R6 un service ne peut être évalué qu'une seule fois par évaluation avec l'attribution d'une note.",
+          "points": 0.125,
+          "type": "code_analysis",
+          "expectedAnswer": "R5",
+          "expectedRegex": "^\\W*R5\\W*$",
+          "explanation": "codeManif est porté par Note_Service : une évaluation pourrait concerner plusieurs manifestations, la règle R5 n'est pas respectée."
+        },
+        {
+          "id": "A4-R-2",
+          "prompt": "Exercice 4, question 2.a : représentation textuelle erronée « Service (codeSer, libSer) ; Evaluation (codeEval, dateEval, codeManif#, codeSer#, note) ; Note_Service (codeEval#, commentaire) ». Indiquez la règle de gestion non respectée (R3, R4, R5 ou R6). Règles : R3 une évaluation peut évaluer plusieurs services ; R4 un service peut être évalué plusieurs fois dans différentes évaluations ; R5 une évaluation concerne une seule manifestation ; R6 un service ne peut être évalué qu'une seule fois par évaluation avec l'attribution d'une note.",
+          "points": 0.125,
+          "type": "code_analysis",
+          "expectedAnswer": "R3",
+          "expectedRegex": "^\\W*R3\\W*$",
+          "explanation": "codeSer est dans Evaluation : une évaluation ne porterait que sur un service, la règle R3 n'est pas respectée."
+        },
+        {
+          "id": "A4-R-3",
+          "prompt": "Exercice 4, question 2.a : représentation textuelle erronée « Service (codeSer, libSer) ; Evaluation (codeEval, dateEval, codeManif#) ; Note_Service (codeEval#, codeSer#, commentaire) ». Indiquez la règle de gestion non respectée (R3, R4, R5 ou R6). Règles : R3 une évaluation peut évaluer plusieurs services ; R4 un service peut être évalué plusieurs fois dans différentes évaluations ; R5 une évaluation concerne une seule manifestation ; R6 un service ne peut être évalué qu'une seule fois par évaluation avec l'attribution d'une note.",
+          "points": 0.125,
+          "type": "code_analysis",
+          "expectedAnswer": "R6",
+          "expectedRegex": "^\\W*R6\\W*$",
+          "explanation": "La note n'est pas attribuée au couple (évaluation, service) : la règle R6 n'est pas respectée."
+        },
+        {
+          "id": "A4-R-4",
+          "prompt": "Exercice 4, question 2.a : représentation textuelle erronée « Service (codeSer, libSer, codeEval#, note) ; Evaluation (codeEval, dateEval, codeManif#) ; Note_Service (codeEval#, commentaire) ». Indiquez la règle de gestion non respectée (R3, R4, R5 ou R6). Règles : R3 une évaluation peut évaluer plusieurs services ; R4 un service peut être évalué plusieurs fois dans différentes évaluations ; R5 une évaluation concerne une seule manifestation ; R6 un service ne peut être évalué qu'une seule fois par évaluation avec l'attribution d'une note.",
+          "points": 0.125,
+          "type": "code_analysis",
+          "expectedAnswer": "R4",
+          "expectedRegex": "^\\W*R4\\W*$",
+          "explanation": "Service porte codeEval et note : un service ne serait évalué qu'une fois, la règle R4 n'est pas respectée."
+        },
+        {
+          "id": "A4-Q2B",
+          "prompt": "Exercice 4, question 2.b : déduisez la représentation textuelle correcte de Service, Evaluation et Note_Service respectant R3, R4, R5 et R6.",
+          "points": 0.5,
+          "type": "representation",
+          "expectedKeywords": [
+            "Service",
+            "Evaluation",
+            "Note_Service",
+            "codeSer",
+            "libSer",
+            "codeEval",
+            "dateEval",
+            "codeManif",
+            "note",
+            "commentaire",
+            "Note_Service\\s*\\(\\s*#?\\s*codeEval\\s*#?\\s*,\\s*#?\\s*codeSer"
+          ],
+          "forbiddenKeywords": [
+            "Note_Service\\s*\\([^)]*codeManif",
+            "Evaluation\\s*\\([^)]*codeSer"
+          ],
+          "explanation": "Service(#codeSer, libSer) ; Evaluation(#codeEval, dateEval, codeManif#) ; Note_Service(#codeEval#, #codeSer#, note, commentaire)."
+        }
+      ]
+    },
+    {
+      "id": "b-ex1-html-lignes",
+      "title": "Partie B, exercice 1 (1) : Numéros de ligne du code HTML (1.5 pt)",
+      "type": "code_analysis",
+      "description": "Page EvaluationManif.html (Fig. 1 et Fig. 2) : indiquez le numéro de la ligne contenant le code correspondant à chaque rôle.",
+      "points": 1.5,
+      "questions": [
+        {
+          "id": "B1-L-1",
+          "prompt": "Partie B, exercice 1, question 1 : indiquez le numéro de la ligne de la Fig. 2 contenant le code HTML correspondant au rôle : « Créer un bouton permettant d'envoyer les données du formulaire à un serveur. »",
+          "points": 0.1875,
+          "type": "code_analysis",
+          "codeSnippet": "1  <!DOCTYPE HTML>\n2  <html lang=\"fr\">\n3  <head>\n4    <title>Évaluation d'une manifestation</title>\n5    <meta charset=\"utf-8\">\n6    <meta name=\"Description\" content=\"Cette page permet l'évaluation des manifestations.\">\n7    <link rel=\"stylesheet\" type=\"text/css\" href=\"mesStyles.css\">\n8    <script src=\"mesScripts.js\"> </script>\n9  </head>\n10 <body onload=\"inconnue()\">\n11   <form id=\"f\" name=\"f\" action=\"evaluation.php\" method=\"POST\" onsubmit=\"return verif ()\">\n12     <fieldset>\n13       <legend>Évaluation d'une manifestation</legend>\n14       <label>Manifestation :</label>\n15       <select id=\"manif\" name=\"manif\">\n16         <option selected>Choisir une manifestation</option>\n17         <option value=\"M0001\">Foire du livre</option>\n18         <option value=\"M0002\">Salon de l'Art</option>\n19         <option value=\"M0003\">Séminaire des médecins</option>\n20       </select><br>\n21       <hr>\n22       <label class=\"labserv\">Service</label> <label id=\"labnote\">Note</label><br><br>\n23       <label class=\"service\">Accueil :</label>\n24       <input type=\"range\" id=\"serv1\" name=\"serv1\" min=\"0\" max=\"5\"\n25              onchange=\"imagenote('serv1', 'imgser1'); calcultotal();\"/>\n26       <img id=\"imgser1\" src=\"0.png\" width=\"150\" height=\"20\" alt=\"Note attribuée à l'accueil\"><br>\n27       <label class=\"service\">Confort : </label>\n28       <input type=\"range\" id=\"serv2\" name=\"serv2\" min=\"0\" max=\"5\"\n29              onchange=\"imagenote('serv2', 'imgser2'); calcultotal();\"/>\n30       <img id=\"imgser2\" src=\"0.png\" width=\"150\" height=\"20\" alt=\"Note attribuée au confort\"><br>\n31       <label class=\"service\">Signalétique :</label>\n32       <input type=\"range\" id=\"serv3\" name=\"serv3\" min=\"0\" max=\"5\"\n33              onchange=\"imagenote('serv3', 'imgser3'); calcultotal();\"/>\n34       <img id=\"imgser3\" src=\"0.png\" width=\"150\" height=\"20\" alt=\"Note attribuée à la signalétique\"><br>\n35       <label class=\"service\">Logistique :</label>\n36       <input type=\"range\" id=\"serv4\" name=\"serv4\" min=\"0\" max=\"5\"\n37              onchange=\"imagenote('serv4', 'imgser4'); calcultotal();\"/>\n38       <img id=\"imgser4\" src=\"0.png\" width=\"150\" height=\"20\" alt=\"Note attribuée à la logistique\"><br>\n39       <label class=\"service\">Note totale :</label>\n40       <span id=\"total\">0/20</span><br>\n41       <div>\n42         <input name=\"Valider\" type=\"submit\" value=\"Valider\">\n43         <input name=\"Annuler\" type=\"reset\" value=\"Annuler\">\n44       </div>\n45     </fieldset>\n46   </form>\n47 </body>\n48 </html>",
+          "language": "html",
+          "expectedAnswer": "42",
+          "expectedRegex": "^\\D*42\\D*$",
+          "explanation": "Le bouton de type submit est à la ligne 42."
+        },
+        {
+          "id": "B1-L-2",
+          "prompt": "Partie B, exercice 1, question 1 : indiquez le numéro de la ligne de la Fig. 2 contenant le code HTML correspondant au rôle : « Créer un conteneur en ligne permettant d'afficher un contenu. »",
+          "points": 0.1875,
+          "type": "code_analysis",
+          "codeSnippet": "1  <!DOCTYPE HTML>\n2  <html lang=\"fr\">\n3  <head>\n4    <title>Évaluation d'une manifestation</title>\n5    <meta charset=\"utf-8\">\n6    <meta name=\"Description\" content=\"Cette page permet l'évaluation des manifestations.\">\n7    <link rel=\"stylesheet\" type=\"text/css\" href=\"mesStyles.css\">\n8    <script src=\"mesScripts.js\"> </script>\n9  </head>\n10 <body onload=\"inconnue()\">\n11   <form id=\"f\" name=\"f\" action=\"evaluation.php\" method=\"POST\" onsubmit=\"return verif ()\">\n12     <fieldset>\n13       <legend>Évaluation d'une manifestation</legend>\n14       <label>Manifestation :</label>\n15       <select id=\"manif\" name=\"manif\">\n16         <option selected>Choisir une manifestation</option>\n17         <option value=\"M0001\">Foire du livre</option>\n18         <option value=\"M0002\">Salon de l'Art</option>\n19         <option value=\"M0003\">Séminaire des médecins</option>\n20       </select><br>\n21       <hr>\n22       <label class=\"labserv\">Service</label> <label id=\"labnote\">Note</label><br><br>\n23       <label class=\"service\">Accueil :</label>\n24       <input type=\"range\" id=\"serv1\" name=\"serv1\" min=\"0\" max=\"5\"\n25              onchange=\"imagenote('serv1', 'imgser1'); calcultotal();\"/>\n26       <img id=\"imgser1\" src=\"0.png\" width=\"150\" height=\"20\" alt=\"Note attribuée à l'accueil\"><br>\n27       <label class=\"service\">Confort : </label>\n28       <input type=\"range\" id=\"serv2\" name=\"serv2\" min=\"0\" max=\"5\"\n29              onchange=\"imagenote('serv2', 'imgser2'); calcultotal();\"/>\n30       <img id=\"imgser2\" src=\"0.png\" width=\"150\" height=\"20\" alt=\"Note attribuée au confort\"><br>\n31       <label class=\"service\">Signalétique :</label>\n32       <input type=\"range\" id=\"serv3\" name=\"serv3\" min=\"0\" max=\"5\"\n33              onchange=\"imagenote('serv3', 'imgser3'); calcultotal();\"/>\n34       <img id=\"imgser3\" src=\"0.png\" width=\"150\" height=\"20\" alt=\"Note attribuée à la signalétique\"><br>\n35       <label class=\"service\">Logistique :</label>\n36       <input type=\"range\" id=\"serv4\" name=\"serv4\" min=\"0\" max=\"5\"\n37              onchange=\"imagenote('serv4', 'imgser4'); calcultotal();\"/>\n38       <img id=\"imgser4\" src=\"0.png\" width=\"150\" height=\"20\" alt=\"Note attribuée à la logistique\"><br>\n39       <label class=\"service\">Note totale :</label>\n40       <span id=\"total\">0/20</span><br>\n41       <div>\n42         <input name=\"Valider\" type=\"submit\" value=\"Valider\">\n43         <input name=\"Annuler\" type=\"reset\" value=\"Annuler\">\n44       </div>\n45     </fieldset>\n46   </form>\n47 </body>\n48 </html>",
+          "language": "html",
+          "expectedAnswer": "40",
+          "expectedRegex": "^\\D*40\\D*$",
+          "explanation": "<span id=\"total\"> est un conteneur en ligne : ligne 40."
+        },
+        {
+          "id": "B1-L-3",
+          "prompt": "Partie B, exercice 1, question 1 : indiquez le numéro de la ligne de la Fig. 2 contenant le code HTML correspondant au rôle : « Spécifier l'encodage des caractères de la page web. »",
+          "points": 0.1875,
+          "type": "code_analysis",
+          "codeSnippet": "1  <!DOCTYPE HTML>\n2  <html lang=\"fr\">\n3  <head>\n4    <title>Évaluation d'une manifestation</title>\n5    <meta charset=\"utf-8\">\n6    <meta name=\"Description\" content=\"Cette page permet l'évaluation des manifestations.\">\n7    <link rel=\"stylesheet\" type=\"text/css\" href=\"mesStyles.css\">\n8    <script src=\"mesScripts.js\"> </script>\n9  </head>\n10 <body onload=\"inconnue()\">\n11   <form id=\"f\" name=\"f\" action=\"evaluation.php\" method=\"POST\" onsubmit=\"return verif ()\">\n12     <fieldset>\n13       <legend>Évaluation d'une manifestation</legend>\n14       <label>Manifestation :</label>\n15       <select id=\"manif\" name=\"manif\">\n16         <option selected>Choisir une manifestation</option>\n17         <option value=\"M0001\">Foire du livre</option>\n18         <option value=\"M0002\">Salon de l'Art</option>\n19         <option value=\"M0003\">Séminaire des médecins</option>\n20       </select><br>\n21       <hr>\n22       <label class=\"labserv\">Service</label> <label id=\"labnote\">Note</label><br><br>\n23       <label class=\"service\">Accueil :</label>\n24       <input type=\"range\" id=\"serv1\" name=\"serv1\" min=\"0\" max=\"5\"\n25              onchange=\"imagenote('serv1', 'imgser1'); calcultotal();\"/>\n26       <img id=\"imgser1\" src=\"0.png\" width=\"150\" height=\"20\" alt=\"Note attribuée à l'accueil\"><br>\n27       <label class=\"service\">Confort : </label>\n28       <input type=\"range\" id=\"serv2\" name=\"serv2\" min=\"0\" max=\"5\"\n29              onchange=\"imagenote('serv2', 'imgser2'); calcultotal();\"/>\n30       <img id=\"imgser2\" src=\"0.png\" width=\"150\" height=\"20\" alt=\"Note attribuée au confort\"><br>\n31       <label class=\"service\">Signalétique :</label>\n32       <input type=\"range\" id=\"serv3\" name=\"serv3\" min=\"0\" max=\"5\"\n33              onchange=\"imagenote('serv3', 'imgser3'); calcultotal();\"/>\n34       <img id=\"imgser3\" src=\"0.png\" width=\"150\" height=\"20\" alt=\"Note attribuée à la signalétique\"><br>\n35       <label class=\"service\">Logistique :</label>\n36       <input type=\"range\" id=\"serv4\" name=\"serv4\" min=\"0\" max=\"5\"\n37              onchange=\"imagenote('serv4', 'imgser4'); calcultotal();\"/>\n38       <img id=\"imgser4\" src=\"0.png\" width=\"150\" height=\"20\" alt=\"Note attribuée à la logistique\"><br>\n39       <label class=\"service\">Note totale :</label>\n40       <span id=\"total\">0/20</span><br>\n41       <div>\n42         <input name=\"Valider\" type=\"submit\" value=\"Valider\">\n43         <input name=\"Annuler\" type=\"reset\" value=\"Annuler\">\n44       </div>\n45     </fieldset>\n46   </form>\n47 </body>\n48 </html>",
+          "language": "html",
+          "expectedAnswer": "5",
+          "expectedRegex": "^\\D*5\\D*$",
+          "explanation": "<meta charset=\"utf-8\"> : ligne 5."
+        },
+        {
+          "id": "B1-L-4",
+          "prompt": "Partie B, exercice 1, question 1 : indiquez le numéro de la ligne de la Fig. 2 contenant le code HTML correspondant au rôle : « Lier une feuille de style CSS externe à la page web. »",
+          "points": 0.1875,
+          "type": "code_analysis",
+          "codeSnippet": "1  <!DOCTYPE HTML>\n2  <html lang=\"fr\">\n3  <head>\n4    <title>Évaluation d'une manifestation</title>\n5    <meta charset=\"utf-8\">\n6    <meta name=\"Description\" content=\"Cette page permet l'évaluation des manifestations.\">\n7    <link rel=\"stylesheet\" type=\"text/css\" href=\"mesStyles.css\">\n8    <script src=\"mesScripts.js\"> </script>\n9  </head>\n10 <body onload=\"inconnue()\">\n11   <form id=\"f\" name=\"f\" action=\"evaluation.php\" method=\"POST\" onsubmit=\"return verif ()\">\n12     <fieldset>\n13       <legend>Évaluation d'une manifestation</legend>\n14       <label>Manifestation :</label>\n15       <select id=\"manif\" name=\"manif\">\n16         <option selected>Choisir une manifestation</option>\n17         <option value=\"M0001\">Foire du livre</option>\n18         <option value=\"M0002\">Salon de l'Art</option>\n19         <option value=\"M0003\">Séminaire des médecins</option>\n20       </select><br>\n21       <hr>\n22       <label class=\"labserv\">Service</label> <label id=\"labnote\">Note</label><br><br>\n23       <label class=\"service\">Accueil :</label>\n24       <input type=\"range\" id=\"serv1\" name=\"serv1\" min=\"0\" max=\"5\"\n25              onchange=\"imagenote('serv1', 'imgser1'); calcultotal();\"/>\n26       <img id=\"imgser1\" src=\"0.png\" width=\"150\" height=\"20\" alt=\"Note attribuée à l'accueil\"><br>\n27       <label class=\"service\">Confort : </label>\n28       <input type=\"range\" id=\"serv2\" name=\"serv2\" min=\"0\" max=\"5\"\n29              onchange=\"imagenote('serv2', 'imgser2'); calcultotal();\"/>\n30       <img id=\"imgser2\" src=\"0.png\" width=\"150\" height=\"20\" alt=\"Note attribuée au confort\"><br>\n31       <label class=\"service\">Signalétique :</label>\n32       <input type=\"range\" id=\"serv3\" name=\"serv3\" min=\"0\" max=\"5\"\n33              onchange=\"imagenote('serv3', 'imgser3'); calcultotal();\"/>\n34       <img id=\"imgser3\" src=\"0.png\" width=\"150\" height=\"20\" alt=\"Note attribuée à la signalétique\"><br>\n35       <label class=\"service\">Logistique :</label>\n36       <input type=\"range\" id=\"serv4\" name=\"serv4\" min=\"0\" max=\"5\"\n37              onchange=\"imagenote('serv4', 'imgser4'); calcultotal();\"/>\n38       <img id=\"imgser4\" src=\"0.png\" width=\"150\" height=\"20\" alt=\"Note attribuée à la logistique\"><br>\n39       <label class=\"service\">Note totale :</label>\n40       <span id=\"total\">0/20</span><br>\n41       <div>\n42         <input name=\"Valider\" type=\"submit\" value=\"Valider\">\n43         <input name=\"Annuler\" type=\"reset\" value=\"Annuler\">\n44       </div>\n45     </fieldset>\n46   </form>\n47 </body>\n48 </html>",
+          "language": "html",
+          "expectedAnswer": "7",
+          "expectedRegex": "^\\D*7\\D*$",
+          "explanation": "<link rel=\"stylesheet\" ...> : ligne 7."
+        },
+        {
+          "id": "B1-L-5",
+          "prompt": "Partie B, exercice 1, question 1 : indiquez le numéro de la ligne de la Fig. 2 contenant le code HTML correspondant au rôle : « Exécuter une fonction JavaScript au moment où la page web est entièrement chargée. »",
+          "points": 0.1875,
+          "type": "code_analysis",
+          "codeSnippet": "1  <!DOCTYPE HTML>\n2  <html lang=\"fr\">\n3  <head>\n4    <title>Évaluation d'une manifestation</title>\n5    <meta charset=\"utf-8\">\n6    <meta name=\"Description\" content=\"Cette page permet l'évaluation des manifestations.\">\n7    <link rel=\"stylesheet\" type=\"text/css\" href=\"mesStyles.css\">\n8    <script src=\"mesScripts.js\"> </script>\n9  </head>\n10 <body onload=\"inconnue()\">\n11   <form id=\"f\" name=\"f\" action=\"evaluation.php\" method=\"POST\" onsubmit=\"return verif ()\">\n12     <fieldset>\n13       <legend>Évaluation d'une manifestation</legend>\n14       <label>Manifestation :</label>\n15       <select id=\"manif\" name=\"manif\">\n16         <option selected>Choisir une manifestation</option>\n17         <option value=\"M0001\">Foire du livre</option>\n18         <option value=\"M0002\">Salon de l'Art</option>\n19         <option value=\"M0003\">Séminaire des médecins</option>\n20       </select><br>\n21       <hr>\n22       <label class=\"labserv\">Service</label> <label id=\"labnote\">Note</label><br><br>\n23       <label class=\"service\">Accueil :</label>\n24       <input type=\"range\" id=\"serv1\" name=\"serv1\" min=\"0\" max=\"5\"\n25              onchange=\"imagenote('serv1', 'imgser1'); calcultotal();\"/>\n26       <img id=\"imgser1\" src=\"0.png\" width=\"150\" height=\"20\" alt=\"Note attribuée à l'accueil\"><br>\n27       <label class=\"service\">Confort : </label>\n28       <input type=\"range\" id=\"serv2\" name=\"serv2\" min=\"0\" max=\"5\"\n29              onchange=\"imagenote('serv2', 'imgser2'); calcultotal();\"/>\n30       <img id=\"imgser2\" src=\"0.png\" width=\"150\" height=\"20\" alt=\"Note attribuée au confort\"><br>\n31       <label class=\"service\">Signalétique :</label>\n32       <input type=\"range\" id=\"serv3\" name=\"serv3\" min=\"0\" max=\"5\"\n33              onchange=\"imagenote('serv3', 'imgser3'); calcultotal();\"/>\n34       <img id=\"imgser3\" src=\"0.png\" width=\"150\" height=\"20\" alt=\"Note attribuée à la signalétique\"><br>\n35       <label class=\"service\">Logistique :</label>\n36       <input type=\"range\" id=\"serv4\" name=\"serv4\" min=\"0\" max=\"5\"\n37              onchange=\"imagenote('serv4', 'imgser4'); calcultotal();\"/>\n38       <img id=\"imgser4\" src=\"0.png\" width=\"150\" height=\"20\" alt=\"Note attribuée à la logistique\"><br>\n39       <label class=\"service\">Note totale :</label>\n40       <span id=\"total\">0/20</span><br>\n41       <div>\n42         <input name=\"Valider\" type=\"submit\" value=\"Valider\">\n43         <input name=\"Annuler\" type=\"reset\" value=\"Annuler\">\n44       </div>\n45     </fieldset>\n46   </form>\n47 </body>\n48 </html>",
+          "language": "html",
+          "expectedAnswer": "10",
+          "expectedRegex": "^\\D*10\\D*$",
+          "explanation": "<body onload=\"inconnue()\"> : ligne 10."
+        },
+        {
+          "id": "B1-L-6",
+          "prompt": "Partie B, exercice 1, question 1 : indiquez le numéro de la ligne de la Fig. 2 contenant le code HTML correspondant au rôle : « Créer une liste déroulante. »",
+          "points": 0.1875,
+          "type": "code_analysis",
+          "codeSnippet": "1  <!DOCTYPE HTML>\n2  <html lang=\"fr\">\n3  <head>\n4    <title>Évaluation d'une manifestation</title>\n5    <meta charset=\"utf-8\">\n6    <meta name=\"Description\" content=\"Cette page permet l'évaluation des manifestations.\">\n7    <link rel=\"stylesheet\" type=\"text/css\" href=\"mesStyles.css\">\n8    <script src=\"mesScripts.js\"> </script>\n9  </head>\n10 <body onload=\"inconnue()\">\n11   <form id=\"f\" name=\"f\" action=\"evaluation.php\" method=\"POST\" onsubmit=\"return verif ()\">\n12     <fieldset>\n13       <legend>Évaluation d'une manifestation</legend>\n14       <label>Manifestation :</label>\n15       <select id=\"manif\" name=\"manif\">\n16         <option selected>Choisir une manifestation</option>\n17         <option value=\"M0001\">Foire du livre</option>\n18         <option value=\"M0002\">Salon de l'Art</option>\n19         <option value=\"M0003\">Séminaire des médecins</option>\n20       </select><br>\n21       <hr>\n22       <label class=\"labserv\">Service</label> <label id=\"labnote\">Note</label><br><br>\n23       <label class=\"service\">Accueil :</label>\n24       <input type=\"range\" id=\"serv1\" name=\"serv1\" min=\"0\" max=\"5\"\n25              onchange=\"imagenote('serv1', 'imgser1'); calcultotal();\"/>\n26       <img id=\"imgser1\" src=\"0.png\" width=\"150\" height=\"20\" alt=\"Note attribuée à l'accueil\"><br>\n27       <label class=\"service\">Confort : </label>\n28       <input type=\"range\" id=\"serv2\" name=\"serv2\" min=\"0\" max=\"5\"\n29              onchange=\"imagenote('serv2', 'imgser2'); calcultotal();\"/>\n30       <img id=\"imgser2\" src=\"0.png\" width=\"150\" height=\"20\" alt=\"Note attribuée au confort\"><br>\n31       <label class=\"service\">Signalétique :</label>\n32       <input type=\"range\" id=\"serv3\" name=\"serv3\" min=\"0\" max=\"5\"\n33              onchange=\"imagenote('serv3', 'imgser3'); calcultotal();\"/>\n34       <img id=\"imgser3\" src=\"0.png\" width=\"150\" height=\"20\" alt=\"Note attribuée à la signalétique\"><br>\n35       <label class=\"service\">Logistique :</label>\n36       <input type=\"range\" id=\"serv4\" name=\"serv4\" min=\"0\" max=\"5\"\n37              onchange=\"imagenote('serv4', 'imgser4'); calcultotal();\"/>\n38       <img id=\"imgser4\" src=\"0.png\" width=\"150\" height=\"20\" alt=\"Note attribuée à la logistique\"><br>\n39       <label class=\"service\">Note totale :</label>\n40       <span id=\"total\">0/20</span><br>\n41       <div>\n42         <input name=\"Valider\" type=\"submit\" value=\"Valider\">\n43         <input name=\"Annuler\" type=\"reset\" value=\"Annuler\">\n44       </div>\n45     </fieldset>\n46   </form>\n47 </body>\n48 </html>",
+          "language": "html",
+          "expectedAnswer": "15",
+          "expectedRegex": "^\\D*15\\D*$",
+          "explanation": "<select> : ligne 15."
+        },
+        {
+          "id": "B1-L-7",
+          "prompt": "Partie B, exercice 1, question 1 : indiquez le numéro de la ligne de la Fig. 2 contenant le code HTML correspondant au rôle : « Regrouper un ou plusieurs éléments d'un formulaire. »",
+          "points": 0.1875,
+          "type": "code_analysis",
+          "codeSnippet": "1  <!DOCTYPE HTML>\n2  <html lang=\"fr\">\n3  <head>\n4    <title>Évaluation d'une manifestation</title>\n5    <meta charset=\"utf-8\">\n6    <meta name=\"Description\" content=\"Cette page permet l'évaluation des manifestations.\">\n7    <link rel=\"stylesheet\" type=\"text/css\" href=\"mesStyles.css\">\n8    <script src=\"mesScripts.js\"> </script>\n9  </head>\n10 <body onload=\"inconnue()\">\n11   <form id=\"f\" name=\"f\" action=\"evaluation.php\" method=\"POST\" onsubmit=\"return verif ()\">\n12     <fieldset>\n13       <legend>Évaluation d'une manifestation</legend>\n14       <label>Manifestation :</label>\n15       <select id=\"manif\" name=\"manif\">\n16         <option selected>Choisir une manifestation</option>\n17         <option value=\"M0001\">Foire du livre</option>\n18         <option value=\"M0002\">Salon de l'Art</option>\n19         <option value=\"M0003\">Séminaire des médecins</option>\n20       </select><br>\n21       <hr>\n22       <label class=\"labserv\">Service</label> <label id=\"labnote\">Note</label><br><br>\n23       <label class=\"service\">Accueil :</label>\n24       <input type=\"range\" id=\"serv1\" name=\"serv1\" min=\"0\" max=\"5\"\n25              onchange=\"imagenote('serv1', 'imgser1'); calcultotal();\"/>\n26       <img id=\"imgser1\" src=\"0.png\" width=\"150\" height=\"20\" alt=\"Note attribuée à l'accueil\"><br>\n27       <label class=\"service\">Confort : </label>\n28       <input type=\"range\" id=\"serv2\" name=\"serv2\" min=\"0\" max=\"5\"\n29              onchange=\"imagenote('serv2', 'imgser2'); calcultotal();\"/>\n30       <img id=\"imgser2\" src=\"0.png\" width=\"150\" height=\"20\" alt=\"Note attribuée au confort\"><br>\n31       <label class=\"service\">Signalétique :</label>\n32       <input type=\"range\" id=\"serv3\" name=\"serv3\" min=\"0\" max=\"5\"\n33              onchange=\"imagenote('serv3', 'imgser3'); calcultotal();\"/>\n34       <img id=\"imgser3\" src=\"0.png\" width=\"150\" height=\"20\" alt=\"Note attribuée à la signalétique\"><br>\n35       <label class=\"service\">Logistique :</label>\n36       <input type=\"range\" id=\"serv4\" name=\"serv4\" min=\"0\" max=\"5\"\n37              onchange=\"imagenote('serv4', 'imgser4'); calcultotal();\"/>\n38       <img id=\"imgser4\" src=\"0.png\" width=\"150\" height=\"20\" alt=\"Note attribuée à la logistique\"><br>\n39       <label class=\"service\">Note totale :</label>\n40       <span id=\"total\">0/20</span><br>\n41       <div>\n42         <input name=\"Valider\" type=\"submit\" value=\"Valider\">\n43         <input name=\"Annuler\" type=\"reset\" value=\"Annuler\">\n44       </div>\n45     </fieldset>\n46   </form>\n47 </body>\n48 </html>",
+          "language": "html",
+          "expectedAnswer": "12",
+          "expectedRegex": "^\\D*12\\D*$",
+          "explanation": "<fieldset> : ligne 12."
+        },
+        {
+          "id": "B1-L-8",
+          "prompt": "Partie B, exercice 1, question 1 : indiquez le numéro de la ligne de la Fig. 2 contenant le code HTML correspondant au rôle : « Fournir des informations supplémentaires sur la page web qui seront utilisées par les moteurs de recherche. »",
+          "points": 0.1875,
+          "type": "code_analysis",
+          "codeSnippet": "1  <!DOCTYPE HTML>\n2  <html lang=\"fr\">\n3  <head>\n4    <title>Évaluation d'une manifestation</title>\n5    <meta charset=\"utf-8\">\n6    <meta name=\"Description\" content=\"Cette page permet l'évaluation des manifestations.\">\n7    <link rel=\"stylesheet\" type=\"text/css\" href=\"mesStyles.css\">\n8    <script src=\"mesScripts.js\"> </script>\n9  </head>\n10 <body onload=\"inconnue()\">\n11   <form id=\"f\" name=\"f\" action=\"evaluation.php\" method=\"POST\" onsubmit=\"return verif ()\">\n12     <fieldset>\n13       <legend>Évaluation d'une manifestation</legend>\n14       <label>Manifestation :</label>\n15       <select id=\"manif\" name=\"manif\">\n16         <option selected>Choisir une manifestation</option>\n17         <option value=\"M0001\">Foire du livre</option>\n18         <option value=\"M0002\">Salon de l'Art</option>\n19         <option value=\"M0003\">Séminaire des médecins</option>\n20       </select><br>\n21       <hr>\n22       <label class=\"labserv\">Service</label> <label id=\"labnote\">Note</label><br><br>\n23       <label class=\"service\">Accueil :</label>\n24       <input type=\"range\" id=\"serv1\" name=\"serv1\" min=\"0\" max=\"5\"\n25              onchange=\"imagenote('serv1', 'imgser1'); calcultotal();\"/>\n26       <img id=\"imgser1\" src=\"0.png\" width=\"150\" height=\"20\" alt=\"Note attribuée à l'accueil\"><br>\n27       <label class=\"service\">Confort : </label>\n28       <input type=\"range\" id=\"serv2\" name=\"serv2\" min=\"0\" max=\"5\"\n29              onchange=\"imagenote('serv2', 'imgser2'); calcultotal();\"/>\n30       <img id=\"imgser2\" src=\"0.png\" width=\"150\" height=\"20\" alt=\"Note attribuée au confort\"><br>\n31       <label class=\"service\">Signalétique :</label>\n32       <input type=\"range\" id=\"serv3\" name=\"serv3\" min=\"0\" max=\"5\"\n33              onchange=\"imagenote('serv3', 'imgser3'); calcultotal();\"/>\n34       <img id=\"imgser3\" src=\"0.png\" width=\"150\" height=\"20\" alt=\"Note attribuée à la signalétique\"><br>\n35       <label class=\"service\">Logistique :</label>\n36       <input type=\"range\" id=\"serv4\" name=\"serv4\" min=\"0\" max=\"5\"\n37              onchange=\"imagenote('serv4', 'imgser4'); calcultotal();\"/>\n38       <img id=\"imgser4\" src=\"0.png\" width=\"150\" height=\"20\" alt=\"Note attribuée à la logistique\"><br>\n39       <label class=\"service\">Note totale :</label>\n40       <span id=\"total\">0/20</span><br>\n41       <div>\n42         <input name=\"Valider\" type=\"submit\" value=\"Valider\">\n43         <input name=\"Annuler\" type=\"reset\" value=\"Annuler\">\n44       </div>\n45     </fieldset>\n46   </form>\n47 </body>\n48 </html>",
+          "language": "html",
+          "expectedAnswer": "6",
+          "expectedRegex": "^\\D*6\\D*$",
+          "explanation": "<meta name=\"Description\" ...> : ligne 6."
+        }
+      ]
+    },
+    {
+      "id": "b-ex1-html-qcm",
+      "title": "Partie B, exercice 1 (2) : Analyse du code HTML (1 pt)",
+      "type": "qcm",
+      "description": "Cochez l'unique proposition correcte.",
+      "points": 1.0,
+      "questions": [
+        {
+          "id": "B1-Q2-A",
+          "question": "Question 2.a) L'attribut method utilisé à la ligne 11 permet de :",
+          "options": [
+            {
+              "id": "opt-url",
+              "label": "spécifier l'adresse URL vers laquelle les données du formulaire seront envoyées"
+            },
+            {
+              "id": "opt-http",
+              "label": "spécifier la méthode HTTP utilisée pour envoyer les données du formulaire"
+            },
+            {
+              "id": "opt-nom",
+              "label": "définir le nom du conteneur où la réponse du serveur sera affichée"
+            }
+          ],
+          "points": 0.25,
+          "multiple": false,
+          "correctAnswers": ["opt-http"],
+          "explanation": "method vaut GET ou POST ; l'URL est donnée par action.",
+          "codeSnippet": "1  <!DOCTYPE HTML>\n2  <html lang=\"fr\">\n3  <head>\n4    <title>Évaluation d'une manifestation</title>\n5    <meta charset=\"utf-8\">\n6    <meta name=\"Description\" content=\"Cette page permet l'évaluation des manifestations.\">\n7    <link rel=\"stylesheet\" type=\"text/css\" href=\"mesStyles.css\">\n8    <script src=\"mesScripts.js\"> </script>\n9  </head>\n10 <body onload=\"inconnue()\">\n11   <form id=\"f\" name=\"f\" action=\"evaluation.php\" method=\"POST\" onsubmit=\"return verif ()\">\n12     <fieldset>\n13       <legend>Évaluation d'une manifestation</legend>\n14       <label>Manifestation :</label>\n15       <select id=\"manif\" name=\"manif\">\n16         <option selected>Choisir une manifestation</option>\n17         <option value=\"M0001\">Foire du livre</option>\n18         <option value=\"M0002\">Salon de l'Art</option>\n19         <option value=\"M0003\">Séminaire des médecins</option>\n20       </select><br>\n21       <hr>\n22       <label class=\"labserv\">Service</label> <label id=\"labnote\">Note</label><br><br>\n23       <label class=\"service\">Accueil :</label>\n24       <input type=\"range\" id=\"serv1\" name=\"serv1\" min=\"0\" max=\"5\"\n25              onchange=\"imagenote('serv1', 'imgser1'); calcultotal();\"/>\n26       <img id=\"imgser1\" src=\"0.png\" width=\"150\" height=\"20\" alt=\"Note attribuée à l'accueil\"><br>\n27       <label class=\"service\">Confort : </label>\n28       <input type=\"range\" id=\"serv2\" name=\"serv2\" min=\"0\" max=\"5\"\n29              onchange=\"imagenote('serv2', 'imgser2'); calcultotal();\"/>\n30       <img id=\"imgser2\" src=\"0.png\" width=\"150\" height=\"20\" alt=\"Note attribuée au confort\"><br>\n31       <label class=\"service\">Signalétique :</label>\n32       <input type=\"range\" id=\"serv3\" name=\"serv3\" min=\"0\" max=\"5\"\n33              onchange=\"imagenote('serv3', 'imgser3'); calcultotal();\"/>\n34       <img id=\"imgser3\" src=\"0.png\" width=\"150\" height=\"20\" alt=\"Note attribuée à la signalétique\"><br>\n35       <label class=\"service\">Logistique :</label>\n36       <input type=\"range\" id=\"serv4\" name=\"serv4\" min=\"0\" max=\"5\"\n37              onchange=\"imagenote('serv4', 'imgser4'); calcultotal();\"/>\n38       <img id=\"imgser4\" src=\"0.png\" width=\"150\" height=\"20\" alt=\"Note attribuée à la logistique\"><br>\n39       <label class=\"service\">Note totale :</label>\n40       <span id=\"total\">0/20</span><br>\n41       <div>\n42         <input name=\"Valider\" type=\"submit\" value=\"Valider\">\n43         <input name=\"Annuler\" type=\"reset\" value=\"Annuler\">\n44       </div>\n45     </fieldset>\n46   </form>\n47 </body>\n48 </html>"
+        },
+        {
+          "id": "B1-Q2-B",
+          "question": "Question 2.b) La balise <hr> utilisée à la ligne 21 permet d'insérer :",
+          "options": [
+            {
+              "id": "opt-horiz",
+              "label": "une ligne horizontale"
+            },
+            {
+              "id": "opt-tableau",
+              "label": "une ligne dans un tableau"
+            },
+            {
+              "id": "opt-retour",
+              "label": "un retour à la ligne"
+            }
+          ],
+          "points": 0.25,
+          "multiple": false,
+          "correctAnswers": ["opt-horiz"],
+          "explanation": "<hr> trace une ligne horizontale de séparation.",
+          "codeSnippet": "1  <!DOCTYPE HTML>\n2  <html lang=\"fr\">\n3  <head>\n4    <title>Évaluation d'une manifestation</title>\n5    <meta charset=\"utf-8\">\n6    <meta name=\"Description\" content=\"Cette page permet l'évaluation des manifestations.\">\n7    <link rel=\"stylesheet\" type=\"text/css\" href=\"mesStyles.css\">\n8    <script src=\"mesScripts.js\"> </script>\n9  </head>\n10 <body onload=\"inconnue()\">\n11   <form id=\"f\" name=\"f\" action=\"evaluation.php\" method=\"POST\" onsubmit=\"return verif ()\">\n12     <fieldset>\n13       <legend>Évaluation d'une manifestation</legend>\n14       <label>Manifestation :</label>\n15       <select id=\"manif\" name=\"manif\">\n16         <option selected>Choisir une manifestation</option>\n17         <option value=\"M0001\">Foire du livre</option>\n18         <option value=\"M0002\">Salon de l'Art</option>\n19         <option value=\"M0003\">Séminaire des médecins</option>\n20       </select><br>\n21       <hr>\n22       <label class=\"labserv\">Service</label> <label id=\"labnote\">Note</label><br><br>\n23       <label class=\"service\">Accueil :</label>\n24       <input type=\"range\" id=\"serv1\" name=\"serv1\" min=\"0\" max=\"5\"\n25              onchange=\"imagenote('serv1', 'imgser1'); calcultotal();\"/>\n26       <img id=\"imgser1\" src=\"0.png\" width=\"150\" height=\"20\" alt=\"Note attribuée à l'accueil\"><br>\n27       <label class=\"service\">Confort : </label>\n28       <input type=\"range\" id=\"serv2\" name=\"serv2\" min=\"0\" max=\"5\"\n29              onchange=\"imagenote('serv2', 'imgser2'); calcultotal();\"/>\n30       <img id=\"imgser2\" src=\"0.png\" width=\"150\" height=\"20\" alt=\"Note attribuée au confort\"><br>\n31       <label class=\"service\">Signalétique :</label>\n32       <input type=\"range\" id=\"serv3\" name=\"serv3\" min=\"0\" max=\"5\"\n33              onchange=\"imagenote('serv3', 'imgser3'); calcultotal();\"/>\n34       <img id=\"imgser3\" src=\"0.png\" width=\"150\" height=\"20\" alt=\"Note attribuée à la signalétique\"><br>\n35       <label class=\"service\">Logistique :</label>\n36       <input type=\"range\" id=\"serv4\" name=\"serv4\" min=\"0\" max=\"5\"\n37              onchange=\"imagenote('serv4', 'imgser4'); calcultotal();\"/>\n38       <img id=\"imgser4\" src=\"0.png\" width=\"150\" height=\"20\" alt=\"Note attribuée à la logistique\"><br>\n39       <label class=\"service\">Note totale :</label>\n40       <span id=\"total\">0/20</span><br>\n41       <div>\n42         <input name=\"Valider\" type=\"submit\" value=\"Valider\">\n43         <input name=\"Annuler\" type=\"reset\" value=\"Annuler\">\n44       </div>\n45     </fieldset>\n46   </form>\n47 </body>\n48 </html>"
+        },
+        {
+          "id": "B1-Q2-C",
+          "question": "Question 2.c) L'élément <input type=\"range\"> utilisé à la ligne 24 permet de :",
+          "options": [
+            {
+              "id": "opt-libre",
+              "label": "saisir librement un texte dont la valeur est comprise entre min et max"
+            },
+            {
+              "id": "opt-plage",
+              "label": "sélectionner une valeur dans une plage définie"
+            },
+            {
+              "id": "opt-num",
+              "label": "saisir une valeur numérique"
+            }
+          ],
+          "points": 0.25,
+          "multiple": false,
+          "correctAnswers": ["opt-plage"],
+          "explanation": "Le curseur range propose une valeur dans l'intervalle min-max.",
+          "codeSnippet": "1  <!DOCTYPE HTML>\n2  <html lang=\"fr\">\n3  <head>\n4    <title>Évaluation d'une manifestation</title>\n5    <meta charset=\"utf-8\">\n6    <meta name=\"Description\" content=\"Cette page permet l'évaluation des manifestations.\">\n7    <link rel=\"stylesheet\" type=\"text/css\" href=\"mesStyles.css\">\n8    <script src=\"mesScripts.js\"> </script>\n9  </head>\n10 <body onload=\"inconnue()\">\n11   <form id=\"f\" name=\"f\" action=\"evaluation.php\" method=\"POST\" onsubmit=\"return verif ()\">\n12     <fieldset>\n13       <legend>Évaluation d'une manifestation</legend>\n14       <label>Manifestation :</label>\n15       <select id=\"manif\" name=\"manif\">\n16         <option selected>Choisir une manifestation</option>\n17         <option value=\"M0001\">Foire du livre</option>\n18         <option value=\"M0002\">Salon de l'Art</option>\n19         <option value=\"M0003\">Séminaire des médecins</option>\n20       </select><br>\n21       <hr>\n22       <label class=\"labserv\">Service</label> <label id=\"labnote\">Note</label><br><br>\n23       <label class=\"service\">Accueil :</label>\n24       <input type=\"range\" id=\"serv1\" name=\"serv1\" min=\"0\" max=\"5\"\n25              onchange=\"imagenote('serv1', 'imgser1'); calcultotal();\"/>\n26       <img id=\"imgser1\" src=\"0.png\" width=\"150\" height=\"20\" alt=\"Note attribuée à l'accueil\"><br>\n27       <label class=\"service\">Confort : </label>\n28       <input type=\"range\" id=\"serv2\" name=\"serv2\" min=\"0\" max=\"5\"\n29              onchange=\"imagenote('serv2', 'imgser2'); calcultotal();\"/>\n30       <img id=\"imgser2\" src=\"0.png\" width=\"150\" height=\"20\" alt=\"Note attribuée au confort\"><br>\n31       <label class=\"service\">Signalétique :</label>\n32       <input type=\"range\" id=\"serv3\" name=\"serv3\" min=\"0\" max=\"5\"\n33              onchange=\"imagenote('serv3', 'imgser3'); calcultotal();\"/>\n34       <img id=\"imgser3\" src=\"0.png\" width=\"150\" height=\"20\" alt=\"Note attribuée à la signalétique\"><br>\n35       <label class=\"service\">Logistique :</label>\n36       <input type=\"range\" id=\"serv4\" name=\"serv4\" min=\"0\" max=\"5\"\n37              onchange=\"imagenote('serv4', 'imgser4'); calcultotal();\"/>\n38       <img id=\"imgser4\" src=\"0.png\" width=\"150\" height=\"20\" alt=\"Note attribuée à la logistique\"><br>\n39       <label class=\"service\">Note totale :</label>\n40       <span id=\"total\">0/20</span><br>\n41       <div>\n42         <input name=\"Valider\" type=\"submit\" value=\"Valider\">\n43         <input name=\"Annuler\" type=\"reset\" value=\"Annuler\">\n44       </div>\n45     </fieldset>\n46   </form>\n47 </body>\n48 </html>"
+        },
+        {
+          "id": "B1-Q2-D",
+          "question": "Question 2.d) L'attribut alt utilisé à la ligne 26 sert à :",
+          "options": [
+            {
+              "id": "opt-legende",
+              "label": "spécifier une légende de l'image"
+            },
+            {
+              "id": "opt-survol",
+              "label": "définir un texte qui s'affiche lorsqu'on survole l'image"
+            },
+            {
+              "id": "opt-desc",
+              "label": "définir une description textuelle alternative pour l'image"
+            }
+          ],
+          "points": 0.25,
+          "multiple": false,
+          "correctAnswers": ["opt-desc"],
+          "explanation": "alt est le texte alternatif affiché si l'image est indisponible et lu par les lecteurs d'écran.",
+          "codeSnippet": "1  <!DOCTYPE HTML>\n2  <html lang=\"fr\">\n3  <head>\n4    <title>Évaluation d'une manifestation</title>\n5    <meta charset=\"utf-8\">\n6    <meta name=\"Description\" content=\"Cette page permet l'évaluation des manifestations.\">\n7    <link rel=\"stylesheet\" type=\"text/css\" href=\"mesStyles.css\">\n8    <script src=\"mesScripts.js\"> </script>\n9  </head>\n10 <body onload=\"inconnue()\">\n11   <form id=\"f\" name=\"f\" action=\"evaluation.php\" method=\"POST\" onsubmit=\"return verif ()\">\n12     <fieldset>\n13       <legend>Évaluation d'une manifestation</legend>\n14       <label>Manifestation :</label>\n15       <select id=\"manif\" name=\"manif\">\n16         <option selected>Choisir une manifestation</option>\n17         <option value=\"M0001\">Foire du livre</option>\n18         <option value=\"M0002\">Salon de l'Art</option>\n19         <option value=\"M0003\">Séminaire des médecins</option>\n20       </select><br>\n21       <hr>\n22       <label class=\"labserv\">Service</label> <label id=\"labnote\">Note</label><br><br>\n23       <label class=\"service\">Accueil :</label>\n24       <input type=\"range\" id=\"serv1\" name=\"serv1\" min=\"0\" max=\"5\"\n25              onchange=\"imagenote('serv1', 'imgser1'); calcultotal();\"/>\n26       <img id=\"imgser1\" src=\"0.png\" width=\"150\" height=\"20\" alt=\"Note attribuée à l'accueil\"><br>\n27       <label class=\"service\">Confort : </label>\n28       <input type=\"range\" id=\"serv2\" name=\"serv2\" min=\"0\" max=\"5\"\n29              onchange=\"imagenote('serv2', 'imgser2'); calcultotal();\"/>\n30       <img id=\"imgser2\" src=\"0.png\" width=\"150\" height=\"20\" alt=\"Note attribuée au confort\"><br>\n31       <label class=\"service\">Signalétique :</label>\n32       <input type=\"range\" id=\"serv3\" name=\"serv3\" min=\"0\" max=\"5\"\n33              onchange=\"imagenote('serv3', 'imgser3'); calcultotal();\"/>\n34       <img id=\"imgser3\" src=\"0.png\" width=\"150\" height=\"20\" alt=\"Note attribuée à la signalétique\"><br>\n35       <label class=\"service\">Logistique :</label>\n36       <input type=\"range\" id=\"serv4\" name=\"serv4\" min=\"0\" max=\"5\"\n37              onchange=\"imagenote('serv4', 'imgser4'); calcultotal();\"/>\n38       <img id=\"imgser4\" src=\"0.png\" width=\"150\" height=\"20\" alt=\"Note attribuée à la logistique\"><br>\n39       <label class=\"service\">Note totale :</label>\n40       <span id=\"total\">0/20</span><br>\n41       <div>\n42         <input name=\"Valider\" type=\"submit\" value=\"Valider\">\n43         <input name=\"Annuler\" type=\"reset\" value=\"Annuler\">\n44       </div>\n45     </fieldset>\n46   </form>\n47 </body>\n48 </html>"
+        }
+      ]
+    },
+    {
+      "id": "b-ex2-css",
+      "title": "Partie B, exercice 2 : Analyse du code CSS (1.5 pt)",
+      "type": "code_analysis",
+      "description": "Écrivez le code CSS adéquat pour chaque mise en forme, à choisir dans la liste : background-color : yellow | border : 3px solid red | font-style : italic | color : red | #labserv | legend | font-weight : bolder | border-radius : 5px | display : inline-block | border : 3px dashed red | .labserv | font-size : 20px | text-align : center | padding : 5px | margin : 5px | color : yellow | width : 150px.",
+      "points": 1.5,
+      "questions": [
+        {
+          "id": "B2-1",
+          "prompt": "Partie B, exercice 2 : sélecteur du titre « Évaluation d'une manifestation » (balise legend) :",
+          "points": 0.125,
+          "type": "code_analysis",
+          "expectedAnswer": "legend",
+          "expectedRegex": "^legend$",
+          "language": "css",
+          "explanation": "Le titre du fieldset est une balise <legend>."
+        },
+        {
+          "id": "B2-2",
+          "prompt": "Partie B, exercice 2 : titre « Évaluation d'une manifestation » : une couleur de texte rouge.",
+          "points": 0.125,
+          "type": "code_analysis",
+          "expectedAnswer": "color : red",
+          "expectedRegex": "^color\\s*:\\s*red\\s*;?$",
+          "language": "css",
+          "explanation": "color : red."
+        },
+        {
+          "id": "B2-3",
+          "prompt": "Partie B, exercice 2 : titre « Évaluation d'une manifestation » : une taille de caractères égale à 20 pixels.",
+          "points": 0.125,
+          "type": "code_analysis",
+          "expectedAnswer": "font-size : 20px",
+          "expectedRegex": "^font-size\\s*:\\s*20px\\s*;?$",
+          "language": "css",
+          "explanation": "font-size : 20px."
+        },
+        {
+          "id": "B2-4",
+          "prompt": "Partie B, exercice 2 : titre « Évaluation d'une manifestation » : un style de caractères gras.",
+          "points": 0.125,
+          "type": "code_analysis",
+          "expectedAnswer": "font-weight : bolder",
+          "expectedRegex": "^font-weight\\s*:\\s*(bolder|bold)\\s*;?$",
+          "language": "css",
+          "explanation": "font-weight : bolder."
+        },
+        {
+          "id": "B2-5",
+          "prompt": "Partie B, exercice 2 : sélecteur du titre « Service » (label de classe labserv) :",
+          "points": 0.125,
+          "type": "code_analysis",
+          "expectedAnswer": ".labserv",
+          "expectedRegex": "^\\.labserv$",
+          "language": "css",
+          "explanation": "Le label a class=\"labserv\" : sélecteur de classe .labserv (pas #labserv)."
+        },
+        {
+          "id": "B2-6",
+          "prompt": "Partie B, exercice 2 : titre « Service » : un texte centré.",
+          "points": 0.125,
+          "type": "code_analysis",
+          "expectedAnswer": "text-align : center",
+          "expectedRegex": "^text-align\\s*:\\s*center\\s*;?$",
+          "language": "css",
+          "explanation": "text-align : center."
+        },
+        {
+          "id": "B2-7",
+          "prompt": "Partie B, exercice 2 : titre « Service » : un arrière-plan jaune.",
+          "points": 0.125,
+          "type": "code_analysis",
+          "expectedAnswer": "background-color : yellow",
+          "expectedRegex": "^background-color\\s*:\\s*yellow\\s*;?$",
+          "language": "css",
+          "explanation": "background-color : yellow (et non color : yellow)."
+        },
+        {
+          "id": "B2-8",
+          "prompt": "Partie B, exercice 2 : titre « Service » : une bordure rouge hachée de 3 pixels.",
+          "points": 0.125,
+          "type": "code_analysis",
+          "expectedAnswer": "border : 3px dashed red",
+          "expectedRegex": "^border\\s*:\\s*3px\\s+dashed\\s+red\\s*;?$",
+          "language": "css",
+          "explanation": "border : 3px dashed red (dashed = hachée)."
+        },
+        {
+          "id": "B2-9",
+          "prompt": "Partie B, exercice 2 : titre « Service » : une largeur de 150 pixels.",
+          "points": 0.125,
+          "type": "code_analysis",
+          "expectedAnswer": "width : 150px",
+          "expectedRegex": "^width\\s*:\\s*150px\\s*;?$",
+          "language": "css",
+          "explanation": "width : 150px."
+        },
+        {
+          "id": "B2-10",
+          "prompt": "Partie B, exercice 2 : titre « Service » : un style de caractères italique.",
+          "points": 0.125,
+          "type": "code_analysis",
+          "expectedAnswer": "font-style : italic",
+          "expectedRegex": "^font-style\\s*:\\s*italic\\s*;?$",
+          "language": "css",
+          "explanation": "font-style : italic."
+        },
+        {
+          "id": "B2-11",
+          "prompt": "Partie B, exercice 2 : libellés du formulaire (label) : un comportement d'affichage bloc en ligne.",
+          "points": 0.125,
+          "type": "code_analysis",
+          "expectedAnswer": "display : inline-block",
+          "expectedRegex": "^display\\s*:\\s*inline-block\\s*;?$",
+          "language": "css",
+          "explanation": "display : inline-block."
+        },
+        {
+          "id": "B2-12",
+          "prompt": "Partie B, exercice 2 : libellés du formulaire (label) : une marge intérieure haut de 5 pixels.",
+          "points": 0.125,
+          "type": "code_analysis",
+          "expectedAnswer": "padding : 5px",
+          "expectedRegex": "^padding(-top)?\\s*:\\s*5px\\s*;?$",
+          "language": "css",
+          "explanation": "padding : 5px (marge intérieure)."
+        }
+      ]
+    },
+    {
+      "id": "b-ex3-js",
+      "title": "Partie B, exercice 3 : Analyse du code JavaScript (2 pts)",
+      "type": "code_analysis",
+      "description": "Répondez V (proposition correcte) ou F pour chaque proposition, puis donnez le rôle de la fonction inconnue.",
+      "points": 2.0,
+      "questions": [
+        {
+          "id": "B3-A-1",
+          "prompt": "Partie B, exercice 3, 1.a) La propriété à ajouter à la fonction verif pour vérifier qu'une manifestation est sélectionnée est .checked. (V ou F)",
+          "points": 0.125,
+          "type": "code_analysis",
+          "expectedAnswer": "F",
+          "expectedRegex": "^(F|Faux)$",
+          "codeSnippet": "function verif () {\n  if (document.getElementById (\"manif\") ........................ ==0)\n    { alert (\"Il faut sélectionner une manifestation.\");\n      return false; }\n}",
+          "language": "javascript",
+          "explanation": "checked concerne les cases à cocher, pas une liste déroulante."
+        },
+        {
+          "id": "B3-A-2",
+          "prompt": "Partie B, exercice 3, 1.a) La propriété à ajouter à la fonction verif pour vérifier qu'une manifestation est sélectionnée est .selectedIndex. (V ou F)",
+          "points": 0.125,
+          "type": "code_analysis",
+          "expectedAnswer": "V",
+          "expectedRegex": "^(V|Vrai)$",
+          "codeSnippet": "function verif () {\n  if (document.getElementById (\"manif\") ........................ ==0)\n    { alert (\"Il faut sélectionner une manifestation.\");\n      return false; }\n}",
+          "language": "javascript",
+          "explanation": "selectedIndex == 0 : la première option « Choisir une manifestation » est sélectionnée."
+        },
+        {
+          "id": "B3-A-3",
+          "prompt": "Partie B, exercice 3, 1.a) La propriété à ajouter à la fonction verif pour vérifier qu'une manifestation est sélectionnée est .value. (V ou F)",
+          "points": 0.125,
+          "type": "code_analysis",
+          "expectedAnswer": "F",
+          "expectedRegex": "^(F|Faux)$",
+          "codeSnippet": "function verif () {\n  if (document.getElementById (\"manif\") ........................ ==0)\n    { alert (\"Il faut sélectionner une manifestation.\");\n      return false; }\n}",
+          "language": "javascript",
+          "explanation": "value vaut le texte de l'option sans attribut value : il ne vaut jamais 0 ici."
+        },
+        {
+          "id": "B3-A-4",
+          "prompt": "Partie B, exercice 3, 1.a) La propriété à ajouter à la fonction verif pour vérifier qu'une manifestation est sélectionnée est .indexOf. (V ou F)",
+          "points": 0.125,
+          "type": "code_analysis",
+          "expectedAnswer": "F",
+          "expectedRegex": "^(F|Faux)$",
+          "codeSnippet": "function verif () {\n  if (document.getElementById (\"manif\") ........................ ==0)\n    { alert (\"Il faut sélectionner une manifestation.\");\n      return false; }\n}",
+          "language": "javascript",
+          "explanation": "indexOf est une méthode de chaîne ou de tableau, pas une propriété d'une liste déroulante."
+        },
+        {
+          "id": "B3-B-1",
+          "prompt": "Partie B, exercice 3, 1.b) L'instruction à ajouter à la fonction imagenote pour afficher l'image correspondant à la note est : document.getElementById (idimage).name=note+'.png'; (V ou F)",
+          "points": 0.125,
+          "type": "code_analysis",
+          "expectedAnswer": "F",
+          "expectedRegex": "^(F|Faux)$",
+          "codeSnippet": "function imagenote (idnote, idimage)\n{\n  note=document.getElementById (idnote).value;\n  ........................................................ ;\n}",
+          "language": "javascript",
+          "explanation": "name n'affiche pas d'image."
+        },
+        {
+          "id": "B3-B-2",
+          "prompt": "Partie B, exercice 3, 1.b) L'instruction à ajouter à la fonction imagenote pour afficher l'image correspondant à la note est : document.getElementsByName (idimage).value=note+'.png'; (V ou F)",
+          "points": 0.125,
+          "type": "code_analysis",
+          "expectedAnswer": "F",
+          "expectedRegex": "^(F|Faux)$",
+          "codeSnippet": "function imagenote (idnote, idimage)\n{\n  note=document.getElementById (idnote).value;\n  ........................................................ ;\n}",
+          "language": "javascript",
+          "explanation": "getElementsByName renvoie une liste et value n'est pas l'image."
+        },
+        {
+          "id": "B3-B-3",
+          "prompt": "Partie B, exercice 3, 1.b) L'instruction à ajouter à la fonction imagenote pour afficher l'image correspondant à la note est : document.getElementById (idimage).src=note+'.png'; (V ou F)",
+          "points": 0.125,
+          "type": "code_analysis",
+          "expectedAnswer": "V",
+          "expectedRegex": "^(V|Vrai)$",
+          "codeSnippet": "function imagenote (idnote, idimage)\n{\n  note=document.getElementById (idnote).value;\n  ........................................................ ;\n}",
+          "language": "javascript",
+          "explanation": "src de l'élément d'identifiant idimage affiche l'image N.png."
+        },
+        {
+          "id": "B3-B-4",
+          "prompt": "Partie B, exercice 3, 1.b) L'instruction à ajouter à la fonction imagenote pour afficher l'image correspondant à la note est : document.getElementsByName (idimage).src=note+'.png'; (V ou F)",
+          "points": 0.125,
+          "type": "code_analysis",
+          "expectedAnswer": "F",
+          "expectedRegex": "^(F|Faux)$",
+          "codeSnippet": "function imagenote (idnote, idimage)\n{\n  note=document.getElementById (idnote).value;\n  ........................................................ ;\n}",
+          "language": "javascript",
+          "explanation": "getElementsByName renvoie une liste d'éléments, pas un élément."
+        },
+        {
+          "id": "B3-C-1",
+          "prompt": "Partie B, exercice 3, 1.c) Le script de la fonction calcultotal est correct : le premier script (let s=0 ; boucle for (let i=1 ; i<=4 ; i++) ; parseInt). (V ou F)",
+          "points": 0.125,
+          "type": "code_analysis",
+          "expectedAnswer": "V",
+          "expectedRegex": "^(V|Vrai)$",
+          "codeSnippet": "function calcultotal ()\n{ let s=0;\n  for (let i=1; i<=4; i++)\n    { idnote=\"serv\"+i;\n      s=s+parseInt(document.getElementById(idnote).value);\n    }\n  document.getElementById (\"total\").innerHTML=String(s) +\"/20\";\n}",
+          "language": "javascript",
+          "explanation": "Script valide : le total des quatre notes est calculé et affiché."
+        },
+        {
+          "id": "B3-C-2",
+          "prompt": "Partie B, exercice 3, 1.c) Le script de la fonction calcultotal est correct : le deuxième script (boucle for (const i=1 ; i<=4 ; i++)). (V ou F)",
+          "points": 0.125,
+          "type": "code_analysis",
+          "expectedAnswer": "F",
+          "expectedRegex": "^(F|Faux)$",
+          "codeSnippet": "function calcultotal ()\n{ let s=0;\n  for (let i=1; i<=4; i++)\n    { idnote=\"serv\"+i;\n      s=s+parseInt(document.getElementById(idnote).value);\n    }\n  document.getElementById (\"total\").innerHTML=String(s) +\"/20\";\n}",
+          "language": "javascript",
+          "explanation": "Une constante ne peut pas être incrémentée : erreur à i++."
+        },
+        {
+          "id": "B3-C-3",
+          "prompt": "Partie B, exercice 3, 1.c) Le script de la fonction calcultotal est correct : le troisième script (sans let s=0). (V ou F)",
+          "points": 0.125,
+          "type": "code_analysis",
+          "expectedAnswer": "F",
+          "expectedRegex": "^(F|Faux)$",
+          "codeSnippet": "function calcultotal ()\n{ let s=0;\n  for (let i=1; i<=4; i++)\n    { idnote=\"serv\"+i;\n      s=s+parseInt(document.getElementById(idnote).value);\n    }\n  document.getElementById (\"total\").innerHTML=String(s) +\"/20\";\n}",
+          "language": "javascript",
+          "explanation": "La variable s n'est pas initialisée : erreur à s=s+..."
+        },
+        {
+          "id": "B3-C-4",
+          "prompt": "Partie B, exercice 3, 1.c) Le script de la fonction calcultotal est correct : le quatrième script (const idnote dans la boucle ; Number). (V ou F)",
+          "points": 0.125,
+          "type": "code_analysis",
+          "expectedAnswer": "V",
+          "expectedRegex": "^(V|Vrai)$",
+          "codeSnippet": "function calcultotal ()\n{ let s=0;\n  for (let i=1; i<=4; i++)\n    { idnote=\"serv\"+i;\n      s=s+parseInt(document.getElementById(idnote).value);\n    }\n  document.getElementById (\"total\").innerHTML=String(s) +\"/20\";\n}",
+          "language": "javascript",
+          "explanation": "Script valide : idnote est une constante recréée à chaque tour."
+        },
+        {
+          "id": "B3-ROLE",
+          "prompt": "Partie B, exercice 3, question 2 : d'après le code de la fonction inconnue et le code HTML de la Fig. 2, donnez le rôle de cette fonction.",
+          "points": 0.5,
+          "type": "code_analysis",
+          "codeSnippet": "function inconnue ()\n{\n  for (i=1; i<=4; i++)\n    {\n      idimage=\"imgser\"+i;\n      document.getElementById (idimage).src='0.png';\n      idnote=\"serv\"+i;\n      document.getElementById (idnote).value=0;\n    }\n}",
+          "language": "javascript",
+          "expectedKeywords": ["initialis|r[ée]initialis|remet|mett?", "0", "image|curseur|note"],
+          "explanation": "Appelée au chargement de la page (onload), elle initialise les quatre images de notes à 0.png et les quatre curseurs à 0."
+        }
+      ]
+    },
+    {
+      "id": "b-ex4-php",
+      "title": "Partie B, exercice 4 : Analyse du code PHP (2 pts)",
+      "type": "qcm",
+      "description": "D'après Evaluation.php (Fig. 3) et EvaluationManif.html (Fig. 2), cochez l'unique proposition correcte.",
+      "points": 2.0,
+      "questions": [
+        {
+          "id": "B4-Q1",
+          "question": "Question 1) Après la ligne 2 du code PHP (clic sur Valider avec « Séminaire des médecins » sélectionné), la variable $manif contient :",
+          "options": [
+            {
+              "id": "opt-nom",
+              "label": "Séminaire des médecins"
+            },
+            {
+              "id": "opt-code",
+              "label": "M0003"
+            },
+            {
+              "id": "opt-champ",
+              "label": "manif"
+            }
+          ],
+          "points": 0.25,
+          "multiple": false,
+          "correctAnswers": ["opt-code"],
+          "explanation": "$_POST[\"manif\"] reçoit l'attribut value de l'option sélectionnée : M0003.",
+          "codeSnippet": "1  <?php\n2  $manif=$_POST[\"manif\"];\n3  $note=array($_POST[\"serv1\"], $_POST[\"serv2\"], $_POST[\"serv3\"], $_POST[\"serv4\"]);\n4  $tot=$_POST[\"total\"];\n5  echo \"Le total des notes attribuées est $tot / 20 <br>\" ;\n6  $datejour=date('Y-m-d') ;\n7  $con=mysqli_connect(\"localhost\",\"root\",\"\", \"Gestion_Exposition\") or die (\"Erreur B.D.\");\n8  $reqSelect=\"select DateOuv , DateFer from manifestation where (CodeManif ='$manif') \";\n9  $resSelect=mysqli_query ($con, $reqSelect) or die (\"La requête est erronée.\");\n10 if ($enreg=mysqli_fetch_array($resSelect))\n11 {\n12   $date1=$enreg[0];\n13   $date2=$enreg[1];\n14   if ($date1>$datejour)\n15      { echo \"La manifestation sélectionnée n'a pas encore commencé.\"; }\n16   else\n17   if ($date2<$datejour)\n18      { echo \"La manifestation sélectionnée est déjà clôturée.\"; }\n19   else\n20   {\n21      $reqInsert=\"insert into evaluation (dateEval, noteAccueil, noteConfort , noteSignal, noteLogistique,\n22      codeManif) values ('$datejour', $note[0], $note[1], $note[2], $note[3], '$manif')\";\n23      $resInsert=mysqli_query($con,$reqInsert) ;\n24      if ($resInsert)\n25         { echo \"L'évaluation est enregistrée avec succès.\"; }\n26      else\n27         { echo \"Echec d'insertion\" . mysqli_error($con); }\n28   }\n29 }\n30 else\n31   echo \"La manifestation n'existe pas !\";\n32 mysqli_close($con) ;\n33 ?>"
+        },
+        {
+          "id": "B4-Q2",
+          "question": "Question 2) Après la ligne 5, le navigateur affiche :",
+          "options": [
+            {
+              "id": "opt-10",
+              "label": "Le total des notes attribuées est 10 / 20"
+            },
+            {
+              "id": "opt-05",
+              "label": "Le total des notes attribuées est 0.5"
+            },
+            {
+              "id": "opt-erreur",
+              "label": "Un message d'erreur relatif au champ « total » et le message : « Le total des notes attribuées est / 20 »"
+            }
+          ],
+          "points": 0.25,
+          "multiple": false,
+          "correctAnswers": ["opt-erreur"],
+          "explanation": "total est un <span>, non un champ de formulaire : $_POST[\"total\"] n'existe pas, d'où l'erreur et un total vide.",
+          "codeSnippet": "1  <?php\n2  $manif=$_POST[\"manif\"];\n3  $note=array($_POST[\"serv1\"], $_POST[\"serv2\"], $_POST[\"serv3\"], $_POST[\"serv4\"]);\n4  $tot=$_POST[\"total\"];\n5  echo \"Le total des notes attribuées est $tot / 20 <br>\" ;\n6  $datejour=date('Y-m-d') ;\n7  $con=mysqli_connect(\"localhost\",\"root\",\"\", \"Gestion_Exposition\") or die (\"Erreur B.D.\");\n8  $reqSelect=\"select DateOuv , DateFer from manifestation where (CodeManif ='$manif') \";\n9  $resSelect=mysqli_query ($con, $reqSelect) or die (\"La requête est erronée.\");\n10 if ($enreg=mysqli_fetch_array($resSelect))\n11 {\n12   $date1=$enreg[0];\n13   $date2=$enreg[1];\n14   if ($date1>$datejour)\n15      { echo \"La manifestation sélectionnée n'a pas encore commencé.\"; }\n16   else\n17   if ($date2<$datejour)\n18      { echo \"La manifestation sélectionnée est déjà clôturée.\"; }\n19   else\n20   {\n21      $reqInsert=\"insert into evaluation (dateEval, noteAccueil, noteConfort , noteSignal, noteLogistique,\n22      codeManif) values ('$datejour', $note[0], $note[1], $note[2], $note[3], '$manif')\";\n23      $resInsert=mysqli_query($con,$reqInsert) ;\n24      if ($resInsert)\n25         { echo \"L'évaluation est enregistrée avec succès.\"; }\n26      else\n27         { echo \"Echec d'insertion\" . mysqli_error($con); }\n28   }\n29 }\n30 else\n31   echo \"La manifestation n'existe pas !\";\n32 mysqli_close($con) ;\n33 ?>"
+        },
+        {
+          "id": "B4-Q3",
+          "question": "Question 3) L'instruction de la ligne 3 permet de :",
+          "options": [
+            {
+              "id": "opt-copie",
+              "label": "copier tous les éléments du tableau associatif $_POST dans le tableau nommé $note"
+            },
+            {
+              "id": "opt-indexe",
+              "label": "créer un tableau indexé nommé $note contenant les notes récupérées à partir du formulaire"
+            },
+            {
+              "id": "opt-assoc",
+              "label": "créer un tableau associatif nommé $note contenant les notes récupérées à partir du formulaire"
+            }
+          ],
+          "points": 0.25,
+          "multiple": false,
+          "correctAnswers": ["opt-indexe"],
+          "explanation": "array(...) sans clés crée un tableau indexé : $note[0] à $note[3].",
+          "codeSnippet": "1  <?php\n2  $manif=$_POST[\"manif\"];\n3  $note=array($_POST[\"serv1\"], $_POST[\"serv2\"], $_POST[\"serv3\"], $_POST[\"serv4\"]);\n4  $tot=$_POST[\"total\"];\n5  echo \"Le total des notes attribuées est $tot / 20 <br>\" ;\n6  $datejour=date('Y-m-d') ;\n7  $con=mysqli_connect(\"localhost\",\"root\",\"\", \"Gestion_Exposition\") or die (\"Erreur B.D.\");\n8  $reqSelect=\"select DateOuv , DateFer from manifestation where (CodeManif ='$manif') \";\n9  $resSelect=mysqli_query ($con, $reqSelect) or die (\"La requête est erronée.\");\n10 if ($enreg=mysqli_fetch_array($resSelect))\n11 {\n12   $date1=$enreg[0];\n13   $date2=$enreg[1];\n14   if ($date1>$datejour)\n15      { echo \"La manifestation sélectionnée n'a pas encore commencé.\"; }\n16   else\n17   if ($date2<$datejour)\n18      { echo \"La manifestation sélectionnée est déjà clôturée.\"; }\n19   else\n20   {\n21      $reqInsert=\"insert into evaluation (dateEval, noteAccueil, noteConfort , noteSignal, noteLogistique,\n22      codeManif) values ('$datejour', $note[0], $note[1], $note[2], $note[3], '$manif')\";\n23      $resInsert=mysqli_query($con,$reqInsert) ;\n24      if ($resInsert)\n25         { echo \"L'évaluation est enregistrée avec succès.\"; }\n26      else\n27         { echo \"Echec d'insertion\" . mysqli_error($con); }\n28   }\n29 }\n30 else\n31   echo \"La manifestation n'existe pas !\";\n32 mysqli_close($con) ;\n33 ?>"
+        },
+        {
+          "id": "B4-Q4",
+          "question": "Question 4) Si la date du jour est le 10 juin 2025, la variable $datejour de la ligne 6 contient :",
+          "options": [
+            {
+              "id": "opt-iso",
+              "label": "2025-06-10"
+            },
+            {
+              "id": "opt-mdy",
+              "label": "06-10-2025"
+            },
+            {
+              "id": "opt-dmy",
+              "label": "10-06-2025"
+            }
+          ],
+          "points": 0.25,
+          "multiple": false,
+          "correctAnswers": ["opt-iso"],
+          "explanation": "date('Y-m-d') donne année-mois-jour : 2025-06-10.",
+          "codeSnippet": "1  <?php\n2  $manif=$_POST[\"manif\"];\n3  $note=array($_POST[\"serv1\"], $_POST[\"serv2\"], $_POST[\"serv3\"], $_POST[\"serv4\"]);\n4  $tot=$_POST[\"total\"];\n5  echo \"Le total des notes attribuées est $tot / 20 <br>\" ;\n6  $datejour=date('Y-m-d') ;\n7  $con=mysqli_connect(\"localhost\",\"root\",\"\", \"Gestion_Exposition\") or die (\"Erreur B.D.\");\n8  $reqSelect=\"select DateOuv , DateFer from manifestation where (CodeManif ='$manif') \";\n9  $resSelect=mysqli_query ($con, $reqSelect) or die (\"La requête est erronée.\");\n10 if ($enreg=mysqli_fetch_array($resSelect))\n11 {\n12   $date1=$enreg[0];\n13   $date2=$enreg[1];\n14   if ($date1>$datejour)\n15      { echo \"La manifestation sélectionnée n'a pas encore commencé.\"; }\n16   else\n17   if ($date2<$datejour)\n18      { echo \"La manifestation sélectionnée est déjà clôturée.\"; }\n19   else\n20   {\n21      $reqInsert=\"insert into evaluation (dateEval, noteAccueil, noteConfort , noteSignal, noteLogistique,\n22      codeManif) values ('$datejour', $note[0], $note[1], $note[2], $note[3], '$manif')\";\n23      $resInsert=mysqli_query($con,$reqInsert) ;\n24      if ($resInsert)\n25         { echo \"L'évaluation est enregistrée avec succès.\"; }\n26      else\n27         { echo \"Echec d'insertion\" . mysqli_error($con); }\n28   }\n29 }\n30 else\n31   echo \"La manifestation n'existe pas !\";\n32 mysqli_close($con) ;\n33 ?>"
+        },
+        {
+          "id": "B4-Q5",
+          "question": "Question 5) L'instruction de la ligne 7 peut être remplacée par :",
+          "options": [
+            {
+              "id": "opt-echo",
+              "label": "$con=mysqli_connect(...); if (!$con) { echo \"Erreur B.D.\"; }"
+            },
+            {
+              "id": "opt-isset",
+              "label": "$con=mysqli_connect(...); if (!isset($con)) { die (\"Erreur B.D.\"); }"
+            },
+            {
+              "id": "opt-die",
+              "label": "$con=mysqli_connect(...); if (!$con) { die (\"Erreur B.D.\"); }"
+            }
+          ],
+          "points": 0.25,
+          "multiple": false,
+          "correctAnswers": ["opt-die"],
+          "explanation": "or die(...) arrête le script si la connexion échoue : if (!$con) { die(...); } ; echo n'arrête pas le script et $con reste défini même après échec.",
+          "codeSnippet": "1  <?php\n2  $manif=$_POST[\"manif\"];\n3  $note=array($_POST[\"serv1\"], $_POST[\"serv2\"], $_POST[\"serv3\"], $_POST[\"serv4\"]);\n4  $tot=$_POST[\"total\"];\n5  echo \"Le total des notes attribuées est $tot / 20 <br>\" ;\n6  $datejour=date('Y-m-d') ;\n7  $con=mysqli_connect(\"localhost\",\"root\",\"\", \"Gestion_Exposition\") or die (\"Erreur B.D.\");\n8  $reqSelect=\"select DateOuv , DateFer from manifestation where (CodeManif ='$manif') \";\n9  $resSelect=mysqli_query ($con, $reqSelect) or die (\"La requête est erronée.\");\n10 if ($enreg=mysqli_fetch_array($resSelect))\n11 {\n12   $date1=$enreg[0];\n13   $date2=$enreg[1];\n14   if ($date1>$datejour)\n15      { echo \"La manifestation sélectionnée n'a pas encore commencé.\"; }\n16   else\n17   if ($date2<$datejour)\n18      { echo \"La manifestation sélectionnée est déjà clôturée.\"; }\n19   else\n20   {\n21      $reqInsert=\"insert into evaluation (dateEval, noteAccueil, noteConfort , noteSignal, noteLogistique,\n22      codeManif) values ('$datejour', $note[0], $note[1], $note[2], $note[3], '$manif')\";\n23      $resInsert=mysqli_query($con,$reqInsert) ;\n24      if ($resInsert)\n25         { echo \"L'évaluation est enregistrée avec succès.\"; }\n26      else\n27         { echo \"Echec d'insertion\" . mysqli_error($con); }\n28   }\n29 }\n30 else\n31   echo \"La manifestation n'existe pas !\";\n32 mysqli_close($con) ;\n33 ?>"
+        },
+        {
+          "id": "B4-Q6",
+          "question": "Question 6) L'instruction de la ligne 10 peut être remplacée par :",
+          "options": [
+            {
+              "id": "opt-numrows",
+              "label": "if ($enreg=mysqli_num_rows($resInsert))"
+            },
+            {
+              "id": "opt-fetchrow",
+              "label": "if ($enreg=mysqli_fetch_row($resSelect))"
+            },
+            {
+              "id": "opt-fetchrows",
+              "label": "if ($enreg=mysqli_fetch_rows($resSelect))"
+            }
+          ],
+          "points": 0.25,
+          "multiple": false,
+          "correctAnswers": ["opt-fetchrow"],
+          "explanation": "mysqli_fetch_row lit un enregistrement du résultat de la sélection ; mysqli_fetch_rows n'existe pas.",
+          "codeSnippet": "1  <?php\n2  $manif=$_POST[\"manif\"];\n3  $note=array($_POST[\"serv1\"], $_POST[\"serv2\"], $_POST[\"serv3\"], $_POST[\"serv4\"]);\n4  $tot=$_POST[\"total\"];\n5  echo \"Le total des notes attribuées est $tot / 20 <br>\" ;\n6  $datejour=date('Y-m-d') ;\n7  $con=mysqli_connect(\"localhost\",\"root\",\"\", \"Gestion_Exposition\") or die (\"Erreur B.D.\");\n8  $reqSelect=\"select DateOuv , DateFer from manifestation where (CodeManif ='$manif') \";\n9  $resSelect=mysqli_query ($con, $reqSelect) or die (\"La requête est erronée.\");\n10 if ($enreg=mysqli_fetch_array($resSelect))\n11 {\n12   $date1=$enreg[0];\n13   $date2=$enreg[1];\n14   if ($date1>$datejour)\n15      { echo \"La manifestation sélectionnée n'a pas encore commencé.\"; }\n16   else\n17   if ($date2<$datejour)\n18      { echo \"La manifestation sélectionnée est déjà clôturée.\"; }\n19   else\n20   {\n21      $reqInsert=\"insert into evaluation (dateEval, noteAccueil, noteConfort , noteSignal, noteLogistique,\n22      codeManif) values ('$datejour', $note[0], $note[1], $note[2], $note[3], '$manif')\";\n23      $resInsert=mysqli_query($con,$reqInsert) ;\n24      if ($resInsert)\n25         { echo \"L'évaluation est enregistrée avec succès.\"; }\n26      else\n27         { echo \"Echec d'insertion\" . mysqli_error($con); }\n28   }\n29 }\n30 else\n31   echo \"La manifestation n'existe pas !\";\n32 mysqli_close($con) ;\n33 ?>"
+        },
+        {
+          "id": "B4-Q7",
+          "question": "Question 7) L'instruction de la ligne 24 peut être remplacée par :",
+          "options": [
+            {
+              "id": "opt-numrows",
+              "label": "if (mysqli_num_rows($resInsert)!=0)"
+            },
+            {
+              "id": "opt-fetch",
+              "label": "if (mysqli_fetch_row($resInsert))"
+            },
+            {
+              "id": "opt-affected",
+              "label": "if (mysqli_affected_rows($con)!=0)"
+            }
+          ],
+          "points": 0.25,
+          "multiple": false,
+          "correctAnswers": ["opt-affected"],
+          "explanation": "Après un INSERT, mysqli_affected_rows($con) donne le nombre de lignes ajoutées.",
+          "codeSnippet": "1  <?php\n2  $manif=$_POST[\"manif\"];\n3  $note=array($_POST[\"serv1\"], $_POST[\"serv2\"], $_POST[\"serv3\"], $_POST[\"serv4\"]);\n4  $tot=$_POST[\"total\"];\n5  echo \"Le total des notes attribuées est $tot / 20 <br>\" ;\n6  $datejour=date('Y-m-d') ;\n7  $con=mysqli_connect(\"localhost\",\"root\",\"\", \"Gestion_Exposition\") or die (\"Erreur B.D.\");\n8  $reqSelect=\"select DateOuv , DateFer from manifestation where (CodeManif ='$manif') \";\n9  $resSelect=mysqli_query ($con, $reqSelect) or die (\"La requête est erronée.\");\n10 if ($enreg=mysqli_fetch_array($resSelect))\n11 {\n12   $date1=$enreg[0];\n13   $date2=$enreg[1];\n14   if ($date1>$datejour)\n15      { echo \"La manifestation sélectionnée n'a pas encore commencé.\"; }\n16   else\n17   if ($date2<$datejour)\n18      { echo \"La manifestation sélectionnée est déjà clôturée.\"; }\n19   else\n20   {\n21      $reqInsert=\"insert into evaluation (dateEval, noteAccueil, noteConfort , noteSignal, noteLogistique,\n22      codeManif) values ('$datejour', $note[0], $note[1], $note[2], $note[3], '$manif')\";\n23      $resInsert=mysqli_query($con,$reqInsert) ;\n24      if ($resInsert)\n25         { echo \"L'évaluation est enregistrée avec succès.\"; }\n26      else\n27         { echo \"Echec d'insertion\" . mysqli_error($con); }\n28   }\n29 }\n30 else\n31   echo \"La manifestation n'existe pas !\";\n32 mysqli_close($con) ;\n33 ?>"
+        },
+        {
+          "id": "B4-Q8",
+          "question": "Question 8) La fonction mysqli_error($con) de la ligne 27 retourne, en cas d'erreur générée par la dernière requête SQL exécutée :",
+          "options": [
+            {
+              "id": "opt-chaine",
+              "label": "une chaîne contenant le message d'erreur"
+            },
+            {
+              "id": "opt-tableau",
+              "label": "un tableau contenant la liste des erreurs"
+            },
+            {
+              "id": "opt-entier",
+              "label": "un entier contenant le code de l'erreur"
+            }
+          ],
+          "points": 0.25,
+          "multiple": false,
+          "correctAnswers": ["opt-chaine"],
+          "explanation": "mysqli_error renvoie le message ; mysqli_errno renvoie le code.",
+          "codeSnippet": "1  <?php\n2  $manif=$_POST[\"manif\"];\n3  $note=array($_POST[\"serv1\"], $_POST[\"serv2\"], $_POST[\"serv3\"], $_POST[\"serv4\"]);\n4  $tot=$_POST[\"total\"];\n5  echo \"Le total des notes attribuées est $tot / 20 <br>\" ;\n6  $datejour=date('Y-m-d') ;\n7  $con=mysqli_connect(\"localhost\",\"root\",\"\", \"Gestion_Exposition\") or die (\"Erreur B.D.\");\n8  $reqSelect=\"select DateOuv , DateFer from manifestation where (CodeManif ='$manif') \";\n9  $resSelect=mysqli_query ($con, $reqSelect) or die (\"La requête est erronée.\");\n10 if ($enreg=mysqli_fetch_array($resSelect))\n11 {\n12   $date1=$enreg[0];\n13   $date2=$enreg[1];\n14   if ($date1>$datejour)\n15      { echo \"La manifestation sélectionnée n'a pas encore commencé.\"; }\n16   else\n17   if ($date2<$datejour)\n18      { echo \"La manifestation sélectionnée est déjà clôturée.\"; }\n19   else\n20   {\n21      $reqInsert=\"insert into evaluation (dateEval, noteAccueil, noteConfort , noteSignal, noteLogistique,\n22      codeManif) values ('$datejour', $note[0], $note[1], $note[2], $note[3], '$manif')\";\n23      $resInsert=mysqli_query($con,$reqInsert) ;\n24      if ($resInsert)\n25         { echo \"L'évaluation est enregistrée avec succès.\"; }\n26      else\n27         { echo \"Echec d'insertion\" . mysqli_error($con); }\n28   }\n29 }\n30 else\n31   echo \"La manifestation n'existe pas !\";\n32 mysqli_close($con) ;\n33 ?>"
+        }
+      ]
+    }
+  ]
+}
