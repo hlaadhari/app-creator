@@ -90,6 +90,18 @@ export function PreviewSandbox({ files, className = "" }: PreviewSandboxProps) {
       });
     } catch(e) {}
 
+    // Pas de boîte « quitter la page » dans l'aperçu (bloquée sans geste utilisateur, #196)
+    try {
+      Object.defineProperty(window, 'onbeforeunload', {
+        get: function() { return null; }, set: function() {}, configurable: false
+      });
+      var __ael = window.addEventListener;
+      window.addEventListener = function(t) {
+        if (t === 'beforeunload' || t === 'unload') return;
+        return __ael.apply(this, arguments);
+      };
+    } catch(e) {}
+
     // Blocage absolu des requêtes réseau sortantes (T-11)
     window.fetch = function() {
       console.warn("[Sandbox Labo STI] Appel fetch bloqué par sécurité.");
