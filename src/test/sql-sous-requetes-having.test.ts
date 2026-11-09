@@ -128,6 +128,31 @@ describe("Moteur SQL : HAVING avec agrégat, sous-requêtes et auto-incrément (
     });
   });
 
+  describe("DATEDIFF et conditions non prises en charge", () => {
+    function moteurManif(): RelationalDatabaseEngine {
+      const e = new RelationalDatabaseEngine();
+      const res = e.executeScript(
+        "CREATE TABLE manif (id INT PRIMARY KEY, ouv DATE, fer DATE); INSERT INTO manif VALUES (1, '2025-03-10', '2025-03-22'), (2, '2025-04-02', '2025-04-05'), (3, '2025-05-14', '2025-05-16');",
+      );
+      expect(res.success).toBe(true);
+      return e;
+    }
+
+    it("DATEDIFF(date1, date2) compte les jours et filtre réellement", () => {
+      const e = moteurManif();
+      expect(
+        e.query("SELECT id FROM manif WHERE DATEDIFF(fer, ouv) < 5").rows.map((r) => r["id"]),
+      ).toEqual([2, 3]);
+      expect(e.query("SELECT id FROM manif WHERE DATEDIFF(fer, ouv) >= 12").rows).toHaveLength(1);
+    });
+
+    it("une condition non reconnue produit une erreur au lieu d'être ignorée", () => {
+      const res = moteurManif().query("SELECT id FROM manif WHERE LENGTH(ouv) > 3");
+      expect(res.error).toBeDefined();
+      expect(res.rows).toHaveLength(0);
+    });
+  });
+
   describe("Clé auto-incrémentée", () => {
     it("génère la valeur quand l'INSERT fournit NULL, comme MySQL", () => {
       const e = moteur();
