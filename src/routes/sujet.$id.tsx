@@ -453,8 +453,8 @@ function WorkspaceView({ ex }: { ex: Exercise }) {
   return (
     <div className="flex h-screen flex-col bg-background text-foreground font-sans overflow-hidden">
       {/* Header Principal */}
-      <header className="flex h-11 items-center justify-between border-b bg-panel px-4 text-xs font-mono select-none shrink-0">
-        <div className="flex items-center gap-2">
+      <header className="flex h-11 items-center justify-between gap-3 border-b bg-panel px-4 text-xs font-mono select-none shrink-0">
+        <div className="flex min-w-0 items-center gap-2">
           <Link to="/" className="flex items-center gap-2 hover:opacity-85 transition-opacity">
             <SproutLogo size="sm" showText={false} />
             <span className="font-semibold text-xs tracking-tight">Labo STI</span>
@@ -462,7 +462,7 @@ function WorkspaceView({ ex }: { ex: Exercise }) {
           <span className="text-muted-foreground/60">/</span>
           <span className="text-muted-foreground">Sujets</span>
           <span className="text-muted-foreground/60">/</span>
-          <h1 className="font-medium text-foreground truncate max-w-[200px] sm:max-w-none text-xs inline">
+          <h1 className="font-medium text-foreground truncate max-w-[120px] sm:max-w-[260px] lg:max-w-none text-xs inline">
             {ex.title}
           </h1>
           <span className="rounded bg-primary/10 border border-primary/20 px-1.5 py-0.5 text-[10px] text-primary hidden md:inline">
@@ -491,7 +491,7 @@ function WorkspaceView({ ex }: { ex: Exercise }) {
           )}
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex min-w-0 shrink items-center gap-2 overflow-x-auto no-scrollbar">
           {baremeRepartition && (
             <BaremeRepartitionBadge
               repartition={baremeRepartition}

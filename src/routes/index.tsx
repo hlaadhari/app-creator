@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { ProgressionModal } from "@/components/competences/ProgressionModal";
 import { getLocalAttempts } from "@/lib/pedagogy/attempts-service";
 import { getExercise } from "@/lib/exercises";
+import { getAllWrittenExams } from "@/lib/content/written-subjects";
 import { load as loadProgress } from "@/lib/progress";
 import {
   getDernierTravailEnCours,
@@ -80,6 +81,14 @@ function Index() {
   const [mesClasses, setMesClasses] = useState<ClassInfo[]>([]);
   const [showGuide, setShowGuide] = useState(false);
   const [dernierTravail, setDernierTravail] = useState<DernierTravailEnCours | null>(null);
+
+  const epreuvesEcrites = useMemo(
+    () =>
+      [...getAllWrittenExams()].sort(
+        (a, b) => (b.year ?? 0) - (a.year ?? 0) || a.title.localeCompare(b.title),
+      ),
+    [],
+  );
 
   const repartitionMap = useMemo(() => {
     const map: Record<string, BaremeRepartition> = {};
@@ -578,6 +587,38 @@ function Index() {
             ))}
           </div>
         </div>
+
+        {/* Épreuves écrites : découvrabilité depuis l'accueil (#191) */}
+        <section className="mt-10" aria-labelledby="epreuves-ecrites-titre">
+          <h2
+            id="epreuves-ecrites-titre"
+            className="mb-4 text-xs font-mono uppercase tracking-wider text-muted-foreground"
+          >
+            Épreuves écrites ({epreuvesEcrites.length})
+          </h2>
+          <div className="grid gap-3 sm:grid-cols-2">
+            {epreuvesEcrites.map((m) => (
+              <Link
+                key={m.id}
+                to="/examen-ecrit/$id"
+                params={{ id: m.id }}
+                className="group flex flex-col gap-1 rounded-lg border bg-card p-4 transition-all hover:border-primary hover:shadow-xs"
+              >
+                <span className="text-sm font-medium text-foreground group-hover:text-primary">
+                  {m.title}
+                </span>
+                <span className="flex items-center gap-3 text-[11px] font-mono text-muted-foreground">
+                  <span>{m.year}</span>
+                  <span className="flex items-center gap-1">
+                    <Clock className="h-3 w-3" />
+                    {m.duration} min
+                  </span>
+                  <span>{m.bareme_total} pts</span>
+                </span>
+              </Link>
+            ))}
+          </div>
+        </section>
       </main>
 
       <OnboardingGuide forceOpen={showGuide} onClose={() => setShowGuide(false)} />

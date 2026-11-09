@@ -24,6 +24,7 @@ export function MonacoEditorPane({
   onCursorChange,
 }: MonacoEditorPaneProps) {
   const [isMounted, setIsMounted] = useState(false);
+  const [loadTimedOut, setLoadTimedOut] = useState(false);
   const editorRef = useRef<unknown>(null);
 
   useEffect(() => {
@@ -31,8 +32,14 @@ export function MonacoEditorPane({
     void ensureMonacoConfigured().finally(() => {
       if (active) setIsMounted(true);
     });
+    // Repli : si Monaco tarde trop (réseau lent), on propose un champ texte simple
+    // pour ne jamais bloquer l'élève devant un écran de chargement (#191).
+    const timer = setTimeout(() => {
+      if (active) setLoadTimedOut(true);
+    }, 8000);
     return () => {
       active = false;
+      clearTimeout(timer);
     };
   }, []);
 
@@ -74,13 +81,43 @@ export function MonacoEditorPane({
     }
   };
 
+  if (!isMounted && loadTimedOut) {
+    return (
+      <div className="flex flex-1 flex-col bg-editor min-h-0 h-full w-full">
+        <p className="px-3 py-1.5 text-[11px] font-mono text-amber-500 border-b" role="status">
+          L'éditeur avancé tarde à charger : saisie en mode texte simple (votre travail est
+          conservé).
+        </p>
+        <textarea
+          aria-label="Éditeur de code (mode texte simple)"
+          className="flex-1 min-h-0 w-full resize-none bg-transparent p-3 font-mono text-[13px] text-foreground outline-none"
+          value={value}
+          readOnly={readOnly}
+          spellCheck={false}
+          onChange={(e) => onChange(e.target.value)}
+        />
+      </div>
+    );
+  }
+
   if (!isMounted) {
     return (
-      <div className="flex flex-1 flex-col items-center justify-center bg-editor p-8 text-muted-foreground font-mono text-xs">
+      <div
+        className="flex flex-1 flex-col gap-2 bg-editor p-4 text-muted-foreground font-mono text-xs"
+        role="status"
+        aria-live="polite"
+      >
         <div className="flex items-center gap-2">
           <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent" />
           <span>Chargement de l'éditeur Monaco...</span>
         </div>
+        {[70, 45, 85, 30, 60].map((w, i) => (
+          <div
+            key={i}
+            className="h-3 animate-pulse rounded bg-muted/40"
+            style={{ width: `${w}%` }}
+          />
+        ))}
       </div>
     );
   }
