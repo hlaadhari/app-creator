@@ -13,6 +13,15 @@ export interface ExamCountdownBannerProps {
   className?: string;
 }
 
+const COMPTE_A_REBOURS_INITIAL: ExamCountdownState = {
+  remainingMs: 0,
+  remainingSeconds: 0,
+  formatted: "--:--",
+  isExpired: false,
+  isCritical: false,
+  isWarning: false,
+};
+
 export function ExamCountdownBanner({
   echeance,
   titre = "Épreuve Pratique du Baccalauréat STI",
@@ -21,9 +30,9 @@ export function ExamCountdownBanner({
   onExpired,
   className = "",
 }: ExamCountdownBannerProps) {
-  const [countdown, setCountdown] = useState<ExamCountdownState>(() =>
-    calculerCompteARebours(echeance, getTempsServeurSynchronise()),
-  );
+  // Premier rendu identique côté serveur et navigateur (#196, erreur React #418) : le temps restant
+  // dépend de l'horloge courante, il n'est donc calculé qu'après l'hydratation, dans l'effet.
+  const [countdown, setCountdown] = useState<ExamCountdownState>(COMPTE_A_REBOURS_INITIAL);
 
   const isVoluntarySubmit = isLocked && motifCloture === "remise_volontaire";
   const isTimeExpired = countdown.isExpired || (isLocked && motifCloture !== "remise_volontaire");
@@ -31,14 +40,16 @@ export function ExamCountdownBanner({
   useEffect(() => {
     if (isLocked) return;
 
-    const interval = setInterval(() => {
+    const tick = () => {
       const current = calculerCompteARebours(echeance, getTempsServeurSynchronise());
       setCountdown(current);
 
       if (current.isExpired && onExpired) {
         onExpired();
       }
-    }, 1000);
+    };
+    tick();
+    const interval = setInterval(tick, 1000);
 
     return () => clearInterval(interval);
   }, [echeance, isLocked, onExpired]);
