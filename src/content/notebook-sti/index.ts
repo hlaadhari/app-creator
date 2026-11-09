@@ -1058,6 +1058,60 @@ export const NOTEBOOK_FLASHCARDS: NotebookFlashcard[] = [
       "WHERE filtre les lignes individuelles AVANT le regroupement GROUP BY (et ne peut pas contenir de fonction d'agrégation). HAVING filtre les groupes APRÈS GROUP BY (ex: HAVING COUNT(*) > 2).",
     codeExample: `SELECT codecat, COUNT(*) FROM habit WHERE disponible='O' GROUP BY codecat HAVING COUNT(*) >= 2;`,
   },
+  {
+    id: "fc-sql-04",
+    moduleId: "sql",
+    tag: "Modélisation & Cardinalités",
+    difficulty: "Essentiel",
+    question:
+      "Comment traduit-on une association de cardinalités 1,N (un élève appartient à une section, une section a plusieurs élèves) dans le schéma relationnel ?",
+    answer:
+      "La clé primaire du côté « 1 » (section) migre comme clé étrangère dans la table du côté « N » (élève). Aucune table supplémentaire n'est créée.",
+    codeExample: `eleve(cin, nom, #code_sec)`,
+  },
+  {
+    id: "fc-sql-05",
+    moduleId: "sql",
+    tag: "Modélisation & N:M",
+    difficulty: "Piège Bac",
+    question:
+      "Que devient une association N:M (un client loue plusieurs habits, un habit est loué par plusieurs clients) ?",
+    answer:
+      "Elle devient une table à part. Sa clé primaire est composée des clés étrangères des deux tables associées (souvent complétée par la date), avec les attributs propres de l'association.",
+    codeExample: `location(#num_cli, #num_hab, date_loc, duree)`,
+  },
+  {
+    id: "fc-sql-06",
+    moduleId: "sql",
+    tag: "Sous-requêtes",
+    difficulty: "Avancé",
+    question:
+      "Comment sélectionner les élèves dont la section appartient à un ensemble calculé par une autre requête ?",
+    answer:
+      "On utilise IN avec une sous-requête entre parenthèses : la requête interne renvoie la liste des valeurs, la requête externe filtre dessus.",
+    codeExample: `SELECT nom FROM eleve WHERE code_sec IN (SELECT code_sec FROM section WHERE libelle_sec LIKE '%Info%');`,
+  },
+  {
+    id: "fc-sql-07",
+    moduleId: "sql",
+    tag: "LIKE & jointures externes",
+    difficulty: "Piège Bac",
+    question:
+      "Quels sont les deux jokers de LIKE, et à quoi sert LEFT JOIN par rapport à INNER JOIN ?",
+    answer:
+      "% remplace n caractères (0 ou plus), _ remplace exactement un caractère. LEFT JOIN conserve toutes les lignes de la table de gauche même sans correspondance (NULL à droite), alors qu'INNER JOIN ne garde que les lignes appariées.",
+    codeExample: `SELECT s.libelle_sec, COUNT(e.cin) FROM section s LEFT JOIN eleve e ON e.code_sec = s.code_sec GROUP BY s.code_sec, s.libelle_sec;`,
+  },
+  {
+    id: "fc-sql-08",
+    moduleId: "sql",
+    tag: "Pourcentage",
+    difficulty: "Avancé",
+    question: "Comment calculer en SQL le pourcentage d'élèves ayant une moyenne d'au moins 10 ?",
+    answer:
+      "On rapporte le nombre d'élèves concernés au total : 100 * SUM(moyenne >= 10) / COUNT(*). La condition booléenne vaut 1 ou 0 en MySQL, donc SUM la compte.",
+    codeExample: `SELECT ROUND(100 * SUM(moyenne >= 10) / COUNT(*), 1) FROM eleve;`,
+  },
 
   // Annales
   {
@@ -1310,6 +1364,63 @@ export const NOTEBOOK_QUIZZES: Record<NotebookCategoryId, NotebookQuizQuestion[]
       explanation:
         "WHERE filtre d'abord les habits disponibles (disponible='O'), GROUP BY regroupe par codecat, et HAVING filtre les groupes sur l'agrégat COUNT(*) >= 3.",
       notebookSource: "Carnet STI-BAC INFO • Agrégations & Groupements (Source #229)",
+    },
+    {
+      id: "qz-sql-4",
+      moduleId: "sql",
+      question:
+        "Dans un schéma relationnel, que devient une association N:M entre client et habit ?",
+      options: [
+        "Une clé étrangère ajoutée dans client",
+        "Une clé étrangère ajoutée dans habit",
+        "Une table à part dont la clé primaire est composée des deux clés étrangères",
+        "Une contrainte CHECK sur la table client",
+      ],
+      correctIndex: 2,
+      explanation:
+        "Une association N:M se traduit toujours par une table dédiée, dont la clé primaire regroupe les clés étrangères des deux tables associées.",
+      notebookSource: "Cours BDR & SQL • Modélisation et requêtes avancées",
+    },
+    {
+      id: "qz-sql-5",
+      moduleId: "sql",
+      question:
+        "Quelle requête affiche les élèves des sections dont le libellé contient « Info » ?",
+      options: [
+        "SELECT nom FROM eleve WHERE code_sec IN (SELECT code_sec FROM section WHERE libelle_sec LIKE '%Info%');",
+        "SELECT nom FROM eleve WHERE code_sec = (SELECT libelle_sec FROM section LIKE '%Info%');",
+        "SELECT nom FROM eleve HAVING libelle_sec LIKE '%Info%';",
+        "SELECT nom FROM eleve WHERE libelle_sec IN 'Info';",
+      ],
+      correctIndex: 0,
+      explanation:
+        "La sous-requête renvoie les codes des sections correspondantes ; IN filtre les élèves sur cet ensemble, et % remplace n caractères dans LIKE.",
+      notebookSource: "Cours BDR & SQL • Modélisation et requêtes avancées",
+    },
+    {
+      id: "qz-sql-6",
+      moduleId: "sql",
+      question: "Quelle jointure affiche toutes les sections, y compris celles sans élève ?",
+      options: ["INNER JOIN", "section LEFT JOIN eleve", "eleve LEFT JOIN section", "CROSS JOIN"],
+      correctIndex: 1,
+      explanation:
+        "Avec section en table de gauche, LEFT JOIN conserve toutes ses lignes ; les sections sans élève apparaissent avec des valeurs NULL côté élève.",
+      notebookSource: "Cours BDR & SQL • Modélisation et requêtes avancées",
+    },
+    {
+      id: "qz-sql-7",
+      moduleId: "sql",
+      question: "Quelle expression donne le pourcentage d'élèves admis (moyenne >= 10) ?",
+      options: [
+        "COUNT(moyenne >= 10) / 100",
+        "100 * SUM(moyenne >= 10) / COUNT(*)",
+        "AVG(moyenne) * 100",
+        "SUM(moyenne) / COUNT(*) * 10",
+      ],
+      correctIndex: 1,
+      explanation:
+        "La condition vaut 1 ou 0 : SUM compte les admis, COUNT(*) donne le total, et on multiplie par 100 pour obtenir un pourcentage.",
+      notebookSource: "Cours BDR & SQL • Modélisation et requêtes avancées",
     },
   ],
   annales: [

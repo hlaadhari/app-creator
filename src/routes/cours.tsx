@@ -72,7 +72,13 @@ const STICKY_MODULES: {
   { id: "annales", label: "Annales Bac", badge: "M6" },
 ];
 
-const QUICK_SEARCH_KEYWORDS = ["mysqli_query", "box-model", "onsubmit", "CREATE TABLE"];
+const QUICK_SEARCH_KEYWORDS = [
+  "mysqli_query",
+  "box-model",
+  "onsubmit",
+  "CREATE TABLE",
+  "LEFT JOIN",
+];
 
 function CoursPage() {
   const [viewMode, setViewMode] = useState<"memento" | "manuel" | "annales">("memento");

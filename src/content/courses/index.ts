@@ -109,6 +109,8 @@ export const COURSE_MODULES: CourseModule[] = [
       { id: "sql-ldd", title: "3. Langage de Définition de Données (LDD)" },
       { id: "sql-lmd", title: "4. Langage de Manipulation de Données (LMD)" },
       { id: "sql-lid", title: "5. Langage d'Interrogation de Données (LID / SELECT)" },
+      { id: "sql-modelisation", title: "6. Modélisation & Schéma Relationnel" },
+      { id: "sql-avance", title: "7. Requêtes Avancées (sous-requêtes, LIKE, jointures externes)" },
     ],
   },
 ];
