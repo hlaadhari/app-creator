@@ -39,7 +39,7 @@ const version = (publiee: boolean, numero = 1) => ({
   duree_min: 30,
   enonce_md: "# Menu",
   publiee,
-  criteres: [],
+  criteres: [{ id: "c1", titre: "Titre", points: 1 }],
   indices: [],
   fichiers_depart: { "index.html": "<body></body>" },
   solutions_test: [],

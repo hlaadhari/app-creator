@@ -5,6 +5,7 @@ import {
   BookOpen,
   CheckCircle2,
   FileCode,
+  Copy,
   Lock,
   Plus,
   Save,
@@ -33,6 +34,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { critereDepuisJson } from "@/lib/evaluation/critere-json";
 import { evaluerDansFrame } from "@/lib/evaluation/iframe-evaluation";
+import { erreursAvantEnregistrement } from "@/lib/subjects/studio-validation";
 import { validerBancDidactiqueReel } from "@/lib/subjects/banc-didactique";
 import type { PreValidationReport, ValidationSolution } from "@/lib/subjects/subject-studio";
 import {
@@ -158,6 +160,15 @@ export function SubjectStudioTab() {
 
   const lancerBanc = async () => {
     if (!version) return;
+    if (version.criteres.length === 0) {
+      setReport(null);
+      setMessage({
+        ok: false,
+        texte: "Ajoutez au moins un critère avant de lancer le banc didactique.",
+      });
+      return;
+    }
+    setMessage(null);
     setIsValidating(true);
     try {
       // Même moteur que pour les élèves : scripts exécutés, chaque critère évalué sur sa page.
@@ -177,6 +188,11 @@ export function SubjectStudioTab() {
 
   const enregistrer = async () => {
     if (!version) return;
+    const erreurs = erreursAvantEnregistrement(version, estNouveau);
+    if (erreurs.length > 0) {
+      setMessage({ ok: false, texte: erreurs.join(" ") });
+      return;
+    }
     setEnregistrement(true);
     setMessage(null);
     try {
@@ -236,6 +252,25 @@ export function SubjectStudioTab() {
     } catch (e) {
       setMessage({ ok: false, texte: messageDe(e, "Création de la version impossible.") });
     }
+  };
+
+  // Copie d'un sujet existant vers un NOUVEAU sujet (identifiant à choisir) : l'original reste intact.
+  const dupliquer = () => {
+    if (!version) return;
+    setVersion({
+      ...version,
+      id: "",
+      sujet_id: "",
+      numero: 1,
+      titre: `${version.titre} (copie)`,
+      publiee: false,
+      fichiers_depart: { ...version.fichiers_depart },
+      solutions_test: version.solutions_test.map((s) => ({ ...s, files: { ...s.files } })),
+    });
+    setEstNouveau(true);
+    setModifie(true);
+    setReport(null);
+    setMessage({ ok: true, texte: "Copie créée : choisissez un identifiant puis enregistrez." });
   };
 
   // ---------------------------------------------------------------- Liste des sujets
@@ -400,15 +435,21 @@ export function SubjectStudioTab() {
             </Button>
           </div>
         ) : (
-          <Button
-            size="sm"
-            variant="outline"
-            className="text-xs gap-1.5"
-            onClick={() => void nouvelleVersion()}
-          >
-            <Plus className="w-3.5 h-3.5" />
-            Créer la version {version.numero + 1}
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              size="sm"
+              variant="outline"
+              className="text-xs gap-1.5"
+              onClick={() => void nouvelleVersion()}
+            >
+              <Plus className="w-3.5 h-3.5" />
+              Créer la version {version.numero + 1}
+            </Button>
+            <Button size="sm" variant="ghost" className="text-xs gap-1.5" onClick={dupliquer}>
+              <Copy className="w-3.5 h-3.5" />
+              Dupliquer en nouveau sujet
+            </Button>
+          </div>
         )}
       </div>
 
@@ -651,7 +692,11 @@ export function SubjectStudioTab() {
                       <div className="flex items-center justify-between">
                         <span className="font-medium text-[11px]">{sol.nom}</span>
                         {res ? (
-                          res.success ? (
+                          res.totalCriteres === 0 ? (
+                            <Badge variant="outline" className="text-[10px] text-muted-foreground">
+                              Aucun critère
+                            </Badge>
+                          ) : res.success ? (
                             <Badge className="bg-emerald-500/10 text-emerald-600 border-emerald-500/20 gap-1 text-[10px]">
                               <CheckCircle2 className="w-3 h-3" />
                               Conforme ({res.criteresPasses}/{res.totalCriteres})

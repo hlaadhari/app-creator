@@ -55,11 +55,23 @@ describe("Écran du Studio (issue #92)", () => {
     );
     render(<SubjectStudioTab />);
     fireEvent.click(await screen.findByRole("button", { name: /Nouveau sujet/ }));
+    fireEvent.change(screen.getByLabelText("Identifiant"), { target: { value: "tp-menu-01" } });
     fireEvent.change(screen.getByLabelText("Titre du sujet"), { target: { value: "Menu" } });
     fireEvent.click(screen.getByRole("button", { name: /Enregistrer le brouillon/ }));
 
     expect(await screen.findByText(/déjà utilisé/)).toBeTruthy();
     expect((screen.getByLabelText("Titre du sujet") as HTMLInputElement).value).toBe("Menu");
+  });
+
+  it("refuse l'enregistrement sans identifiant, avec un message clair et sans appel serveur", async () => {
+    studio.enregistrerBrouillon.mockReset();
+    render(<SubjectStudioTab />);
+    fireEvent.click(await screen.findByRole("button", { name: /Nouveau sujet/ }));
+    fireEvent.change(screen.getByLabelText("Titre du sujet"), { target: { value: "Menu" } });
+    fireEvent.click(screen.getByRole("button", { name: /Enregistrer le brouillon/ }));
+
+    expect(await screen.findByText(/identifiant du sujet est obligatoire/)).toBeTruthy();
+    expect(studio.enregistrerBrouillon).not.toHaveBeenCalled();
   });
 
   it("verrouille une version publiée : aucun bouton d'enregistrement", async () => {
