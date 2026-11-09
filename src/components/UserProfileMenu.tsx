@@ -24,6 +24,7 @@ import {
   LayoutGrid,
   Eye,
   Check,
+  Info,
 } from "lucide-react";
 import {
   useAuth,
@@ -274,6 +275,13 @@ export function UserProfileMenu({ onClassesChanged }: UserProfileMenuProps) {
           )}
 
           <DropdownMenuSeparator />
+
+          <DropdownMenuItem asChild className="text-xs gap-2 cursor-pointer">
+            <a href="/a-propos">
+              <Info className="h-3.5 w-3.5 text-muted-foreground" />
+              <span>À propos · droits & auteurs</span>
+            </a>
+          </DropdownMenuItem>
 
           {/* Section 3 : Rafraîchissement & Déconnexion */}
           <DropdownMenuItem
