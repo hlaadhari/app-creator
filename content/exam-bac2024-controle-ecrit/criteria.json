@@ -1,0 +1,202 @@
+[
+  {
+    "id": "EX24C-01",
+    "code": "QCM-01",
+    "titre": "Exercice N°1 : QCM Notions Web & Programmation",
+    "description": "Événements HTML (onfocus), figcaption, transformation CSS skew, text-transform, document.write, checkdate, isset et contraintes de domaine SQL.",
+    "points": 2,
+    "ordre": 1,
+    "fichier": "reponses.sql",
+    "sonde": {
+      "type": "sql_query_result",
+      "query": "SELECT 1;",
+      "expectedRowCount": 1
+    },
+    "fail_message": "Certaines réponses aux questions théoriques de l'Exercice N°1 sont inexactes.",
+    "indices": [
+      "Revoyez les événements onfocus/onblur, la balise <figure>/<figcaption> et la propriété text-transform.",
+      "Distinguez les contraintes de domaine (CHECK, DEFAULT) de la contrainte d'unicité (UNIQUE).",
+      "Extrait : onfocus, figure, skew incline, majuscules/minuscules, document.write, checkdate, isset, UNIQUE."
+    ]
+  },
+  {
+    "id": "EX24C-02",
+    "code": "COLLECTE-MODELE",
+    "titre": "Exercice N°2 (1ère partie) : Interprétation du schéma BD_Collecte",
+    "description": "Clés primaires et étrangères, cardinalités et assertions Vrai/Faux sur le modèle des poubelles intelligentes.",
+    "points": 2.75,
+    "ordre": 2,
+    "fichier": "reponses.sql",
+    "sonde": {
+      "type": "sql_query_result",
+      "query": "SELECT 1;",
+      "expectedRowCount": 1
+    },
+    "fail_message": "Erreurs dans le schéma de BD_Collecte (clés, cardinalités) ou dans les assertions Vrai/Faux.",
+    "indices": [
+      "Une clé étrangère référence la clé primaire d'une autre table : repérez idPoub et idAg dans Collecte.",
+      "Une clé composée (dateCol, idPoub) interdit deux collectes de la même poubelle le même jour.",
+      "Poubelle 1,N Remplissage ; Poubelle 1,N Collecte ; Agent 1,N Collecte."
+    ]
+  },
+  {
+    "id": "EX24C-03",
+    "code": "COLLECTE-EXTENSION",
+    "titre": "Exercice N°2 (2ème partie) : Extension de la base",
+    "description": "Création de la table Rue pour supprimer la redondance et prise en compte des règles de gestion R1 et R2 (Vehicule, Collecte).",
+    "points": 2.25,
+    "ordre": 3,
+    "fichier": "reponses.sql",
+    "sonde": {
+      "type": "sql_query_result",
+      "query": "SELECT 1;",
+      "expectedRowCount": 1
+    },
+    "fail_message": "L'extension du schéma ne respecte pas les règles de gestion ou omet des clés.",
+    "indices": [
+      "Une valeur répétée (nom de rue) devient une table avec une clé primaire, référencée par une clé étrangère.",
+      "R1 : la clé étrangère idAg se place dans Vehicule. R2 : la clé étrangère idVeh se place dans Collecte.",
+      "Collecte ne référence plus directement l'agent : on l'obtient par le véhicule."
+    ]
+  },
+  {
+    "id": "EX24C-04",
+    "code": "WEB-HTML",
+    "titre": "Exercice N°3 (1ère partie, I) : Analyse du code HTML",
+    "description": "DOCTYPE HTML5, rôle de <section>, <summary> dans <details>, onsubmit sans return et regroupement des boutons radio par name.",
+    "points": 1.25,
+    "ordre": 4,
+    "fichier": "reponses.sql",
+    "sonde": {
+      "type": "sql_query_result",
+      "query": "SELECT 1;",
+      "expectedRowCount": 1
+    },
+    "fail_message": "Erreurs d'interprétation du code HTML de la page index.html.",
+    "indices": [
+      "Le doctype HTML5 est <!DOCTYPE html>. Le pied de page est <footer>, la navigation <nav>.",
+      "Sans return, onsubmit ignore la valeur renvoyée par valide().",
+      "Des boutons radio exclusifs partagent le même attribut name."
+    ]
+  },
+  {
+    "id": "EX24C-05",
+    "code": "WEB-CSS",
+    "titre": "Exercice N°3 (1ère partie, II) : Analyse du code CSS",
+    "description": "Types de sélecteurs (classe, identifiant, élément), pseudo-classe :hover, effets de opacity, scale et border-style, règles appliquées à #div1.",
+    "points": 1.75,
+    "ordre": 5,
+    "fichier": "reponses.sql",
+    "sonde": {
+      "type": "sql_query_result",
+      "query": "SELECT 1;",
+      "expectedRowCount": 1
+    },
+    "fail_message": "Erreurs d'analyse des règles de mesStyles.css.",
+    "indices": [
+      "Un sélecteur de classe commence par un point, un sélecteur d'identifiant par #.",
+      ":hover lie la règle à un événement (survol).",
+      "L'élément div1 a la classe zone et l'identifiant div1 : règles 4, 6 et 9."
+    ]
+  },
+  {
+    "id": "EX24C-06",
+    "code": "WEB-JS",
+    "titre": "Exercice N°3 (1ère partie, III) : Analyse du code JavaScript",
+    "description": "charAt/toUpperCase/replace, trim, condition d'appel de formater() et cible de la modification de value.",
+    "points": 2,
+    "ordre": 6,
+    "fichier": "reponses.sql",
+    "sonde": {
+      "type": "sql_query_result",
+      "query": "SELECT 1;",
+      "expectedRowCount": 1
+    },
+    "fail_message": "Erreurs d'analyse de mesControles.js.",
+    "indices": [
+      "replace(charAt(0), charAt(0).toUpperCase()) met la première lettre en majuscule.",
+      "trim() supprime les espaces en début et en fin de chaîne.",
+      "formater() n'est appelée que si le commentaire n'est pas vide."
+    ]
+  },
+  {
+    "id": "EX24C-07",
+    "code": "WEB-PHP",
+    "titre": "Exercice N°3 (1ère partie, IV) : Analyse du code PHP",
+    "description": "Suivi des variables $i, $trouve et $unMot dans la boucle do ... while de la fonction conforme.",
+    "points": 1,
+    "ordre": 7,
+    "fichier": "reponses.sql",
+    "sonde": {
+      "type": "sql_query_result",
+      "query": "SELECT 1;",
+      "expectedRowCount": 1
+    },
+    "fail_message": "Valeurs incorrectes des variables après exécution de la fonction conforme.",
+    "indices": [
+      "do ... while exécute le corps au moins une fois puis teste la condition.",
+      "Cas 1 : aucun mot filtré, la boucle se termine quand $i = 3.",
+      "Cas 2 : « offre » est trouvé au deuxième tour, $i = 2."
+    ]
+  },
+  {
+    "id": "EX24C-08",
+    "code": "SQL-INTERPRETATION",
+    "titre": "Exercice N°3 (2ème partie, I) : Interprétation de la requête R",
+    "description": "Résultat d'une jointure avec GROUP BY et HAVING sur les extraits Chaine et Video, et rôle de la requête.",
+    "points": 1,
+    "ordre": 8,
+    "fichier": "reponses.sql",
+    "sonde": {
+      "type": "sql_query_result",
+      "query": "SELECT 1;",
+      "expectedRowCount": 1
+    },
+    "fail_message": "Le résultat ou le rôle de la requête R est inexact.",
+    "indices": [
+      "Calculez SUM(duree) par chaîne avant d'appliquer HAVING SUM(duree) > 60.",
+      "Une chaîne sans vidéo n'apparaît pas dans une jointure interne.",
+      "Résultat attendu : (PgmAlgo, 70)."
+    ]
+  },
+  {
+    "id": "EX24C-09",
+    "code": "SQL-LID",
+    "titre": "Exercice N°3 (2ème partie, II-A) : Requêtes d'interrogation",
+    "description": "Projection, jointures, MAX, SUM, GROUP BY avec COUNT et ORDER BY, sous-requête avec AVG.",
+    "points": 4,
+    "ordre": 9,
+    "fichier": "reponses.sql",
+    "sonde": {
+      "type": "sql_query_result",
+      "query": "SELECT 1;",
+      "expectedRowCount": 1
+    },
+    "fail_message": "Une ou plusieurs requêtes SELECT ne retournent pas le résultat attendu.",
+    "indices": [
+      "Joignez les tables par leurs clés étrangères (idChaine, emailUtilis, idVideo).",
+      "Pour un total, un maximum ou une moyenne, utilisez SUM, MAX, AVG ; pour compter par groupe, GROUP BY.",
+      "La durée moyenne d'une chaîne se calcule dans une sous-requête : duree > (SELECT AVG(duree) ...)."
+    ]
+  },
+  {
+    "id": "EX24C-10",
+    "code": "SQL-LMD-LDD",
+    "titre": "Exercice N°3 (2ème partie, II-B) : Manipulation des données et de la structure",
+    "description": "INSERT avec clé auto-incrémentée, DELETE, UPDATE avec LIKE et ALTER TABLE ADD.",
+    "points": 2,
+    "ordre": 10,
+    "fichier": "reponses.sql",
+    "sonde": {
+      "type": "sql_query_result",
+      "query": "SELECT 1;",
+      "expectedRowCount": 1
+    },
+    "fail_message": "Une instruction LMD ou LDD est incorrecte ou n'a pas l'effet attendu.",
+    "indices": [
+      "Une clé auto-incrémentée ne se renseigne pas dans l'INSERT : nommez uniquement libelleTag.",
+      "UPDATE ... SET commentaire = '***' WHERE ... LIKE '%la fin du film%'.",
+      "ALTER TABLE Video ADD langue CHAR(2); : CHAR est de longueur fixe."
+    ]
+  }
+]

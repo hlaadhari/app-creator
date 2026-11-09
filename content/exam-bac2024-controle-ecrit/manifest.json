@@ -1,0 +1,693 @@
+{
+  "id": "exam-bac2024-controle-ecrit",
+  "title": "Bac 2024 (Session de Contrôle) - Épreuve Écrite Systèmes & Technologies de l'Informatique",
+  "referentiel_id": "bac-si-tn",
+  "type_sujet": "annale_officielle",
+  "source_reference": "Ministère de l'Éducation — Tunisie (sujet transcrit du PDF « controle_2024 »)",
+  "statut_validation": "valide_pedagogiquement",
+  "session_annee": 2024,
+  "session_libelle": "Session de contrôle",
+  "category": "Module C - Épreuves Écrites",
+  "exam_type": "written",
+  "session_type": "controle",
+  "year": 2024,
+  "duration": 180,
+  "level": "Difficile",
+  "exam_mode": true,
+  "bareme_total": 20,
+  "tags": [
+    "QCM HTML5/CSS3",
+    "BD_Collecte",
+    "StreamVision",
+    "Modélisation relationnelle",
+    "Sous-requêtes",
+    "COUNT, MAX, SUM, AVG",
+    "DOM & Chaînes JavaScript",
+    "Boucle PHP"
+  ],
+  "initialSql": "CREATE TABLE IF NOT EXISTS `Poubelle` ( `idPoub` INT PRIMARY KEY, `nomRue` VARCHAR(50) NOT NULL, `volMax` DECIMAL(6,2) NOT NULL ); CREATE TABLE IF NOT EXISTS `Remplissage` ( `dateRemp` DATETIME NOT NULL, `idPoub` INT NOT NULL, `nivRemp` INT NOT NULL, PRIMARY KEY (`dateRemp`, `idPoub`), FOREIGN KEY (`idPoub`) REFERENCES `Poubelle`(`idPoub`) ON UPDATE CASCADE ON DELETE CASCADE ); CREATE TABLE IF NOT EXISTS `Agent` ( `idAg` INT PRIMARY KEY, `nomAg` VARCHAR(40) NOT NULL, `telAg` CHAR(8) NOT NULL ); CREATE TABLE IF NOT EXISTS `Collecte` ( `dateCol` DATE NOT NULL, `idPoub` INT NOT NULL, `poids` DECIMAL(6,2) NOT NULL, `idAg` INT NOT NULL, PRIMARY KEY (`dateCol`, `idPoub`), FOREIGN KEY (`idPoub`) REFERENCES `Poubelle`(`idPoub`) ON UPDATE CASCADE ON DELETE CASCADE, FOREIGN KEY (`idAg`) REFERENCES `Agent`(`idAg`) ON UPDATE CASCADE ON DELETE CASCADE ); INSERT INTO `Poubelle` VALUES (1, 'Rue de la Liberté', 120.00), (2, 'Avenue Habib Bourguiba', 240.00), (3, 'Rue de la Liberté', 120.00); INSERT INTO `Remplissage` VALUES ('2024-05-02 06:00:00', 1, 35), ('2024-05-02 18:00:00', 1, 88), ('2024-05-02 18:00:00', 2, 64); INSERT INTO `Agent` VALUES (1, 'Mansouri', '20123456'), (2, 'Jlassi', '98765432'); INSERT INTO `Collecte` VALUES ('2024-05-02', 1, 41.50, 1), ('2024-05-02', 2, 77.00, 2), ('2024-05-03', 1, 12.25, 1); CREATE TABLE IF NOT EXISTS `Proprietaire` ( `emailProp` VARCHAR(60) PRIMARY KEY, `nomProp` VARCHAR(40) NOT NULL, `pswProp` VARCHAR(40) NOT NULL ); CREATE TABLE IF NOT EXISTS `Chaine` ( `idChaine` INT PRIMARY KEY, `nomChaine` VARCHAR(40) NOT NULL, `emailProp` VARCHAR(60) NOT NULL, FOREIGN KEY (`emailProp`) REFERENCES `Proprietaire`(`emailProp`) ON UPDATE CASCADE ON DELETE CASCADE ); CREATE TABLE IF NOT EXISTS `Video` ( `idVideo` INT PRIMARY KEY, `titreVideo` VARCHAR(60) NOT NULL, `duree` INT NOT NULL, `taille` DECIMAL(8,2) NOT NULL, `idChaine` INT NOT NULL, FOREIGN KEY (`idChaine`) REFERENCES `Chaine`(`idChaine`) ON UPDATE CASCADE ON DELETE CASCADE ); CREATE TABLE IF NOT EXISTS `Tag` ( `idTag` INT AUTO_INCREMENT PRIMARY KEY, `libelleTag` VARCHAR(30) NOT NULL ); CREATE TABLE IF NOT EXISTS `VideosTag` ( `idVideo` INT NOT NULL, `idTag` INT NOT NULL, PRIMARY KEY (`idVideo`, `idTag`), FOREIGN KEY (`idVideo`) REFERENCES `Video`(`idVideo`) ON UPDATE CASCADE ON DELETE CASCADE, FOREIGN KEY (`idTag`) REFERENCES `Tag`(`idTag`) ON UPDATE CASCADE ON DELETE CASCADE ); CREATE TABLE IF NOT EXISTS `Utilisateur` ( `emailUtilis` VARCHAR(60) PRIMARY KEY, `nomUtilis` VARCHAR(40) NOT NULL, `pswUtilis` VARCHAR(40) NOT NULL ); CREATE TABLE IF NOT EXISTS `Visualisation` ( `idVis` INT PRIMARY KEY, `dateVis` DATETIME NOT NULL, `commentaire` VARCHAR(200), `appreciation` INT NOT NULL, `emailUtilis` VARCHAR(60) NOT NULL, `idVideo` INT NOT NULL, FOREIGN KEY (`emailUtilis`) REFERENCES `Utilisateur`(`emailUtilis`) ON UPDATE CASCADE ON DELETE CASCADE, FOREIGN KEY (`idVideo`) REFERENCES `Video`(`idVideo`) ON UPDATE CASCADE ON DELETE CASCADE ); INSERT INTO `Proprietaire` VALUES ('ppgm@gmail.com', 'Karim Ben Ali', 'pw-prop-1'), ('pweb@gmail.com', 'Leila Gharbi', 'pw-prop-2'), ('adcryp@gmail.com', 'Anis Mejri', 'pw-prop-3'), ('pexp@gmail.com', 'Salma Trabelsi', 'pw-prop-4'); INSERT INTO `Chaine` VALUES (1, 'PgmAlgo', 'ppgm@gmail.com'), (2, 'WebX', 'pweb@gmail.com'), (3, 'Crypto4tous', 'adcryp@gmail.com'), (5, 'info_Experts', 'pexp@gmail.com'); INSERT INTO `Video` VALUES (110, 'Video1', 30, 428.00, 1), (225, 'Video2', 40, 753.00, 1), (303, 'Video3', 10, 259.00, 2), (400, 'Video4', 20, 145.00, 2), (330, 'Chiffrement de Cesar', 18, 90.50, 3), (510, 'Introduction a SQL', 25, 310.50, 5), (520, 'Les bases de PHP', 35, 420.00, 5), (530, 'JavaScript avance', 60, 800.25, 5), (540, 'Projet web complet', 50, 650.75, 5), (2216, 'Film robotique', 15, 120.00, 2), (2438, 'Programmez votre premier robot', 22, 215.40, 2); INSERT INTO `Tag` VALUES (1, 'Algorithmique'), (2, 'Web'), (3, 'SQL'), (4, 'PHP'), (5, 'Robotique'), (6, 'Cryptographie'), (7, 'JavaScript'); INSERT INTO `VideosTag` VALUES (110, 1), (225, 1), (510, 3), (510, 7), (520, 4), (530, 7), (530, 2), (540, 7), (2438, 7), (2438, 5), (2216, 5); INSERT INTO `Utilisateur` VALUES ('ch240t@mail.tn', 'Ch240T', 'pw-u-1'), ('sami@mail.tn', 'Sami22', 'pw-u-2'), ('nour@mail.tn', 'NourDev', 'pw-u-3'); INSERT INTO `Visualisation` VALUES (1, '2024-03-01 10:00:00', 'Super video', 1, 'ch240t@mail.tn', 2438), (2, '2024-03-05 18:30:00', 'Tres utile', 1, 'sami@mail.tn', 2438), (3, '2024-03-12 09:15:00', 'la fin du film est surprenante', 1, 'ch240t@mail.tn', 2216), (4, '2024-03-12 20:40:00', 'Bof, la fin du film est decevante', -1, 'nour@mail.tn', 2216), (5, '2024-03-20 14:05:00', '', 1, 'ch240t@mail.tn', 510), (6, '2024-04-02 11:11:00', 'Merci', 1, 'sami@mail.tn', 510), (7, '2024-04-02 16:00:00', '', 1, 'nour@mail.tn', 510), (8, '2024-04-10 08:30:00', 'Clair', 1, 'ch240t@mail.tn', 530), (9, '2024-04-15 19:00:00', '', -1, 'sami@mail.tn', 530), (10, '2024-04-18 21:30:00', 'Top', 1, 'nour@mail.tn', 540), (11, '2024-04-20 10:10:00', '', 1, 'ch240t@mail.tn', 110), (12, '2024-04-22 12:00:00', 'Encore', 1, 'sami@mail.tn', 510), (13, '2024-04-25 17:45:00', 'Bravo', 1, 'nour@mail.tn', 2438);",
+  "sections": [
+    {
+      "id": "exercice-1-qcm",
+      "title": "Exercice N°1 : QCM Notions Web & Programmation (2 pts)",
+      "type": "qcm",
+      "description": "Pour chaque question, cochez l'unique bonne réponse. Toute réponse comportant plus d'une croix est erronée.",
+      "points": 2,
+      "questions": [
+        {
+          "id": "EX1-Q1",
+          "question": "1. En HTML, quel événement utiliser pour déclencher une action lorsqu'un champ de saisie devient actif ?",
+          "options": [
+            {
+              "id": "opt-oninput",
+              "label": "oninput"
+            },
+            {
+              "id": "opt-onfocus",
+              "label": "onfocus"
+            },
+            {
+              "id": "opt-onblur",
+              "label": "onblur"
+            }
+          ],
+          "points": 0.25,
+          "multiple": false,
+          "correctAnswers": ["opt-onfocus"],
+          "explanation": "onfocus se déclenche quand le champ reçoit le focus (devient actif) ; onblur à la perte du focus, oninput à chaque saisie."
+        },
+        {
+          "id": "EX1-Q2",
+          "question": "2. En HTML, à quel élément la balise <figcaption> ajoute-t-elle une légende ?",
+          "options": [
+            {
+              "id": "opt-figure",
+              "label": "à l'élément figure"
+            },
+            {
+              "id": "opt-table",
+              "label": "à l'élément table"
+            },
+            {
+              "id": "opt-audio",
+              "label": "à l'élément audio"
+            }
+          ],
+          "points": 0.25,
+          "multiple": false,
+          "correctAnswers": ["opt-figure"],
+          "explanation": "<figcaption> est la légende de l'élément <figure> qui la contient."
+        },
+        {
+          "id": "EX1-Q3",
+          "question": "3. En CSS, quel est l'effet de la déclaration suivante lorsqu'elle est appliquée à un élément img ? transform: skew(15deg, 15deg);",
+          "options": [
+            {
+              "id": "opt-deplacer",
+              "label": "déplacer l'image de 15 degrés vers la droite et de 15 degrés vers le haut"
+            },
+            {
+              "id": "opt-rotation",
+              "label": "appliquer une rotation de l'image de 15 degrés vers la droite"
+            },
+            {
+              "id": "opt-incliner",
+              "label": "incliner l'image de 15 degrés vers la droite et de 15 degrés vers le bas"
+            }
+          ],
+          "points": 0.25,
+          "multiple": false,
+          "correctAnswers": ["opt-incliner"],
+          "explanation": "skew(ax, ay) incline l'élément selon l'axe X puis l'axe Y : ce n'est ni un déplacement ni une rotation."
+        },
+        {
+          "id": "EX1-Q4",
+          "question": "4. En CSS, quel est le rôle de la propriété text-transform ?",
+          "options": [
+            {
+              "id": "opt-couleur",
+              "label": "modifier la couleur du texte"
+            },
+            {
+              "id": "opt-casse",
+              "label": "transformer les caractères d'un texte en majuscules ou en minuscules"
+            },
+            {
+              "id": "opt-image",
+              "label": "transformer les caractères d'un texte en image"
+            }
+          ],
+          "points": 0.25,
+          "multiple": false,
+          "correctAnswers": ["opt-casse"],
+          "explanation": "text-transform: uppercase | lowercase | capitalize modifie la casse du texte."
+        },
+        {
+          "id": "EX1-Q5",
+          "question": "5. En JavaScript, quelle méthode utiliser pour afficher du texte directement dans une page HTML ?",
+          "options": [
+            {
+              "id": "opt-alert",
+              "label": "alert()"
+            },
+            {
+              "id": "opt-prompt",
+              "label": "prompt()"
+            },
+            {
+              "id": "opt-document-write",
+              "label": "document.write()"
+            }
+          ],
+          "points": 0.25,
+          "multiple": false,
+          "correctAnswers": ["opt-document-write"],
+          "explanation": "document.write() écrit dans le document ; alert() et prompt() ouvrent des boîtes de dialogue."
+        },
+        {
+          "id": "EX1-Q6",
+          "question": "6. En PHP, quelle fonction prédéfinie utiliser pour vérifier la validité d'une date ?",
+          "options": [
+            {
+              "id": "opt-checkdate",
+              "label": "checkdate()"
+            },
+            {
+              "id": "opt-time",
+              "label": "time()"
+            },
+            {
+              "id": "opt-date",
+              "label": "date()"
+            }
+          ],
+          "points": 0.25,
+          "multiple": false,
+          "correctAnswers": ["opt-checkdate"],
+          "explanation": "checkdate(mois, jour, année) vérifie qu'une date du calendrier grégorien est valide."
+        },
+        {
+          "id": "EX1-Q7",
+          "question": "7. En PHP, quelle fonction utiliser pour vérifier si une variable de type tableau est définie ?",
+          "options": [
+            {
+              "id": "opt-array",
+              "label": "array()"
+            },
+            {
+              "id": "opt-isset",
+              "label": "isset()"
+            },
+            {
+              "id": "opt-count",
+              "label": "count()"
+            }
+          ],
+          "points": 0.25,
+          "multiple": false,
+          "correctAnswers": ["opt-isset"],
+          "explanation": "isset() teste qu'une variable (y compris un tableau) existe et n'est pas NULL."
+        },
+        {
+          "id": "EX1-Q8",
+          "question": "8. En SQL, quel mot-clé n'est pas utilisé pour définir une contrainte de domaine ?",
+          "options": [
+            {
+              "id": "opt-unique",
+              "label": "UNIQUE"
+            },
+            {
+              "id": "opt-check",
+              "label": "CHECK"
+            },
+            {
+              "id": "opt-default",
+              "label": "DEFAULT"
+            }
+          ],
+          "points": 0.25,
+          "multiple": false,
+          "correctAnswers": ["opt-unique"],
+          "explanation": "CHECK et DEFAULT restreignent le domaine des valeurs ; UNIQUE interdit les doublons, c'est une contrainte d'unicité."
+        }
+      ]
+    },
+    {
+      "id": "exercice-2-collecte",
+      "title": "Exercice N°2 : Base BD_Collecte - Poubelles intelligentes (5 pts)",
+      "type": "modeling",
+      "description": "BD_Collecte : Poubelle (idPoub, nomRue, volMax) ; Remplissage (dateRemp, idPoub#, nivRemp) ; Agent (idAg, nomAg, telAg) ; Collecte (dateCol, idPoub#, poids, idAg#). dateRemp : date et heure ; dateCol : date seule ; nivRemp : pourcentage.",
+      "points": 5,
+      "questions": [
+        {
+          "id": "EX2-REP-1",
+          "prompt": "1ère partie, question 1 : compléter la représentation graphique de BD_Collecte (Remplissage, Poubelle, Collecte, Agent) en indiquant les clés primaires, les clés étrangères et les cardinalités. Rédigez le schéma sous forme textuelle, par exemple : Table(#clé, ..., clé_étrangère#) et Table1 1,N Table2.",
+          "points": 1.5,
+          "type": "representation",
+          "expectedKeywords": [
+            "Poubelle",
+            "Remplissage",
+            "Collecte",
+            "Agent",
+            "idPoub",
+            "dateRemp",
+            "dateCol",
+            "idAg",
+            "1\\s*[,\\-–—.:]*\\s*(N|∞|\\*)"
+          ],
+          "explanation": "Poubelle 1,N Remplissage ; Poubelle 1,N Collecte ; Agent 1,N Collecte. Clés primaires : idPoub ; (dateRemp, idPoub) ; idAg ; (dateCol, idPoub). Clés étrangères : idPoub dans Remplissage et Collecte, idAg dans Collecte."
+        },
+        {
+          "id": "EX2-VF-A",
+          "prompt": "1ère partie, question 2.a : « Une poubelle est associée à une seule rue. » (Vrai ou Faux)",
+          "points": 0.25,
+          "type": "code_analysis",
+          "expectedAnswer": "Vrai",
+          "expectedRegex": "^(Vrai|V|True)$",
+          "explanation": "Vrai : nomRue est un attribut de Poubelle, chaque poubelle n'a donc qu'une seule rue."
+        },
+        {
+          "id": "EX2-VF-B",
+          "prompt": "1ère partie, question 2.b : « Un agent collecte toujours le contenu de la même poubelle. » (Vrai ou Faux)",
+          "points": 0.25,
+          "type": "code_analysis",
+          "expectedAnswer": "Faux",
+          "expectedRegex": "^(Faux|F|False)$",
+          "explanation": "Faux : la clé de Collecte est (dateCol, idPoub) ; un même agent peut collecter plusieurs poubelles."
+        },
+        {
+          "id": "EX2-VF-C",
+          "prompt": "1ère partie, question 2.c : « Au cours d'une journée, le niveau de remplissage d'une poubelle peut avoir différentes valeurs. » (Vrai ou Faux)",
+          "points": 0.25,
+          "type": "code_analysis",
+          "expectedAnswer": "Vrai",
+          "expectedRegex": "^(Vrai|V|True)$",
+          "explanation": "Vrai : dateRemp contient la date et l'heure, plusieurs relevés d'une même poubelle sont possibles dans la journée."
+        },
+        {
+          "id": "EX2-VF-D",
+          "prompt": "1ère partie, question 2.d : « À une date donnée, le champ poids correspond au poids total de toutes les poubelles collectées par un agent donné. » (Vrai ou Faux)",
+          "points": 0.25,
+          "type": "code_analysis",
+          "expectedAnswer": "Faux",
+          "expectedRegex": "^(Faux|F|False)$",
+          "explanation": "Faux : poids est le poids d'une seule poubelle collectée (une ligne de Collecte)."
+        },
+        {
+          "id": "EX2-VF-E",
+          "prompt": "1ère partie, question 2.e : « À une date donnée, une poubelle peut être collectée plusieurs fois. » (Vrai ou Faux)",
+          "points": 0.25,
+          "type": "code_analysis",
+          "expectedAnswer": "Faux",
+          "expectedRegex": "^(Faux|F|False)$",
+          "explanation": "Faux : dateCol est une date sans heure et la clé primaire (dateCol, idPoub) interdit deux collectes le même jour."
+        },
+        {
+          "id": "EX2-EXT-1",
+          "prompt": "2ème partie, question 1 : le nom d'une rue figure dans plusieurs enregistrements de la table Poubelle. Pour éviter cette redondance, on ajoute une table Rue (identifiant et nom de la rue). Proposez la représentation textuelle des tables Poubelle et Rue, avec les clés primaires et étrangères et la relation entre elles.",
+          "points": 1.25,
+          "type": "representation",
+          "expectedKeywords": [
+            "Poubelle",
+            "Rue",
+            "idRue",
+            "nomRue",
+            "idPoub",
+            "volMax",
+            "#\\s*idRue|idRue\\s*#"
+          ],
+          "forbiddenKeywords": ["Poubelle\\s*\\([^)]*nomRue"],
+          "explanation": "Rue(#idRue, nomRue) et Poubelle(#idPoub, volMax, idRue#) : la clé primaire de Rue migre en clé étrangère dans Poubelle."
+        },
+        {
+          "id": "EX2-EXT-2",
+          "prompt": "2ème partie, question 2 : des véhicules autonomes remplacent les agents pour la collecte ; les agents les supervisent. Chaque véhicule a un identifiant et une capacité maximale. R1 : un véhicule est affecté à un seul agent, un agent peut superviser plusieurs véhicules. R2 : un véhicule peut effectuer plusieurs collectes, une collecte est réalisée par un seul véhicule. Proposez la représentation textuelle de Agent, Vehicule et Collecte.",
+          "points": 1.0,
+          "type": "representation",
+          "expectedKeywords": [
+            "Agent",
+            "Vehicule",
+            "Collecte",
+            "idVeh",
+            "capMax|capacite",
+            "idAg",
+            "dateCol",
+            "idPoub"
+          ],
+          "forbiddenKeywords": ["Collecte\\s*\\([^)]*\\bidAg\\b"],
+          "explanation": "Agent(#idAg, nomAg, telAg), Vehicule(#idVeh, capMax, idAg#), Collecte(#dateCol, #idPoub, poids, idVeh#) : l'agent est atteint par le véhicule, Collecte ne référence plus idAg."
+        }
+      ]
+    },
+    {
+      "id": "exercice-3-html",
+      "title": "Exercice N°3 - 1ère partie, I : Analyse du code HTML (1.25 pt)",
+      "type": "qcm",
+      "description": "Site de la plateforme Tech@boot : analysez la Figure 2 (page index.html) et cochez la réponse correcte.",
+      "points": 1.25,
+      "questions": [
+        {
+          "id": "EX3-HTML-1",
+          "question": "I.1. Quelle déclaration doctype doit figurer à la ligne N° 1 pour que le navigateur interprète la page en tant que document HTML5 ?",
+          "options": [
+            {
+              "id": "opt-html5",
+              "label": "<!DOCTYPE html5>"
+            },
+            {
+              "id": "opt-html5-public",
+              "label": "<!DOCTYPE html5 PUBLIC>"
+            },
+            {
+              "id": "opt-html",
+              "label": "<!DOCTYPE html>"
+            }
+          ],
+          "points": 0.25,
+          "multiple": false,
+          "correctAnswers": ["opt-html"],
+          "explanation": "En HTML5 la déclaration est simplement <!DOCTYPE html>.",
+          "codeSnippet": "1\n2 <html lang=\"fr\">\n3 <head>\n4   <meta content=\"text/html; charset=utf-8\" http-equiv=\"Content-Type\">\n5   <title>Univers de la robotique</title>\n6   <script src=\"mesControles.js\"></script>\n7   <link href=\"mesStyles.css\" rel=\"stylesheet\" type=\"text/css\">\n8 </head>\n9 <body>\n10  <header><h1>Tech@boot : L'univers fascinant de la robotique</h1></header>\n11  <nav>\n12    <div class=\"zone\" id=\"div1\">\n13      <img id=\"img1\" src=\"img/src1.jpeg\" alt=\"\" onclick=\"chargerVideo(1)\"/>\n14      <p>Poubelle intelligente</p>\n15    </div>\n16    <div class=\"zone\" id=\"div2\">\n17      <img id=\"img2\" src=\"img/src2.jpeg\" alt=\"\" onclick=\"chargerVideo(2)\"/>\n18      <p>Programmez votre 1er robot</p>\n19    </div>\n20    <div class=\"zone\" id=\"div3\">\n21      <img id=\"img3\" src=\"img/src3.jpeg\" alt=\"\" onclick=\"chargerVideo(3)\"/>\n22      <p>Robotique pour enfants</p>\n23    </div>\n24  </nav>\n25  <section>\n26    <div class=\"zoneP\" id=\"div5\">\n27      <video class=\"video\" id=\"video1\" src=\"video/vid1.mp4\" controls></video>\n28      <details>Découvrez le monde fascinant des robots intelligents...</details>\n29      <div class=\"zone\">\n30        <fieldset><legend>Avis et commentaire</legend>\n31          <form action=\"commenter.php\" method=\"post\" onsubmit=\"valide()\">\n32            <input type=\"radio\" name=\"like\" id=\"oui\" value=\"1\">J'aime\n33            <input type=\"radio\" name=\"dislike\" id=\"non\" value=\"-1\">Je n'aime pas\n34            <input type=\"text\" name=\"comment\" id=\"comment\">\n35            <input type=\"submit\" name=\"submit\" id=\"btn\" value=\"Envoyer\">\n36          </form>\n37        </fieldset>\n38      </div>\n39    </div>\n40  </section>\n41  <footer><h1>Contact : support@techboot.info</h1></footer>\n42 </body>\n43 </html>"
+        },
+        {
+          "id": "EX3-HTML-2",
+          "question": "I.2. Comment décrire le rôle de la balise <section> de la ligne N° 25 ?",
+          "options": [
+            {
+              "id": "opt-pied",
+              "label": "Elle définit le contenu du pied de la page index.html"
+            },
+            {
+              "id": "opt-principal",
+              "label": "Elle définit le contenu principal de la page index.html"
+            },
+            {
+              "id": "opt-nav",
+              "label": "Elle définit le contenu de navigation de la page index.html"
+            }
+          ],
+          "points": 0.25,
+          "multiple": false,
+          "correctAnswers": ["opt-principal"],
+          "explanation": "Le pied de page est <footer> (ligne 41) et la navigation est <nav> (ligne 11) : <section> porte le contenu principal.",
+          "codeSnippet": "1\n2 <html lang=\"fr\">\n3 <head>\n4   <meta content=\"text/html; charset=utf-8\" http-equiv=\"Content-Type\">\n5   <title>Univers de la robotique</title>\n6   <script src=\"mesControles.js\"></script>\n7   <link href=\"mesStyles.css\" rel=\"stylesheet\" type=\"text/css\">\n8 </head>\n9 <body>\n10  <header><h1>Tech@boot : L'univers fascinant de la robotique</h1></header>\n11  <nav>\n12    <div class=\"zone\" id=\"div1\">\n13      <img id=\"img1\" src=\"img/src1.jpeg\" alt=\"\" onclick=\"chargerVideo(1)\"/>\n14      <p>Poubelle intelligente</p>\n15    </div>\n16    <div class=\"zone\" id=\"div2\">\n17      <img id=\"img2\" src=\"img/src2.jpeg\" alt=\"\" onclick=\"chargerVideo(2)\"/>\n18      <p>Programmez votre 1er robot</p>\n19    </div>\n20    <div class=\"zone\" id=\"div3\">\n21      <img id=\"img3\" src=\"img/src3.jpeg\" alt=\"\" onclick=\"chargerVideo(3)\"/>\n22      <p>Robotique pour enfants</p>\n23    </div>\n24  </nav>\n25  <section>\n26    <div class=\"zoneP\" id=\"div5\">\n27      <video class=\"video\" id=\"video1\" src=\"video/vid1.mp4\" controls></video>\n28      <details>Découvrez le monde fascinant des robots intelligents...</details>\n29      <div class=\"zone\">\n30        <fieldset><legend>Avis et commentaire</legend>\n31          <form action=\"commenter.php\" method=\"post\" onsubmit=\"valide()\">\n32            <input type=\"radio\" name=\"like\" id=\"oui\" value=\"1\">J'aime\n33            <input type=\"radio\" name=\"dislike\" id=\"non\" value=\"-1\">Je n'aime pas\n34            <input type=\"text\" name=\"comment\" id=\"comment\">\n35            <input type=\"submit\" name=\"submit\" id=\"btn\" value=\"Envoyer\">\n36          </form>\n37        </fieldset>\n38      </div>\n39    </div>\n40  </section>\n41  <footer><h1>Contact : support@techboot.info</h1></footer>\n42 </body>\n43 </html>"
+        },
+        {
+          "id": "EX3-HTML-3",
+          "question": "I.3. À la ligne N° 28, quelle balise inclure dans <details> pour remplacer son titre « Détails » par « Afficher plus » ?",
+          "options": [
+            {
+              "id": "opt-summary",
+              "label": "<summary>Afficher plus</summary>"
+            },
+            {
+              "id": "opt-title",
+              "label": "<title>Afficher plus</title>"
+            },
+            {
+              "id": "opt-caption",
+              "label": "<caption>Afficher plus</caption>"
+            }
+          ],
+          "points": 0.25,
+          "multiple": false,
+          "correctAnswers": ["opt-summary"],
+          "explanation": "<summary> fournit le titre cliquable d'un bloc <details>.",
+          "codeSnippet": "1\n2 <html lang=\"fr\">\n3 <head>\n4   <meta content=\"text/html; charset=utf-8\" http-equiv=\"Content-Type\">\n5   <title>Univers de la robotique</title>\n6   <script src=\"mesControles.js\"></script>\n7   <link href=\"mesStyles.css\" rel=\"stylesheet\" type=\"text/css\">\n8 </head>\n9 <body>\n10  <header><h1>Tech@boot : L'univers fascinant de la robotique</h1></header>\n11  <nav>\n12    <div class=\"zone\" id=\"div1\">\n13      <img id=\"img1\" src=\"img/src1.jpeg\" alt=\"\" onclick=\"chargerVideo(1)\"/>\n14      <p>Poubelle intelligente</p>\n15    </div>\n16    <div class=\"zone\" id=\"div2\">\n17      <img id=\"img2\" src=\"img/src2.jpeg\" alt=\"\" onclick=\"chargerVideo(2)\"/>\n18      <p>Programmez votre 1er robot</p>\n19    </div>\n20    <div class=\"zone\" id=\"div3\">\n21      <img id=\"img3\" src=\"img/src3.jpeg\" alt=\"\" onclick=\"chargerVideo(3)\"/>\n22      <p>Robotique pour enfants</p>\n23    </div>\n24  </nav>\n25  <section>\n26    <div class=\"zoneP\" id=\"div5\">\n27      <video class=\"video\" id=\"video1\" src=\"video/vid1.mp4\" controls></video>\n28      <details>Découvrez le monde fascinant des robots intelligents...</details>\n29      <div class=\"zone\">\n30        <fieldset><legend>Avis et commentaire</legend>\n31          <form action=\"commenter.php\" method=\"post\" onsubmit=\"valide()\">\n32            <input type=\"radio\" name=\"like\" id=\"oui\" value=\"1\">J'aime\n33            <input type=\"radio\" name=\"dislike\" id=\"non\" value=\"-1\">Je n'aime pas\n34            <input type=\"text\" name=\"comment\" id=\"comment\">\n35            <input type=\"submit\" name=\"submit\" id=\"btn\" value=\"Envoyer\">\n36          </form>\n37        </fieldset>\n38      </div>\n39    </div>\n40  </section>\n41  <footer><h1>Contact : support@techboot.info</h1></footer>\n42 </body>\n43 </html>"
+        },
+        {
+          "id": "EX3-HTML-4",
+          "question": "I.4. À la ligne N° 31, quelle est la condition de déclenchement de l'appel du fichier commenter.php, sachant qu'il manque le mot-clé return dans l'attribut onsubmit ?",
+          "options": [
+            {
+              "id": "opt-vrai",
+              "label": "Uniquement lorsque la fonction valide() retourne la valeur vraie"
+            },
+            {
+              "id": "opt-faux",
+              "label": "Uniquement lorsque la fonction valide() retourne la valeur faux"
+            },
+            {
+              "id": "opt-toujours",
+              "label": "Quelle que soit la valeur retournée par la fonction valide()"
+            }
+          ],
+          "points": 0.25,
+          "multiple": false,
+          "correctAnswers": ["opt-toujours"],
+          "explanation": "Sans return, la valeur de valide() est ignorée : le formulaire est toujours soumis.",
+          "codeSnippet": "1\n2 <html lang=\"fr\">\n3 <head>\n4   <meta content=\"text/html; charset=utf-8\" http-equiv=\"Content-Type\">\n5   <title>Univers de la robotique</title>\n6   <script src=\"mesControles.js\"></script>\n7   <link href=\"mesStyles.css\" rel=\"stylesheet\" type=\"text/css\">\n8 </head>\n9 <body>\n10  <header><h1>Tech@boot : L'univers fascinant de la robotique</h1></header>\n11  <nav>\n12    <div class=\"zone\" id=\"div1\">\n13      <img id=\"img1\" src=\"img/src1.jpeg\" alt=\"\" onclick=\"chargerVideo(1)\"/>\n14      <p>Poubelle intelligente</p>\n15    </div>\n16    <div class=\"zone\" id=\"div2\">\n17      <img id=\"img2\" src=\"img/src2.jpeg\" alt=\"\" onclick=\"chargerVideo(2)\"/>\n18      <p>Programmez votre 1er robot</p>\n19    </div>\n20    <div class=\"zone\" id=\"div3\">\n21      <img id=\"img3\" src=\"img/src3.jpeg\" alt=\"\" onclick=\"chargerVideo(3)\"/>\n22      <p>Robotique pour enfants</p>\n23    </div>\n24  </nav>\n25  <section>\n26    <div class=\"zoneP\" id=\"div5\">\n27      <video class=\"video\" id=\"video1\" src=\"video/vid1.mp4\" controls></video>\n28      <details>Découvrez le monde fascinant des robots intelligents...</details>\n29      <div class=\"zone\">\n30        <fieldset><legend>Avis et commentaire</legend>\n31          <form action=\"commenter.php\" method=\"post\" onsubmit=\"valide()\">\n32            <input type=\"radio\" name=\"like\" id=\"oui\" value=\"1\">J'aime\n33            <input type=\"radio\" name=\"dislike\" id=\"non\" value=\"-1\">Je n'aime pas\n34            <input type=\"text\" name=\"comment\" id=\"comment\">\n35            <input type=\"submit\" name=\"submit\" id=\"btn\" value=\"Envoyer\">\n36          </form>\n37        </fieldset>\n38      </div>\n39    </div>\n40  </section>\n41  <footer><h1>Contact : support@techboot.info</h1></footer>\n42 </body>\n43 </html>"
+        },
+        {
+          "id": "EX3-HTML-5",
+          "question": "I.5. Pourquoi les balises des lignes N° 32 et 33 permettent-elles de sélectionner les deux boutons radio à la fois ?",
+          "options": [
+            {
+              "id": "opt-name",
+              "label": "Les deux boutons ont des valeurs différentes pour l'attribut name"
+            },
+            {
+              "id": "opt-id",
+              "label": "Les deux boutons ont des valeurs différentes pour l'attribut id"
+            },
+            {
+              "id": "opt-value",
+              "label": "Les deux boutons ont des valeurs différentes pour l'attribut value"
+            }
+          ],
+          "points": 0.25,
+          "multiple": false,
+          "correctAnswers": ["opt-name"],
+          "explanation": "Des boutons radio ne sont exclusifs que s'ils partagent le même name ; ici name=\"like\" et name=\"dislike\".",
+          "codeSnippet": "1\n2 <html lang=\"fr\">\n3 <head>\n4   <meta content=\"text/html; charset=utf-8\" http-equiv=\"Content-Type\">\n5   <title>Univers de la robotique</title>\n6   <script src=\"mesControles.js\"></script>\n7   <link href=\"mesStyles.css\" rel=\"stylesheet\" type=\"text/css\">\n8 </head>\n9 <body>\n10  <header><h1>Tech@boot : L'univers fascinant de la robotique</h1></header>\n11  <nav>\n12    <div class=\"zone\" id=\"div1\">\n13      <img id=\"img1\" src=\"img/src1.jpeg\" alt=\"\" onclick=\"chargerVideo(1)\"/>\n14      <p>Poubelle intelligente</p>\n15    </div>\n16    <div class=\"zone\" id=\"div2\">\n17      <img id=\"img2\" src=\"img/src2.jpeg\" alt=\"\" onclick=\"chargerVideo(2)\"/>\n18      <p>Programmez votre 1er robot</p>\n19    </div>\n20    <div class=\"zone\" id=\"div3\">\n21      <img id=\"img3\" src=\"img/src3.jpeg\" alt=\"\" onclick=\"chargerVideo(3)\"/>\n22      <p>Robotique pour enfants</p>\n23    </div>\n24  </nav>\n25  <section>\n26    <div class=\"zoneP\" id=\"div5\">\n27      <video class=\"video\" id=\"video1\" src=\"video/vid1.mp4\" controls></video>\n28      <details>Découvrez le monde fascinant des robots intelligents...</details>\n29      <div class=\"zone\">\n30        <fieldset><legend>Avis et commentaire</legend>\n31          <form action=\"commenter.php\" method=\"post\" onsubmit=\"valide()\">\n32            <input type=\"radio\" name=\"like\" id=\"oui\" value=\"1\">J'aime\n33            <input type=\"radio\" name=\"dislike\" id=\"non\" value=\"-1\">Je n'aime pas\n34            <input type=\"text\" name=\"comment\" id=\"comment\">\n35            <input type=\"submit\" name=\"submit\" id=\"btn\" value=\"Envoyer\">\n36          </form>\n37        </fieldset>\n38      </div>\n39    </div>\n40  </section>\n41  <footer><h1>Contact : support@techboot.info</h1></footer>\n42 </body>\n43 </html>"
+        }
+      ]
+    },
+    {
+      "id": "exercice-3-web",
+      "title": "Exercice N°3 - 1ère partie, II à IV : Analyse du code CSS, JavaScript et PHP (4.75 pts)",
+      "type": "code_analysis",
+      "description": "Analysez les extraits de mesStyles.css (Figure 3), mesControles.js (Figure 4) et commenter.php (Figure 5).",
+      "points": 4.75,
+      "questions": [
+        {
+          "id": "EX3-CSS-1",
+          "prompt": "II.1. Règle N° 1 (Figure 3) : indiquez le type de sélecteur, si la règle est liée à un événement (Vrai/Faux) et l'effet de la règle sur l'élément video.",
+          "points": 0.5,
+          "type": "code_analysis",
+          "codeSnippet": "/* Règle 1 */ .video { opacity: 0.5; }\n/* Règle 2 */ video:hover { transform: scale(1.2); }\n/* Règle 3 */ #video1 { border-style: solid; }\n/* Règle 4 */ .zone { overflow: auto; }\n/* Règle 5 */ img { width: 200px; height: 180px; }\n/* Règle 6 */ #div1 { top: 100px; }\n/* Règle 7 */ #div2 { top: 340px; }\n/* Règle 8 */ #div3 { top: 580px; }\n/* Règle 9 */ #div1, #div2, #div3 { right: 100px; width: 200px; height: 220px; border-bottom: 4px solid black; }",
+          "language": "css",
+          "expectedKeywords": ["classe", "faux", "opacit|transparen"],
+          "explanation": "Sélecteur de classe (.video) ; règle non liée à un événement (Faux) ; la vidéo devient semi-transparente (opacité 50 %)."
+        },
+        {
+          "id": "EX3-CSS-2",
+          "prompt": "II.1. Règle N° 2 (Figure 3) : indiquez le type de sélecteur, si la règle est liée à un événement (Vrai/Faux) et l'effet de la règle sur l'élément video.",
+          "points": 0.5,
+          "type": "code_analysis",
+          "codeSnippet": "/* Règle 1 */ .video { opacity: 0.5; }\n/* Règle 2 */ video:hover { transform: scale(1.2); }\n/* Règle 3 */ #video1 { border-style: solid; }\n/* Règle 4 */ .zone { overflow: auto; }\n/* Règle 5 */ img { width: 200px; height: 180px; }\n/* Règle 6 */ #div1 { top: 100px; }\n/* Règle 7 */ #div2 { top: 340px; }\n/* Règle 8 */ #div3 { top: 580px; }\n/* Règle 9 */ #div1, #div2, #div3 { right: 100px; width: 200px; height: 220px; border-bottom: 4px solid black; }",
+          "language": "css",
+          "expectedKeywords": ["[ée]l[ée]ment", "vrai", "agrand|scale|zoom|1[.,]2"],
+          "explanation": "Sélecteur d'élément (video) avec la pseudo-classe :hover ; règle liée à un événement (Vrai) ; la vidéo est agrandie de 20 % (scale 1.2) au survol."
+        },
+        {
+          "id": "EX3-CSS-3",
+          "prompt": "II.1. Règle N° 3 (Figure 3) : indiquez le type de sélecteur, si la règle est liée à un événement (Vrai/Faux) et l'effet de la règle sur l'élément video.",
+          "points": 0.5,
+          "type": "code_analysis",
+          "codeSnippet": "/* Règle 1 */ .video { opacity: 0.5; }\n/* Règle 2 */ video:hover { transform: scale(1.2); }\n/* Règle 3 */ #video1 { border-style: solid; }\n/* Règle 4 */ .zone { overflow: auto; }\n/* Règle 5 */ img { width: 200px; height: 180px; }\n/* Règle 6 */ #div1 { top: 100px; }\n/* Règle 7 */ #div2 { top: 340px; }\n/* Règle 8 */ #div3 { top: 580px; }\n/* Règle 9 */ #div1, #div2, #div3 { right: 100px; width: 200px; height: 220px; border-bottom: 4px solid black; }",
+          "language": "css",
+          "expectedKeywords": ["identifiant", "faux", "bordure|border|cadre|trait"],
+          "explanation": "Sélecteur d'identifiant (#video1) ; règle non liée à un événement (Faux) ; la vidéo reçoit une bordure continue."
+        },
+        {
+          "id": "EX3-CSS-4",
+          "prompt": "II.2. Quels sont les numéros des règles de mesStyles.css qui s'appliquent à l'élément d'identifiant div1 ?",
+          "points": 0.25,
+          "type": "code_analysis",
+          "codeSnippet": "/* Règle 1 */ .video { opacity: 0.5; }\n/* Règle 2 */ video:hover { transform: scale(1.2); }\n/* Règle 3 */ #video1 { border-style: solid; }\n/* Règle 4 */ .zone { overflow: auto; }\n/* Règle 5 */ img { width: 200px; height: 180px; }\n/* Règle 6 */ #div1 { top: 100px; }\n/* Règle 7 */ #div2 { top: 340px; }\n/* Règle 8 */ #div3 { top: 580px; }\n/* Règle 9 */ #div1, #div2, #div3 { right: 100px; width: 200px; height: 220px; border-bottom: 4px solid black; }",
+          "language": "css",
+          "expectedAnswer": "4, 6 et 9",
+          "expectedKeywords": ["\\b4\\b", "\\b6\\b", "\\b9\\b"],
+          "forbiddenKeywords": ["\\b[1235780]\\b"],
+          "explanation": "div1 a la classe zone (règle 4), l'identifiant div1 (règle 6) et figure dans le groupe de sélecteurs de la règle 9."
+        },
+        {
+          "id": "EX3-JS-1",
+          "prompt": "III.1. Donnez le résultat de l'exécution de l'instruction de la ligne N° 6 lorsque la variable ch contient la valeur bravo.",
+          "points": 0.5,
+          "type": "code_analysis",
+          "codeSnippet": "1 function formater(ch){\n2   while(ch.indexOf(\" \",0) != -1)\n3     { ch = ch.replace(\" \",\"_\") }\n4   if(ch.length>0){\n5     ch = ch.toLowerCase()\n6     ch = ch.replace(ch.charAt(0),ch.charAt(0).toUpperCase())\n7   }\n8   return ch\n9 }\n10 function valide(){\n11   let resultat = false\n12   let like = document.getElementById(\"oui\")\n13   let dislike = document.getElementById(\"non\")\n14   let comment = document.getElementById(\"comment\").value\n15   comment = comment.trim()\n16   if(like.checked || dislike.checked || comment.length>0){\n17     resultat = true\n18     if(comment.length>0)\n19       document.getElementById(\"comment\").value = formater(comment)\n20   }\n21   return resultat\n22 }",
+          "language": "javascript",
+          "expectedAnswer": "Bravo",
+          "expectedKeywords": ["bravo|majuscule"],
+          "explanation": "ch = ch.replace(ch.charAt(0), ch.charAt(0).toUpperCase()) met la première lettre en majuscule : « Bravo »."
+        },
+        {
+          "id": "EX3-JS-2",
+          "prompt": "III.2. Donnez le rôle de l'instruction de la ligne N° 15.",
+          "points": 0.5,
+          "type": "code_analysis",
+          "codeSnippet": "1 function formater(ch){\n2   while(ch.indexOf(\" \",0) != -1)\n3     { ch = ch.replace(\" \",\"_\") }\n4   if(ch.length>0){\n5     ch = ch.toLowerCase()\n6     ch = ch.replace(ch.charAt(0),ch.charAt(0).toUpperCase())\n7   }\n8   return ch\n9 }\n10 function valide(){\n11   let resultat = false\n12   let like = document.getElementById(\"oui\")\n13   let dislike = document.getElementById(\"non\")\n14   let comment = document.getElementById(\"comment\").value\n15   comment = comment.trim()\n16   if(like.checked || dislike.checked || comment.length>0){\n17     resultat = true\n18     if(comment.length>0)\n19       document.getElementById(\"comment\").value = formater(comment)\n20   }\n21   return resultat\n22 }",
+          "language": "javascript",
+          "expectedKeywords": ["espace", "d[ée]but|fin|extr[ée]mit|trim"],
+          "explanation": "comment.trim() supprime les espaces situés au début et à la fin du commentaire."
+        },
+        {
+          "id": "EX3-JS-3",
+          "prompt": "III.3. Quel aperçu du formulaire (1er : champ rempli par « bravo », 2e : rien de saisi ni coché, 3e : « Je n'aime pas » coché sans commentaire) permet d'activer, après soumission, l'exécution de la fonction formater() de la ligne N° 19 ?",
+          "points": 0.5,
+          "type": "code_analysis",
+          "codeSnippet": "1 function formater(ch){\n2   while(ch.indexOf(\" \",0) != -1)\n3     { ch = ch.replace(\" \",\"_\") }\n4   if(ch.length>0){\n5     ch = ch.toLowerCase()\n6     ch = ch.replace(ch.charAt(0),ch.charAt(0).toUpperCase())\n7   }\n8   return ch\n9 }\n10 function valide(){\n11   let resultat = false\n12   let like = document.getElementById(\"oui\")\n13   let dislike = document.getElementById(\"non\")\n14   let comment = document.getElementById(\"comment\").value\n15   comment = comment.trim()\n16   if(like.checked || dislike.checked || comment.length>0){\n17     resultat = true\n18     if(comment.length>0)\n19       document.getElementById(\"comment\").value = formater(comment)\n20   }\n21   return resultat\n22 }",
+          "language": "javascript",
+          "expectedAnswer": "1er aperçu",
+          "expectedKeywords": ["1er|premier|\\b1\\b"],
+          "forbiddenKeywords": ["2e|2[èe]me|deuxi|\\b2\\b|3e|3[èe]me|troisi|\\b3\\b"],
+          "explanation": "formater() n'est appelée que si le commentaire (après trim) n'est pas vide : seul le 1er aperçu convient."
+        },
+        {
+          "id": "EX3-JS-4",
+          "prompt": "III.4. D'après la ligne N° 19, dans quel élément du formulaire sera placé le résultat de l'exécution de formater(comment) ?",
+          "points": 0.5,
+          "type": "code_analysis",
+          "codeSnippet": "1 function formater(ch){\n2   while(ch.indexOf(\" \",0) != -1)\n3     { ch = ch.replace(\" \",\"_\") }\n4   if(ch.length>0){\n5     ch = ch.toLowerCase()\n6     ch = ch.replace(ch.charAt(0),ch.charAt(0).toUpperCase())\n7   }\n8   return ch\n9 }\n10 function valide(){\n11   let resultat = false\n12   let like = document.getElementById(\"oui\")\n13   let dislike = document.getElementById(\"non\")\n14   let comment = document.getElementById(\"comment\").value\n15   comment = comment.trim()\n16   if(like.checked || dislike.checked || comment.length>0){\n17     resultat = true\n18     if(comment.length>0)\n19       document.getElementById(\"comment\").value = formater(comment)\n20   }\n21   return resultat\n22 }",
+          "language": "javascript",
+          "expectedKeywords": ["comment", "champ|zone|input|saisie|texte"],
+          "explanation": "Dans le champ de saisie de texte d'identifiant « comment » (propriété value)."
+        },
+        {
+          "id": "EX3-PHP-1",
+          "prompt": "IV. 1er cas : $comment = \"Bravo\". Donnez la valeur des variables $i, $trouve et $unMot après exécution de la fonction conforme.",
+          "points": 0.5,
+          "type": "code_analysis",
+          "codeSnippet": "3 function conforme ($comment)\n4 {\n5   $wordsFilter = array (\"gratuit\",\"offre\",\"urgent\");\n6   $i = 0;\n7   $trouve = false;\n8   do {\n9     $unMot = $wordsFilter[$i];\n10    $i = $i+1;\n11    if (strpos($comment,$unMot)!== false)\n12      $trouve = true;\n13  } while ($i < count($wordsFilter) && !$trouve );\n14\n15  return !$trouve;\n16 }",
+          "language": "php",
+          "expectedKeywords": ["3", "false|faux", "urgent"],
+          "explanation": "Aucun mot filtré n'est trouvé : la boucle va jusqu'au bout, $i = 3, $trouve = false et $unMot = \"urgent\"."
+        },
+        {
+          "id": "EX3-PHP-2",
+          "prompt": "IV. 2ème cas : $comment = \"Profitez offre spéciale\". Donnez la valeur des variables $i, $trouve et $unMot après exécution de la fonction conforme.",
+          "points": 0.5,
+          "type": "code_analysis",
+          "codeSnippet": "3 function conforme ($comment)\n4 {\n5   $wordsFilter = array (\"gratuit\",\"offre\",\"urgent\");\n6   $i = 0;\n7   $trouve = false;\n8   do {\n9     $unMot = $wordsFilter[$i];\n10    $i = $i+1;\n11    if (strpos($comment,$unMot)!== false)\n12      $trouve = true;\n13  } while ($i < count($wordsFilter) && !$trouve );\n14\n15  return !$trouve;\n16 }",
+          "language": "php",
+          "expectedKeywords": ["2", "true|vrai", "offre"],
+          "explanation": "Le mot « offre » est trouvé au 2e tour : $i = 2, $trouve = true et $unMot = \"offre\"."
+        }
+      ]
+    },
+    {
+      "id": "exercice-3-bdd",
+      "title": "Exercice N°3 - 2ème partie : Base StreamVision - Interprétation et requêtes SQL (7 pts)",
+      "type": "sql",
+      "description": "StreamVision : Proprietaire (emailProp, nomProp, pswProp) ; Chaine (idChaine, nomChaine, emailProp#) ; Video (idVideo, titreVideo, duree, taille, idChaine#) ; Tag (idTag, libelleTag) ; VideosTag (idVideo#, idTag#) ; Utilisateur (emailUtilis, nomUtilis, pswUtilis) ; Visualisation (idVis, dateVis, commentaire, appreciation, emailUtilis#, idVideo#).",
+      "points": 7,
+      "questions": [
+        {
+          "id": "EX3-BDD-R1",
+          "prompt": "2ème partie, I.1. Sur les extraits des tables Chaine et Video fournis dans l'énoncé, donnez le résultat de la requête R : SELECT nomChaine, SUM(duree) FROM Chaine C, Video V WHERE C.idChaine = V.idChaine GROUP BY nomChaine HAVING SUM(duree) > 60",
+          "points": 0.5,
+          "type": "code_analysis",
+          "expectedKeywords": ["PgmAlgo", "70"],
+          "forbiddenKeywords": ["WebX", "Crypto4tous"],
+          "expectedAnswer": "(PgmAlgo, 70)",
+          "explanation": "PgmAlgo totalise 30 + 40 = 70 min (> 60) ; WebX totalise 30 min, Crypto4tous n'a aucune vidéo : une seule ligne (PgmAlgo, 70)."
+        },
+        {
+          "id": "EX3-BDD-R2",
+          "prompt": "2ème partie, I.2. Déduisez le rôle de la requête R.",
+          "points": 0.5,
+          "type": "code_analysis",
+          "expectedKeywords": ["cha[iî]ne", "dur[ée]e", "60|sup[ée]rieur|d[ée]pass"],
+          "explanation": "Elle affiche le nom des chaînes et la durée totale de leurs vidéos, pour les chaînes dont cette durée totale dépasse 60 minutes."
+        },
+        {
+          "id": "EX3-SQL-LID-1",
+          "prompt": "2ème partie, II-A.1. Quelles sont les chaînes de la plateforme ? On affichera les champs nomChaine et emailProp.",
+          "points": 0.5,
+          "type": "query",
+          "expectedQuery": "SELECT nomChaine, emailProp FROM Chaine;",
+          "explanation": "Projection simple sur la table Chaine."
+        },
+        {
+          "id": "EX3-SQL-LID-2",
+          "prompt": "2ème partie, II-A.2. Qui sont les utilisateurs qui ont visualisé la vidéo d'identifiant 2438 ? On affichera les champs emailUtilis et dateVis.",
+          "points": 0.5,
+          "type": "query",
+          "expectedQuery": "SELECT emailUtilis, dateVis FROM Visualisation WHERE idVideo = 2438;",
+          "explanation": "Sélection dans Visualisation sur idVideo = 2438."
+        },
+        {
+          "id": "EX3-SQL-LID-3",
+          "prompt": "2ème partie, II-A.3. Quelles sont les vidéos de la chaîne nommée « info_Experts » ? On affichera les champs titreVideo et duree.",
+          "points": 0.5,
+          "type": "query",
+          "expectedQuery": "SELECT titreVideo, duree FROM Video V, Chaine C WHERE V.idChaine = C.idChaine AND nomChaine = 'info_Experts';",
+          "explanation": "Jointure Video-Chaine sur idChaine puis filtre sur nomChaine."
+        },
+        {
+          "id": "EX3-SQL-LID-4",
+          "prompt": "2ème partie, II-A.4. Quelle est la dernière date de visualisation pour l'utilisateur ayant le nom « Ch240T » ?",
+          "points": 0.5,
+          "type": "query",
+          "expectedQuery": "SELECT MAX(dateVis) FROM Visualisation V, Utilisateur U WHERE V.emailUtilis = U.emailUtilis AND nomUtilis = 'Ch240T';",
+          "explanation": "Jointure Visualisation-Utilisateur et fonction MAX sur dateVis."
+        },
+        {
+          "id": "EX3-SQL-LID-5",
+          "prompt": "2ème partie, II-A.5. Quelle est la taille totale de toutes les vidéos de la chaîne nommée « info_Experts » ?",
+          "points": 0.5,
+          "type": "query",
+          "expectedQuery": "SELECT SUM(taille) FROM Video V, Chaine C WHERE V.idChaine = C.idChaine AND nomChaine = 'info_Experts';",
+          "explanation": "Jointure Video-Chaine et fonction SUM sur taille."
+        },
+        {
+          "id": "EX3-SQL-LID-6",
+          "prompt": "2ème partie, II-A.6. Quel est le nombre de visualisations de chaque vidéo associée au tag d'identifiant 7 ? On affichera le champ idVideo ainsi que le nombre de ses visualisations, triées par ordre décroissant du nombre de visualisations.",
+          "points": 0.75,
+          "type": "query",
+          "expectedQuery": "SELECT V.idVideo, COUNT(*) AS nbVisualisations FROM VideosTag T, Visualisation V WHERE T.idVideo = V.idVideo AND T.idTag = 7 GROUP BY V.idVideo ORDER BY nbVisualisations DESC;",
+          "explanation": "Jointure VideosTag-Visualisation, GROUP BY idVideo, COUNT(*) et ORDER BY décroissant."
+        },
+        {
+          "id": "EX3-SQL-LID-7",
+          "prompt": "2ème partie, II-A.7. Quelles sont les vidéos de la chaîne d'identifiant 5 dont la durée est supérieure à la durée moyenne des vidéos publiées par cette même chaîne ? On affichera les champs idVideo, titreVideo et duree.",
+          "points": 0.75,
+          "type": "query",
+          "expectedQuery": "SELECT idVideo, titreVideo, duree FROM Video WHERE idChaine = 5 AND duree > (SELECT AVG(duree) FROM Video WHERE idChaine = 5);",
+          "explanation": "Sous-requête scalaire avec AVG(duree) sur la même chaîne."
+        },
+        {
+          "id": "EX3-SQL-LMD-1",
+          "prompt": "2ème partie, II-B.1. Un algorithme détecte le nouveau tag « HTMX ». Insérez ce tag dans la table correspondante, sachant que l'identifiant d'un tag est un champ auto-incrémenté.",
+          "points": 0.5,
+          "type": "dml",
+          "expectedTableRows": {
+            "table": "Tag",
+            "where": {
+              "libelleTag": "HTMX",
+              "idTag": 8
+            },
+            "exactCount": 8
+          },
+          "explanation": "INSERT en omettant idTag (auto-incrémenté) : INSERT INTO Tag (libelleTag) VALUES ('HTMX');"
+        },
+        {
+          "id": "EX3-SQL-LMD-2",
+          "prompt": "2ème partie, II-B.2. En raison du non-respect des conditions d'utilisation, supprimez toutes les vidéos de la chaîne d'identifiant 3.",
+          "points": 0.5,
+          "type": "dml",
+          "expectedTableRows": {
+            "table": "Video",
+            "exactCount": 10
+          },
+          "explanation": "DELETE FROM Video WHERE idChaine = 3;"
+        },
+        {
+          "id": "EX3-SQL-LMD-3",
+          "prompt": "2ème partie, II-B.3. Pour la vidéo d'identifiant 2216, remplacez par la chaîne « *** » les commentaires contenant le texte « la fin du film ».",
+          "points": 0.5,
+          "type": "dml",
+          "expectedTableRows": {
+            "table": "Visualisation",
+            "where": {
+              "idVis": 3,
+              "commentaire": "***"
+            }
+          },
+          "verificationSql": "SELECT idVis FROM Visualisation WHERE idVideo = 2216 AND commentaire = '***';",
+          "explanation": "UPDATE Visualisation SET commentaire = '***' WHERE idVideo = 2216 AND commentaire LIKE '%la fin du film%';"
+        },
+        {
+          "id": "EX3-SQL-LDD-4",
+          "prompt": "2ème partie, II-B.4. Ajoutez à la table Video une colonne nommée langue, de type chaîne de caractères de longueur fixe de 2 caractères.",
+          "points": 0.5,
+          "type": "ddl",
+          "verificationSql": "SELECT langue FROM Video;",
+          "explanation": "ALTER TABLE Video ADD langue CHAR(2);"
+        }
+      ]
+    }
+  ]
+}

@@ -848,6 +848,8 @@ export class RelationalDatabaseEngine {
       for (const col of table.columns) {
         const colIdx = specifiedCols.indexOf(col.name);
         let rawVal = colIdx !== -1 ? parsedVals[colIdx] : undefined;
+        // MySQL : NULL ou 0 dans une colonne AUTO_INCREMENT déclenche la génération de la valeur.
+        if (col.autoIncrement && (rawVal === null || rawVal === 0)) rawVal = undefined;
 
         if (rawVal === undefined) {
           if (col.autoIncrement) {
@@ -911,7 +913,7 @@ export class RelationalDatabaseEngine {
       assignments.push({ col: colDef, expr: assignMatch[2].trim() });
     }
 
-    const whereClause = m[3] || "";
+    const whereClause = this.resolveSubqueries(m[3] || "");
     let affected = 0;
 
     table.rows.forEach((row, idx) => {
@@ -966,7 +968,7 @@ export class RelationalDatabaseEngine {
       throw new Error(this.lastError);
     }
 
-    const whereClause = m[2] || "";
+    const whereClause = this.resolveSubqueries(m[2] || "");
     const remaining: Record<string, unknown>[] = [];
     let deletedCount = 0;
 
@@ -1028,7 +1030,8 @@ export class RelationalDatabaseEngine {
     }
 
     const selectExprs = splitTopLevelCommas(selectMatch[1].trim());
-    const rest = selectMatch[2].trim();
+    // Sous-requêtes non corrélées : remplacées par leur résultat avant l'analyse des clauses.
+    const rest = this.resolveSubqueries(selectMatch[2].trim());
 
     // Analyse de la clause FROM et des JOINs
     const fromAndRestMatch = rest.match(
@@ -1073,6 +1076,8 @@ export class RelationalDatabaseEngine {
 
     // 5. Calcul des lignes projetées avec agrégats
     let projectedRows: Record<string, unknown>[] = [];
+    // Groupe de lignes source de chaque ligne projetée (nécessaire pour évaluer HAVING).
+    const projectedGroups: Record<string, unknown>[][] = [];
     const outputColumns: string[] = [];
 
     for (const group of finalGroups) {
@@ -1203,11 +1208,14 @@ export class RelationalDatabaseEngine {
       }
 
       projectedRows.push(outRow);
+      projectedGroups.push(group);
     }
 
-    // 6. Filtrage HAVING
+    // 6. Filtrage HAVING : les agrégats (SUM(col) > 60, COUNT(*) >= 3...) sont calculés par groupe.
     if (havingClause) {
-      projectedRows = projectedRows.filter((r) => this.evaluateWhereCondition(r, havingClause));
+      projectedRows = projectedRows.filter((r, idx) =>
+        this.evaluateHaving(r, projectedGroups[idx] ?? [], havingClause),
+      );
     }
 
     // 7. Tri ORDER BY
@@ -1659,6 +1667,132 @@ export class RelationalDatabaseEngine {
   // =========================================================================
   // PARSING DES VALEURS LITTÉRALES & CONTRAINTES
   // =========================================================================
+  /**
+   * Évalue une condition HAVING pour un groupe : chaque agrégat (COUNT, SUM, AVG, MIN, MAX) est
+   * calculé sur les lignes du groupe puis exposé comme une colonne temporaire de la ligne évaluée.
+   */
+  private evaluateHaving(
+    row: Record<string, unknown>,
+    group: Record<string, unknown>[],
+    condition: string,
+  ): boolean {
+    const bound: Record<string, unknown> = { ...row };
+    let n = 0;
+    const clause = condition.replace(
+      /\b(COUNT|SUM|AVG|MIN|MAX)\s*\(\s*(DISTINCT\s+)?([^()]*?)\s*\)/gi,
+      (_match, fn: string, distinct: string | undefined, arg: string) => {
+        const column = arg.replace(/[`"']/g, "").trim();
+        const values =
+          column === "*"
+            ? group.map(() => 1)
+            : group
+                .map((r) => this.resolveValue(r, column))
+                .filter((v) => v !== null && v !== undefined);
+        const pool = distinct ? Array.from(new Set(values.map(String))) : values;
+        const nums = pool.map(Number).filter((x) => !Number.isNaN(x));
+        const somme = nums.reduce((x, y) => x + y, 0);
+
+        let value: unknown;
+        switch (fn.toUpperCase()) {
+          case "COUNT":
+            value = pool.length;
+            break;
+          case "SUM":
+            value = somme;
+            break;
+          case "AVG":
+            value = nums.length > 0 ? somme / nums.length : 0;
+            break;
+          default: {
+            const isMin = fn.toUpperCase() === "MIN";
+            value =
+              pool.length === 0 ? null : pool.reduce((x, y) => ((isMin ? x < y : x > y) ? x : y));
+          }
+        }
+        const name = `__agg${n++}`;
+        bound[name] = value;
+        return name;
+      },
+    );
+    return this.evaluateWhereCondition(bound, clause);
+  }
+
+  // =========================================================================
+  // SOUS-REQUÊTES (non corrélées)
+  // =========================================================================
+  /**
+   * Remplace chaque sous-requête `(SELECT ...)` qui suit un opérateur de comparaison par sa valeur
+   * (sous-requête scalaire) et chaque `IN (SELECT ...)` par la liste de ses valeurs.
+   * Les sous-requêtes corrélées ne sont pas prises en charge.
+   */
+  private resolveSubqueries(text: string): string {
+    if (!/\(\s*SELECT\b/i.test(text)) return text;
+
+    const toLiteral = (v: unknown): string => {
+      if (v === null || v === undefined) return "NULL";
+      if (typeof v === "number") return String(v);
+      return `'${String(v).replace(/'/g, "''")}'`;
+    };
+
+    let out = "";
+    let i = 0;
+    while (i < text.length) {
+      const ch = text.charAt(i);
+
+      // Littéral entre quotes : recopié tel quel.
+      if (ch === "'" || ch === '"') {
+        let j = i + 1;
+        while (j < text.length && text.charAt(j) !== ch) j++;
+        out += text.slice(i, j + 1);
+        i = j + 1;
+        continue;
+      }
+
+      if (ch === "(") {
+        // Recherche de la parenthèse fermante correspondante.
+        let depth = 0;
+        let end = -1;
+        let quote = "";
+        for (let j = i; j < text.length; j++) {
+          const c = text.charAt(j);
+          if (quote) {
+            if (c === quote) quote = "";
+          } else if (c === "'" || c === '"') {
+            quote = c;
+          } else if (c === "(") {
+            depth++;
+          } else if (c === ")") {
+            depth--;
+            if (depth === 0) {
+              end = j;
+              break;
+            }
+          }
+        }
+        const inner = end === -1 ? "" : text.slice(i + 1, end).trim();
+        const before = out.trimEnd();
+        const afterComparison = /(<=|>=|<>|!=|=|<|>)$/.test(before);
+        const afterIn = /\bIN$/i.test(before);
+
+        if (end !== -1 && /^SELECT\b/i.test(inner) && (afterComparison || afterIn)) {
+          const { rows } = this.handleSelect(inner);
+          const values = rows.map((r) => Object.values(r)[0]);
+          if (afterIn) {
+            out += `(${values.length > 0 ? values.map(toLiteral).join(", ") : "NULL"})`;
+          } else {
+            out += values.length > 0 ? toLiteral(values[0]) : "NULL";
+          }
+          i = end + 1;
+          continue;
+        }
+      }
+
+      out += ch;
+      i++;
+    }
+    return out;
+  }
+
   public parseValueLiterals(tupleStr: string): unknown[] {
     const items = splitTopLevelCommas(tupleStr);
     return items.map((item) => {
