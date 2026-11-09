@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState, useMemo } from "react";
 import { SproutLogo } from "@/components/SproutLogo";
 import { AuthModal } from "@/components/AuthModal";
+import { AppFooter } from "@/components/AppIdentity";
 import { JoinClassModal } from "@/components/JoinClassModal";
 import { OnboardingGuide } from "@/components/OnboardingGuide";
 import { getSujetsCatalog, type RemoteSujet } from "@/lib/supabase/sujets";
@@ -620,6 +621,8 @@ function Index() {
           </div>
         </section>
       </main>
+
+      <AppFooter />
 
       <OnboardingGuide forceOpen={showGuide} onClose={() => setShowGuide(false)} />
     </div>

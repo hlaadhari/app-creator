@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AProposRouteImport } from './routes/a-propos'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as CalendrierRouteImport } from './routes/calendrier'
 import { Route as CoursRouteImport } from './routes/cours'
@@ -20,6 +21,11 @@ import { Route as SujetIdRouteImport } from './routes/sujet.$id'
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AProposRoute = AProposRouteImport.update({
+  id: '/a-propos',
+  path: '/a-propos',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminRoute = AdminRouteImport.update({
@@ -55,6 +61,7 @@ const SujetIdRoute = SujetIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/a-propos': typeof AProposRoute
   '/admin': typeof AdminRoute
   '/calendrier': typeof CalendrierRoute
   '/cours': typeof CoursRoute
@@ -64,6 +71,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/a-propos': typeof AProposRoute
   '/admin': typeof AdminRoute
   '/calendrier': typeof CalendrierRoute
   '/cours': typeof CoursRoute
@@ -74,6 +82,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/a-propos': typeof AProposRoute
   '/admin': typeof AdminRoute
   '/calendrier': typeof CalendrierRoute
   '/cours': typeof CoursRoute
@@ -85,6 +94,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/a-propos'
     | '/admin'
     | '/calendrier'
     | '/cours'
@@ -94,6 +104,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/a-propos'
     | '/admin'
     | '/calendrier'
     | '/cours'
@@ -103,6 +114,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/a-propos'
     | '/admin'
     | '/calendrier'
     | '/cours'
@@ -113,6 +125,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AProposRoute: typeof AProposRoute
   AdminRoute: typeof AdminRoute
   CalendrierRoute: typeof CalendrierRoute
   CoursRoute: typeof CoursRoute
@@ -128,6 +141,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/a-propos': {
+      id: '/a-propos'
+      path: '/a-propos'
+      fullPath: '/a-propos'
+      preLoaderRoute: typeof AProposRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin': {
@@ -177,6 +197,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AProposRoute: AProposRoute,
   AdminRoute: AdminRoute,
   CalendrierRoute: CalendrierRoute,
   CoursRoute: CoursRoute,
