@@ -1,0 +1,162 @@
+[
+  {
+    "id": "EX25C-01",
+    "code": "INCENDIES-SCHEMA",
+    "titre": "Partie A, exercice 1 : Interprétation du schéma et erreurs d'insertion",
+    "description": "Affirmations Oui/Non sur le schéma Gestion_Incendies, contraintes d'intégrité (DEFAULT, REFERENCES, NOT NULL, UNIQUE, ON DELETE CASCADE, ALTER TABLE) et repérage des violations lors d'une insertion.",
+    "points": 3.25,
+    "ordre": 1,
+    "fichier": "reponses.sql",
+    "sonde": {
+      "type": "sql_query_result",
+      "query": "SELECT 1;",
+      "expectedRowCount": 1
+    },
+    "fail_message": "Erreurs dans l'interprétation du schéma ou des contraintes d'intégrité.",
+    "indices": [
+      "Une clé étrangère simple signifie « un seul » côté qui la porte (codeGouv dans Ville, codeVille dans Foret).",
+      "Trois types de violations : clé primaire (doublon), référentielle (valeur absente de la table mère), domaine (valeur interdite).",
+      "Lignes 3 (Foret.codeVille), 4 (Foret.superficieForet) et 7 (Ville.codeVille)."
+    ]
+  },
+  {
+    "id": "EX25C-02",
+    "code": "INCENDIES-REQUETE-R",
+    "titre": "Partie A, exercice 2 : Interprétation de la requête R",
+    "description": "Résultat d'une jointure avec SUM et GROUP BY, rôle de la requête et ajout d'un HAVING.",
+    "points": 1.75,
+    "ordre": 2,
+    "fichier": "reponses.sql",
+    "sonde": {
+      "type": "sql_query_result",
+      "query": "SELECT 1;",
+      "expectedRowCount": 1
+    },
+    "fail_message": "Le résultat, le rôle ou la réécriture de la requête R est incorrect.",
+    "indices": [
+      "Additionnez superficieInt pour chaque type avant de lire le résultat.",
+      "Un type sans intervention n'apparaît pas dans une jointure interne.",
+      "Filtrer sur une somme demande HAVING après GROUP BY."
+    ]
+  },
+  {
+    "id": "EX25C-03",
+    "code": "INCENDIES-SQL",
+    "titre": "Partie A, exercice 3 : Manipulation de la structure et des données",
+    "description": "ALTER TABLE, UPDATE, INSERT d'une intervention non achevée et six requêtes (jointures, COUNT, SUM, DISTINCT, HAVING, sous-requête MAX).",
+    "points": 5.5,
+    "ordre": 3,
+    "fichier": "reponses.sql",
+    "sonde": {
+      "type": "sql_query_result",
+      "query": "SELECT 1;",
+      "expectedRowCount": 1
+    },
+    "fail_message": "Une instruction de structure ou une requête SQL est incorrecte.",
+    "indices": [
+      "Supprimer ou renommer un champ : ALTER TABLE ... DROP / RENAME ; changer ses valeurs : UPDATE ... SET.",
+      "Une intervention non achevée n'a pas de date de fin : on omet dateHeureFinInt.",
+      "Plusieurs forêts peuvent avoir la superficie maximale : comparez à (SELECT MAX(...))."
+    ]
+  },
+  {
+    "id": "EX25C-04",
+    "code": "INCENDIES-EXTENSION",
+    "titre": "Partie A, exercice 4 : Extension de la base",
+    "description": "Représentation textuelle de Espece et ImpactEspece, clé primaire composée (règle R3) et table StatutEspece (R4, R5).",
+    "points": 1.5,
+    "ordre": 4,
+    "fichier": "reponses.sql",
+    "sonde": {
+      "type": "sql_query_result",
+      "query": "SELECT 1;",
+      "expectedRowCount": 1
+    },
+    "fail_message": "La représentation textuelle ne respecte pas les règles de gestion ou omet des clés.",
+    "indices": [
+      "Une clé primaire composée de (codeEspece, codeIncendie) interdit d'enregistrer deux fois le même impact.",
+      "R4 et R5 : la clé étrangère codeStatut se place dans Espece.",
+      "Indiquez toujours la clé primaire (#) et les clés étrangères (#) de chaque table."
+    ]
+  },
+  {
+    "id": "EX25C-05",
+    "code": "WEB-HTML",
+    "titre": "Partie B, exercice 1 : Analyse du code HTML",
+    "description": "Rôle de title, header, liens internes et externes, attribut required et placement des balises par numéro de ligne.",
+    "points": 3.0,
+    "ordre": 5,
+    "fichier": "reponses.sql",
+    "sonde": {
+      "type": "sql_query_result",
+      "query": "SELECT 1;",
+      "expectedRowCount": 1
+    },
+    "fail_message": "Erreurs d'interprétation du code HTML de la page Statistiques_Interventions.html.",
+    "indices": [
+      "Un lien interne pointe vers une ancre de la même page (#stat).",
+      "<header> est dans <body> ; <title> est le titre de la page.",
+      "Replacez chaque balise dans la structure : head, header, nav, section, form, footer."
+    ]
+  },
+  {
+    "id": "EX25C-06",
+    "code": "WEB-CSS",
+    "titre": "Partie B, exercice 2 : Analyse du code CSS",
+    "description": "Sélecteurs de classe et d'élément, display inline, background-size, background-image et effet de :hover avec text-transform.",
+    "points": 1.0,
+    "ordre": 6,
+    "fichier": "reponses.sql",
+    "sonde": {
+      "type": "sql_query_result",
+      "query": "SELECT 1;",
+      "expectedRowCount": 1
+    },
+    "fail_message": "Erreurs d'analyse du code CSS (mesStyles.css).",
+    "indices": [
+      "Une classe se cible avec un point (.menu) ; les liens avec le sélecteur a.",
+      "background-size dimensionne l'image de fond ; background-image la définit.",
+      ":hover + text-transform: uppercase met le texte en majuscules au survol."
+    ]
+  },
+  {
+    "id": "EX25C-07",
+    "code": "WEB-JS",
+    "titre": "Partie B, exercice 3 : Analyse du code JavaScript",
+    "description": "Éléments du langage (String, Date, getDate, value, checked, getElementsByName, alert, return), trace de la fonction inconnue et rôle.",
+    "points": 2.0,
+    "ordre": 7,
+    "fichier": "reponses.sql",
+    "sonde": {
+      "type": "sql_query_result",
+      "query": "SELECT 1;",
+      "expectedRowCount": 1
+    },
+    "fail_message": "Erreurs d'analyse du code JavaScript (mesScripts.js).",
+    "indices": [
+      "Suivez i, test et interventions[i].checked à chaque tour du do ... while.",
+      "La boucle s'arrête dès qu'une case cochée est trouvée ou quand i atteint le dernier indice.",
+      "La fonction renvoie true si au moins un type d'intervention est coché."
+    ]
+  },
+  {
+    "id": "EX25C-08",
+    "code": "WEB-PHP",
+    "titre": "Partie B, exercice 4 : Analyse du code PHP",
+    "description": "Fonctions mysqli (connexion, requête, nombre de lignes, lecture d'un enregistrement, fermeture), count, strlen et substr.",
+    "points": 2.0,
+    "ordre": 8,
+    "fichier": "reponses.sql",
+    "sonde": {
+      "type": "sql_query_result",
+      "query": "SELECT 1;",
+      "expectedRowCount": 1
+    },
+    "fail_message": "Fonctions PHP incorrectes dans le fichier Statistiques_Types.php.",
+    "indices": [
+      "Connexion : mysqli_connect ; exécution : mysqli_query($con, $req) ; fermeture : mysqli_close($con).",
+      "Nombre de lignes : mysqli_num_rows($res) ; un enregistrement : mysqli_fetch_array($res).",
+      "Sans le dernier caractère : substr($ch, 0, $L - 1)."
+    ]
+  }
+]
