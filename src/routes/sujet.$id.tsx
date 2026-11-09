@@ -161,6 +161,7 @@ function WorkspaceView({ ex }: { ex: Exercise }) {
   const [unlockedHints, setUnlockedHints] = useState<UnlockedHint[]>([]);
   const [unlockingHint, setUnlockingHint] = useState(false);
   const [verifying, setVerifying] = useState(false);
+  const [evaluationError, setEvaluationError] = useState<string | null>(null);
   const [cursorPos, setCursorPos] = useState({ line: 1, col: 1 });
   const [showCourseDrawer, setShowCourseDrawer] = useState(false);
 
@@ -198,32 +199,18 @@ function WorkspaceView({ ex }: { ex: Exercise }) {
   const isExamMode = Boolean(ex.examMode);
 
   // Synchronisation du compte à rebours officiel d'examen avec l'horloge et l'échéance serveur (#198, PRD F-48, F-50, T-06).
-  // Le localStorage n'est utilisé que comme cache d'affichage initial ; la base de données fait foi.
-  const [examDeadline, setExamDeadline] = useState<string | null>(() => {
-    if (!isExamMode) return null;
-    return lireCacheChronometreExamen(id)?.echeanceServeur ?? null;
-  });
-  const [examProjetId, setExamProjetId] = useState<string | null>(() => {
-    if (!isExamMode) return null;
-    return lireCacheChronometreExamen(id)?.projetId ?? null;
-  });
-  const [examVersionId, setExamVersionId] = useState<string | null>(() => {
-    if (!isExamMode) return null;
-    return lireCacheChronometreExamen(id)?.versionId ?? null;
-  });
-  const [examCadre, setExamCadre] = useState<CadreExamenPratique>(() => {
-    if (!isExamMode) return "entrainement";
-    return lireCacheChronometreExamen(id)?.cadre ?? "entrainement";
-  });
+  // Le localStorage n'est lu QU'APRÈS le montage (effet ci-dessous) : le lire pendant le rendu
+  // produit un écart serveur/client (erreur React #418, #196). La base de données fait foi.
+  const [examDeadline, setExamDeadline] = useState<string | null>(null);
+  const [examProjetId, setExamProjetId] = useState<string | null>(null);
+  const [examVersionId, setExamVersionId] = useState<string | null>(null);
+  const [examCadre, setExamCadre] = useState<CadreExamenPratique>("entrainement");
   const [restartingExam, setRestartingExam] = useState(false);
   const [showSolutionModal, setShowSolutionModal] = useState(false);
 
-  const [countdown, setCountdown] = useState(() => {
-    if (!isExamMode) return null;
-    const cached = lireCacheChronometreExamen(id);
-    if (!cached) return null;
-    return calculerCompteARebours(cached.echeanceServeur, getTempsServeurSynchronise());
-  });
+  const [countdown, setCountdown] = useState<ReturnType<typeof calculerCompteARebours> | null>(
+    null,
+  );
 
   useEffect(() => {
     if (!isExamMode) {
@@ -312,6 +299,7 @@ function WorkspaceView({ ex }: { ex: Exercise }) {
       Object.entries(files).map(([nom, f]) => [nom, f.content]),
     );
 
+    setEvaluationError(null);
     try {
       // Moteur unique (issue #127) : chaque critère est évalué sur sa page, dans une frame sandboxée
       const { resultats: r, bilan: sc } = await evaluerCopie(
@@ -372,6 +360,13 @@ function WorkspaceView({ ex }: { ex: Exercise }) {
       }
     } catch (err) {
       console.error("Erreur lors de l'évaluation formative :", err);
+      const watchdog = err instanceof Error && err.message.includes("Watchdog");
+      setEvaluationError(
+        watchdog
+          ? "L'évaluation a dépassé 3 secondes et a été interrompue (boucle infinie ou page trop lourde ?). Vérifiez votre code puis relancez."
+          : "L'évaluation a échoué. Vérifiez votre code puis relancez.",
+      );
+      setSidebarTab("resultats");
     } finally {
       setVerifying(false);
     }
@@ -779,6 +774,22 @@ function WorkspaceView({ ex }: { ex: Exercise }) {
                 onAddFile={addNewFile}
                 onDeleteFile={removeFile}
               />
+            )}
+
+            {sidebarTab === "resultats" && evaluationError && (
+              <div
+                role="alert"
+                className="m-3 rounded-md border border-rose-500/30 bg-rose-500/10 p-3 text-xs text-rose-500 space-y-2"
+              >
+                <p>{evaluationError}</p>
+                <button
+                  onClick={handleVerify}
+                  disabled={verifying}
+                  className="rounded border border-rose-500/40 px-2.5 py-1 font-semibold hover:bg-rose-500/15 disabled:opacity-50 cursor-pointer"
+                >
+                  Relancer l'évaluation
+                </button>
+              </div>
             )}
 
             {sidebarTab === "resultats" && (
