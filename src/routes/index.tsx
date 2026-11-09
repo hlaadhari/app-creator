@@ -83,7 +83,10 @@ function Index() {
   const [dernierTravail, setDernierTravail] = useState<DernierTravailEnCours | null>(null);
 
   const epreuvesEcrites = useMemo(
-    () => [...getAllWrittenExams()].sort((a, b) => (b.year ?? 0) - (a.year ?? 0) || a.title.localeCompare(b.title)),
+    () =>
+      [...getAllWrittenExams()].sort(
+        (a, b) => (b.year ?? 0) - (a.year ?? 0) || a.title.localeCompare(b.title),
+      ),
     [],
   );
 
