@@ -47,6 +47,53 @@
           "code": "-- 1. Consultation avec projection et jointure relationnelle\nSELECT c.cin, c.nom, s.libelle, c.moyenne\nFROM candidat c\nINNER JOIN section s ON c.code_sec = s.code_sec\nWHERE c.moyenne >= 10.00\nORDER BY c.moyenne DESC;\n\n-- 2. Statistiques et regroupement avec HAVING\nSELECT s.libelle, \n       COUNT(c.cin) AS total_inscrits, \n       ROUND(AVG(c.moyenne), 2) AS moyenne_section\nFROM section s\nLEFT JOIN candidat c ON s.code_sec = c.code_sec\nGROUP BY s.code_sec, s.libelle\nHAVING total_inscrits >= 1\nORDER BY moyenne_section DESC;"
         }
       ]
+    },
+    {
+      "id": "sql-modelisation",
+      "title": "4. Modélisation & Schéma Relationnel",
+      "description": "Cardinalités, clés primaires et étrangères, association N:M et traduction des règles de gestion en contraintes.",
+      "keyPoints": [
+        "Cardinalité 1,N : la clé primaire du côté 1 migre comme clé étrangère côté N.",
+        "Association N:M : table à part, clé primaire composée des deux clés étrangères.",
+        "Règle de gestion = contrainte : NOT NULL, CHECK, DEFAULT, REFERENCES."
+      ],
+      "snippets": [
+        {
+          "title": "Association N:M : table de location",
+          "language": "sql",
+          "targetFile": "schema.sql",
+          "keywords": ["PRIMARY KEY", "FOREIGN KEY", "REFERENCES", "CHECK", "DEFAULT"],
+          "code": "CREATE TABLE client (\n  num_cli INT PRIMARY KEY,\n  nom VARCHAR(40) NOT NULL\n);\n\nCREATE TABLE habit (\n  num_hab INT PRIMARY KEY,\n  libelle VARCHAR(50) NOT NULL,\n  prix DECIMAL(6, 2) CHECK (prix > 0)\n);\n\nCREATE TABLE location (\n  num_cli INT NOT NULL,\n  num_hab INT NOT NULL,\n  date_loc DATE NOT NULL,\n  duree INT DEFAULT 1 CHECK (duree >= 1),\n  PRIMARY KEY (num_cli, num_hab, date_loc),\n  FOREIGN KEY (num_cli) REFERENCES client(num_cli),\n  FOREIGN KEY (num_hab) REFERENCES habit(num_hab)\n);"
+        },
+        {
+          "title": "Modifier le schéma avec ALTER TABLE",
+          "language": "sql",
+          "targetFile": "schema.sql",
+          "keywords": ["ALTER TABLE", "ADD COLUMN", "ADD CONSTRAINT", "MODIFY", "DROP COLUMN"],
+          "code": "ALTER TABLE habit ADD COLUMN stock INT DEFAULT 0;\nALTER TABLE habit ADD CONSTRAINT chk_stock CHECK (stock >= 0);\nALTER TABLE habit MODIFY libelle VARCHAR(80) NOT NULL;\nALTER TABLE habit DROP COLUMN stock;"
+        }
+      ]
+    },
+    {
+      "id": "sql-avance",
+      "title": "5. Requêtes Avancées",
+      "description": "Sous-requêtes IN, LIKE, jointure externe, pourcentage et filtres sur dates.",
+      "snippets": [
+        {
+          "title": "Sous-requête IN et LIKE",
+          "language": "sql",
+          "targetFile": "requetes.sql",
+          "keywords": ["IN", "SELECT", "LIKE", "WHERE"],
+          "code": "SELECT cin, nom\nFROM candidat\nWHERE code_sec IN (SELECT code_sec FROM section WHERE libelle LIKE '%Info%');\n\nSELECT nom FROM candidat WHERE nom LIKE 'B%';"
+        },
+        {
+          "title": "Jointure externe et pourcentage",
+          "language": "sql",
+          "targetFile": "requetes.sql",
+          "keywords": ["LEFT JOIN", "COUNT", "ROUND", "SUM", "BETWEEN"],
+          "code": "SELECT s.libelle, COUNT(c.cin) AS effectif\nFROM section s\nLEFT JOIN candidat c ON c.code_sec = s.code_sec\nGROUP BY s.code_sec, s.libelle;\n\nSELECT ROUND(100 * SUM(moyenne >= 10) / COUNT(*), 1) AS pourcentage_admis\nFROM candidat;\n\nSELECT cin, nom FROM candidat\nWHERE date_naiss BETWEEN '2006-01-01' AND '2006-12-31';"
+        }
+      ]
     }
   ]
 }

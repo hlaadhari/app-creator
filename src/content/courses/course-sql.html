@@ -268,4 +268,118 @@ FROM eleve
 WHERE MONTH(date_naiss) = 4;</code></pre>
     </div>
   </article>
+
+  <!-- 6. Modélisation & schéma relationnel -->
+  <article id="sql-modelisation" class="course-section">
+    <h2>6. Modélisation &amp; Schéma Relationnel</h2>
+    <p>
+      Une base de données relationnelle se décrit par un <strong>schéma relationnel</strong> :
+      chaque table (relation) a une <strong>clé primaire</strong> (soulignée) et, le cas échéant,
+      des <strong>clés étrangères</strong> (précédées de #) qui référencent la clé primaire d'une
+      autre table.
+    </p>
+    <ul>
+      <li>
+        <strong>Cardinalité 1,N / 0,N</strong> : la clé primaire du côté « 1 » migre comme clé
+        étrangère dans la table du côté « N ». Un élève appartient à une seule section, une section
+        compte plusieurs élèves : <code>eleve(cin, nom, #code_sec)</code>.
+      </li>
+      <li>
+        <strong>Association N:M</strong> : elle devient une table à part, dont la clé primaire est
+        composée des deux clés étrangères (plus les attributs propres de l'association).
+      </li>
+      <li>
+        <strong>Règle de gestion</strong> : une phrase de l'énoncé se traduit par une contrainte
+        (<code>NOT NULL</code>, <code>CHECK</code>, <code>DEFAULT</code>, <code>REFERENCES</code>).
+      </li>
+    </ul>
+
+    <div class="code-card">
+      <div class="code-card-header">
+        <span>Du schéma relationnel au script SQL (association N:M)</span>
+        <span class="lang-tag">SQL</span>
+      </div>
+      <pre><code class="language-sql">-- Schéma : client(num_cli, nom)  habit(num_hab, libelle, prix)
+--          location(#num_cli, #num_hab, date_loc, duree)
+-- Règle de gestion : un client peut louer plusieurs habits, un habit peut être
+-- loué par plusieurs clients à des dates différentes.
+CREATE TABLE client (
+  num_cli INT PRIMARY KEY,
+  nom VARCHAR(40) NOT NULL
+);
+
+CREATE TABLE habit (
+  num_hab INT PRIMARY KEY,
+  libelle VARCHAR(50) NOT NULL,
+  prix DECIMAL(6, 2) CHECK (prix &gt; 0)
+);
+
+CREATE TABLE location (
+  num_cli INT NOT NULL,
+  num_hab INT NOT NULL,
+  date_loc DATE NOT NULL,
+  duree INT DEFAULT 1 CHECK (duree &gt;= 1),
+  PRIMARY KEY (num_cli, num_hab, date_loc),
+  FOREIGN KEY (num_cli) REFERENCES client(num_cli),
+  FOREIGN KEY (num_hab) REFERENCES habit(num_hab)
+);</code></pre>
+    </div>
+
+    <div class="code-card">
+      <div class="code-card-header">
+        <span>Interpréter et modifier les contraintes (ALTER TABLE)</span>
+        <span class="lang-tag">SQL</span>
+      </div>
+      <pre><code class="language-sql">-- DEFAULT : valeur prise si la colonne est omise à l'insertion
+-- NOT NULL : valeur obligatoire ; REFERENCES : la valeur doit exister dans la table mère
+-- CHECK : condition logique que chaque ligne doit respecter
+ALTER TABLE habit ADD COLUMN stock INT DEFAULT 0;
+ALTER TABLE habit ADD CONSTRAINT chk_stock CHECK (stock &gt;= 0);
+ALTER TABLE location ADD CONSTRAINT chk_duree_max CHECK (duree &lt;= 30);
+ALTER TABLE habit MODIFY libelle VARCHAR(80) NOT NULL;
+ALTER TABLE habit DROP COLUMN stock;</code></pre>
+    </div>
+  </article>
+
+  <!-- 7. Requêtes avancées -->
+  <article id="sql-avance" class="course-section">
+    <h2>7. Requêtes Avancées : Sous-requêtes, LIKE, Jointures Externes, Pourcentages</h2>
+    <div class="code-card">
+      <div class="code-card-header">
+        <span>Sous-requêtes, LIKE, jointure externe et pourcentage</span>
+        <span class="lang-tag">SQL</span>
+      </div>
+      <pre><code class="language-sql">-- 1. Sous-requête avec IN : élèves des sections dont le libellé contient 'Info'
+SELECT cin, nom
+FROM eleve
+WHERE code_sec IN (SELECT code_sec FROM section WHERE libelle_sec LIKE '%Info%');
+
+-- 2. Sous-requête scalaire : élèves dont la moyenne dépasse la moyenne générale
+SELECT cin, nom, moyenne
+FROM eleve
+WHERE moyenne &gt; (SELECT AVG(moyenne) FROM eleve);
+
+-- 3. LIKE : % remplace n caractères, _ remplace exactement un caractère
+SELECT nom FROM eleve WHERE nom LIKE 'B%';      -- commence par B
+SELECT nom FROM eleve WHERE nom LIKE '_a%';     -- 2e lettre = a
+
+-- 4. Jointure externe : toutes les sections, même sans élève
+SELECT s.libelle_sec, COUNT(e.cin) AS effectif
+FROM section s
+LEFT JOIN eleve e ON e.code_sec = s.code_sec
+GROUP BY s.code_sec, s.libelle_sec;
+
+-- 5. Pourcentage : part des élèves admis (moyenne &gt;= 10)
+SELECT ROUND(100 * SUM(moyenne &gt;= 10) / COUNT(*), 1) AS pourcentage_admis
+FROM eleve;
+
+-- 6. Filtre sur une période de dates
+SELECT cin, nom FROM eleve
+WHERE date_naiss BETWEEN '2006-01-01' AND '2006-12-31';
+
+-- 7. DISTINCT et HAVING
+SELECT DISTINCT code_sec FROM eleve;
+SELECT code_sec, COUNT(*) AS effectif FROM eleve GROUP BY code_sec HAVING COUNT(*) &gt; 5;</code></pre>
+    </div>
+  </article>
 </section>

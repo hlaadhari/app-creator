@@ -260,4 +260,73 @@ describe("Support de Cours Interactif & Mémento Bac STI (feat/course-support-ht
       expect(rAnnales.answer).toContain("Aurythia");
     });
   });
+  describe("Modélisation et requêtes SQL avancées des annales (#205)", () => {
+    const NOTIONS = [
+      "cardinalité",
+      "N:M",
+      "DEFAULT",
+      "NOT NULL",
+      "ALTER TABLE",
+      "IN (SELECT",
+      "LIKE",
+      "LEFT JOIN",
+      "pourcentage",
+      "DISTINCT",
+      "HAVING",
+    ];
+
+    it("le cours SQL traite chaque notion et déclare ses sections", () => {
+      const sql = COURSE_MODULES.find((m) => m.id === "sql")!;
+      const html = sql.rawHtml.toLowerCase();
+      for (const n of NOTIONS) expect(html, n).toContain(n.toLowerCase());
+      for (const id of ["sql-modelisation", "sql-avance"]) {
+        expect(
+          sql.sections.some((s) => s.id === id),
+          id,
+        ).toBe(true);
+        expect(sql.rawHtml).toContain(`id="${id}"`);
+      }
+    });
+
+    it("le mémento propose des extraits exécutables injectables dans l'IDE", async () => {
+      const { MEMENTO_CARDS } = await import("@/content/mementos");
+      const f = MEMENTO_CARDS.find((c) => c.id === "sql")!;
+      for (const id of ["sql-modelisation", "sql-avance"]) {
+        const sec = f.sections.find((s) => s.id === id);
+        expect(sec, id).toBeDefined();
+        expect(sec!.snippets.length).toBeGreaterThan(0);
+        for (const sn of sec!.snippets) {
+          expect(sn.targetFile).toBeTruthy();
+          expect(sn.code.trim().endsWith(";")).toBe(true);
+        }
+      }
+      const code = f.sections.flatMap((s) => s.snippets.map((sn) => sn.code)).join(" ");
+      for (const motif of ["IN (SELECT", "LIKE", "LEFT JOIN", "100 *", "ALTER TABLE"]) {
+        expect(code, motif).toContain(motif);
+      }
+    });
+
+    it("le carnet fournit au moins une flashcard et une question de quiz cohérentes par notion", async () => {
+      const { NOTEBOOK_FLASHCARDS, NOTEBOOK_QUIZZES } = await import("@/content/notebook-sti");
+      const cartes = NOTEBOOK_FLASHCARDS.filter((c) => c.moduleId === "sql");
+      const tout = cartes.map((c) => `${c.tag} ${c.question} ${c.answer}`).join(" ");
+      for (const m of [
+        "N:M",
+        "Cardinalit",
+        "IN avec une sous-requête",
+        "LEFT JOIN",
+        "pourcentage",
+      ]) {
+        expect(tout, m).toContain(m);
+      }
+      const ids = NOTEBOOK_QUIZZES.sql.map((q) => q.id);
+      expect(new Set(ids).size).toBe(ids.length);
+      for (const q of NOTEBOOK_QUIZZES.sql) {
+        expect(q.options.length).toBeGreaterThanOrEqual(3);
+        expect(q.correctIndex).toBeGreaterThanOrEqual(0);
+        expect(q.correctIndex).toBeLessThan(q.options.length);
+      }
+      expect(NOTEBOOK_QUIZZES.sql.length).toBeGreaterThanOrEqual(7);
+    });
+  });
 });
