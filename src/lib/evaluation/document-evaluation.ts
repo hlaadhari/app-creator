@@ -69,7 +69,8 @@ export function serialiserCriteresPourSandbox(criteres: Criterion[]): CritereSer
  * Empêche le code élève d'enregistrer un gestionnaire `beforeunload` : le navigateur bloque
  * la boîte de confirmation d'une frame sans geste utilisateur et pollue la console (#196).
  */
-export const NEUTRALISEUR_BEFOREUNLOAD = "<script>(function(){try{Object.defineProperty(window,\"onbeforeunload\",{get:function(){return null;},set:function(){},configurable:false});}catch(e){}var a=window.addEventListener;window.addEventListener=function(t){if(t===\"beforeunload\"||t===\"unload\")return;return a.apply(this,arguments);};})();</script>";
+export const NEUTRALISEUR_BEFOREUNLOAD =
+  '<script>(function(){try{Object.defineProperty(window,"onbeforeunload",{get:function(){return null;},set:function(){},configurable:false});}catch(e){}var a=window.addEventListener;window.addEventListener=function(t){if(t==="beforeunload"||t==="unload")return;return a.apply(this,arguments);};})();</script>';
 
 /**
  * Construit le `srcdoc` d'évaluation isolée (`sandbox="allow-scripts"`) incluant le script
