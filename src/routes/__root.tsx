@@ -15,6 +15,8 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { AuthProvider } from "@/lib/supabase/auth";
 import { RolePreviewBanner } from "@/components/RolePreviewBanner";
+import { Toaster } from "@/components/ui/sonner";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { registerOfflineServiceWorker } from "@/lib/storage/service-worker-register";
 
 function NotFoundComponent() {
@@ -126,6 +128,7 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     void registerOfflineServiceWorker();
@@ -137,6 +140,8 @@ function RootComponent() {
         <RolePreviewBanner />
         {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
         <Outlet />
+        {/* En haut sur mobile pour ne pas passer sous le clavier virtuel (#238). */}
+        <Toaster position={isMobile ? "top-center" : "bottom-right"} richColors closeButton />
       </AuthProvider>
     </QueryClientProvider>
   );

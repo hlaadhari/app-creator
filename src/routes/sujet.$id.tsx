@@ -10,6 +10,7 @@ import {
 import { chargerSujetPublie } from "@/lib/supabase/sujets-publies";
 import { clear } from "@/lib/progress";
 import { useBufferSync } from "@/lib/storage/useBufferSync";
+import { notify } from "@/lib/notify";
 import { deleteFromBuffer } from "@/lib/storage/indexeddb";
 import { SyncStatusBar } from "@/components/workspace/SyncStatusBar";
 import { ConflictModal } from "@/components/workspace/ConflictModal";
@@ -186,6 +187,19 @@ function WorkspaceView({ ex }: { ex: Exercise }) {
     return "";
   }, [evaluationSummary, syncStatus]);
 
+  // Retour d'état de synchronisation : seules les transitions utiles sont notifiées.
+  const previousSyncStatus = useRef(syncStatus);
+  useEffect(() => {
+    const previous = previousSyncStatus.current;
+    previousSyncStatus.current = syncStatus;
+    if (previous === syncStatus) return;
+    if (syncStatus === "offline") {
+      notify.info("Hors ligne : votre travail est conservé sur cet appareil.", { id: "sync" });
+    } else if (previous === "offline" && syncStatus === "synced") {
+      notify.success("Connexion rétablie : travail synchronisé.", { id: "sync" });
+    }
+  }, [syncStatus]);
+
   const handleInsertCourseCode = (snippet: string, targetFile?: string | undefined) => {
     const destFile = targetFile && files[targetFile] ? targetFile : activeFileName;
     if (destFile !== activeFileName) {
@@ -338,6 +352,16 @@ function WorkspaceView({ ex }: { ex: Exercise }) {
 
       setEvaluationSummary(summary);
       setSidebarTab("resultats");
+      if (notable) {
+        notify.success(`Vérification terminée : ${sc.note20}/20`, {
+          description: `${sc.got} points sur ${sc.total}`,
+          id: "verification",
+        });
+      } else {
+        notify.info("Vérification terminée : aucun critère noté automatiquement.", {
+          id: "verification",
+        });
+      }
 
       if (notable) {
         enregistrerNouvelleTentative({
@@ -366,6 +390,10 @@ function WorkspaceView({ ex }: { ex: Exercise }) {
           ? "L'évaluation a dépassé 3 secondes et a été interrompue (boucle infinie ou page trop lourde ?). Vérifiez votre code puis relancez."
           : "L'évaluation a échoué. Vérifiez votre code puis relancez.",
       );
+      notify.error(watchdog ? "Évaluation interrompue (plus de 3 s)" : "L'évaluation a échoué", {
+        description: "Vérifiez votre code puis relancez.",
+        id: "verification",
+      });
       setSidebarTab("resultats");
     } finally {
       setVerifying(false);
@@ -399,6 +427,7 @@ function WorkspaceView({ ex }: { ex: Exercise }) {
     setActiveFileName(Object.keys(ex.starter)[0] ?? "index.html");
     setEvaluationSummary(null);
     setUnlockedHints([]);
+    notify.info("Sujet réinitialisé aux fichiers de départ");
 
     if (isExamMode && examCadre !== "officiel") {
       const res = await relancerEntrainementExamen(id, ex.dureeMinutes || 90, true);
