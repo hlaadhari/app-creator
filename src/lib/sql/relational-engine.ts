@@ -1426,7 +1426,9 @@ export class RelationalDatabaseEngine {
     }
 
     // 1. IS NULL / IS NOT NULL
-    const nullMatch = trimmed.match(/^([`"']?[a-zA-Z0-9_.]+[`"']?)\s+IS\s+(NOT\s+)?NULL$/i);
+    const nullMatch = trimmed.match(
+      /^((?:YEAR|MONTH|DAY)\(\s*[`"']?[a-zA-Z0-9_.]+[`"']?\s*\)|[`"']?[a-zA-Z0-9_.]+[`"']?)\s+IS\s+(NOT\s+)?NULL$/i,
+    );
     if (nullMatch && nullMatch[1]) {
       const val = this.resolveValue(row, nullMatch[1]);
       const isNull = val === null || val === undefined;
@@ -1435,7 +1437,7 @@ export class RelationalDatabaseEngine {
 
     // 2. BETWEEN val1 AND val2
     const betweenMatch = trimmed.match(
-      /^([`"']?[a-zA-Z0-9_.]+[`"']?)\s+BETWEEN\s+('([^']*)'|"([^"]*)"|-?\d+(?:\.\d+)?)\s+AND\s+('([^']*)'|"([^"]*)"|-?\d+(?:\.\d+)?)$/i,
+      /^((?:YEAR|MONTH|DAY)\(\s*[`"']?[a-zA-Z0-9_.]+[`"']?\s*\)|[`"']?[a-zA-Z0-9_.]+[`"']?)\s+BETWEEN\s+('([^']*)'|"([^"]*)"|-?\d+(?:\.\d+)?)\s+AND\s+('([^']*)'|"([^"]*)"|-?\d+(?:\.\d+)?)$/i,
     );
     if (betweenMatch && betweenMatch[1]) {
       const val = this.resolveValue(row, betweenMatch[1]);
@@ -1459,7 +1461,9 @@ export class RelationalDatabaseEngine {
     }
 
     // 3. IN (val1, val2, ...) ou NOT IN
-    const inMatch = trimmed.match(/^([`"']?[a-zA-Z0-9_.]+[`"']?)\s+(NOT\s+)?IN\s*\(([\s\S]+)\)$/i);
+    const inMatch = trimmed.match(
+      /^((?:YEAR|MONTH|DAY)\(\s*[`"']?[a-zA-Z0-9_.]+[`"']?\s*\)|[`"']?[a-zA-Z0-9_.]+[`"']?)\s+(NOT\s+)?IN\s*\(([\s\S]+)\)$/i,
+    );
     if (inMatch && inMatch[1] && inMatch[3]) {
       const val = this.resolveValue(row, inMatch[1]);
       const allowed = this.parseValueLiterals(inMatch[3]);
@@ -1469,7 +1473,7 @@ export class RelationalDatabaseEngine {
 
     // 4. LIKE (avec % et _)
     const likeMatch = trimmed.match(
-      /^([`"']?[a-zA-Z0-9_.]+[`"']?)\s+(NOT\s+)?LIKE\s+('([^']*)'|"([^"]*)")$/i,
+      /^((?:YEAR|MONTH|DAY)\(\s*[`"']?[a-zA-Z0-9_.]+[`"']?\s*\)|[`"']?[a-zA-Z0-9_.]+[`"']?)\s+(NOT\s+)?LIKE\s+('([^']*)'|"([^"]*)")$/i,
     );
     if (likeMatch && likeMatch[1]) {
       const val = String(this.resolveValue(row, likeMatch[1]) ?? "");
@@ -1488,7 +1492,7 @@ export class RelationalDatabaseEngine {
 
     // 5. Comparaisons directes : =, !=, <>, >=, <=, >, <
     const cmpMatch = trimmed.match(
-      /^([`"']?[a-zA-Z0-9_.]+[`"']?)\s*(=|!=|<>|>=|<=|>|<)\s*([\s\S]+)$/i,
+      /^((?:YEAR|MONTH|DAY)\(\s*[`"']?[a-zA-Z0-9_.]+[`"']?\s*\)|[`"']?[a-zA-Z0-9_.]+[`"']?)\s*(=|!=|<>|>=|<=|>|<)\s*([\s\S]+)$/i,
     );
     if (cmpMatch && cmpMatch[1] && cmpMatch[2] && cmpMatch[3]) {
       const leftKey = cmpMatch[1];

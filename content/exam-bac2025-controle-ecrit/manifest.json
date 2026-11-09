@@ -1,0 +1,1077 @@
+{
+  "id": "exam-bac2025-controle-ecrit",
+  "title": "Bac 2025 (Session de Contrôle) - Épreuve Écrite Systèmes & Technologies de l'Informatique",
+  "referentiel_id": "bac-si-tn",
+  "type_sujet": "annale_officielle",
+  "source_reference": "Ministère de l'Éducation — Tunisie (sujet transcrit du PDF « controle_2025 »)",
+  "statut_validation": "valide_pedagogiquement",
+  "session_annee": 2025,
+  "session_libelle": "Session de contrôle",
+  "category": "Module C - Épreuves Écrites",
+  "exam_type": "written",
+  "session_type": "controle",
+  "year": 2025,
+  "duration": 180,
+  "level": "Difficile",
+  "exam_mode": true,
+  "bareme_total": 20,
+  "tags": [
+    "Gestion_Incendies",
+    "GeoIncendie",
+    "Contraintes d'intégrité",
+    "Modélisation relationnelle",
+    "Jointures, GROUP BY, HAVING",
+    "Sous-requête MAX",
+    "HTML5 formulaire",
+    "CSS3",
+    "JavaScript DOM",
+    "PHP MySQLi"
+  ],
+  "initialSql": "CREATE TABLE IF NOT EXISTS `Gouvernorat` ( `codeGouv` CHAR(3) PRIMARY KEY, `nomGouv` VARCHAR(50) NOT NULL UNIQUE ); CREATE TABLE IF NOT EXISTS `Ville` ( `codeVille` CHAR(5) PRIMARY KEY, `nomVille` VARCHAR(50) NOT NULL, `nbForet` INT CHECK (`nbForet` > 0), `codeGouv` CHAR(3) NOT NULL, FOREIGN KEY (`codeGouv`) REFERENCES `Gouvernorat`(`codeGouv`) ON UPDATE CASCADE ON DELETE CASCADE ); CREATE TABLE IF NOT EXISTS `Foret` ( `codeForet` CHAR(6) PRIMARY KEY, `nomForet` VARCHAR(50) NOT NULL, `superficieForet` DECIMAL(10,3) NOT NULL CHECK (`superficieForet` > 0), `codeVille` CHAR(5) NOT NULL, FOREIGN KEY (`codeVille`) REFERENCES `Ville`(`codeVille`) ON UPDATE CASCADE ON DELETE CASCADE ); CREATE TABLE IF NOT EXISTS `Incendie` ( `codeInc` CHAR(10) PRIMARY KEY, `dateHeureInc` DATETIME NOT NULL, `superficieBrulee` DECIMAL(10,3) NOT NULL CHECK (`superficieBrulee` > 0), `statutInc` CHAR(1) DEFAULT 'A' CHECK (`statutInc` IN ('A', 'E')), `dateHeureExt` DATETIME NULL, `codeForet` CHAR(6) NOT NULL, FOREIGN KEY (`codeForet`) REFERENCES `Foret`(`codeForet`) ON UPDATE CASCADE ON DELETE CASCADE ); CREATE TABLE IF NOT EXISTS `TypeIntervention` ( `codeTypeInt` CHAR(3) PRIMARY KEY, `description` VARCHAR(9) NOT NULL ); CREATE TABLE IF NOT EXISTS `Intervention` ( `codeInt` CHAR(10) PRIMARY KEY, `dateHeureDebInt` DATETIME NOT NULL, `dateHeureFinInt` DATETIME NULL, `superficieInt` DECIMAL(10,3) DEFAULT 0 CHECK (`superficieInt` >= 0), `codeTypeInt` CHAR(3) NOT NULL, `codeInc` CHAR(10) NOT NULL, FOREIGN KEY (`codeTypeInt`) REFERENCES `TypeIntervention`(`codeTypeInt`) ON UPDATE CASCADE ON DELETE CASCADE, FOREIGN KEY (`codeInc`) REFERENCES `Incendie`(`codeInc`) ON UPDATE CASCADE ON DELETE CASCADE ); INSERT INTO `Gouvernorat` VALUES ('G03', 'Ben Arous'), ('G06', 'Zaghouan'), ('G09', 'Jendouba'), ('G11', 'Siliana'), ('G13', 'Kairouan'); INSERT INTO `Ville` VALUES ('V0001', 'Hammam Lif', 1, 'G03'), ('V0002', 'Bargou', 1, 'G11'), ('V0003', 'Zaghouan', 1, 'G06'), ('V0004', 'Aïn Draham', 3, 'G09'), ('V0005', 'Souk Jomaa', 1, 'G09'), ('V0006', 'Ghardimaou', 1, 'G09'); INSERT INTO `Foret` VALUES ('F00001', 'Parc national de Boukornine', 1939.000, 'V0001'), ('F00002', 'Forêt de Jbel Serj', 1720.000, 'V0002'), ('F00003', 'Forêt de Jbel Zaghouan', 2010.000, 'V0003'), ('F00004', 'Réserve naturelle de Aïn Zana', 47.000, 'V0004'), ('F00005', 'Forêt Bent Hmed', 1541.000, 'V0005'), ('F00006', 'Parc national d''El Feija', 2632.000, 'V0006'), ('F00007', 'La Tourbière de Dar Fatma', 15.000, 'V0004'), ('F00008', 'Forêt d''Aïn Soltane', 2632.000, 'V0004'); INSERT INTO `Incendie` VALUES ('INC0000001', '2024-07-01 15:00:00', 200.000, 'E', '2024-07-03 18:00:00', 'F00001'), ('INC0000002', '2024-07-05 10:00:00', 70.000, 'E', '2024-07-05 17:00:00', 'F00002'), ('INC0000003', '2024-08-20 11:00:00', 300.000, 'E', '2024-08-22 12:00:00', 'F00003'), ('INC0000004', '2023-06-15 13:30:00', 50.000, 'E', '2023-06-16 09:00:00', 'F00001'), ('INC0000005', '2023-07-20 16:00:00', 120.000, 'E', '2023-07-21 10:00:00', 'F00001'), ('INC0000006', '2023-08-05 14:00:00', 80.000, 'E', '2023-08-06 08:00:00', 'F00004'), ('INC0000007', '2023-05-30 12:00:00', 40.000, 'E', '2023-05-30 20:00:00', 'F00002'), ('INC0000008', '2024-09-10 09:00:00', 150.000, 'A', NULL, 'F00006'), ('INC0000009', '2024-10-02 17:30:00', 65.000, 'A', NULL, 'F00002'), ('INC0000010', '2025-05-30 09:00:00', 90.000, 'A', NULL, 'F00005'); INSERT INTO `TypeIntervention` VALUES ('TI1', 'Aérienne'), ('TI2', 'Terrestre'), ('TI3', 'Maritime'), ('TI4', 'Mixte'); INSERT INTO `Intervention` VALUES ('INT0000001', '2024-07-01 17:00:00', '2024-07-02 12:00:00', 80.000, 'TI2', 'INC0000001'), ('INT0000002', '2024-07-02 08:00:00', '2024-07-02 12:00:00', 20.000, 'TI1', 'INC0000001'), ('INT0000003', '2024-07-02 12:00:00', '2024-07-03 18:00:00', 100.000, 'TI2', 'INC0000001'), ('INT0000004', '2024-07-05 11:00:00', '2024-07-05 17:00:00', 70.000, 'TI4', 'INC0000002'), ('INT0000005', '2024-08-20 11:30:00', '2024-08-21 12:00:00', 200.000, 'TI1', 'INC0000003'), ('INT0000006', '2024-08-21 11:00:00', '2024-08-22 12:00:00', 100.000, 'TI2', 'INC0000003'), ('INT0000007', '2024-07-03 08:00:00', '2024-07-03 14:00:00', 15.000, 'TI1', 'INC0000001'), ('INT0000008', '2024-07-03 14:00:00', '2024-07-03 18:00:00', 10.000, 'TI3', 'INC0000001'), ('INT0000009', '2024-08-22 06:00:00', '2024-08-22 12:00:00', 40.000, 'TI2', 'INC0000003');",
+  "sections": [
+    {
+      "id": "a-ex1-schema",
+      "title": "Partie A, exercice 1 (1) : Interprétation du schéma et insertions (2.5 pts)",
+      "type": "modeling",
+      "description": "Gestion_Incendies : Gouvernorat (codeGouv, nomGouv) ; Ville (codeVille, nomVille, nbForet, codeGouv#) ; Foret (codeForet, nomForet, superficieForet, codeVille#) ; Incendie (codeInc, dateHeureInc, superficieBrulee, statutInc, dateHeureExt, codeForet#) ; TypeIntervention (codeTypeInt, description) ; Intervention (codeInt, dateHeureDebInt, dateHeureFinInt, superficieInt, codeTypeInt#, codeInc#).",
+      "points": 2.5,
+      "questions": [
+        {
+          "id": "A1-ON-1",
+          "prompt": "Partie A, exercice 1, question 1 : « Chaque gouvernorat comporte une ou plusieurs villes, mais chaque ville est rattachée à un seul gouvernorat. » (Oui ou Non)",
+          "points": 0.125,
+          "type": "code_analysis",
+          "expectedAnswer": "Oui",
+          "expectedRegex": "^(Oui|O)$",
+          "explanation": "Oui : codeGouv est une clé étrangère de Ville, une ville n'a donc qu'un gouvernorat."
+        },
+        {
+          "id": "A1-ON-2",
+          "prompt": "Partie A, exercice 1, question 1 : « Une intervention peut concerner plusieurs incendies simultanément. » (Oui ou Non)",
+          "points": 0.125,
+          "type": "code_analysis",
+          "expectedAnswer": "Non",
+          "expectedRegex": "^(Non|N)$",
+          "explanation": "Non : codeInc est une clé étrangère simple dans Intervention, une intervention vise un seul incendie."
+        },
+        {
+          "id": "A1-ON-3",
+          "prompt": "Partie A, exercice 1, question 1 : « Pour un type d'intervention, on peut mener plusieurs interventions en même temps. » (Oui ou Non)",
+          "points": 0.125,
+          "type": "code_analysis",
+          "expectedAnswer": "Oui",
+          "expectedRegex": "^(Oui|O)$",
+          "explanation": "Oui : codeTypeInt est une clé étrangère de Intervention, un type peut être utilisé par plusieurs interventions."
+        },
+        {
+          "id": "A1-ON-4",
+          "prompt": "Partie A, exercice 1, question 1 : « Il est possible que le statut d'un incendie soit éteint sans nécessiter aucune intervention. » (Oui ou Non)",
+          "points": 0.125,
+          "type": "code_analysis",
+          "expectedAnswer": "Non",
+          "expectedRegex": "^(Non|N)$",
+          "explanation": "Non : statutInc vaut « E » si l'incendie est éteint suite à une intervention."
+        },
+        {
+          "id": "A1-ON-5",
+          "prompt": "Partie A, exercice 1, question 1 : « La date et l'heure d'extinction est obligatoire lors de l'insertion des données dans la table Incendie. » (Oui ou Non)",
+          "points": 0.125,
+          "type": "code_analysis",
+          "expectedAnswer": "Non",
+          "expectedRegex": "^(Non|N)$",
+          "explanation": "Non : si l'incendie est actif, le champ dateHeureExt ne contient aucune valeur (NULL)."
+        },
+        {
+          "id": "A1-ON-6",
+          "prompt": "Partie A, exercice 1, question 1 : « Un incendie peut nécessiter plusieurs interventions en même temps. » (Oui ou Non)",
+          "points": 0.125,
+          "type": "code_analysis",
+          "expectedAnswer": "Oui",
+          "expectedRegex": "^(Oui|O)$",
+          "explanation": "Oui : plusieurs lignes de Intervention peuvent référencer le même codeInc."
+        },
+        {
+          "id": "A1-ON-7",
+          "prompt": "Partie A, exercice 1, question 1 : « Une forêt peut être rattachée à plusieurs villes. » (Oui ou Non)",
+          "points": 0.125,
+          "type": "code_analysis",
+          "expectedAnswer": "Non",
+          "expectedRegex": "^(Non|N)$",
+          "explanation": "Non : codeVille est une clé étrangère simple de Foret, une forêt appartient à une seule ville."
+        },
+        {
+          "id": "A1-ON-8",
+          "prompt": "Partie A, exercice 1, question 1 : « Le même incendie peut se produire dans plusieurs forêts. » (Oui ou Non)",
+          "points": 0.125,
+          "type": "code_analysis",
+          "expectedAnswer": "Non",
+          "expectedRegex": "^(Non|N)$",
+          "explanation": "Non : codeForet est une clé étrangère simple de Incendie."
+        },
+        {
+          "id": "A1-ERR-1",
+          "prompt": "Partie A, exercice 1, question 3 : première erreur d'insertion des données de Ville (lignes 1 à 7) et de Foret. Indiquez le numéro de ligne, la table, le champ et la contrainte non respectée (intégrité de table, référentielle ou de domaine).",
+          "points": 0.5,
+          "type": "representation",
+          "expectedKeywords": ["\\b3\\b", "Foret", "codeVille", "r[ée]f[ée]rentielle"],
+          "explanation": "Ligne 3, table Foret, champ codeVille : « V00003 » n'existe pas dans Ville (V0003) : intégrité référentielle."
+        },
+        {
+          "id": "A1-ERR-2",
+          "prompt": "Partie A, exercice 1, question 3 : deuxième erreur d'insertion. Indiquez le numéro de ligne, la table, le champ et la contrainte non respectée.",
+          "points": 0.5,
+          "type": "representation",
+          "expectedKeywords": ["\\b4\\b", "Foret", "superficieForet", "domaine"],
+          "explanation": "Ligne 4, table Foret, champ superficieForet : -47.000 n'est pas strictement positif : intégrité de domaine."
+        },
+        {
+          "id": "A1-ERR-3",
+          "prompt": "Partie A, exercice 1, question 3 : troisième erreur d'insertion. Indiquez le numéro de ligne, la table, le champ et la contrainte non respectée.",
+          "points": 0.5,
+          "type": "representation",
+          "expectedKeywords": ["\\b7\\b", "Ville", "codeVille", "(cl[ée] primaire|table)"],
+          "explanation": "Ligne 7, table Ville, champ codeVille : « V0006 » existe déjà (ligne 6) : intégrité de table (clé primaire)."
+        }
+      ]
+    },
+    {
+      "id": "a-ex1-contraintes",
+      "title": "Partie A, exercice 1 (2) : Contraintes d'intégrité (0.75 pt)",
+      "type": "qcm",
+      "description": "Pour chaque affirmation, cochez l'unique réponse correcte.",
+      "points": 0.75,
+      "questions": [
+        {
+          "id": "A1-Q2-A",
+          "question": "2.a) Pour initialiser le champ statutInc à la lettre « A » lors de la création de la table Incendie, on utilise :",
+          "options": [
+            {
+              "id": "opt-default",
+              "label": "DEFAULT"
+            },
+            {
+              "id": "opt-distinct",
+              "label": "DISTINCT"
+            },
+            {
+              "id": "opt-null",
+              "label": "NULL"
+            }
+          ],
+          "points": 0.125,
+          "multiple": false,
+          "correctAnswers": ["opt-default"],
+          "explanation": "DEFAULT 'A' fixe la valeur par défaut du champ."
+        },
+        {
+          "id": "A1-Q2-B",
+          "question": "2.b) Pour créer une relation entre la table Gouvernorat et la table Ville, on utilise :",
+          "options": [
+            {
+              "id": "opt-pk",
+              "label": "PRIMARY KEY"
+            },
+            {
+              "id": "opt-notnull",
+              "label": "NOT NULL"
+            },
+            {
+              "id": "opt-references",
+              "label": "REFERENCES"
+            }
+          ],
+          "points": 0.125,
+          "multiple": false,
+          "correctAnswers": ["opt-references"],
+          "explanation": "REFERENCES (clé étrangère) relie Ville à Gouvernorat."
+        },
+        {
+          "id": "A1-Q2-C",
+          "question": "2.c) Pour obliger l'utilisateur à saisir un contenu dans le champ nomForet, on utilise :",
+          "options": [
+            {
+              "id": "opt-default",
+              "label": "DEFAULT"
+            },
+            {
+              "id": "opt-unique",
+              "label": "UNIQUE"
+            },
+            {
+              "id": "opt-notnull",
+              "label": "NOT NULL"
+            }
+          ],
+          "points": 0.125,
+          "multiple": false,
+          "correctAnswers": ["opt-notnull"],
+          "explanation": "NOT NULL rend la saisie obligatoire."
+        },
+        {
+          "id": "A1-Q2-D",
+          "question": "2.d) Pour garantir que le contenu du champ nomGouv ne se répète pas, on utilise :",
+          "options": [
+            {
+              "id": "opt-check",
+              "label": "CHECK"
+            },
+            {
+              "id": "opt-unique",
+              "label": "UNIQUE"
+            },
+            {
+              "id": "opt-references",
+              "label": "REFERENCES"
+            }
+          ],
+          "points": 0.125,
+          "multiple": false,
+          "correctAnswers": ["opt-unique"],
+          "explanation": "UNIQUE interdit les doublons."
+        },
+        {
+          "id": "A1-Q2-E",
+          "question": "2.e) Pour supprimer un enregistrement de la table Ville ainsi que tous les enregistrements de la table Foret qui lui sont associés, on utilise :",
+          "options": [
+            {
+              "id": "opt-delete",
+              "label": "ON DELETE CASCADE"
+            },
+            {
+              "id": "opt-update",
+              "label": "ON UPDATE CASCADE"
+            },
+            {
+              "id": "opt-drop",
+              "label": "ON DROP CASCADE"
+            }
+          ],
+          "points": 0.125,
+          "multiple": false,
+          "correctAnswers": ["opt-delete"],
+          "explanation": "ON DELETE CASCADE propage la suppression aux enregistrements liés."
+        },
+        {
+          "id": "A1-Q2-F",
+          "question": "2.f) Pour ajouter une contrainte d'intégrité nommée FKTypeInt sur la clé étrangère codeTypeInt de la table Intervention, on utilise la commande :",
+          "options": [
+            {
+              "id": "opt-droptable",
+              "label": "DROP TABLE"
+            },
+            {
+              "id": "opt-alter",
+              "label": "ALTER TABLE"
+            },
+            {
+              "id": "opt-update",
+              "label": "UPDATE"
+            }
+          ],
+          "points": 0.125,
+          "multiple": false,
+          "correctAnswers": ["opt-alter"],
+          "explanation": "ALTER TABLE ... ADD CONSTRAINT modifie la structure de la table."
+        }
+      ]
+    },
+    {
+      "id": "a-ex2-requete-r",
+      "title": "Partie A, exercice 2 : Interprétation de la requête R (1.75 pt)",
+      "type": "sql",
+      "description": "Gestion_Incendies : Gouvernorat (codeGouv, nomGouv) ; Ville (codeVille, nomVille, nbForet, codeGouv#) ; Foret (codeForet, nomForet, superficieForet, codeVille#) ; Incendie (codeInc, dateHeureInc, superficieBrulee, statutInc, dateHeureExt, codeForet#) ; TypeIntervention (codeTypeInt, description) ; Intervention (codeInt, dateHeureDebInt, dateHeureFinInt, superficieInt, codeTypeInt#, codeInc#).",
+      "points": 1.75,
+      "questions": [
+        {
+          "id": "A2-R1",
+          "prompt": "Exercice 2, question 1 : d'après l'extrait des tables TypeIntervention et Intervention, donnez le résultat (noms de colonnes compris) de la requête R : SELECT description, SUM(superficieInt) AS SuperficieTotale FROM TypeIntervention T, Intervention I WHERE T.codeTypeInt = I.codeTypeInt GROUP BY description ;",
+          "points": 0.75,
+          "type": "code_analysis",
+          "expectedKeywords": [
+            "description",
+            "SuperficieTotale",
+            "A[ée]rienne\\D*220",
+            "Terrestre\\D*280",
+            "Mixte\\D*70"
+          ],
+          "forbiddenKeywords": ["Maritime\\D*\\d"],
+          "explanation": "Trois lignes : Aérienne 220 (20 + 200), Terrestre 280 (80 + 100 + 100) et Mixte 70 ; Maritime n'a aucune intervention dans l'extrait. Colonnes : description et SuperficieTotale."
+        },
+        {
+          "id": "A2-R2",
+          "prompt": "Exercice 2, question 2 : déduisez le rôle de la requête R.",
+          "points": 0.5,
+          "type": "code_analysis",
+          "expectedKeywords": ["type", "superficie", "total|somme|cumul"],
+          "explanation": "Elle affiche, pour chaque type d'intervention, la superficie totale traitée (somme des superficies des interventions)."
+        },
+        {
+          "id": "A2-R3",
+          "prompt": "Exercice 2, question 3 : réécrivez la requête R pour afficher uniquement les types d'intervention ayant une superficie totale supérieure ou égale à 120.000 hectares.",
+          "points": 0.5,
+          "type": "query",
+          "expectedQuery": "SELECT description, SUM(superficieInt) AS SuperficieTotale FROM TypeIntervention T, Intervention I WHERE T.codeTypeInt = I.codeTypeInt GROUP BY description HAVING SUM(superficieInt) >= 120;",
+          "explanation": "Ajout de HAVING SUM(superficieInt) >= 120 après le GROUP BY."
+        }
+      ]
+    },
+    {
+      "id": "a-ex3-structure",
+      "title": "Partie A, exercice 3 (1) : Manipulation de la structure (1 pt)",
+      "type": "qcm",
+      "description": "Pour chaque affirmation, cochez l'unique réponse correcte.",
+      "points": 1.0,
+      "questions": [
+        {
+          "id": "A3-Q1-A",
+          "question": "Exercice 3, 1.a) Pour supprimer de la table Ville le champ nbForet, la requête est :",
+          "options": [
+            {
+              "id": "opt-delete",
+              "label": "ALTER TABLE Ville DELETE nbForet"
+            },
+            {
+              "id": "opt-drop",
+              "label": "ALTER TABLE Ville DROP nbForet"
+            },
+            {
+              "id": "opt-dropc",
+              "label": "ALTER TABLE Ville DROP CONSTRAINT nbForet"
+            }
+          ],
+          "points": 0.25,
+          "multiple": false,
+          "correctAnswers": ["opt-drop"],
+          "explanation": "ALTER TABLE ... DROP colonne supprime un champ."
+        },
+        {
+          "id": "A3-Q1-B",
+          "question": "Exercice 3, 1.b) Pour attribuer la valeur NULL au champ dateHeureExt de la table Incendie pour tous les incendies ayant le statut actif, on utilise :",
+          "options": [
+            {
+              "id": "opt-alter",
+              "label": "ALTER Table Incendie ADD dateHeureExt DATETIME NULL DEFAULT"
+            },
+            {
+              "id": "opt-updateadd",
+              "label": "UPDATE Incendie ADD dateHeureExt DEFAULT NULL WHERE StatutInc='A'"
+            },
+            {
+              "id": "opt-update",
+              "label": "UPDATE Incendie SET dateHeureExt =NULL WHERE StatutInc='A'"
+            }
+          ],
+          "points": 0.25,
+          "multiple": false,
+          "correctAnswers": ["opt-update"],
+          "explanation": "Modifier des valeurs existantes se fait avec UPDATE ... SET ... WHERE."
+        },
+        {
+          "id": "A3-Q1-C",
+          "question": "Exercice 3, 1.c) Pour modifier le nom du champ dateHeureExt de la table Incendie par dateHExt, on utilise :",
+          "options": [
+            {
+              "id": "opt-rename",
+              "label": "ALTER TABLE Incendie RENAME dateHeureExt To dateHExt"
+            },
+            {
+              "id": "opt-alterinc",
+              "label": "ALTER Incendie RENAME dateHeureExt To dateHExt"
+            },
+            {
+              "id": "opt-update",
+              "label": "UPDATE TABLE Incendie SET dateHeureExt = dateHExt"
+            }
+          ],
+          "points": 0.25,
+          "multiple": false,
+          "correctAnswers": ["opt-rename"],
+          "explanation": "Le renommage d'un champ est une modification de structure : ALTER TABLE."
+        },
+        {
+          "id": "A3-Q1-D",
+          "question": "Exercice 3, 1.d) Pour augmenter la taille du champ nomForet de la table Foret de 50 à 100 caractères, on utilise :",
+          "options": [
+            {
+              "id": "opt-change",
+              "label": "ALTER TABLE Foret CHANGE nomForet varchar(100)"
+            },
+            {
+              "id": "opt-modify",
+              "label": "ALTER TABLE Foret MODIFY nomForet varchar(100)"
+            },
+            {
+              "id": "opt-modifyto",
+              "label": "ALTER TABLE Foret MODIFY nomForet varchar(50) To nomForet varchar(100)"
+            }
+          ],
+          "points": 0.25,
+          "multiple": false,
+          "correctAnswers": ["opt-modify"],
+          "explanation": "MODIFY change le type ou la taille d'un champ existant."
+        }
+      ]
+    },
+    {
+      "id": "a-ex3-sql",
+      "title": "Partie A, exercice 3 (2 et 3) : Insertion et requêtes SQL (4.5 pts)",
+      "type": "sql",
+      "description": "Gestion_Incendies : Gouvernorat (codeGouv, nomGouv) ; Ville (codeVille, nomVille, nbForet, codeGouv#) ; Foret (codeForet, nomForet, superficieForet, codeVille#) ; Incendie (codeInc, dateHeureInc, superficieBrulee, statutInc, dateHeureExt, codeForet#) ; TypeIntervention (codeTypeInt, description) ; Intervention (codeInt, dateHeureDebInt, dateHeureFinInt, superficieInt, codeTypeInt#, codeInc#).",
+      "points": 4.5,
+      "questions": [
+        {
+          "id": "A3-Q2",
+          "prompt": "Exercice 3, question 2 : ajoutez une nouvelle intervention non achevée : code de l'incendie INC0000010, code de l'intervention INT0000017, type TI4, début le 2025-06-01 14:00, superficie 8.000 hectares (l'incendie et le type existent déjà).",
+          "points": 1.0,
+          "type": "dml",
+          "expectedTableRows": {
+            "table": "Intervention",
+            "where": {
+              "codeInt": "INT0000017",
+              "codeTypeInt": "TI4",
+              "codeInc": "INC0000010"
+            },
+            "exactCount": 10
+          },
+          "explanation": "INSERT en omettant dateHeureFinInt (intervention non achevée : NULL)."
+        },
+        {
+          "id": "A3-Q3-A",
+          "prompt": "Exercice 3, 3.a) Quelles sont les forêts localisées dans le gouvernorat de Jendouba ? On affichera les champs nomForet et superficieForet.",
+          "points": 0.5,
+          "type": "query",
+          "expectedQuery": "SELECT nomForet, superficieForet FROM Foret F, Ville V, Gouvernorat G WHERE F.codeVille = V.codeVille AND V.codeGouv = G.codeGouv AND nomGouv = 'Jendouba';",
+          "explanation": "Jointure Foret-Ville-Gouvernorat puis filtre sur nomGouv."
+        },
+        {
+          "id": "A3-Q3-B",
+          "prompt": "Exercice 3, 3.b) Quel est le nombre d'incendies enregistrés pour chaque forêt au cours de l'année 2024 ? On affichera les champs nomForet ainsi que le nombre d'incendies de chaque forêt.",
+          "points": 0.5,
+          "type": "query",
+          "expectedQuery": "SELECT nomForet, COUNT(*) AS nbIncendies FROM Foret F, Incendie I WHERE F.codeForet = I.codeForet AND YEAR(dateHeureInc) = 2024 GROUP BY nomForet;",
+          "explanation": "Jointure Foret-Incendie, filtre YEAR(dateHeureInc) = 2024 et COUNT par forêt."
+        },
+        {
+          "id": "A3-Q3-C",
+          "prompt": "Exercice 3, 3.c) Quelle est la somme des superficies brûlées pendant l'été 2023 (juin, juillet, août) pour chaque ville ? On affichera les champs nomVille ainsi que la somme des superficies brûlées.",
+          "points": 0.75,
+          "type": "query",
+          "expectedQuery": "SELECT nomVille, SUM(superficieBrulee) AS totalBrule FROM Ville V, Foret F, Incendie I WHERE V.codeVille = F.codeVille AND F.codeForet = I.codeForet AND dateHeureInc BETWEEN '2023-06-01 00:00:00' AND '2023-08-31 23:59:59' GROUP BY nomVille;",
+          "explanation": "Jointure Ville-Foret-Incendie, période du 1er juin au 31 août 2023 et SUM par ville."
+        },
+        {
+          "id": "A3-Q3-D",
+          "prompt": "Exercice 3, 3.d) Quels sont les incendies ayant fait l'objet d'une intervention « Aérienne » ? On affichera, sans répétition, les champs codeInc et dateHeureInc.",
+          "points": 0.5,
+          "type": "query",
+          "expectedQuery": "SELECT DISTINCT I.codeInc, dateHeureInc FROM Incendie I, Intervention N, TypeIntervention T WHERE I.codeInc = N.codeInc AND N.codeTypeInt = T.codeTypeInt AND description = 'Aérienne';",
+          "explanation": "Triple jointure et DISTINCT : un incendie peut avoir plusieurs interventions aériennes."
+        },
+        {
+          "id": "A3-Q3-E",
+          "prompt": "Exercice 3, 3.e) Quels sont les incendies ayant subi trois interventions ou plus ? On affichera les champs codeInc, nomForet et dateHeureInc ainsi que le nombre d'interventions.",
+          "points": 0.75,
+          "type": "query",
+          "expectedQuery": "SELECT I.codeInc, nomForet, dateHeureInc, COUNT(*) AS nbInterventions FROM Incendie I, Foret F, Intervention N WHERE I.codeForet = F.codeForet AND I.codeInc = N.codeInc GROUP BY I.codeInc, nomForet, dateHeureInc HAVING COUNT(*) >= 3;",
+          "explanation": "Jointures Incendie-Foret-Intervention, GROUP BY et HAVING COUNT(*) >= 3."
+        },
+        {
+          "id": "A3-Q3-F",
+          "prompt": "Exercice 3, 3.f) Quelles sont les forêts ayant la plus grande superficie ? On affichera les champs nomForet et superficieForet.",
+          "points": 0.5,
+          "type": "query",
+          "expectedQuery": "SELECT nomForet, superficieForet FROM Foret WHERE superficieForet = (SELECT MAX(superficieForet) FROM Foret);",
+          "explanation": "Sous-requête avec MAX : plusieurs forêts peuvent partager la plus grande superficie."
+        }
+      ]
+    },
+    {
+      "id": "a-ex4-extension",
+      "title": "Partie A, exercice 4 : Extension de la base (1.5 pt)",
+      "type": "modeling",
+      "description": "Indiquez à chaque représentation textuelle la clé primaire et les clés étrangères de chaque table.",
+      "points": 1.5,
+      "questions": [
+        {
+          "id": "A4-Q1",
+          "prompt": "Exercice 4, question 1 : d'après les requêtes CREATE TABLE fournies, donnez la représentation textuelle des tables Espece et ImpactEspece (clés primaires et étrangères).",
+          "points": 0.5,
+          "type": "representation",
+          "expectedKeywords": [
+            "Espece",
+            "ImpactEspece",
+            "codeEspece",
+            "nomEspece",
+            "typeEspece",
+            "codeImpact",
+            "codeIncendie",
+            "populationAffectee"
+          ],
+          "explanation": "Espece(#codeEspece, nomEspece, typeEspece) ; ImpactEspece(#codeImpact, codeEspece#, codeIncendie#, populationAffectee)."
+        },
+        {
+          "id": "A4-Q2",
+          "prompt": "Exercice 4, question 2 : proposez une nouvelle représentation textuelle de ImpactEspece respectant les règles R1 (une espèce touchée par plusieurs incendies), R2 (un incendie affecte plusieurs espèces) et R3 (l'impact d'un incendie sur une espèce est enregistré une seule fois).",
+          "points": 0.5,
+          "type": "representation",
+          "expectedKeywords": [
+            "ImpactEspece",
+            "codeEspece",
+            "codeIncendie",
+            "populationAffectee",
+            "ImpactEspece\\s*\\(\\s*#?\\s*codeEspece\\s*#?\\s*,\\s*#?\\s*codeIncendie"
+          ],
+          "forbiddenKeywords": ["ImpactEspece\\s*\\(\\s*#?\\s*codeImpact"],
+          "explanation": "La clé primaire devient composée : ImpactEspece(#codeEspece#, #codeIncendie#, populationAffectee), sans codeImpact : un couple (espèce, incendie) n'apparaît qu'une fois."
+        },
+        {
+          "id": "A4-Q3",
+          "prompt": "Exercice 4, question 3 : ajoutez la table StatutEspece (codeStatut, libelle) avec les règles R4 (une espèce a un seul statut) et R5 (un statut concerne plusieurs espèces). Donnez la représentation textuelle de StatutEspece et de la table modifiée.",
+          "points": 0.5,
+          "type": "representation",
+          "expectedKeywords": [
+            "StatutEspece",
+            "codeStatut",
+            "libelle",
+            "Espece",
+            "codeStatut\\s*#|#\\s*codeStatut"
+          ],
+          "explanation": "StatutEspece(#codeStatut, libelle) et Espece(#codeEspece, nomEspece, typeEspece, codeStatut#) : la clé étrangère va du côté « plusieurs »."
+        }
+      ]
+    },
+    {
+      "id": "b-ex1-html",
+      "title": "Partie B, exercice 1 : Analyse du code HTML (3 pts)",
+      "type": "code_analysis",
+      "description": "Page Statistiques_Interventions.html (Fig. 1 et Fig. 2). Répondez V ou F pour chaque proposition, puis donnez les numéros de ligne demandés.",
+      "points": 3.0,
+      "questions": [
+        {
+          "id": "B1-A-1",
+          "prompt": "Partie B, exercice 1, 1.a) La balise <title> (ligne 4) affiche le titre d'un tableau. (V ou F)",
+          "points": 0.125,
+          "type": "code_analysis",
+          "expectedAnswer": "F",
+          "expectedRegex": "^(F|Faux)$",
+          "codeSnippet": "1 <!DOCTYPE HTML>\n2 <html lang=\"fr\">\n3 <head>\n4   <title>Gestion des Incendies</title>\n5   ........................................\n6   <script src=\"mesScripts.js\"></script>\n7 </head>\n8 ........................................\n9   <header>\n10    <h1>Gestion des Incendies</h1>\n11    ........................................\n12    <nav>\n13      <div class=\"menu\"><a href=\"accueil.html\">Accueil</a></div>\n14      <div class=\"menu\"><a href=\"ajout_donnees.html#intervention\">Ajout des données</a></div>\n15      <div class=\"menu\"><a href=\"#stat\">Statistiques</a></div>\n16    </nav>\n17  </header>\n18  <section id=\"#stat\">\n19    <h3>Statistiques des types d'interventions</h3>\n20    <form id=\"f\" action=\"Statistiques_Types.php\" method=\"POST\" onsubmit=\"return verification()\">\n21      <label>Date et heure de début d'une intervention: </label>\n22      <input id=\"date1\" name=\"date1\" type=\"date\" required>\n23      <input id=\"temps1\" name=\"temps1\" type=\"time\" required><br>\n24      <label>Date et heure de fin d'une intervention: </label>\n25      <input id=\"date2\" name=\"date2\" type=\"date\" required>\n26      <input id=\"temps2\" name=\"temps2\" type=\"time\" required><br>\n27      ........................................\n28      <input name=\"intervention[]\" type=\"checkbox\" value=\"TI1\">Aérienne\n29      <input name=\"intervention[]\" type=\"checkbox\" value=\"TI2\">Terrestre\n30      <input name=\"intervention[]\" type=\"checkbox\" value=\"TI3\">Maritime\n31      <input name=\"intervention[]\" type=\"checkbox\" value=\"TI4\">Mixte <br>\n32      <div>\n33        <input class=\"bouton\" id=\"bt1\" name=\"bt1\" type=\"submit\" value=\"Envoyer\">\n34        ........................................\n35      </div>\n36    </form>\n37  </section>\n38  ........................................\n39 </body>\n40 </html>",
+          "language": "html",
+          "explanation": "<title> donne le titre de la page Web, pas celui d'un tableau."
+        },
+        {
+          "id": "B1-A-2",
+          "prompt": "Partie B, exercice 1, 1.a) La balise <title> (ligne 4) affiche le titre de la page Web. (V ou F)",
+          "points": 0.125,
+          "type": "code_analysis",
+          "expectedAnswer": "V",
+          "expectedRegex": "^(V|Vrai)$",
+          "codeSnippet": "1 <!DOCTYPE HTML>\n2 <html lang=\"fr\">\n3 <head>\n4   <title>Gestion des Incendies</title>\n5   ........................................\n6   <script src=\"mesScripts.js\"></script>\n7 </head>\n8 ........................................\n9   <header>\n10    <h1>Gestion des Incendies</h1>\n11    ........................................\n12    <nav>\n13      <div class=\"menu\"><a href=\"accueil.html\">Accueil</a></div>\n14      <div class=\"menu\"><a href=\"ajout_donnees.html#intervention\">Ajout des données</a></div>\n15      <div class=\"menu\"><a href=\"#stat\">Statistiques</a></div>\n16    </nav>\n17  </header>\n18  <section id=\"#stat\">\n19    <h3>Statistiques des types d'interventions</h3>\n20    <form id=\"f\" action=\"Statistiques_Types.php\" method=\"POST\" onsubmit=\"return verification()\">\n21      <label>Date et heure de début d'une intervention: </label>\n22      <input id=\"date1\" name=\"date1\" type=\"date\" required>\n23      <input id=\"temps1\" name=\"temps1\" type=\"time\" required><br>\n24      <label>Date et heure de fin d'une intervention: </label>\n25      <input id=\"date2\" name=\"date2\" type=\"date\" required>\n26      <input id=\"temps2\" name=\"temps2\" type=\"time\" required><br>\n27      ........................................\n28      <input name=\"intervention[]\" type=\"checkbox\" value=\"TI1\">Aérienne\n29      <input name=\"intervention[]\" type=\"checkbox\" value=\"TI2\">Terrestre\n30      <input name=\"intervention[]\" type=\"checkbox\" value=\"TI3\">Maritime\n31      <input name=\"intervention[]\" type=\"checkbox\" value=\"TI4\">Mixte <br>\n32      <div>\n33        <input class=\"bouton\" id=\"bt1\" name=\"bt1\" type=\"submit\" value=\"Envoyer\">\n34        ........................................\n35      </div>\n36    </form>\n37  </section>\n38  ........................................\n39 </body>\n40 </html>",
+          "language": "html",
+          "explanation": "<title> est le titre de la page Web (onglet du navigateur)."
+        },
+        {
+          "id": "B1-A-3",
+          "prompt": "Partie B, exercice 1, 1.a) La balise <title> (ligne 4) affiche l'auteur de la page Web. (V ou F)",
+          "points": 0.125,
+          "type": "code_analysis",
+          "expectedAnswer": "F",
+          "expectedRegex": "^(F|Faux)$",
+          "codeSnippet": "1 <!DOCTYPE HTML>\n2 <html lang=\"fr\">\n3 <head>\n4   <title>Gestion des Incendies</title>\n5   ........................................\n6   <script src=\"mesScripts.js\"></script>\n7 </head>\n8 ........................................\n9   <header>\n10    <h1>Gestion des Incendies</h1>\n11    ........................................\n12    <nav>\n13      <div class=\"menu\"><a href=\"accueil.html\">Accueil</a></div>\n14      <div class=\"menu\"><a href=\"ajout_donnees.html#intervention\">Ajout des données</a></div>\n15      <div class=\"menu\"><a href=\"#stat\">Statistiques</a></div>\n16    </nav>\n17  </header>\n18  <section id=\"#stat\">\n19    <h3>Statistiques des types d'interventions</h3>\n20    <form id=\"f\" action=\"Statistiques_Types.php\" method=\"POST\" onsubmit=\"return verification()\">\n21      <label>Date et heure de début d'une intervention: </label>\n22      <input id=\"date1\" name=\"date1\" type=\"date\" required>\n23      <input id=\"temps1\" name=\"temps1\" type=\"time\" required><br>\n24      <label>Date et heure de fin d'une intervention: </label>\n25      <input id=\"date2\" name=\"date2\" type=\"date\" required>\n26      <input id=\"temps2\" name=\"temps2\" type=\"time\" required><br>\n27      ........................................\n28      <input name=\"intervention[]\" type=\"checkbox\" value=\"TI1\">Aérienne\n29      <input name=\"intervention[]\" type=\"checkbox\" value=\"TI2\">Terrestre\n30      <input name=\"intervention[]\" type=\"checkbox\" value=\"TI3\">Maritime\n31      <input name=\"intervention[]\" type=\"checkbox\" value=\"TI4\">Mixte <br>\n32      <div>\n33        <input class=\"bouton\" id=\"bt1\" name=\"bt1\" type=\"submit\" value=\"Envoyer\">\n34        ........................................\n35      </div>\n36    </form>\n37  </section>\n38  ........................................\n39 </body>\n40 </html>",
+          "language": "html",
+          "explanation": "L'auteur se définit par <meta name=\"author\">."
+        },
+        {
+          "id": "B1-B-1",
+          "prompt": "Partie B, exercice 1, 1.b) La balise <header> (ligne 9) définit un conteneur pour le contenu d'introduction. (V ou F)",
+          "points": 0.125,
+          "type": "code_analysis",
+          "expectedAnswer": "V",
+          "expectedRegex": "^(V|Vrai)$",
+          "codeSnippet": "1 <!DOCTYPE HTML>\n2 <html lang=\"fr\">\n3 <head>\n4   <title>Gestion des Incendies</title>\n5   ........................................\n6   <script src=\"mesScripts.js\"></script>\n7 </head>\n8 ........................................\n9   <header>\n10    <h1>Gestion des Incendies</h1>\n11    ........................................\n12    <nav>\n13      <div class=\"menu\"><a href=\"accueil.html\">Accueil</a></div>\n14      <div class=\"menu\"><a href=\"ajout_donnees.html#intervention\">Ajout des données</a></div>\n15      <div class=\"menu\"><a href=\"#stat\">Statistiques</a></div>\n16    </nav>\n17  </header>\n18  <section id=\"#stat\">\n19    <h3>Statistiques des types d'interventions</h3>\n20    <form id=\"f\" action=\"Statistiques_Types.php\" method=\"POST\" onsubmit=\"return verification()\">\n21      <label>Date et heure de début d'une intervention: </label>\n22      <input id=\"date1\" name=\"date1\" type=\"date\" required>\n23      <input id=\"temps1\" name=\"temps1\" type=\"time\" required><br>\n24      <label>Date et heure de fin d'une intervention: </label>\n25      <input id=\"date2\" name=\"date2\" type=\"date\" required>\n26      <input id=\"temps2\" name=\"temps2\" type=\"time\" required><br>\n27      ........................................\n28      <input name=\"intervention[]\" type=\"checkbox\" value=\"TI1\">Aérienne\n29      <input name=\"intervention[]\" type=\"checkbox\" value=\"TI2\">Terrestre\n30      <input name=\"intervention[]\" type=\"checkbox\" value=\"TI3\">Maritime\n31      <input name=\"intervention[]\" type=\"checkbox\" value=\"TI4\">Mixte <br>\n32      <div>\n33        <input class=\"bouton\" id=\"bt1\" name=\"bt1\" type=\"submit\" value=\"Envoyer\">\n34        ........................................\n35      </div>\n36    </form>\n37  </section>\n38  ........................................\n39 </body>\n40 </html>",
+          "language": "html",
+          "explanation": "<header> contient le contenu introductif ou de navigation."
+        },
+        {
+          "id": "B1-B-2",
+          "prompt": "Partie B, exercice 1, 1.b) La balise <header> (ligne 9) définit le contenu principal d'un document. (V ou F)",
+          "points": 0.125,
+          "type": "code_analysis",
+          "expectedAnswer": "F",
+          "expectedRegex": "^(F|Faux)$",
+          "codeSnippet": "1 <!DOCTYPE HTML>\n2 <html lang=\"fr\">\n3 <head>\n4   <title>Gestion des Incendies</title>\n5   ........................................\n6   <script src=\"mesScripts.js\"></script>\n7 </head>\n8 ........................................\n9   <header>\n10    <h1>Gestion des Incendies</h1>\n11    ........................................\n12    <nav>\n13      <div class=\"menu\"><a href=\"accueil.html\">Accueil</a></div>\n14      <div class=\"menu\"><a href=\"ajout_donnees.html#intervention\">Ajout des données</a></div>\n15      <div class=\"menu\"><a href=\"#stat\">Statistiques</a></div>\n16    </nav>\n17  </header>\n18  <section id=\"#stat\">\n19    <h3>Statistiques des types d'interventions</h3>\n20    <form id=\"f\" action=\"Statistiques_Types.php\" method=\"POST\" onsubmit=\"return verification()\">\n21      <label>Date et heure de début d'une intervention: </label>\n22      <input id=\"date1\" name=\"date1\" type=\"date\" required>\n23      <input id=\"temps1\" name=\"temps1\" type=\"time\" required><br>\n24      <label>Date et heure de fin d'une intervention: </label>\n25      <input id=\"date2\" name=\"date2\" type=\"date\" required>\n26      <input id=\"temps2\" name=\"temps2\" type=\"time\" required><br>\n27      ........................................\n28      <input name=\"intervention[]\" type=\"checkbox\" value=\"TI1\">Aérienne\n29      <input name=\"intervention[]\" type=\"checkbox\" value=\"TI2\">Terrestre\n30      <input name=\"intervention[]\" type=\"checkbox\" value=\"TI3\">Maritime\n31      <input name=\"intervention[]\" type=\"checkbox\" value=\"TI4\">Mixte <br>\n32      <div>\n33        <input class=\"bouton\" id=\"bt1\" name=\"bt1\" type=\"submit\" value=\"Envoyer\">\n34        ........................................\n35      </div>\n36    </form>\n37  </section>\n38  ........................................\n39 </body>\n40 </html>",
+          "language": "html",
+          "explanation": "Le contenu principal est dans <main> ou <section>."
+        },
+        {
+          "id": "B1-B-3",
+          "prompt": "Partie B, exercice 1, 1.b) La balise <header> (ligne 9) doit figurer dans le corps de la page web. (V ou F)",
+          "points": 0.125,
+          "type": "code_analysis",
+          "expectedAnswer": "V",
+          "expectedRegex": "^(V|Vrai)$",
+          "codeSnippet": "1 <!DOCTYPE HTML>\n2 <html lang=\"fr\">\n3 <head>\n4   <title>Gestion des Incendies</title>\n5   ........................................\n6   <script src=\"mesScripts.js\"></script>\n7 </head>\n8 ........................................\n9   <header>\n10    <h1>Gestion des Incendies</h1>\n11    ........................................\n12    <nav>\n13      <div class=\"menu\"><a href=\"accueil.html\">Accueil</a></div>\n14      <div class=\"menu\"><a href=\"ajout_donnees.html#intervention\">Ajout des données</a></div>\n15      <div class=\"menu\"><a href=\"#stat\">Statistiques</a></div>\n16    </nav>\n17  </header>\n18  <section id=\"#stat\">\n19    <h3>Statistiques des types d'interventions</h3>\n20    <form id=\"f\" action=\"Statistiques_Types.php\" method=\"POST\" onsubmit=\"return verification()\">\n21      <label>Date et heure de début d'une intervention: </label>\n22      <input id=\"date1\" name=\"date1\" type=\"date\" required>\n23      <input id=\"temps1\" name=\"temps1\" type=\"time\" required><br>\n24      <label>Date et heure de fin d'une intervention: </label>\n25      <input id=\"date2\" name=\"date2\" type=\"date\" required>\n26      <input id=\"temps2\" name=\"temps2\" type=\"time\" required><br>\n27      ........................................\n28      <input name=\"intervention[]\" type=\"checkbox\" value=\"TI1\">Aérienne\n29      <input name=\"intervention[]\" type=\"checkbox\" value=\"TI2\">Terrestre\n30      <input name=\"intervention[]\" type=\"checkbox\" value=\"TI3\">Maritime\n31      <input name=\"intervention[]\" type=\"checkbox\" value=\"TI4\">Mixte <br>\n32      <div>\n33        <input class=\"bouton\" id=\"bt1\" name=\"bt1\" type=\"submit\" value=\"Envoyer\">\n34        ........................................\n35      </div>\n36    </form>\n37  </section>\n38  ........................................\n39 </body>\n40 </html>",
+          "language": "html",
+          "explanation": "<header> est placé dans <body>."
+        },
+        {
+          "id": "B1-C-1",
+          "prompt": "Partie B, exercice 1, 1.c) <a href=\"accueil.html\">Accueil</a> (ligne 13) définit un lien hypertexte externe. (V ou F)",
+          "points": 0.125,
+          "type": "code_analysis",
+          "expectedAnswer": "V",
+          "expectedRegex": "^(V|Vrai)$",
+          "codeSnippet": "1 <!DOCTYPE HTML>\n2 <html lang=\"fr\">\n3 <head>\n4   <title>Gestion des Incendies</title>\n5   ........................................\n6   <script src=\"mesScripts.js\"></script>\n7 </head>\n8 ........................................\n9   <header>\n10    <h1>Gestion des Incendies</h1>\n11    ........................................\n12    <nav>\n13      <div class=\"menu\"><a href=\"accueil.html\">Accueil</a></div>\n14      <div class=\"menu\"><a href=\"ajout_donnees.html#intervention\">Ajout des données</a></div>\n15      <div class=\"menu\"><a href=\"#stat\">Statistiques</a></div>\n16    </nav>\n17  </header>\n18  <section id=\"#stat\">\n19    <h3>Statistiques des types d'interventions</h3>\n20    <form id=\"f\" action=\"Statistiques_Types.php\" method=\"POST\" onsubmit=\"return verification()\">\n21      <label>Date et heure de début d'une intervention: </label>\n22      <input id=\"date1\" name=\"date1\" type=\"date\" required>\n23      <input id=\"temps1\" name=\"temps1\" type=\"time\" required><br>\n24      <label>Date et heure de fin d'une intervention: </label>\n25      <input id=\"date2\" name=\"date2\" type=\"date\" required>\n26      <input id=\"temps2\" name=\"temps2\" type=\"time\" required><br>\n27      ........................................\n28      <input name=\"intervention[]\" type=\"checkbox\" value=\"TI1\">Aérienne\n29      <input name=\"intervention[]\" type=\"checkbox\" value=\"TI2\">Terrestre\n30      <input name=\"intervention[]\" type=\"checkbox\" value=\"TI3\">Maritime\n31      <input name=\"intervention[]\" type=\"checkbox\" value=\"TI4\">Mixte <br>\n32      <div>\n33        <input class=\"bouton\" id=\"bt1\" name=\"bt1\" type=\"submit\" value=\"Envoyer\">\n34        ........................................\n35      </div>\n36    </form>\n37  </section>\n38  ........................................\n39 </body>\n40 </html>",
+          "language": "html",
+          "explanation": "Le lien pointe vers une autre page : lien externe."
+        },
+        {
+          "id": "B1-C-2",
+          "prompt": "Partie B, exercice 1, 1.c) <a href=\"ajout_donnees.html#intervention\">Ajout des données</a> (ligne 14) définit un lien hypertexte externe. (V ou F)",
+          "points": 0.125,
+          "type": "code_analysis",
+          "expectedAnswer": "V",
+          "expectedRegex": "^(V|Vrai)$",
+          "codeSnippet": "1 <!DOCTYPE HTML>\n2 <html lang=\"fr\">\n3 <head>\n4   <title>Gestion des Incendies</title>\n5   ........................................\n6   <script src=\"mesScripts.js\"></script>\n7 </head>\n8 ........................................\n9   <header>\n10    <h1>Gestion des Incendies</h1>\n11    ........................................\n12    <nav>\n13      <div class=\"menu\"><a href=\"accueil.html\">Accueil</a></div>\n14      <div class=\"menu\"><a href=\"ajout_donnees.html#intervention\">Ajout des données</a></div>\n15      <div class=\"menu\"><a href=\"#stat\">Statistiques</a></div>\n16    </nav>\n17  </header>\n18  <section id=\"#stat\">\n19    <h3>Statistiques des types d'interventions</h3>\n20    <form id=\"f\" action=\"Statistiques_Types.php\" method=\"POST\" onsubmit=\"return verification()\">\n21      <label>Date et heure de début d'une intervention: </label>\n22      <input id=\"date1\" name=\"date1\" type=\"date\" required>\n23      <input id=\"temps1\" name=\"temps1\" type=\"time\" required><br>\n24      <label>Date et heure de fin d'une intervention: </label>\n25      <input id=\"date2\" name=\"date2\" type=\"date\" required>\n26      <input id=\"temps2\" name=\"temps2\" type=\"time\" required><br>\n27      ........................................\n28      <input name=\"intervention[]\" type=\"checkbox\" value=\"TI1\">Aérienne\n29      <input name=\"intervention[]\" type=\"checkbox\" value=\"TI2\">Terrestre\n30      <input name=\"intervention[]\" type=\"checkbox\" value=\"TI3\">Maritime\n31      <input name=\"intervention[]\" type=\"checkbox\" value=\"TI4\">Mixte <br>\n32      <div>\n33        <input class=\"bouton\" id=\"bt1\" name=\"bt1\" type=\"submit\" value=\"Envoyer\">\n34        ........................................\n35      </div>\n36    </form>\n37  </section>\n38  ........................................\n39 </body>\n40 </html>",
+          "language": "html",
+          "explanation": "Le lien pointe vers une autre page (avec une ancre) : lien externe."
+        },
+        {
+          "id": "B1-C-3",
+          "prompt": "Partie B, exercice 1, 1.c) <a href=\"#stat\">Statistiques</a> (ligne 15) définit un lien hypertexte externe. (V ou F)",
+          "points": 0.125,
+          "type": "code_analysis",
+          "expectedAnswer": "F",
+          "expectedRegex": "^(F|Faux)$",
+          "codeSnippet": "1 <!DOCTYPE HTML>\n2 <html lang=\"fr\">\n3 <head>\n4   <title>Gestion des Incendies</title>\n5   ........................................\n6   <script src=\"mesScripts.js\"></script>\n7 </head>\n8 ........................................\n9   <header>\n10    <h1>Gestion des Incendies</h1>\n11    ........................................\n12    <nav>\n13      <div class=\"menu\"><a href=\"accueil.html\">Accueil</a></div>\n14      <div class=\"menu\"><a href=\"ajout_donnees.html#intervention\">Ajout des données</a></div>\n15      <div class=\"menu\"><a href=\"#stat\">Statistiques</a></div>\n16    </nav>\n17  </header>\n18  <section id=\"#stat\">\n19    <h3>Statistiques des types d'interventions</h3>\n20    <form id=\"f\" action=\"Statistiques_Types.php\" method=\"POST\" onsubmit=\"return verification()\">\n21      <label>Date et heure de début d'une intervention: </label>\n22      <input id=\"date1\" name=\"date1\" type=\"date\" required>\n23      <input id=\"temps1\" name=\"temps1\" type=\"time\" required><br>\n24      <label>Date et heure de fin d'une intervention: </label>\n25      <input id=\"date2\" name=\"date2\" type=\"date\" required>\n26      <input id=\"temps2\" name=\"temps2\" type=\"time\" required><br>\n27      ........................................\n28      <input name=\"intervention[]\" type=\"checkbox\" value=\"TI1\">Aérienne\n29      <input name=\"intervention[]\" type=\"checkbox\" value=\"TI2\">Terrestre\n30      <input name=\"intervention[]\" type=\"checkbox\" value=\"TI3\">Maritime\n31      <input name=\"intervention[]\" type=\"checkbox\" value=\"TI4\">Mixte <br>\n32      <div>\n33        <input class=\"bouton\" id=\"bt1\" name=\"bt1\" type=\"submit\" value=\"Envoyer\">\n34        ........................................\n35      </div>\n36    </form>\n37  </section>\n38  ........................................\n39 </body>\n40 </html>",
+          "language": "html",
+          "explanation": "#stat est une ancre de la même page : lien interne."
+        },
+        {
+          "id": "B1-D-1",
+          "prompt": "Partie B, exercice 1, 1.d) L'attribut required (ligne 22) désactive la saisie dans un champ. (V ou F)",
+          "points": 0.125,
+          "type": "code_analysis",
+          "expectedAnswer": "F",
+          "expectedRegex": "^(F|Faux)$",
+          "codeSnippet": "1 <!DOCTYPE HTML>\n2 <html lang=\"fr\">\n3 <head>\n4   <title>Gestion des Incendies</title>\n5   ........................................\n6   <script src=\"mesScripts.js\"></script>\n7 </head>\n8 ........................................\n9   <header>\n10    <h1>Gestion des Incendies</h1>\n11    ........................................\n12    <nav>\n13      <div class=\"menu\"><a href=\"accueil.html\">Accueil</a></div>\n14      <div class=\"menu\"><a href=\"ajout_donnees.html#intervention\">Ajout des données</a></div>\n15      <div class=\"menu\"><a href=\"#stat\">Statistiques</a></div>\n16    </nav>\n17  </header>\n18  <section id=\"#stat\">\n19    <h3>Statistiques des types d'interventions</h3>\n20    <form id=\"f\" action=\"Statistiques_Types.php\" method=\"POST\" onsubmit=\"return verification()\">\n21      <label>Date et heure de début d'une intervention: </label>\n22      <input id=\"date1\" name=\"date1\" type=\"date\" required>\n23      <input id=\"temps1\" name=\"temps1\" type=\"time\" required><br>\n24      <label>Date et heure de fin d'une intervention: </label>\n25      <input id=\"date2\" name=\"date2\" type=\"date\" required>\n26      <input id=\"temps2\" name=\"temps2\" type=\"time\" required><br>\n27      ........................................\n28      <input name=\"intervention[]\" type=\"checkbox\" value=\"TI1\">Aérienne\n29      <input name=\"intervention[]\" type=\"checkbox\" value=\"TI2\">Terrestre\n30      <input name=\"intervention[]\" type=\"checkbox\" value=\"TI3\">Maritime\n31      <input name=\"intervention[]\" type=\"checkbox\" value=\"TI4\">Mixte <br>\n32      <div>\n33        <input class=\"bouton\" id=\"bt1\" name=\"bt1\" type=\"submit\" value=\"Envoyer\">\n34        ........................................\n35      </div>\n36    </form>\n37  </section>\n38  ........................................\n39 </body>\n40 </html>",
+          "language": "html",
+          "explanation": "required n'interdit pas la saisie (c'est le rôle de disabled)."
+        },
+        {
+          "id": "B1-D-2",
+          "prompt": "Partie B, exercice 1, 1.d) L'attribut required (ligne 22) initialise le champ à une valeur donnée. (V ou F)",
+          "points": 0.125,
+          "type": "code_analysis",
+          "expectedAnswer": "F",
+          "expectedRegex": "^(F|Faux)$",
+          "codeSnippet": "1 <!DOCTYPE HTML>\n2 <html lang=\"fr\">\n3 <head>\n4   <title>Gestion des Incendies</title>\n5   ........................................\n6   <script src=\"mesScripts.js\"></script>\n7 </head>\n8 ........................................\n9   <header>\n10    <h1>Gestion des Incendies</h1>\n11    ........................................\n12    <nav>\n13      <div class=\"menu\"><a href=\"accueil.html\">Accueil</a></div>\n14      <div class=\"menu\"><a href=\"ajout_donnees.html#intervention\">Ajout des données</a></div>\n15      <div class=\"menu\"><a href=\"#stat\">Statistiques</a></div>\n16    </nav>\n17  </header>\n18  <section id=\"#stat\">\n19    <h3>Statistiques des types d'interventions</h3>\n20    <form id=\"f\" action=\"Statistiques_Types.php\" method=\"POST\" onsubmit=\"return verification()\">\n21      <label>Date et heure de début d'une intervention: </label>\n22      <input id=\"date1\" name=\"date1\" type=\"date\" required>\n23      <input id=\"temps1\" name=\"temps1\" type=\"time\" required><br>\n24      <label>Date et heure de fin d'une intervention: </label>\n25      <input id=\"date2\" name=\"date2\" type=\"date\" required>\n26      <input id=\"temps2\" name=\"temps2\" type=\"time\" required><br>\n27      ........................................\n28      <input name=\"intervention[]\" type=\"checkbox\" value=\"TI1\">Aérienne\n29      <input name=\"intervention[]\" type=\"checkbox\" value=\"TI2\">Terrestre\n30      <input name=\"intervention[]\" type=\"checkbox\" value=\"TI3\">Maritime\n31      <input name=\"intervention[]\" type=\"checkbox\" value=\"TI4\">Mixte <br>\n32      <div>\n33        <input class=\"bouton\" id=\"bt1\" name=\"bt1\" type=\"submit\" value=\"Envoyer\">\n34        ........................................\n35      </div>\n36    </form>\n37  </section>\n38  ........................................\n39 </body>\n40 </html>",
+          "language": "html",
+          "explanation": "La valeur initiale se donne avec value."
+        },
+        {
+          "id": "B1-D-3",
+          "prompt": "Partie B, exercice 1, 1.d) L'attribut required (ligne 22) exige la saisie d'une valeur dans un champ. (V ou F)",
+          "points": 0.125,
+          "type": "code_analysis",
+          "expectedAnswer": "V",
+          "expectedRegex": "^(V|Vrai)$",
+          "codeSnippet": "1 <!DOCTYPE HTML>\n2 <html lang=\"fr\">\n3 <head>\n4   <title>Gestion des Incendies</title>\n5   ........................................\n6   <script src=\"mesScripts.js\"></script>\n7 </head>\n8 ........................................\n9   <header>\n10    <h1>Gestion des Incendies</h1>\n11    ........................................\n12    <nav>\n13      <div class=\"menu\"><a href=\"accueil.html\">Accueil</a></div>\n14      <div class=\"menu\"><a href=\"ajout_donnees.html#intervention\">Ajout des données</a></div>\n15      <div class=\"menu\"><a href=\"#stat\">Statistiques</a></div>\n16    </nav>\n17  </header>\n18  <section id=\"#stat\">\n19    <h3>Statistiques des types d'interventions</h3>\n20    <form id=\"f\" action=\"Statistiques_Types.php\" method=\"POST\" onsubmit=\"return verification()\">\n21      <label>Date et heure de début d'une intervention: </label>\n22      <input id=\"date1\" name=\"date1\" type=\"date\" required>\n23      <input id=\"temps1\" name=\"temps1\" type=\"time\" required><br>\n24      <label>Date et heure de fin d'une intervention: </label>\n25      <input id=\"date2\" name=\"date2\" type=\"date\" required>\n26      <input id=\"temps2\" name=\"temps2\" type=\"time\" required><br>\n27      ........................................\n28      <input name=\"intervention[]\" type=\"checkbox\" value=\"TI1\">Aérienne\n29      <input name=\"intervention[]\" type=\"checkbox\" value=\"TI2\">Terrestre\n30      <input name=\"intervention[]\" type=\"checkbox\" value=\"TI3\">Maritime\n31      <input name=\"intervention[]\" type=\"checkbox\" value=\"TI4\">Mixte <br>\n32      <div>\n33        <input class=\"bouton\" id=\"bt1\" name=\"bt1\" type=\"submit\" value=\"Envoyer\">\n34        ........................................\n35      </div>\n36    </form>\n37  </section>\n38  ........................................\n39 </body>\n40 </html>",
+          "language": "html",
+          "explanation": "required rend la saisie obligatoire avant l'envoi du formulaire."
+        },
+        {
+          "id": "B1-L-1",
+          "prompt": "Partie B, exercice 1, question 2 : numéro de la ligne où insérer <input class=\"bouton\" id=\"bt2\" name=\"bt2\" type=\"reset\" value=\"Annuler\">.",
+          "points": 0.25,
+          "type": "code_analysis",
+          "expectedAnswer": "34",
+          "expectedRegex": "^\\D*34\\D*$",
+          "codeSnippet": "1 <!DOCTYPE HTML>\n2 <html lang=\"fr\">\n3 <head>\n4   <title>Gestion des Incendies</title>\n5   ........................................\n6   <script src=\"mesScripts.js\"></script>\n7 </head>\n8 ........................................\n9   <header>\n10    <h1>Gestion des Incendies</h1>\n11    ........................................\n12    <nav>\n13      <div class=\"menu\"><a href=\"accueil.html\">Accueil</a></div>\n14      <div class=\"menu\"><a href=\"ajout_donnees.html#intervention\">Ajout des données</a></div>\n15      <div class=\"menu\"><a href=\"#stat\">Statistiques</a></div>\n16    </nav>\n17  </header>\n18  <section id=\"#stat\">\n19    <h3>Statistiques des types d'interventions</h3>\n20    <form id=\"f\" action=\"Statistiques_Types.php\" method=\"POST\" onsubmit=\"return verification()\">\n21      <label>Date et heure de début d'une intervention: </label>\n22      <input id=\"date1\" name=\"date1\" type=\"date\" required>\n23      <input id=\"temps1\" name=\"temps1\" type=\"time\" required><br>\n24      <label>Date et heure de fin d'une intervention: </label>\n25      <input id=\"date2\" name=\"date2\" type=\"date\" required>\n26      <input id=\"temps2\" name=\"temps2\" type=\"time\" required><br>\n27      ........................................\n28      <input name=\"intervention[]\" type=\"checkbox\" value=\"TI1\">Aérienne\n29      <input name=\"intervention[]\" type=\"checkbox\" value=\"TI2\">Terrestre\n30      <input name=\"intervention[]\" type=\"checkbox\" value=\"TI3\">Maritime\n31      <input name=\"intervention[]\" type=\"checkbox\" value=\"TI4\">Mixte <br>\n32      <div>\n33        <input class=\"bouton\" id=\"bt1\" name=\"bt1\" type=\"submit\" value=\"Envoyer\">\n34        ........................................\n35      </div>\n36    </form>\n37  </section>\n38  ........................................\n39 </body>\n40 </html>",
+          "language": "html",
+          "explanation": "Dans le <div> du bouton Envoyer : ligne 34."
+        },
+        {
+          "id": "B1-L-2",
+          "prompt": "Partie B, exercice 1, question 2 : numéro de la ligne où insérer <h2>Statistiques des Incendies</h2>.",
+          "points": 0.25,
+          "type": "code_analysis",
+          "expectedAnswer": "11",
+          "expectedRegex": "^\\D*11\\D*$",
+          "codeSnippet": "1 <!DOCTYPE HTML>\n2 <html lang=\"fr\">\n3 <head>\n4   <title>Gestion des Incendies</title>\n5   ........................................\n6   <script src=\"mesScripts.js\"></script>\n7 </head>\n8 ........................................\n9   <header>\n10    <h1>Gestion des Incendies</h1>\n11    ........................................\n12    <nav>\n13      <div class=\"menu\"><a href=\"accueil.html\">Accueil</a></div>\n14      <div class=\"menu\"><a href=\"ajout_donnees.html#intervention\">Ajout des données</a></div>\n15      <div class=\"menu\"><a href=\"#stat\">Statistiques</a></div>\n16    </nav>\n17  </header>\n18  <section id=\"#stat\">\n19    <h3>Statistiques des types d'interventions</h3>\n20    <form id=\"f\" action=\"Statistiques_Types.php\" method=\"POST\" onsubmit=\"return verification()\">\n21      <label>Date et heure de début d'une intervention: </label>\n22      <input id=\"date1\" name=\"date1\" type=\"date\" required>\n23      <input id=\"temps1\" name=\"temps1\" type=\"time\" required><br>\n24      <label>Date et heure de fin d'une intervention: </label>\n25      <input id=\"date2\" name=\"date2\" type=\"date\" required>\n26      <input id=\"temps2\" name=\"temps2\" type=\"time\" required><br>\n27      ........................................\n28      <input name=\"intervention[]\" type=\"checkbox\" value=\"TI1\">Aérienne\n29      <input name=\"intervention[]\" type=\"checkbox\" value=\"TI2\">Terrestre\n30      <input name=\"intervention[]\" type=\"checkbox\" value=\"TI3\">Maritime\n31      <input name=\"intervention[]\" type=\"checkbox\" value=\"TI4\">Mixte <br>\n32      <div>\n33        <input class=\"bouton\" id=\"bt1\" name=\"bt1\" type=\"submit\" value=\"Envoyer\">\n34        ........................................\n35      </div>\n36    </form>\n37  </section>\n38  ........................................\n39 </body>\n40 </html>",
+          "language": "html",
+          "explanation": "Dans <header>, sous le <h1> : ligne 11."
+        },
+        {
+          "id": "B1-L-3",
+          "prompt": "Partie B, exercice 1, question 2 : numéro de la ligne où insérer <footer id=\"stat\">Gestion des Incendies - GeoIncendie 2025</footer>.",
+          "points": 0.25,
+          "type": "code_analysis",
+          "expectedAnswer": "38",
+          "expectedRegex": "^\\D*38\\D*$",
+          "codeSnippet": "1 <!DOCTYPE HTML>\n2 <html lang=\"fr\">\n3 <head>\n4   <title>Gestion des Incendies</title>\n5   ........................................\n6   <script src=\"mesScripts.js\"></script>\n7 </head>\n8 ........................................\n9   <header>\n10    <h1>Gestion des Incendies</h1>\n11    ........................................\n12    <nav>\n13      <div class=\"menu\"><a href=\"accueil.html\">Accueil</a></div>\n14      <div class=\"menu\"><a href=\"ajout_donnees.html#intervention\">Ajout des données</a></div>\n15      <div class=\"menu\"><a href=\"#stat\">Statistiques</a></div>\n16    </nav>\n17  </header>\n18  <section id=\"#stat\">\n19    <h3>Statistiques des types d'interventions</h3>\n20    <form id=\"f\" action=\"Statistiques_Types.php\" method=\"POST\" onsubmit=\"return verification()\">\n21      <label>Date et heure de début d'une intervention: </label>\n22      <input id=\"date1\" name=\"date1\" type=\"date\" required>\n23      <input id=\"temps1\" name=\"temps1\" type=\"time\" required><br>\n24      <label>Date et heure de fin d'une intervention: </label>\n25      <input id=\"date2\" name=\"date2\" type=\"date\" required>\n26      <input id=\"temps2\" name=\"temps2\" type=\"time\" required><br>\n27      ........................................\n28      <input name=\"intervention[]\" type=\"checkbox\" value=\"TI1\">Aérienne\n29      <input name=\"intervention[]\" type=\"checkbox\" value=\"TI2\">Terrestre\n30      <input name=\"intervention[]\" type=\"checkbox\" value=\"TI3\">Maritime\n31      <input name=\"intervention[]\" type=\"checkbox\" value=\"TI4\">Mixte <br>\n32      <div>\n33        <input class=\"bouton\" id=\"bt1\" name=\"bt1\" type=\"submit\" value=\"Envoyer\">\n34        ........................................\n35      </div>\n36    </form>\n37  </section>\n38  ........................................\n39 </body>\n40 </html>",
+          "language": "html",
+          "explanation": "Après la section, avant </body> : ligne 38."
+        },
+        {
+          "id": "B1-L-4",
+          "prompt": "Partie B, exercice 1, question 2 : numéro de la ligne où insérer <label>Type(s) d'intervention: </label>.",
+          "points": 0.25,
+          "type": "code_analysis",
+          "expectedAnswer": "27",
+          "expectedRegex": "^\\D*27\\D*$",
+          "codeSnippet": "1 <!DOCTYPE HTML>\n2 <html lang=\"fr\">\n3 <head>\n4   <title>Gestion des Incendies</title>\n5   ........................................\n6   <script src=\"mesScripts.js\"></script>\n7 </head>\n8 ........................................\n9   <header>\n10    <h1>Gestion des Incendies</h1>\n11    ........................................\n12    <nav>\n13      <div class=\"menu\"><a href=\"accueil.html\">Accueil</a></div>\n14      <div class=\"menu\"><a href=\"ajout_donnees.html#intervention\">Ajout des données</a></div>\n15      <div class=\"menu\"><a href=\"#stat\">Statistiques</a></div>\n16    </nav>\n17  </header>\n18  <section id=\"#stat\">\n19    <h3>Statistiques des types d'interventions</h3>\n20    <form id=\"f\" action=\"Statistiques_Types.php\" method=\"POST\" onsubmit=\"return verification()\">\n21      <label>Date et heure de début d'une intervention: </label>\n22      <input id=\"date1\" name=\"date1\" type=\"date\" required>\n23      <input id=\"temps1\" name=\"temps1\" type=\"time\" required><br>\n24      <label>Date et heure de fin d'une intervention: </label>\n25      <input id=\"date2\" name=\"date2\" type=\"date\" required>\n26      <input id=\"temps2\" name=\"temps2\" type=\"time\" required><br>\n27      ........................................\n28      <input name=\"intervention[]\" type=\"checkbox\" value=\"TI1\">Aérienne\n29      <input name=\"intervention[]\" type=\"checkbox\" value=\"TI2\">Terrestre\n30      <input name=\"intervention[]\" type=\"checkbox\" value=\"TI3\">Maritime\n31      <input name=\"intervention[]\" type=\"checkbox\" value=\"TI4\">Mixte <br>\n32      <div>\n33        <input class=\"bouton\" id=\"bt1\" name=\"bt1\" type=\"submit\" value=\"Envoyer\">\n34        ........................................\n35      </div>\n36    </form>\n37  </section>\n38  ........................................\n39 </body>\n40 </html>",
+          "language": "html",
+          "explanation": "Avant les cases à cocher : ligne 27."
+        },
+        {
+          "id": "B1-L-5",
+          "prompt": "Partie B, exercice 1, question 2 : numéro de la ligne où insérer <body onload=\"date(); temps()\">.",
+          "points": 0.25,
+          "type": "code_analysis",
+          "expectedAnswer": "8",
+          "expectedRegex": "^\\D*8\\D*$",
+          "codeSnippet": "1 <!DOCTYPE HTML>\n2 <html lang=\"fr\">\n3 <head>\n4   <title>Gestion des Incendies</title>\n5   ........................................\n6   <script src=\"mesScripts.js\"></script>\n7 </head>\n8 ........................................\n9   <header>\n10    <h1>Gestion des Incendies</h1>\n11    ........................................\n12    <nav>\n13      <div class=\"menu\"><a href=\"accueil.html\">Accueil</a></div>\n14      <div class=\"menu\"><a href=\"ajout_donnees.html#intervention\">Ajout des données</a></div>\n15      <div class=\"menu\"><a href=\"#stat\">Statistiques</a></div>\n16    </nav>\n17  </header>\n18  <section id=\"#stat\">\n19    <h3>Statistiques des types d'interventions</h3>\n20    <form id=\"f\" action=\"Statistiques_Types.php\" method=\"POST\" onsubmit=\"return verification()\">\n21      <label>Date et heure de début d'une intervention: </label>\n22      <input id=\"date1\" name=\"date1\" type=\"date\" required>\n23      <input id=\"temps1\" name=\"temps1\" type=\"time\" required><br>\n24      <label>Date et heure de fin d'une intervention: </label>\n25      <input id=\"date2\" name=\"date2\" type=\"date\" required>\n26      <input id=\"temps2\" name=\"temps2\" type=\"time\" required><br>\n27      ........................................\n28      <input name=\"intervention[]\" type=\"checkbox\" value=\"TI1\">Aérienne\n29      <input name=\"intervention[]\" type=\"checkbox\" value=\"TI2\">Terrestre\n30      <input name=\"intervention[]\" type=\"checkbox\" value=\"TI3\">Maritime\n31      <input name=\"intervention[]\" type=\"checkbox\" value=\"TI4\">Mixte <br>\n32      <div>\n33        <input class=\"bouton\" id=\"bt1\" name=\"bt1\" type=\"submit\" value=\"Envoyer\">\n34        ........................................\n35      </div>\n36    </form>\n37  </section>\n38  ........................................\n39 </body>\n40 </html>",
+          "language": "html",
+          "explanation": "Après </head>, avant <header> : ligne 8."
+        },
+        {
+          "id": "B1-L-6",
+          "prompt": "Partie B, exercice 1, question 2 : numéro de la ligne où insérer <link rel=\"stylesheet\" href=\"mesStyles.css\">.",
+          "points": 0.25,
+          "type": "code_analysis",
+          "expectedAnswer": "5",
+          "expectedRegex": "^\\D*5\\D*$",
+          "codeSnippet": "1 <!DOCTYPE HTML>\n2 <html lang=\"fr\">\n3 <head>\n4   <title>Gestion des Incendies</title>\n5   ........................................\n6   <script src=\"mesScripts.js\"></script>\n7 </head>\n8 ........................................\n9   <header>\n10    <h1>Gestion des Incendies</h1>\n11    ........................................\n12    <nav>\n13      <div class=\"menu\"><a href=\"accueil.html\">Accueil</a></div>\n14      <div class=\"menu\"><a href=\"ajout_donnees.html#intervention\">Ajout des données</a></div>\n15      <div class=\"menu\"><a href=\"#stat\">Statistiques</a></div>\n16    </nav>\n17  </header>\n18  <section id=\"#stat\">\n19    <h3>Statistiques des types d'interventions</h3>\n20    <form id=\"f\" action=\"Statistiques_Types.php\" method=\"POST\" onsubmit=\"return verification()\">\n21      <label>Date et heure de début d'une intervention: </label>\n22      <input id=\"date1\" name=\"date1\" type=\"date\" required>\n23      <input id=\"temps1\" name=\"temps1\" type=\"time\" required><br>\n24      <label>Date et heure de fin d'une intervention: </label>\n25      <input id=\"date2\" name=\"date2\" type=\"date\" required>\n26      <input id=\"temps2\" name=\"temps2\" type=\"time\" required><br>\n27      ........................................\n28      <input name=\"intervention[]\" type=\"checkbox\" value=\"TI1\">Aérienne\n29      <input name=\"intervention[]\" type=\"checkbox\" value=\"TI2\">Terrestre\n30      <input name=\"intervention[]\" type=\"checkbox\" value=\"TI3\">Maritime\n31      <input name=\"intervention[]\" type=\"checkbox\" value=\"TI4\">Mixte <br>\n32      <div>\n33        <input class=\"bouton\" id=\"bt1\" name=\"bt1\" type=\"submit\" value=\"Envoyer\">\n34        ........................................\n35      </div>\n36    </form>\n37  </section>\n38  ........................................\n39 </body>\n40 </html>",
+          "language": "html",
+          "explanation": "Dans <head>, ligne 5."
+        }
+      ]
+    },
+    {
+      "id": "b-ex2-css",
+      "title": "Partie B, exercice 2 (1) : Analyse du code CSS (0.5 pt)",
+      "type": "qcm",
+      "description": "D'après les figures Fig. 1, Fig. 2 et Fig. 3, cochez l'unique réponse correcte.",
+      "points": 0.5,
+      "questions": [
+        {
+          "id": "B2-A",
+          "question": "Exercice 2, 1.a) Pour afficher les liens « Accueil », « Ajout des données » et « Statistiques » sur la même ligne avec une marge externe droite de 15 pixels, la règle à ajouter à la ligne 1 du code CSS est :",
+          "options": [
+            {
+              "id": "opt-menu-inline",
+              "label": ".menu { display: inline; margin: 0px 15px 0px 0px; }"
+            },
+            {
+              "id": "opt-id-menu",
+              "label": "#menu { display: inline; margin: 0px 15px 0px 0px; }"
+            },
+            {
+              "id": "opt-menu-none",
+              "label": ".menu { display: none; margin: 0px 15px 0px 0px; }"
+            }
+          ],
+          "points": 0.125,
+          "multiple": false,
+          "correctAnswers": ["opt-menu-inline"],
+          "explanation": "Les éléments ont class=\"menu\" : sélecteur de classe .menu ; display: inline les aligne.",
+          "codeSnippet": "1  ........................................\n2  ........................................\n3  label {\n4    display: inline-block;\n5    margin: 0px 0px 5px 0px;\n6    width: 300px; }\n7  .bouton {\n8    background-color: yellow;\n9    background-size: 30px 30px;\n10   width: 150px;\n11   height: 30px; }\n12 .bouton:hover { text-transform: uppercase; }\n13 h3, div { text-align: center; }\n14 footer, header {\n15   background: black;\n16   text-align: center;\n17   margin: 10px;\n18   color: white; }\n19 header { background: #007BFF; }\n20 h1,h2 { margin: 5px 0px 5 px 0px;}\n21 #bt1 { ........................................ : url(valider.png); }"
+        },
+        {
+          "id": "B2-B",
+          "question": "Exercice 2, 1.b) Pour colorer en blanc les textes des liens, la règle à ajouter à la ligne 2 du code CSS est :",
+          "options": [
+            {
+              "id": "opt-div",
+              "label": "div { color: white; }"
+            },
+            {
+              "id": "opt-href",
+              "label": "href { color: white; }"
+            },
+            {
+              "id": "opt-a",
+              "label": "a { color: white; }"
+            }
+          ],
+          "points": 0.125,
+          "multiple": false,
+          "correctAnswers": ["opt-a"],
+          "explanation": "Les liens sont des éléments <a> : sélecteur a.",
+          "codeSnippet": "1  ........................................\n2  ........................................\n3  label {\n4    display: inline-block;\n5    margin: 0px 0px 5px 0px;\n6    width: 300px; }\n7  .bouton {\n8    background-color: yellow;\n9    background-size: 30px 30px;\n10   width: 150px;\n11   height: 30px; }\n12 .bouton:hover { text-transform: uppercase; }\n13 h3, div { text-align: center; }\n14 footer, header {\n15   background: black;\n16   text-align: center;\n17   margin: 10px;\n18   color: white; }\n19 header { background: #007BFF; }\n20 h1,h2 { margin: 5px 0px 5 px 0px;}\n21 #bt1 { ........................................ : url(valider.png); }"
+        },
+        {
+          "id": "B2-C",
+          "question": "Exercice 2, 1.c) La propriété background-size: 30px 30px; (ligne 9) permet de :",
+          "options": [
+            {
+              "id": "opt-largeur",
+              "label": "définir la largeur et la hauteur à 30 pixels des deux boutons"
+            },
+            {
+              "id": "opt-image",
+              "label": "définir la largeur et la hauteur à 30 pixels des images d'arrière-plan des deux boutons"
+            },
+            {
+              "id": "opt-place",
+              "label": "placer les images à 30 pixels du bord supérieur et du bord inférieur des deux boutons"
+            }
+          ],
+          "points": 0.125,
+          "multiple": false,
+          "correctAnswers": ["opt-image"],
+          "explanation": "background-size dimensionne l'image d'arrière-plan, pas le bouton.",
+          "codeSnippet": "1  ........................................\n2  ........................................\n3  label {\n4    display: inline-block;\n5    margin: 0px 0px 5px 0px;\n6    width: 300px; }\n7  .bouton {\n8    background-color: yellow;\n9    background-size: 30px 30px;\n10   width: 150px;\n11   height: 30px; }\n12 .bouton:hover { text-transform: uppercase; }\n13 h3, div { text-align: center; }\n14 footer, header {\n15   background: black;\n16   text-align: center;\n17   margin: 10px;\n18   color: white; }\n19 header { background: #007BFF; }\n20 h1,h2 { margin: 5px 0px 5 px 0px;}\n21 #bt1 { ........................................ : url(valider.png); }"
+        },
+        {
+          "id": "B2-D",
+          "question": "Exercice 2, 1.d) Pour que l'image valider.png s'affiche en image de fond du bouton Envoyer, il faut ajouter à la ligne 21 la propriété :",
+          "options": [
+            {
+              "id": "opt-img",
+              "label": "img"
+            },
+            {
+              "id": "opt-list",
+              "label": "list-style-image"
+            },
+            {
+              "id": "opt-bgimage",
+              "label": "background-image"
+            }
+          ],
+          "points": 0.125,
+          "multiple": false,
+          "correctAnswers": ["opt-bgimage"],
+          "explanation": "background-image : url(...) définit l'image de fond.",
+          "codeSnippet": "1  ........................................\n2  ........................................\n3  label {\n4    display: inline-block;\n5    margin: 0px 0px 5px 0px;\n6    width: 300px; }\n7  .bouton {\n8    background-color: yellow;\n9    background-size: 30px 30px;\n10   width: 150px;\n11   height: 30px; }\n12 .bouton:hover { text-transform: uppercase; }\n13 h3, div { text-align: center; }\n14 footer, header {\n15   background: black;\n16   text-align: center;\n17   margin: 10px;\n18   color: white; }\n19 header { background: #007BFF; }\n20 h1,h2 { margin: 5px 0px 5 px 0px;}\n21 #bt1 { ........................................ : url(valider.png); }"
+        }
+      ]
+    },
+    {
+      "id": "b-analyse",
+      "title": "Partie B, exercices 2 (2), 3 et 4 : règle CSS, JavaScript et PHP (4.5 pts)",
+      "type": "code_analysis",
+      "description": "Analysez les extraits mesStyles.css (Fig. 3), mesScripts.js (Fig. 4) et Statistiques_Types.php (Fig. 5).",
+      "points": 4.5,
+      "questions": [
+        {
+          "id": "B2-ROLE",
+          "prompt": "Exercice 2, question 2 : quel est le rôle de la règle CSS .bouton:hover { text-transform: uppercase; } (ligne 12) ?",
+          "points": 0.5,
+          "type": "code_analysis",
+          "codeSnippet": "1  ........................................\n2  ........................................\n3  label {\n4    display: inline-block;\n5    margin: 0px 0px 5px 0px;\n6    width: 300px; }\n7  .bouton {\n8    background-color: yellow;\n9    background-size: 30px 30px;\n10   width: 150px;\n11   height: 30px; }\n12 .bouton:hover { text-transform: uppercase; }\n13 h3, div { text-align: center; }\n14 footer, header {\n15   background: black;\n16   text-align: center;\n17   margin: 10px;\n18   color: white; }\n19 header { background: #007BFF; }\n20 h1,h2 { margin: 5px 0px 5 px 0px;}\n21 #bt1 { ........................................ : url(valider.png); }",
+          "language": "css",
+          "expectedKeywords": ["majuscule|uppercase", "survol|hover|souris|pointeur"],
+          "explanation": "Quand la souris survole un bouton, son texte s'affiche en majuscules."
+        },
+        {
+          "id": "B3-T-1",
+          "prompt": "Exercice 3, question 1 : quel élément du langage JavaScript correspond au rôle : « Fonction qui convertit une valeur numérique en une chaîne. »",
+          "points": 0.125,
+          "type": "code_analysis",
+          "codeSnippet": "1  function date() {\n2    const datej=new Date();\n3    let jour=datej.getDate();\n4    if (jour<10)\n5      jour=\"0\"+jour\n6    let mois=datej.getMonth()+1;\n7    if (mois<10)\n8      mois=\"0\"+mois\n9    const annee=datej.getFullYear();\n10   let datejour=String(annee)+\"-\"+mois+\"-\"+jour;\n11   document.getElementById(\"date1\").value=datejour;\n12   document.getElementById(\"date2\").value=datejour;\n13 }\n14 function temps() {\n15   document.getElementById(\"temps1\").value=\"00:00\";\n16   document.getElementById(\"temps2\").value=\"23:59\";\n17 }\n18 function inconnue () {\n19   // sauvegarder dans la constante \"interventions\" les éléments HTML ayant le nom \"intervention[]\".\n20   const interventions = document.getElementsByName(\"intervention[]\");\n21   let test = false ;\n22   let i = -1;\n23   do\n24   {\n25     i++;\n26     if (interventions[i].checked == true)\n27       test = true;\n28   } while (test == false && i < interventions.length-1);\n29   return test;\n30 }\n31 function verification() {\n32   const date1=document.getElementById(\"date1\").value;\n33   const date2=document.getElementById(\"date2\").value;\n34   const temps1=document.getElementById(\"temps1\").value;\n35   const temps2=document.getElementById(\"temps2\").value;\n36   if (date1>date2) {\n37     alert(\"La date de début doit être inférieure ou égale à la date de fin de l'intervention\");\n38     return false; }\n39   if ((date1==date2) && (temps1>=temps2)) {\n40     alert(\"L'heure de début doit être inférieure ou égale à l'heure de fin de l'intervention\");\n41     return false; }\n42   if (inconnue()==false) {\n43     alert(\"Il faut cocher au moins un type d'intervention\");\n44     return false; }\n45 }",
+          "language": "javascript",
+          "expectedAnswer": "String(...)",
+          "expectedRegex": "^String(\\s*\\(.*\\))?$",
+          "explanation": "L'élément attendu est String()."
+        },
+        {
+          "id": "B3-T-2",
+          "prompt": "Exercice 3, question 1 : quel élément du langage JavaScript correspond au rôle : « Expression qui retourne la date courante du système. »",
+          "points": 0.125,
+          "type": "code_analysis",
+          "codeSnippet": "1  function date() {\n2    const datej=new Date();\n3    let jour=datej.getDate();\n4    if (jour<10)\n5      jour=\"0\"+jour\n6    let mois=datej.getMonth()+1;\n7    if (mois<10)\n8      mois=\"0\"+mois\n9    const annee=datej.getFullYear();\n10   let datejour=String(annee)+\"-\"+mois+\"-\"+jour;\n11   document.getElementById(\"date1\").value=datejour;\n12   document.getElementById(\"date2\").value=datejour;\n13 }\n14 function temps() {\n15   document.getElementById(\"temps1\").value=\"00:00\";\n16   document.getElementById(\"temps2\").value=\"23:59\";\n17 }\n18 function inconnue () {\n19   // sauvegarder dans la constante \"interventions\" les éléments HTML ayant le nom \"intervention[]\".\n20   const interventions = document.getElementsByName(\"intervention[]\");\n21   let test = false ;\n22   let i = -1;\n23   do\n24   {\n25     i++;\n26     if (interventions[i].checked == true)\n27       test = true;\n28   } while (test == false && i < interventions.length-1);\n29   return test;\n30 }\n31 function verification() {\n32   const date1=document.getElementById(\"date1\").value;\n33   const date2=document.getElementById(\"date2\").value;\n34   const temps1=document.getElementById(\"temps1\").value;\n35   const temps2=document.getElementById(\"temps2\").value;\n36   if (date1>date2) {\n37     alert(\"La date de début doit être inférieure ou égale à la date de fin de l'intervention\");\n38     return false; }\n39   if ((date1==date2) && (temps1>=temps2)) {\n40     alert(\"L'heure de début doit être inférieure ou égale à l'heure de fin de l'intervention\");\n41     return false; }\n42   if (inconnue()==false) {\n43     alert(\"Il faut cocher au moins un type d'intervention\");\n44     return false; }\n45 }",
+          "language": "javascript",
+          "expectedAnswer": "new Date()",
+          "expectedRegex": "^new\\s+Date\\s*(\\(\\s*\\))?$",
+          "explanation": "L'élément attendu est new Date()."
+        },
+        {
+          "id": "B3-T-3",
+          "prompt": "Exercice 3, question 1 : quel élément du langage JavaScript correspond au rôle : « Méthode qui retourne la valeur du jour (entre 1 et 31) d'une date donnée. »",
+          "points": 0.125,
+          "type": "code_analysis",
+          "codeSnippet": "1  function date() {\n2    const datej=new Date();\n3    let jour=datej.getDate();\n4    if (jour<10)\n5      jour=\"0\"+jour\n6    let mois=datej.getMonth()+1;\n7    if (mois<10)\n8      mois=\"0\"+mois\n9    const annee=datej.getFullYear();\n10   let datejour=String(annee)+\"-\"+mois+\"-\"+jour;\n11   document.getElementById(\"date1\").value=datejour;\n12   document.getElementById(\"date2\").value=datejour;\n13 }\n14 function temps() {\n15   document.getElementById(\"temps1\").value=\"00:00\";\n16   document.getElementById(\"temps2\").value=\"23:59\";\n17 }\n18 function inconnue () {\n19   // sauvegarder dans la constante \"interventions\" les éléments HTML ayant le nom \"intervention[]\".\n20   const interventions = document.getElementsByName(\"intervention[]\");\n21   let test = false ;\n22   let i = -1;\n23   do\n24   {\n25     i++;\n26     if (interventions[i].checked == true)\n27       test = true;\n28   } while (test == false && i < interventions.length-1);\n29   return test;\n30 }\n31 function verification() {\n32   const date1=document.getElementById(\"date1\").value;\n33   const date2=document.getElementById(\"date2\").value;\n34   const temps1=document.getElementById(\"temps1\").value;\n35   const temps2=document.getElementById(\"temps2\").value;\n36   if (date1>date2) {\n37     alert(\"La date de début doit être inférieure ou égale à la date de fin de l'intervention\");\n38     return false; }\n39   if ((date1==date2) && (temps1>=temps2)) {\n40     alert(\"L'heure de début doit être inférieure ou égale à l'heure de fin de l'intervention\");\n41     return false; }\n42   if (inconnue()==false) {\n43     alert(\"Il faut cocher au moins un type d'intervention\");\n44     return false; }\n45 }",
+          "language": "javascript",
+          "expectedAnswer": "getDate()",
+          "expectedRegex": "^(\\w+\\.)?getDate\\s*(\\(\\s*\\))?$",
+          "explanation": "L'élément attendu est getDate()."
+        },
+        {
+          "id": "B3-T-4",
+          "prompt": "Exercice 3, question 1 : quel élément du langage JavaScript correspond au rôle : « Propriété qui retourne le contenu d'un champ de saisie. »",
+          "points": 0.125,
+          "type": "code_analysis",
+          "codeSnippet": "1  function date() {\n2    const datej=new Date();\n3    let jour=datej.getDate();\n4    if (jour<10)\n5      jour=\"0\"+jour\n6    let mois=datej.getMonth()+1;\n7    if (mois<10)\n8      mois=\"0\"+mois\n9    const annee=datej.getFullYear();\n10   let datejour=String(annee)+\"-\"+mois+\"-\"+jour;\n11   document.getElementById(\"date1\").value=datejour;\n12   document.getElementById(\"date2\").value=datejour;\n13 }\n14 function temps() {\n15   document.getElementById(\"temps1\").value=\"00:00\";\n16   document.getElementById(\"temps2\").value=\"23:59\";\n17 }\n18 function inconnue () {\n19   // sauvegarder dans la constante \"interventions\" les éléments HTML ayant le nom \"intervention[]\".\n20   const interventions = document.getElementsByName(\"intervention[]\");\n21   let test = false ;\n22   let i = -1;\n23   do\n24   {\n25     i++;\n26     if (interventions[i].checked == true)\n27       test = true;\n28   } while (test == false && i < interventions.length-1);\n29   return test;\n30 }\n31 function verification() {\n32   const date1=document.getElementById(\"date1\").value;\n33   const date2=document.getElementById(\"date2\").value;\n34   const temps1=document.getElementById(\"temps1\").value;\n35   const temps2=document.getElementById(\"temps2\").value;\n36   if (date1>date2) {\n37     alert(\"La date de début doit être inférieure ou égale à la date de fin de l'intervention\");\n38     return false; }\n39   if ((date1==date2) && (temps1>=temps2)) {\n40     alert(\"L'heure de début doit être inférieure ou égale à l'heure de fin de l'intervention\");\n41     return false; }\n42   if (inconnue()==false) {\n43     alert(\"Il faut cocher au moins un type d'intervention\");\n44     return false; }\n45 }",
+          "language": "javascript",
+          "expectedAnswer": "value",
+          "expectedRegex": "^(\\.)?value$",
+          "explanation": "L'élément attendu est value."
+        },
+        {
+          "id": "B3-T-5",
+          "prompt": "Exercice 3, question 1 : quel élément du langage JavaScript correspond au rôle : « Propriété qui vérifie si une case est cochée ou non. »",
+          "points": 0.125,
+          "type": "code_analysis",
+          "codeSnippet": "1  function date() {\n2    const datej=new Date();\n3    let jour=datej.getDate();\n4    if (jour<10)\n5      jour=\"0\"+jour\n6    let mois=datej.getMonth()+1;\n7    if (mois<10)\n8      mois=\"0\"+mois\n9    const annee=datej.getFullYear();\n10   let datejour=String(annee)+\"-\"+mois+\"-\"+jour;\n11   document.getElementById(\"date1\").value=datejour;\n12   document.getElementById(\"date2\").value=datejour;\n13 }\n14 function temps() {\n15   document.getElementById(\"temps1\").value=\"00:00\";\n16   document.getElementById(\"temps2\").value=\"23:59\";\n17 }\n18 function inconnue () {\n19   // sauvegarder dans la constante \"interventions\" les éléments HTML ayant le nom \"intervention[]\".\n20   const interventions = document.getElementsByName(\"intervention[]\");\n21   let test = false ;\n22   let i = -1;\n23   do\n24   {\n25     i++;\n26     if (interventions[i].checked == true)\n27       test = true;\n28   } while (test == false && i < interventions.length-1);\n29   return test;\n30 }\n31 function verification() {\n32   const date1=document.getElementById(\"date1\").value;\n33   const date2=document.getElementById(\"date2\").value;\n34   const temps1=document.getElementById(\"temps1\").value;\n35   const temps2=document.getElementById(\"temps2\").value;\n36   if (date1>date2) {\n37     alert(\"La date de début doit être inférieure ou égale à la date de fin de l'intervention\");\n38     return false; }\n39   if ((date1==date2) && (temps1>=temps2)) {\n40     alert(\"L'heure de début doit être inférieure ou égale à l'heure de fin de l'intervention\");\n41     return false; }\n42   if (inconnue()==false) {\n43     alert(\"Il faut cocher au moins un type d'intervention\");\n44     return false; }\n45 }",
+          "language": "javascript",
+          "expectedAnswer": "checked",
+          "expectedRegex": "^(\\.)?checked$",
+          "explanation": "L'élément attendu est checked."
+        },
+        {
+          "id": "B3-T-6",
+          "prompt": "Exercice 3, question 1 : quel élément du langage JavaScript correspond au rôle : « Méthode qui retourne une liste d'éléments ayant le même nom. »",
+          "points": 0.125,
+          "type": "code_analysis",
+          "codeSnippet": "1  function date() {\n2    const datej=new Date();\n3    let jour=datej.getDate();\n4    if (jour<10)\n5      jour=\"0\"+jour\n6    let mois=datej.getMonth()+1;\n7    if (mois<10)\n8      mois=\"0\"+mois\n9    const annee=datej.getFullYear();\n10   let datejour=String(annee)+\"-\"+mois+\"-\"+jour;\n11   document.getElementById(\"date1\").value=datejour;\n12   document.getElementById(\"date2\").value=datejour;\n13 }\n14 function temps() {\n15   document.getElementById(\"temps1\").value=\"00:00\";\n16   document.getElementById(\"temps2\").value=\"23:59\";\n17 }\n18 function inconnue () {\n19   // sauvegarder dans la constante \"interventions\" les éléments HTML ayant le nom \"intervention[]\".\n20   const interventions = document.getElementsByName(\"intervention[]\");\n21   let test = false ;\n22   let i = -1;\n23   do\n24   {\n25     i++;\n26     if (interventions[i].checked == true)\n27       test = true;\n28   } while (test == false && i < interventions.length-1);\n29   return test;\n30 }\n31 function verification() {\n32   const date1=document.getElementById(\"date1\").value;\n33   const date2=document.getElementById(\"date2\").value;\n34   const temps1=document.getElementById(\"temps1\").value;\n35   const temps2=document.getElementById(\"temps2\").value;\n36   if (date1>date2) {\n37     alert(\"La date de début doit être inférieure ou égale à la date de fin de l'intervention\");\n38     return false; }\n39   if ((date1==date2) && (temps1>=temps2)) {\n40     alert(\"L'heure de début doit être inférieure ou égale à l'heure de fin de l'intervention\");\n41     return false; }\n42   if (inconnue()==false) {\n43     alert(\"Il faut cocher au moins un type d'intervention\");\n44     return false; }\n45 }",
+          "language": "javascript",
+          "expectedAnswer": "getElementsByName()",
+          "expectedRegex": "^(\\w+\\.)?getElementsByName\\s*(\\(.*\\))?$",
+          "explanation": "L'élément attendu est getElementsByName()."
+        },
+        {
+          "id": "B3-T-7",
+          "prompt": "Exercice 3, question 1 : quel élément du langage JavaScript correspond au rôle : « Fonction qui affiche un message dans une boîte de dialogue. »",
+          "points": 0.125,
+          "type": "code_analysis",
+          "codeSnippet": "1  function date() {\n2    const datej=new Date();\n3    let jour=datej.getDate();\n4    if (jour<10)\n5      jour=\"0\"+jour\n6    let mois=datej.getMonth()+1;\n7    if (mois<10)\n8      mois=\"0\"+mois\n9    const annee=datej.getFullYear();\n10   let datejour=String(annee)+\"-\"+mois+\"-\"+jour;\n11   document.getElementById(\"date1\").value=datejour;\n12   document.getElementById(\"date2\").value=datejour;\n13 }\n14 function temps() {\n15   document.getElementById(\"temps1\").value=\"00:00\";\n16   document.getElementById(\"temps2\").value=\"23:59\";\n17 }\n18 function inconnue () {\n19   // sauvegarder dans la constante \"interventions\" les éléments HTML ayant le nom \"intervention[]\".\n20   const interventions = document.getElementsByName(\"intervention[]\");\n21   let test = false ;\n22   let i = -1;\n23   do\n24   {\n25     i++;\n26     if (interventions[i].checked == true)\n27       test = true;\n28   } while (test == false && i < interventions.length-1);\n29   return test;\n30 }\n31 function verification() {\n32   const date1=document.getElementById(\"date1\").value;\n33   const date2=document.getElementById(\"date2\").value;\n34   const temps1=document.getElementById(\"temps1\").value;\n35   const temps2=document.getElementById(\"temps2\").value;\n36   if (date1>date2) {\n37     alert(\"La date de début doit être inférieure ou égale à la date de fin de l'intervention\");\n38     return false; }\n39   if ((date1==date2) && (temps1>=temps2)) {\n40     alert(\"L'heure de début doit être inférieure ou égale à l'heure de fin de l'intervention\");\n41     return false; }\n42   if (inconnue()==false) {\n43     alert(\"Il faut cocher au moins un type d'intervention\");\n44     return false; }\n45 }",
+          "language": "javascript",
+          "expectedAnswer": "alert()",
+          "expectedRegex": "^alert\\s*(\\(.*\\))?$",
+          "explanation": "L'élément attendu est alert()."
+        },
+        {
+          "id": "B3-T-8",
+          "prompt": "Exercice 3, question 1 : quel élément du langage JavaScript correspond au rôle : « Instruction qui retourne le résultat d'une fonction. »",
+          "points": 0.125,
+          "type": "code_analysis",
+          "codeSnippet": "1  function date() {\n2    const datej=new Date();\n3    let jour=datej.getDate();\n4    if (jour<10)\n5      jour=\"0\"+jour\n6    let mois=datej.getMonth()+1;\n7    if (mois<10)\n8      mois=\"0\"+mois\n9    const annee=datej.getFullYear();\n10   let datejour=String(annee)+\"-\"+mois+\"-\"+jour;\n11   document.getElementById(\"date1\").value=datejour;\n12   document.getElementById(\"date2\").value=datejour;\n13 }\n14 function temps() {\n15   document.getElementById(\"temps1\").value=\"00:00\";\n16   document.getElementById(\"temps2\").value=\"23:59\";\n17 }\n18 function inconnue () {\n19   // sauvegarder dans la constante \"interventions\" les éléments HTML ayant le nom \"intervention[]\".\n20   const interventions = document.getElementsByName(\"intervention[]\");\n21   let test = false ;\n22   let i = -1;\n23   do\n24   {\n25     i++;\n26     if (interventions[i].checked == true)\n27       test = true;\n28   } while (test == false && i < interventions.length-1);\n29   return test;\n30 }\n31 function verification() {\n32   const date1=document.getElementById(\"date1\").value;\n33   const date2=document.getElementById(\"date2\").value;\n34   const temps1=document.getElementById(\"temps1\").value;\n35   const temps2=document.getElementById(\"temps2\").value;\n36   if (date1>date2) {\n37     alert(\"La date de début doit être inférieure ou égale à la date de fin de l'intervention\");\n38     return false; }\n39   if ((date1==date2) && (temps1>=temps2)) {\n40     alert(\"L'heure de début doit être inférieure ou égale à l'heure de fin de l'intervention\");\n41     return false; }\n42   if (inconnue()==false) {\n43     alert(\"Il faut cocher au moins un type d'intervention\");\n44     return false; }\n45 }",
+          "language": "javascript",
+          "expectedAnswer": "return",
+          "expectedRegex": "^return(\\s+.*)?$",
+          "explanation": "L'élément attendu est return."
+        },
+        {
+          "id": "B3-TRACE-1",
+          "prompt": "Exercice 3, question 2.a) Exemple N° 1 (cases Aérienne et Maritime cochées) : donnez la trace d'exécution de la fonction inconnue (valeurs de test, i et interventions[i].checked) et la valeur retournée.",
+          "points": 0.25,
+          "type": "code_analysis",
+          "codeSnippet": "1  function date() {\n2    const datej=new Date();\n3    let jour=datej.getDate();\n4    if (jour<10)\n5      jour=\"0\"+jour\n6    let mois=datej.getMonth()+1;\n7    if (mois<10)\n8      mois=\"0\"+mois\n9    const annee=datej.getFullYear();\n10   let datejour=String(annee)+\"-\"+mois+\"-\"+jour;\n11   document.getElementById(\"date1\").value=datejour;\n12   document.getElementById(\"date2\").value=datejour;\n13 }\n14 function temps() {\n15   document.getElementById(\"temps1\").value=\"00:00\";\n16   document.getElementById(\"temps2\").value=\"23:59\";\n17 }\n18 function inconnue () {\n19   // sauvegarder dans la constante \"interventions\" les éléments HTML ayant le nom \"intervention[]\".\n20   const interventions = document.getElementsByName(\"intervention[]\");\n21   let test = false ;\n22   let i = -1;\n23   do\n24   {\n25     i++;\n26     if (interventions[i].checked == true)\n27       test = true;\n28   } while (test == false && i < interventions.length-1);\n29   return test;\n30 }\n31 function verification() {\n32   const date1=document.getElementById(\"date1\").value;\n33   const date2=document.getElementById(\"date2\").value;\n34   const temps1=document.getElementById(\"temps1\").value;\n35   const temps2=document.getElementById(\"temps2\").value;\n36   if (date1>date2) {\n37     alert(\"La date de début doit être inférieure ou égale à la date de fin de l'intervention\");\n38     return false; }\n39   if ((date1==date2) && (temps1>=temps2)) {\n40     alert(\"L'heure de début doit être inférieure ou égale à l'heure de fin de l'intervention\");\n41     return false; }\n42   if (inconnue()==false) {\n43     alert(\"Il faut cocher au moins un type d'intervention\");\n44     return false; }\n45 }",
+          "language": "javascript",
+          "expectedKeywords": ["\\b0\\b", "true|vrai"],
+          "explanation": "i passe de -1 à 0 : interventions[0].checked vaut true, test devient true et la boucle s'arrête ; la fonction retourne true."
+        },
+        {
+          "id": "B3-TRACE-2",
+          "prompt": "Exercice 3, question 2.a) Exemple N° 2 (aucune case cochée) : donnez la trace d'exécution de la fonction inconnue et la valeur retournée.",
+          "points": 0.25,
+          "type": "code_analysis",
+          "codeSnippet": "1  function date() {\n2    const datej=new Date();\n3    let jour=datej.getDate();\n4    if (jour<10)\n5      jour=\"0\"+jour\n6    let mois=datej.getMonth()+1;\n7    if (mois<10)\n8      mois=\"0\"+mois\n9    const annee=datej.getFullYear();\n10   let datejour=String(annee)+\"-\"+mois+\"-\"+jour;\n11   document.getElementById(\"date1\").value=datejour;\n12   document.getElementById(\"date2\").value=datejour;\n13 }\n14 function temps() {\n15   document.getElementById(\"temps1\").value=\"00:00\";\n16   document.getElementById(\"temps2\").value=\"23:59\";\n17 }\n18 function inconnue () {\n19   // sauvegarder dans la constante \"interventions\" les éléments HTML ayant le nom \"intervention[]\".\n20   const interventions = document.getElementsByName(\"intervention[]\");\n21   let test = false ;\n22   let i = -1;\n23   do\n24   {\n25     i++;\n26     if (interventions[i].checked == true)\n27       test = true;\n28   } while (test == false && i < interventions.length-1);\n29   return test;\n30 }\n31 function verification() {\n32   const date1=document.getElementById(\"date1\").value;\n33   const date2=document.getElementById(\"date2\").value;\n34   const temps1=document.getElementById(\"temps1\").value;\n35   const temps2=document.getElementById(\"temps2\").value;\n36   if (date1>date2) {\n37     alert(\"La date de début doit être inférieure ou égale à la date de fin de l'intervention\");\n38     return false; }\n39   if ((date1==date2) && (temps1>=temps2)) {\n40     alert(\"L'heure de début doit être inférieure ou égale à l'heure de fin de l'intervention\");\n41     return false; }\n42   if (inconnue()==false) {\n43     alert(\"Il faut cocher au moins un type d'intervention\");\n44     return false; }\n45 }",
+          "language": "javascript",
+          "expectedKeywords": ["\\b3\\b", "false|faux"],
+          "explanation": "i prend les valeurs 0, 1, 2 puis 3 ; checked vaut toujours false, test reste false ; la fonction retourne false."
+        },
+        {
+          "id": "B3-ROLE",
+          "prompt": "Exercice 3, question 2.b) Déduisez le rôle de la fonction inconnue.",
+          "points": 0.5,
+          "type": "code_analysis",
+          "codeSnippet": "1  function date() {\n2    const datej=new Date();\n3    let jour=datej.getDate();\n4    if (jour<10)\n5      jour=\"0\"+jour\n6    let mois=datej.getMonth()+1;\n7    if (mois<10)\n8      mois=\"0\"+mois\n9    const annee=datej.getFullYear();\n10   let datejour=String(annee)+\"-\"+mois+\"-\"+jour;\n11   document.getElementById(\"date1\").value=datejour;\n12   document.getElementById(\"date2\").value=datejour;\n13 }\n14 function temps() {\n15   document.getElementById(\"temps1\").value=\"00:00\";\n16   document.getElementById(\"temps2\").value=\"23:59\";\n17 }\n18 function inconnue () {\n19   // sauvegarder dans la constante \"interventions\" les éléments HTML ayant le nom \"intervention[]\".\n20   const interventions = document.getElementsByName(\"intervention[]\");\n21   let test = false ;\n22   let i = -1;\n23   do\n24   {\n25     i++;\n26     if (interventions[i].checked == true)\n27       test = true;\n28   } while (test == false && i < interventions.length-1);\n29   return test;\n30 }\n31 function verification() {\n32   const date1=document.getElementById(\"date1\").value;\n33   const date2=document.getElementById(\"date2\").value;\n34   const temps1=document.getElementById(\"temps1\").value;\n35   const temps2=document.getElementById(\"temps2\").value;\n36   if (date1>date2) {\n37     alert(\"La date de début doit être inférieure ou égale à la date de fin de l'intervention\");\n38     return false; }\n39   if ((date1==date2) && (temps1>=temps2)) {\n40     alert(\"L'heure de début doit être inférieure ou égale à l'heure de fin de l'intervention\");\n41     return false; }\n42   if (inconnue()==false) {\n43     alert(\"Il faut cocher au moins un type d'intervention\");\n44     return false; }\n45 }",
+          "language": "javascript",
+          "expectedKeywords": ["case|type|intervention", "coch"],
+          "explanation": "Elle vérifie si au moins un type d'intervention (une case à cocher) est coché."
+        },
+        {
+          "id": "B4-T-1",
+          "prompt": "Exercice 4 : tâche N° 1 du fichier Statistiques_Types.php. Écrivez la fonction correspondante.",
+          "points": 0.25,
+          "type": "code_analysis",
+          "codeSnippet": "1  <?php\n2  //Tâche N° 1 : Établir une connexion à la base de données.\n3  $con=........................................(\"localhost\", \"root\", \"\", \"gestion_incendies\") or die (\"Erreur de la base de données\");\n4  $datedebut=$_POST[\"date1\"].\" \".$_POST[\"temps1\"];\n5  $datefin=$_POST[\"date2\"].\" \".$_POST[\"temps2\"];\n6  $types=$_POST[\"intervention\"];\n7  $ch=\"(\";\n8  //Tâche N° 2 : Retourner le nombre de cases du tableau \"types\".\n9  for($i=0; $i<........................................; $i++)\n10   $ch=$ch.\"'\".$types[$i].\"',\";\n11 //Tâche N° 3 : Retourner la longueur de la chaîne de caractères \"ch\".\n12 $L=........................................;\n13 //Tâche N° 4 : Retourner une sous-chaîne à partir de la chaîne de caractères \"ch\" sans le dernier caractère.\n14 $ch1=........................................;\n15 $ch1=$ch1.\")\";\n16 $req=\"select T.description, count(I.codeInt)\n17        from Intervention I, typeintervention T\n18        where (I.codeTypeInt=T.codeTypeInt) and (I.codeTypeInt in $ch1) and\n19              (dateHeureDebInt>='$datedebut') and (dateHeureFinInt<='$datefin')\n20        group by T.description;\";\n21 //Tâche N° 5 : Exécuter la requête \"req\".\n22 $res=........................................ or die (\"Erreur de la requête\".mysqli_error($con));\n23 //Tâche N° 6 : Récupérer le nombre d'enregistrements retourné par la requête.\n24 if (........................................==0)\n25   echo \"Aucune intervention n'est enregistrée pour les critères introduits.\";\n26 else\n27   echo \"<table border=1><thead><tr><th>Type Interventions</th><th>Nombre Interventions</th></tr> </thead><tbody>\";\n28 //Tâche N° 7 : Retourner un enregistrement du résultat de l'exécution de la requête.\n29 while ($enreg=........................................)\n30   echo \"<tr><td>$enreg[0]</td>\n31         <td>$enreg[1]</td></tr>\";\n32 echo \"</tbody></table>\";\n33 //Tâche N° 8 : Se déconnecter de la base de données.\n34 ........................................;\n35 ?>",
+          "language": "php",
+          "expectedAnswer": "mysqli_connect",
+          "expectedRegex": "^mysqli_connect(\\s*\\(.*\\))?$",
+          "explanation": "La fonction attendue est mysqli_connect."
+        },
+        {
+          "id": "B4-T-2",
+          "prompt": "Exercice 4 : tâche N° 2 du fichier Statistiques_Types.php. Écrivez la fonction correspondante.",
+          "points": 0.25,
+          "type": "code_analysis",
+          "codeSnippet": "1  <?php\n2  //Tâche N° 1 : Établir une connexion à la base de données.\n3  $con=........................................(\"localhost\", \"root\", \"\", \"gestion_incendies\") or die (\"Erreur de la base de données\");\n4  $datedebut=$_POST[\"date1\"].\" \".$_POST[\"temps1\"];\n5  $datefin=$_POST[\"date2\"].\" \".$_POST[\"temps2\"];\n6  $types=$_POST[\"intervention\"];\n7  $ch=\"(\";\n8  //Tâche N° 2 : Retourner le nombre de cases du tableau \"types\".\n9  for($i=0; $i<........................................; $i++)\n10   $ch=$ch.\"'\".$types[$i].\"',\";\n11 //Tâche N° 3 : Retourner la longueur de la chaîne de caractères \"ch\".\n12 $L=........................................;\n13 //Tâche N° 4 : Retourner une sous-chaîne à partir de la chaîne de caractères \"ch\" sans le dernier caractère.\n14 $ch1=........................................;\n15 $ch1=$ch1.\")\";\n16 $req=\"select T.description, count(I.codeInt)\n17        from Intervention I, typeintervention T\n18        where (I.codeTypeInt=T.codeTypeInt) and (I.codeTypeInt in $ch1) and\n19              (dateHeureDebInt>='$datedebut') and (dateHeureFinInt<='$datefin')\n20        group by T.description;\";\n21 //Tâche N° 5 : Exécuter la requête \"req\".\n22 $res=........................................ or die (\"Erreur de la requête\".mysqli_error($con));\n23 //Tâche N° 6 : Récupérer le nombre d'enregistrements retourné par la requête.\n24 if (........................................==0)\n25   echo \"Aucune intervention n'est enregistrée pour les critères introduits.\";\n26 else\n27   echo \"<table border=1><thead><tr><th>Type Interventions</th><th>Nombre Interventions</th></tr> </thead><tbody>\";\n28 //Tâche N° 7 : Retourner un enregistrement du résultat de l'exécution de la requête.\n29 while ($enreg=........................................)\n30   echo \"<tr><td>$enreg[0]</td>\n31         <td>$enreg[1]</td></tr>\";\n32 echo \"</tbody></table>\";\n33 //Tâche N° 8 : Se déconnecter de la base de données.\n34 ........................................;\n35 ?>",
+          "language": "php",
+          "expectedAnswer": "count($types)",
+          "expectedRegex": "^count\\s*\\(\\s*\\$types\\s*\\)$",
+          "explanation": "La fonction attendue est count($types)."
+        },
+        {
+          "id": "B4-T-3",
+          "prompt": "Exercice 4 : tâche N° 3 du fichier Statistiques_Types.php. Écrivez la fonction correspondante.",
+          "points": 0.25,
+          "type": "code_analysis",
+          "codeSnippet": "1  <?php\n2  //Tâche N° 1 : Établir une connexion à la base de données.\n3  $con=........................................(\"localhost\", \"root\", \"\", \"gestion_incendies\") or die (\"Erreur de la base de données\");\n4  $datedebut=$_POST[\"date1\"].\" \".$_POST[\"temps1\"];\n5  $datefin=$_POST[\"date2\"].\" \".$_POST[\"temps2\"];\n6  $types=$_POST[\"intervention\"];\n7  $ch=\"(\";\n8  //Tâche N° 2 : Retourner le nombre de cases du tableau \"types\".\n9  for($i=0; $i<........................................; $i++)\n10   $ch=$ch.\"'\".$types[$i].\"',\";\n11 //Tâche N° 3 : Retourner la longueur de la chaîne de caractères \"ch\".\n12 $L=........................................;\n13 //Tâche N° 4 : Retourner une sous-chaîne à partir de la chaîne de caractères \"ch\" sans le dernier caractère.\n14 $ch1=........................................;\n15 $ch1=$ch1.\")\";\n16 $req=\"select T.description, count(I.codeInt)\n17        from Intervention I, typeintervention T\n18        where (I.codeTypeInt=T.codeTypeInt) and (I.codeTypeInt in $ch1) and\n19              (dateHeureDebInt>='$datedebut') and (dateHeureFinInt<='$datefin')\n20        group by T.description;\";\n21 //Tâche N° 5 : Exécuter la requête \"req\".\n22 $res=........................................ or die (\"Erreur de la requête\".mysqli_error($con));\n23 //Tâche N° 6 : Récupérer le nombre d'enregistrements retourné par la requête.\n24 if (........................................==0)\n25   echo \"Aucune intervention n'est enregistrée pour les critères introduits.\";\n26 else\n27   echo \"<table border=1><thead><tr><th>Type Interventions</th><th>Nombre Interventions</th></tr> </thead><tbody>\";\n28 //Tâche N° 7 : Retourner un enregistrement du résultat de l'exécution de la requête.\n29 while ($enreg=........................................)\n30   echo \"<tr><td>$enreg[0]</td>\n31         <td>$enreg[1]</td></tr>\";\n32 echo \"</tbody></table>\";\n33 //Tâche N° 8 : Se déconnecter de la base de données.\n34 ........................................;\n35 ?>",
+          "language": "php",
+          "expectedAnswer": "strlen($ch)",
+          "expectedRegex": "^strlen\\s*\\(\\s*\\$ch\\s*\\)$",
+          "explanation": "La fonction attendue est strlen($ch)."
+        },
+        {
+          "id": "B4-T-4",
+          "prompt": "Exercice 4 : tâche N° 4 du fichier Statistiques_Types.php. Écrivez la fonction correspondante.",
+          "points": 0.25,
+          "type": "code_analysis",
+          "codeSnippet": "1  <?php\n2  //Tâche N° 1 : Établir une connexion à la base de données.\n3  $con=........................................(\"localhost\", \"root\", \"\", \"gestion_incendies\") or die (\"Erreur de la base de données\");\n4  $datedebut=$_POST[\"date1\"].\" \".$_POST[\"temps1\"];\n5  $datefin=$_POST[\"date2\"].\" \".$_POST[\"temps2\"];\n6  $types=$_POST[\"intervention\"];\n7  $ch=\"(\";\n8  //Tâche N° 2 : Retourner le nombre de cases du tableau \"types\".\n9  for($i=0; $i<........................................; $i++)\n10   $ch=$ch.\"'\".$types[$i].\"',\";\n11 //Tâche N° 3 : Retourner la longueur de la chaîne de caractères \"ch\".\n12 $L=........................................;\n13 //Tâche N° 4 : Retourner une sous-chaîne à partir de la chaîne de caractères \"ch\" sans le dernier caractère.\n14 $ch1=........................................;\n15 $ch1=$ch1.\")\";\n16 $req=\"select T.description, count(I.codeInt)\n17        from Intervention I, typeintervention T\n18        where (I.codeTypeInt=T.codeTypeInt) and (I.codeTypeInt in $ch1) and\n19              (dateHeureDebInt>='$datedebut') and (dateHeureFinInt<='$datefin')\n20        group by T.description;\";\n21 //Tâche N° 5 : Exécuter la requête \"req\".\n22 $res=........................................ or die (\"Erreur de la requête\".mysqli_error($con));\n23 //Tâche N° 6 : Récupérer le nombre d'enregistrements retourné par la requête.\n24 if (........................................==0)\n25   echo \"Aucune intervention n'est enregistrée pour les critères introduits.\";\n26 else\n27   echo \"<table border=1><thead><tr><th>Type Interventions</th><th>Nombre Interventions</th></tr> </thead><tbody>\";\n28 //Tâche N° 7 : Retourner un enregistrement du résultat de l'exécution de la requête.\n29 while ($enreg=........................................)\n30   echo \"<tr><td>$enreg[0]</td>\n31         <td>$enreg[1]</td></tr>\";\n32 echo \"</tbody></table>\";\n33 //Tâche N° 8 : Se déconnecter de la base de données.\n34 ........................................;\n35 ?>",
+          "language": "php",
+          "expectedAnswer": "substr($ch,0,$L-1)",
+          "expectedRegex": "^substr\\s*\\(\\s*\\$ch\\s*,\\s*0\\s*,\\s*\\$L\\s*-\\s*1\\s*\\)$",
+          "explanation": "La fonction attendue est substr($ch,0,$L-1)."
+        },
+        {
+          "id": "B4-T-5",
+          "prompt": "Exercice 4 : tâche N° 5 du fichier Statistiques_Types.php. Écrivez la fonction correspondante.",
+          "points": 0.25,
+          "type": "code_analysis",
+          "codeSnippet": "1  <?php\n2  //Tâche N° 1 : Établir une connexion à la base de données.\n3  $con=........................................(\"localhost\", \"root\", \"\", \"gestion_incendies\") or die (\"Erreur de la base de données\");\n4  $datedebut=$_POST[\"date1\"].\" \".$_POST[\"temps1\"];\n5  $datefin=$_POST[\"date2\"].\" \".$_POST[\"temps2\"];\n6  $types=$_POST[\"intervention\"];\n7  $ch=\"(\";\n8  //Tâche N° 2 : Retourner le nombre de cases du tableau \"types\".\n9  for($i=0; $i<........................................; $i++)\n10   $ch=$ch.\"'\".$types[$i].\"',\";\n11 //Tâche N° 3 : Retourner la longueur de la chaîne de caractères \"ch\".\n12 $L=........................................;\n13 //Tâche N° 4 : Retourner une sous-chaîne à partir de la chaîne de caractères \"ch\" sans le dernier caractère.\n14 $ch1=........................................;\n15 $ch1=$ch1.\")\";\n16 $req=\"select T.description, count(I.codeInt)\n17        from Intervention I, typeintervention T\n18        where (I.codeTypeInt=T.codeTypeInt) and (I.codeTypeInt in $ch1) and\n19              (dateHeureDebInt>='$datedebut') and (dateHeureFinInt<='$datefin')\n20        group by T.description;\";\n21 //Tâche N° 5 : Exécuter la requête \"req\".\n22 $res=........................................ or die (\"Erreur de la requête\".mysqli_error($con));\n23 //Tâche N° 6 : Récupérer le nombre d'enregistrements retourné par la requête.\n24 if (........................................==0)\n25   echo \"Aucune intervention n'est enregistrée pour les critères introduits.\";\n26 else\n27   echo \"<table border=1><thead><tr><th>Type Interventions</th><th>Nombre Interventions</th></tr> </thead><tbody>\";\n28 //Tâche N° 7 : Retourner un enregistrement du résultat de l'exécution de la requête.\n29 while ($enreg=........................................)\n30   echo \"<tr><td>$enreg[0]</td>\n31         <td>$enreg[1]</td></tr>\";\n32 echo \"</tbody></table>\";\n33 //Tâche N° 8 : Se déconnecter de la base de données.\n34 ........................................;\n35 ?>",
+          "language": "php",
+          "expectedAnswer": "mysqli_query($con,$req)",
+          "expectedRegex": "^mysqli_query\\s*\\(\\s*\\$con\\s*,\\s*\\$req\\s*\\)$",
+          "explanation": "La fonction attendue est mysqli_query($con,$req)."
+        },
+        {
+          "id": "B4-T-6",
+          "prompt": "Exercice 4 : tâche N° 6 du fichier Statistiques_Types.php. Écrivez la fonction correspondante.",
+          "points": 0.25,
+          "type": "code_analysis",
+          "codeSnippet": "1  <?php\n2  //Tâche N° 1 : Établir une connexion à la base de données.\n3  $con=........................................(\"localhost\", \"root\", \"\", \"gestion_incendies\") or die (\"Erreur de la base de données\");\n4  $datedebut=$_POST[\"date1\"].\" \".$_POST[\"temps1\"];\n5  $datefin=$_POST[\"date2\"].\" \".$_POST[\"temps2\"];\n6  $types=$_POST[\"intervention\"];\n7  $ch=\"(\";\n8  //Tâche N° 2 : Retourner le nombre de cases du tableau \"types\".\n9  for($i=0; $i<........................................; $i++)\n10   $ch=$ch.\"'\".$types[$i].\"',\";\n11 //Tâche N° 3 : Retourner la longueur de la chaîne de caractères \"ch\".\n12 $L=........................................;\n13 //Tâche N° 4 : Retourner une sous-chaîne à partir de la chaîne de caractères \"ch\" sans le dernier caractère.\n14 $ch1=........................................;\n15 $ch1=$ch1.\")\";\n16 $req=\"select T.description, count(I.codeInt)\n17        from Intervention I, typeintervention T\n18        where (I.codeTypeInt=T.codeTypeInt) and (I.codeTypeInt in $ch1) and\n19              (dateHeureDebInt>='$datedebut') and (dateHeureFinInt<='$datefin')\n20        group by T.description;\";\n21 //Tâche N° 5 : Exécuter la requête \"req\".\n22 $res=........................................ or die (\"Erreur de la requête\".mysqli_error($con));\n23 //Tâche N° 6 : Récupérer le nombre d'enregistrements retourné par la requête.\n24 if (........................................==0)\n25   echo \"Aucune intervention n'est enregistrée pour les critères introduits.\";\n26 else\n27   echo \"<table border=1><thead><tr><th>Type Interventions</th><th>Nombre Interventions</th></tr> </thead><tbody>\";\n28 //Tâche N° 7 : Retourner un enregistrement du résultat de l'exécution de la requête.\n29 while ($enreg=........................................)\n30   echo \"<tr><td>$enreg[0]</td>\n31         <td>$enreg[1]</td></tr>\";\n32 echo \"</tbody></table>\";\n33 //Tâche N° 8 : Se déconnecter de la base de données.\n34 ........................................;\n35 ?>",
+          "language": "php",
+          "expectedAnswer": "mysqli_num_rows($res)",
+          "expectedRegex": "^mysqli_num_rows\\s*\\(\\s*\\$res\\s*\\)$",
+          "explanation": "La fonction attendue est mysqli_num_rows($res)."
+        },
+        {
+          "id": "B4-T-7",
+          "prompt": "Exercice 4 : tâche N° 7 du fichier Statistiques_Types.php. Écrivez la fonction correspondante.",
+          "points": 0.25,
+          "type": "code_analysis",
+          "codeSnippet": "1  <?php\n2  //Tâche N° 1 : Établir une connexion à la base de données.\n3  $con=........................................(\"localhost\", \"root\", \"\", \"gestion_incendies\") or die (\"Erreur de la base de données\");\n4  $datedebut=$_POST[\"date1\"].\" \".$_POST[\"temps1\"];\n5  $datefin=$_POST[\"date2\"].\" \".$_POST[\"temps2\"];\n6  $types=$_POST[\"intervention\"];\n7  $ch=\"(\";\n8  //Tâche N° 2 : Retourner le nombre de cases du tableau \"types\".\n9  for($i=0; $i<........................................; $i++)\n10   $ch=$ch.\"'\".$types[$i].\"',\";\n11 //Tâche N° 3 : Retourner la longueur de la chaîne de caractères \"ch\".\n12 $L=........................................;\n13 //Tâche N° 4 : Retourner une sous-chaîne à partir de la chaîne de caractères \"ch\" sans le dernier caractère.\n14 $ch1=........................................;\n15 $ch1=$ch1.\")\";\n16 $req=\"select T.description, count(I.codeInt)\n17        from Intervention I, typeintervention T\n18        where (I.codeTypeInt=T.codeTypeInt) and (I.codeTypeInt in $ch1) and\n19              (dateHeureDebInt>='$datedebut') and (dateHeureFinInt<='$datefin')\n20        group by T.description;\";\n21 //Tâche N° 5 : Exécuter la requête \"req\".\n22 $res=........................................ or die (\"Erreur de la requête\".mysqli_error($con));\n23 //Tâche N° 6 : Récupérer le nombre d'enregistrements retourné par la requête.\n24 if (........................................==0)\n25   echo \"Aucune intervention n'est enregistrée pour les critères introduits.\";\n26 else\n27   echo \"<table border=1><thead><tr><th>Type Interventions</th><th>Nombre Interventions</th></tr> </thead><tbody>\";\n28 //Tâche N° 7 : Retourner un enregistrement du résultat de l'exécution de la requête.\n29 while ($enreg=........................................)\n30   echo \"<tr><td>$enreg[0]</td>\n31         <td>$enreg[1]</td></tr>\";\n32 echo \"</tbody></table>\";\n33 //Tâche N° 8 : Se déconnecter de la base de données.\n34 ........................................;\n35 ?>",
+          "language": "php",
+          "expectedAnswer": "mysqli_fetch_array($res)",
+          "expectedRegex": "^mysqli_fetch_array\\s*\\(\\s*\\$res\\s*\\)$",
+          "explanation": "La fonction attendue est mysqli_fetch_array($res)."
+        },
+        {
+          "id": "B4-T-8",
+          "prompt": "Exercice 4 : tâche N° 8 du fichier Statistiques_Types.php. Écrivez la fonction correspondante.",
+          "points": 0.25,
+          "type": "code_analysis",
+          "codeSnippet": "1  <?php\n2  //Tâche N° 1 : Établir une connexion à la base de données.\n3  $con=........................................(\"localhost\", \"root\", \"\", \"gestion_incendies\") or die (\"Erreur de la base de données\");\n4  $datedebut=$_POST[\"date1\"].\" \".$_POST[\"temps1\"];\n5  $datefin=$_POST[\"date2\"].\" \".$_POST[\"temps2\"];\n6  $types=$_POST[\"intervention\"];\n7  $ch=\"(\";\n8  //Tâche N° 2 : Retourner le nombre de cases du tableau \"types\".\n9  for($i=0; $i<........................................; $i++)\n10   $ch=$ch.\"'\".$types[$i].\"',\";\n11 //Tâche N° 3 : Retourner la longueur de la chaîne de caractères \"ch\".\n12 $L=........................................;\n13 //Tâche N° 4 : Retourner une sous-chaîne à partir de la chaîne de caractères \"ch\" sans le dernier caractère.\n14 $ch1=........................................;\n15 $ch1=$ch1.\")\";\n16 $req=\"select T.description, count(I.codeInt)\n17        from Intervention I, typeintervention T\n18        where (I.codeTypeInt=T.codeTypeInt) and (I.codeTypeInt in $ch1) and\n19              (dateHeureDebInt>='$datedebut') and (dateHeureFinInt<='$datefin')\n20        group by T.description;\";\n21 //Tâche N° 5 : Exécuter la requête \"req\".\n22 $res=........................................ or die (\"Erreur de la requête\".mysqli_error($con));\n23 //Tâche N° 6 : Récupérer le nombre d'enregistrements retourné par la requête.\n24 if (........................................==0)\n25   echo \"Aucune intervention n'est enregistrée pour les critères introduits.\";\n26 else\n27   echo \"<table border=1><thead><tr><th>Type Interventions</th><th>Nombre Interventions</th></tr> </thead><tbody>\";\n28 //Tâche N° 7 : Retourner un enregistrement du résultat de l'exécution de la requête.\n29 while ($enreg=........................................)\n30   echo \"<tr><td>$enreg[0]</td>\n31         <td>$enreg[1]</td></tr>\";\n32 echo \"</tbody></table>\";\n33 //Tâche N° 8 : Se déconnecter de la base de données.\n34 ........................................;\n35 ?>",
+          "language": "php",
+          "expectedAnswer": "mysqli_close($con)",
+          "expectedRegex": "^mysqli_close\\s*\\(\\s*\\$con\\s*\\)$",
+          "explanation": "La fonction attendue est mysqli_close($con)."
+        }
+      ]
+    }
+  ]
+}

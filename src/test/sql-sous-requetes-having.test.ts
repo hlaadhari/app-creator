@@ -103,6 +103,31 @@ describe("Moteur SQL : HAVING avec agrégat, sous-requêtes et auto-incrément (
     });
   });
 
+  describe("Fonctions de date en partie gauche d'une condition", () => {
+    function moteurDates(): RelationalDatabaseEngine {
+      const e = new RelationalDatabaseEngine();
+      const res = e.executeScript(
+        "CREATE TABLE inc (id INT PRIMARY KEY, d DATETIME); INSERT INTO inc VALUES (1, '2023-05-30 12:00:00'), (2, '2023-06-15 13:00:00'), (3, '2023-08-05 14:00:00'), (4, '2024-07-01 10:00:00');",
+      );
+      expect(res.success).toBe(true);
+      return e;
+    }
+
+    it("YEAR(col) = valeur filtre réellement les lignes", () => {
+      const res = moteurDates().query("SELECT id FROM inc WHERE YEAR(d) = 2024");
+      expect(res.rows.map((r) => r["id"])).toEqual([4]);
+    });
+
+    it("MONTH(col) avec comparaison, BETWEEN et IN", () => {
+      const e = moteurDates();
+      expect(
+        e.query("SELECT id FROM inc WHERE YEAR(d) = 2023 AND MONTH(d) >= 6 AND MONTH(d) <= 8").rows,
+      ).toHaveLength(2);
+      expect(e.query("SELECT id FROM inc WHERE MONTH(d) BETWEEN 6 AND 8").rows).toHaveLength(3);
+      expect(e.query("SELECT id FROM inc WHERE MONTH(d) IN (5, 7)").rows).toHaveLength(2);
+    });
+  });
+
   describe("Clé auto-incrémentée", () => {
     it("génère la valeur quand l'INSERT fournit NULL, comme MySQL", () => {
       const e = moteur();
