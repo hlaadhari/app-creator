@@ -61,6 +61,53 @@
           "code": "input[type=\"submit\"] {\n  background-color: #2563eb;\n  color: #ffffff;\n  padding: 8px 20px;\n  border: none;\n  border-radius: 6px;\n  font-size: 14px;\n  /* Définition de la transition fluide */\n  transition: all 1s ease-in-out;\n}\n\ninput[type=\"submit\"]:hover {\n  background-color: #1d4ed8;\n  transform: scale(1.1); /* Agrandissement de 10% */\n  opacity: 0.9;\n}"
         }
       ]
+    },
+    {
+      "id": "css-annales",
+      "title": "7. Notions fréquentes des annales",
+      "description": "Notions de CSS3 qui reviennent dans les épreuves écrites : transformations (skew, rotate), cercle avec border-radius, graisse de police, liaison d'une feuille de style.",
+      "keyPoints": [
+        "Piège : skew incline, rotate fait tourner et translate déplace.",
+        "Piège : text-transform modifie la casse du texte, pas sa couleur ni sa forme.",
+        "Piège : un sélecteur de classe commence par un point (.menu), un identifiant par # (#menu).",
+        "Annale : Bac 2024 contrôle, exercice 1 (skew, text-transform) — /examen-ecrit/exam-bac2024-controle-ecrit",
+        "Annale : Bac 2024 principale, partie web (rotate, border-radius, font-weight) — /examen-ecrit/exam-bac2024-principale-ecrit",
+        "Annale : Bac 2025 principale, partie B exercice 2 (font-weight, display) — /examen-ecrit/exam-bac2025-principale-ecrit",
+        "Annale : Bac 2023 principale (link, sélecteurs) — /examen-ecrit/exam-bac2023-principale-ecrit"
+      ],
+      "snippets": [
+        {
+          "title": "Transformations : skew, rotate et scale",
+          "language": "css",
+          "targetFile": "mesStyles.css",
+          "keywords": ["transform", "skew", "rotate", "scale", "hover"],
+          "code": "img.incline { transform: skew(15deg, 15deg); }   /* incline : ni rotation ni déplacement */\nimg.pivote   { transform: rotate(45deg); }         /* tourne de 45 degrés */\nvideo:hover  { transform: scale(1.2); }            /* agrandit de 20 % au survol */",
+          "explanation": "skew(ax, ay) incline l'élément selon les axes X et Y. rotate(a) le fait tourner autour de son centre. scale(k) change sa taille."
+        },
+        {
+          "title": "Cercle et gras : border-radius et font-weight",
+          "language": "css",
+          "targetFile": "mesStyles.css",
+          "keywords": [
+            "border-radius",
+            "font-weight",
+            "bold",
+            "bolder",
+            "cercle",
+            "text-transform"
+          ],
+          "code": ".pastille {\n  width: 40px;\n  height: 40px;\n  border-radius: 50%;       /* une boîte carrée devient un cercle */\n  font-weight: bold;        /* texte en gras */\n  text-transform: uppercase; /* texte en majuscules */\n}",
+          "explanation": "border-radius: 50% arrondit les coins au maximum : sur un carré on obtient un cercle. font-weight: bold met le texte en gras. text-transform change la casse du texte."
+        },
+        {
+          "title": "Liaison d'une feuille de style externe",
+          "language": "html",
+          "targetFile": "index.html",
+          "keywords": ["link", "stylesheet", "href", "rel", "head"],
+          "code": "<head>\n  <meta charset=\"utf-8\">\n  <link rel=\"stylesheet\" type=\"text/css\" href=\"mesStyles.css\">\n</head>",
+          "explanation": "La balise link, placée dans head, relie la page à la feuille de style : rel=\"stylesheet\" et href donnent le fichier."
+        }
+      ]
     }
   ]
 }

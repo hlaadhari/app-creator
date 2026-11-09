@@ -1112,6 +1112,97 @@ export const NOTEBOOK_FLASHCARDS: NotebookFlashcard[] = [
       "On rapporte le nombre d'élèves concernés au total : 100 * SUM(moyenne >= 10) / COUNT(*). La condition booléenne vaut 1 ou 0 en MySQL, donc SUM la compte.",
     codeExample: `SELECT ROUND(100 * SUM(moyenne >= 10) / COUNT(*), 1) FROM eleve;`,
   },
+  {
+    id: "fc-html-04",
+    moduleId: "html5",
+    tag: "figure, alt et title",
+    difficulty: "Piège Bac",
+    question:
+      "Quelle balise légende une figure, et quelle est la différence entre les attributs alt et title d'une image ?",
+    answer:
+      "figcaption légende l'élément figure (la légende d'un tableau est caption). alt est la description alternative de l'image (image absente, lecteur d'écran) ; title est l'infobulle affichée au survol.",
+    codeExample:
+      '<figure>\n  <img src="robot.jpg" alt="Robot humanoïde" title="Notre robot">\n  <figcaption>Figure 1 : le robot</figcaption>\n</figure>',
+  },
+  {
+    id: "fc-html-05",
+    moduleId: "html5",
+    tag: "range, hr et événements",
+    difficulty: "Essentiel",
+    question: 'Que permettent input type="range", la balise hr et l\'événement onfocus ?',
+    answer:
+      "range propose une valeur dans l'intervalle min-max (curseur). hr trace une ligne horizontale de séparation. onfocus se déclenche quand le champ devient actif ; onblur quand il le quitte ; oninput à chaque modification.",
+    codeExample: '<input type="range" min="0" max="5" onfocus="aide()">\n<hr>',
+  },
+  {
+    id: "fc-css-04",
+    moduleId: "css3",
+    tag: "transform",
+    difficulty: "Piège Bac",
+    question:
+      "Quel est l'effet de transform: skew(15deg, 15deg) et en quoi diffère-t-il de rotate(15deg) ?",
+    answer:
+      "skew incline l'élément selon les axes X et Y (déformation en parallélogramme) ; rotate le fait tourner autour de son centre sans le déformer. Aucun des deux ne le déplace (c'est translate).",
+    codeExample: "img { transform: skew(15deg, 15deg); }\nimg.tourne { transform: rotate(15deg); }",
+  },
+  {
+    id: "fc-css-05",
+    moduleId: "css3",
+    tag: "border-radius et font-weight",
+    difficulty: "Essentiel",
+    question:
+      "Comment obtenir un cercle à partir d'une boîte carrée et comment mettre un texte en gras ?",
+    answer:
+      "border-radius: 50% arrondit les coins au maximum : un carré devient un cercle. font-weight: bold (ou bolder) met le texte en gras.",
+    codeExample: ".pastille { width: 40px; height: 40px; border-radius: 50%; font-weight: bold; }",
+  },
+  {
+    id: "fc-js-04",
+    moduleId: "js",
+    tag: "indexOf, substr, charAt",
+    difficulty: "Piège Bac",
+    question:
+      "Que renvoient indexOf, substr et charAt, et quelle erreur fréquente commet-on avec substr ?",
+    answer:
+      "indexOf(texte, départ) renvoie la position de la première occurrence (-1 si absent). substr(début, longueur) extrait une sous-chaîne : le second paramètre est une longueur, pas une position de fin (contrairement à substring). charAt(i) renvoie le caractère d'indice i.",
+    codeExample:
+      'let ch = "Tech#Robot#2025";\nlet d = ch.indexOf("#", 0);          // 4\nlet f = ch.indexOf("#", d + 1);      // 10\nlet mot = ch.substr(d + 1, f - d - 1); // "Robot"',
+  },
+  {
+    id: "fc-js-05",
+    moduleId: "js",
+    tag: "innerHTML et toUpperCase",
+    difficulty: "Essentiel",
+    question:
+      "Quelle différence entre innerHTML et value, et comment mettre la première lettre d'une chaîne en majuscule ?",
+    answer:
+      "innerHTML affecte un contenu HTML à un conteneur (span, div) ; value lit ou écrit le contenu d'un champ de saisie. Pour la majuscule initiale : ch.replace(ch.charAt(0), ch.charAt(0).toUpperCase()).",
+    codeExample:
+      'document.getElementById("total").innerHTML = "<b>10</b>/20";\nch = ch.replace(ch.charAt(0), ch.charAt(0).toUpperCase());',
+  },
+  {
+    id: "fc-php-04",
+    moduleId: "php",
+    tag: "(int) et count",
+    difficulty: "Piège Bac",
+    question: "Que vaut $X après $X = (int) 2.99; et que retourne count($A) ?",
+    answer:
+      "(int) tronque la partie décimale sans arrondir : $X vaut 2. count($A) retourne le nombre d'éléments du tableau $A.",
+    codeExample:
+      "$X = (int) 2.99;          // 2\n$A = array(4, 8, 15);\necho count($A);           // 3",
+  },
+  {
+    id: "fc-php-05",
+    moduleId: "php",
+    tag: "require et str_replace",
+    difficulty: "Essentiel",
+    question:
+      'Que fait require si le fichier est introuvable, et que fait str_replace("_", " ", $nom) ?',
+    answer:
+      "require provoque une erreur fatale et arrête le script (include ne produit qu'un avertissement). str_replace remplace toutes les occurrences du premier argument par le deuxième dans la chaîne : les underscores deviennent des espaces.",
+    codeExample:
+      'require("connexion.php");\n$nom = str_replace("_", " ", "Sidi_Salem"); // "Sidi Salem"',
+  },
 
   // Annales
   {
@@ -1175,6 +1266,21 @@ export const NOTEBOOK_QUIZZES: Record<NotebookCategoryId, NotebookQuizQuestion[]
         "Le navigateur regroupe les boutons radio qui partagent le même attribut name. L'attribut id doit rester unique dans toute la page HTML pour document.getElementById().",
       notebookSource: "Carnet STI-BAC INFO • Contrôles de Formulaire (Source #28)",
     },
+    {
+      id: "qz-html-annales-1",
+      moduleId: "html5",
+      question: "À quoi sert la balise figcaption ?",
+      options: [
+        "À donner un titre à un tableau",
+        "À ajouter une légende à un élément figure",
+        "À afficher une infobulle au survol d'une image",
+        "À définir le texte alternatif d'une image",
+      ],
+      correctIndex: 1,
+      explanation:
+        "figcaption est la légende de figure ; la légende d'un tableau est caption et l'infobulle d'une image est l'attribut title.",
+      notebookSource: "Annale Bac 2024 contrôle, exercice 1 (exam-bac2024-controle-ecrit)",
+    },
   ],
   css3: [
     {
@@ -1220,6 +1326,22 @@ export const NOTEBOOK_QUIZZES: Record<NotebookCategoryId, NotebookQuizQuestion[]
         "transform: scale(1.1) applique le facteur d'échelle 1.1 (110 %) au survol (:hover), et transition: transform 0.3s adoucit le changement d'état.",
       notebookSource: "Carnet STI-BAC INFO • Étude de Cas CSS3 & Animations (Source #84)",
     },
+    {
+      id: "qz-css-annales-1",
+      moduleId: "css3",
+      question:
+        "Quel est l'effet de la déclaration transform: skew(15deg, 15deg); appliquée à une image ?",
+      options: [
+        "Elle déplace l'image de 15 degrés vers la droite et vers le haut",
+        "Elle fait tourner l'image de 15 degrés vers la droite",
+        "Elle incline l'image selon les axes X et Y",
+        "Elle change la casse du texte de l'image",
+      ],
+      correctIndex: 2,
+      explanation:
+        "skew incline (déforme) l'élément ; rotate le fait tourner et translate le déplace.",
+      notebookSource: "Annale Bac 2024 contrôle, exercice 1 (exam-bac2024-controle-ecrit)",
+    },
   ],
   js: [
     {
@@ -1264,6 +1386,22 @@ export const NOTEBOOK_QUIZZES: Record<NotebookCategoryId, NotebookQuizQuestion[]
       explanation:
         "L'instruction return false; interrompt l'exécution de verif() et indique à l'événement onsubmit du formulaire d'annuler l'envoi HTTP vers le serveur PHP.",
       notebookSource: "Carnet STI-BAC INFO • Patron Canonique verif() (Source #139)",
+    },
+    {
+      id: "qz-js-annales-1",
+      moduleId: "js",
+      question:
+        'Quelle instruction extrait « Robot » de ch = "Tech#Robot#2025" quand debut vaut 4 et fin vaut 10 ?',
+      options: [
+        "ch.substr(debut, fin)",
+        "ch.substr(debut + 1, fin - debut - 1)",
+        "ch.charAt(debut + 1)",
+        "ch.indexOf(debut, fin)",
+      ],
+      correctIndex: 1,
+      explanation:
+        "substr(début, longueur) : le mot commence après le premier # (debut + 1) et a pour longueur fin - debut - 1 = 5 caractères.",
+      notebookSource: "Annale Bac 2024 principale, partie web (exam-bac2024-principale-ecrit)",
     },
   ],
   php: [
@@ -1314,6 +1452,16 @@ export const NOTEBOOK_QUIZZES: Record<NotebookCategoryId, NotebookQuizQuestion[]
       explanation:
         "mysqli_error($cnx) renvoie la chaîne descriptive de la dernière erreur survenue sur la connexion $cnx (ex: Violation de clé primaire #1062 ou de clé étrangère #1452).",
       notebookSource: "Carnet STI-BAC INFO • Débogage MySQLi (Source #191)",
+    },
+    {
+      id: "qz-php-annales-1",
+      moduleId: "php",
+      question: "Que contient $X après l'instruction $X = (int) 2.99; ?",
+      options: ["3", "2", "NULL", "2.99"],
+      correctIndex: 1,
+      explanation:
+        "Le transtypage (int) tronque la partie décimale sans arrondir : 2.99 devient 2.",
+      notebookSource: "Annale Bac 2024 principale, exercice 1 (exam-bac2024-principale-ecrit)",
     },
   ],
   sql: [
@@ -1675,6 +1823,81 @@ mysqli_query($cnx, "UPDATE croisiere SET nbplaces = nbplaces - $nbPlaces WHERE n
       "Explique-moi le corrigé du Bac 2026 Bijoux Aurythia",
       "Quelle est la méthode en 4 étapes le jour de l'examen ?",
     ],
+  },
+  {
+    id: "kb-html-annales",
+    moduleId: "html5",
+    title: "Notions HTML5 des annales : figcaption, range, hr, alt, title, textarea, oninput",
+    sourceRef: "Annales Bac 2023-2025 (HTML5)",
+    keywords: [
+      "figcaption",
+      "range",
+      "hr",
+      "alt",
+      "title",
+      "textarea",
+      "oninput",
+      "onfocus",
+      "figure",
+    ],
+    answer:
+      "Notions d'HTML5 fréquentes : **figcaption** (légende de figure), **alt** (description alternative) et **title** (infobulle), **hr** (ligne horizontale), **input type=range** (curseur min-max), **textarea** (zone multiligne) et les événements **onfocus**, **onblur**, **oninput**.",
+    codeSnippet:
+      '<figure><img src="robot.jpg" alt="Robot" title="Notre robot"><figcaption>Figure 1</figcaption></figure>\n<input type="range" min="0" max="5"><hr>',
+    followUps: ["Quelle différence entre alt et title ?", "Quand se déclenche onfocus ?"],
+  },
+  {
+    id: "kb-css-annales",
+    moduleId: "css3",
+    title: "Notions CSS3 des annales : skew, rotate, border-radius, font-weight, link",
+    sourceRef: "Annales Bac 2023-2025 (CSS3)",
+    keywords: [
+      "skew",
+      "rotate",
+      "transform",
+      "border-radius",
+      "font-weight",
+      "link",
+      "stylesheet",
+      "text-transform",
+    ],
+    answer:
+      "Notions de CSS3 fréquentes : **transform** (skew incline, rotate tourne, scale agrandit), **border-radius: 50%** (cercle), **font-weight** (gras), **text-transform** (casse) et la liaison **link rel=stylesheet**.",
+    codeSnippet:
+      "img { transform: skew(15deg, 15deg); }\n.pastille { border-radius: 50%; font-weight: bold; }",
+    followUps: ["Quelle différence entre skew et rotate ?", "Comment obtenir un cercle ?"],
+  },
+  {
+    id: "kb-js-annales",
+    moduleId: "js",
+    title: "Notions JavaScript des annales : indexOf, substr, charAt, toUpperCase, innerHTML",
+    sourceRef: "Annales Bac 2023-2025 (JavaScript)",
+    keywords: ["indexof", "substr", "charat", "touppercase", "innerhtml", "trim", "replace"],
+    answer:
+      "Notions de JavaScript fréquentes : **indexOf** (position, -1 si absent), **substr(début, longueur)**, **charAt(i)**, **toUpperCase()**, **trim()**, **replace** et **innerHTML** pour écrire dans un conteneur.",
+    codeSnippet:
+      'let d = ch.indexOf("#", 0);\nlet mot = ch.substr(d + 1, 5);\ndocument.getElementById("info").innerHTML = mot;',
+    followUps: ["Quelle différence entre substr et substring ?", "innerHTML ou value ?"],
+  },
+  {
+    id: "kb-php-annales",
+    moduleId: "php",
+    title: "Notions PHP des annales : (int), count, isset, require, str_replace, mysqli_num_rows",
+    sourceRef: "Annales Bac 2023-2025 (PHP)",
+    keywords: [
+      "(int)",
+      "transtypage",
+      "count",
+      "isset",
+      "require",
+      "str_replace",
+      "mysqli_num_rows",
+      "mysqli_affected_rows",
+    ],
+    answer:
+      "Notions de PHP fréquentes : **(int)** (tronque), **count** (taille d'un tableau), **isset** (variable définie), **require** (arrêt si fichier absent), **str_replace** (remplacement), **mysqli_num_rows** (lignes d'un SELECT) et **mysqli_affected_rows** (lignes touchées par INSERT, UPDATE, DELETE).",
+    codeSnippet: '$X = (int) 2.99;\nif (mysqli_num_rows($res) == 0) { echo "Aucun résultat"; }',
+    followUps: ["require ou include ?", "Quand utiliser mysqli_affected_rows ?"],
   },
 ];
 

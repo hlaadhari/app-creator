@@ -61,6 +61,45 @@
           "code": "/**\n * Fichier : controle.js\n * Épreuve Pratique Bac STI - Contrôle de Saisie Officiel\n */\nfunction verif() {\n  let cin = document.getElementById(\"cin\").value.trim();\n  let nom = document.getElementById(\"nom\").value.trim();\n  let genreM = document.getElementById(\"genreM\");\n  let genreF = document.getElementById(\"genreF\");\n  let section = document.getElementById(\"section\");\n\n  // Règle 1 : CIN composé de 8 chiffres\n  if (cin.length !== 8 || isNaN(cin)) {\n    alert(\"Erreur : Le numéro de CIN doit comporter exactement 8 chiffres décimaux !\");\n    document.getElementById(\"cin\").focus();\n    return false;\n  }\n\n  // Règle 2 : Nom et prénom non vides\n  if (nom === \"\") {\n    alert(\"Erreur : Veuillez renseigner le nom et prénom !\");\n    document.getElementById(\"nom\").focus();\n    return false;\n  }\n\n  // Règle 3 : Genre sélectionné\n  if (!genreM.checked && !genreF.checked) {\n    alert(\"Erreur : Veuillez sélectionner le genre (Masculin / Féminin) !\");\n    return false;\n  }\n\n  // Règle 4 : Sélection effective dans la liste\n  if (section.selectedIndex === 0 || section.value === \"\") {\n    alert(\"Erreur : Veuillez sélectionner une section dans la liste !\");\n    section.focus();\n    return false;\n  }\n\n  // Toutes les conditions sont remplies : validation du formulaire\n  return true;\n}"
         }
       ]
+    },
+    {
+      "id": "js-annales",
+      "title": "8. Notions fréquentes des annales",
+      "description": "Notions de JavaScript qui reviennent dans les épreuves écrites : recherche et extraction dans une chaîne, mise en majuscule, écriture dans le DOM.",
+      "keyPoints": [
+        "Piège : substr(début, longueur) n'est pas substring(début, fin).",
+        "Piège : indexOf renvoie -1 quand le texte est absent ; il ne renvoie jamais false.",
+        "Piège : innerHTML pour un conteneur (span, div) ; value pour un champ de saisie.",
+        "Annale : Bac 2024 principale, partie web (indexOf, substr, innerHTML) — /examen-ecrit/exam-bac2024-principale-ecrit",
+        "Annale : Bac 2024 contrôle, exercice 3 (charAt, toUpperCase, trim) — /examen-ecrit/exam-bac2024-controle-ecrit",
+        "Annale : Bac 2025 contrôle, partie B exercice 3 (getElementsByName, checked) — /examen-ecrit/exam-bac2025-controle-ecrit"
+      ],
+      "snippets": [
+        {
+          "title": "Extraire un mot : indexOf, substr, charAt",
+          "language": "javascript",
+          "targetFile": "mesScripts.js",
+          "keywords": ["indexOf", "substr", "charAt", "toUpperCase", "chaîne", "extraire"],
+          "code": "let ch = \"Tech#Robot#2025\";\nlet debut = ch.indexOf(\"#\", 0);                  // 4 : premier # trouvé\nlet fin = ch.indexOf(\"#\", debut + 1);            // 10 : # suivant\nlet mot = ch.substr(debut + 1, fin - debut - 1); // \"Robot\"\nlet premiere = ch.charAt(0).toUpperCase();       // \"T\" ",
+          "explanation": "indexOf(texte, départ) donne la position de la première occurrence (-1 si absent). substr(début, longueur) extrait une sous-chaîne. charAt(i) lit le caractère d'indice i."
+        },
+        {
+          "title": "Mettre la première lettre en majuscule",
+          "language": "javascript",
+          "targetFile": "mesControles.js",
+          "keywords": ["replace", "charAt", "toUpperCase", "toLowerCase", "trim", "formater"],
+          "code": "function formater(ch) {\n  ch = ch.trim();                      // retire les espaces aux extrémités\n  if (ch.length > 0) {\n    ch = ch.toLowerCase();             // \"bravo\"\n    ch = ch.replace(ch.charAt(0), ch.charAt(0).toUpperCase()); // \"Bravo\"\n  }\n  return ch;\n}",
+          "explanation": "replace remplace la première occurrence trouvée : ici la première lettre, convertie par toUpperCase. trim supprime les espaces au début et à la fin."
+        },
+        {
+          "title": "Écrire dans la page : innerHTML et value",
+          "language": "javascript",
+          "targetFile": "mesScripts.js",
+          "keywords": ["innerHTML", "value", "getElementById", "DOM", "textContent"],
+          "code": "document.getElementById(\"total\").innerHTML = \"<b>\" + total + \"</b>/20\"; // balises interprétées\ndocument.getElementById(\"comment\").value = \"Merci\";                      // contenu d'un champ de saisie",
+          "explanation": "innerHTML affecte un contenu HTML (balises interprétées) à un élément comme span ou div. value lit ou modifie le contenu d'un champ de saisie."
+        }
+      ]
     }
   ]
 }

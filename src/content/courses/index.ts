@@ -38,6 +38,7 @@ export const COURSE_MODULES: CourseModule[] = [
       { id: "formulaires", title: "5. Formulaires interactifs" },
       { id: "cadres-conteneurs", title: "6. Cadres, Conteneurs & Événements" },
       { id: "evenements-html", title: "7. Attributs d'Événements HTML" },
+      { id: "html-annales", title: "8. Notions fréquentes des annales" },
     ],
   },
   {
@@ -56,6 +57,7 @@ export const COURSE_MODULES: CourseModule[] = [
       { id: "typographie-couleurs", title: "4. Typographie & Couleurs" },
       { id: "arriere-plans", title: "5. Arrière-plans & Gradients" },
       { id: "transitions-transformations", title: "6. Transformations & Transitions" },
+      { id: "css-annales", title: "7. Notions fréquentes des annales" },
     ],
   },
   {
@@ -75,6 +77,7 @@ export const COURSE_MODULES: CourseModule[] = [
       { id: "js-strings", title: "5. Manipulation des Chaînes de Caractères" },
       { id: "js-objets", title: "6. Objets Prédéfinis : Math & Date" },
       { id: "js-verif", title: "7. Patron Canonique de la Fonction verif()" },
+      { id: "js-annales", title: "8. Notions fréquentes des annales" },
     ],
   },
   {
@@ -92,6 +95,7 @@ export const COURSE_MODULES: CourseModule[] = [
       { id: "php-chaines", title: "3. Fonctions Natives Essentielles" },
       { id: "php-mysqli", title: "4. Interfaçage MySQLi Procédural" },
       { id: "php-patron", title: "5. Patron Canonique d'Insertion & Consultation" },
+      { id: "php-annales", title: "6. Notions fréquentes des annales" },
     ],
   },
   {

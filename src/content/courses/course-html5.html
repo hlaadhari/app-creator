@@ -387,4 +387,87 @@
       </li>
     </ul>
   </section>
+
+  <section id="html-annales" class="course-section">
+    <h2>8. Notions fréquentes des annales</h2>
+    <p>
+      Notions d'HTML5 qui reviennent dans les épreuves écrites : légende de figure, textes
+      alternatifs, titre de page, ligne de séparation, curseur, zone de texte et événements de
+      saisie.
+    </p>
+    <div class="code-card">
+      <div class="code-card-header">
+        <span>Image légendée : figure, figcaption, alt et title</span>
+        <span class="lang-tag">HTML</span>
+      </div>
+      <pre><code class="language-html">&lt;figure&gt;
+  &lt;img src="robot.jpg" alt="Robot humanoïde dans un atelier" title="Notre robot"&gt;
+  &lt;figcaption&gt;Figure 1 : le robot Tech@boot&lt;/figcaption&gt;
+&lt;/figure&gt;</code></pre>
+    </div>
+    <p>
+      figcaption est la légende de l'élément figure. alt est la description alternative de l'image
+      (lecteurs d'écran, image absente) ; title est l'infobulle affichée au survol.
+    </p>
+    <div class="code-card">
+      <div class="code-card-header">
+        <span>Titre de page, ligne horizontale et curseur (range)</span>
+        <span class="lang-tag">HTML</span>
+      </div>
+      <pre><code class="language-html">&lt;head&gt;
+  &lt;title&gt;Évaluation d'une manifestation&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;label for="serv1"&gt;Accueil :&lt;/label&gt;
+  &lt;input type="range" id="serv1" name="serv1" min="0" max="5" onchange="afficher(this.value)"&gt;
+  &lt;hr&gt;
+  &lt;p&gt;Note : &lt;span id="note"&gt;0&lt;/span&gt;/5&lt;/p&gt;
+&lt;/body&gt;</code></pre>
+    </div>
+    <p>
+      title est le titre de la page (onglet du navigateur), pas celui d'un tableau (caption). hr
+      trace une ligne horizontale. input type=range propose une valeur dans l'intervalle min-max.
+    </p>
+    <div class="code-card">
+      <div class="code-card-header">
+        <span>Zone de texte et événements de saisie</span>
+        <span class="lang-tag">HTML</span>
+      </div>
+      <pre><code class="language-html">&lt;textarea id="avis" name="avis" rows="3" cols="30"
+          onfocus="this.style.background='#ffc'"
+          onblur="this.style.background='white'"
+          oninput="document.getElementById('nb').innerHTML = this.value.length"&gt;&lt;/textarea&gt;
+&lt;span id="nb"&gt;0&lt;/span&gt; caractères</code></pre>
+    </div>
+    <p>
+      textarea est un champ multiligne. onfocus se déclenche quand le champ devient actif, onblur
+      quand il le quitte, oninput à chaque modification de la valeur saisie.
+    </p>
+    <ul>
+      <li>
+        Piège : &lt;figcaption&gt; légende une &lt;figure&gt; ; la légende d'un tableau est
+        &lt;caption&gt;.
+      </li>
+      <li>Piège : alt décrit l'image ; le texte affiché au survol est title.</li>
+      <li>Piège : onfocus = le champ devient actif ; onblur = il perd le focus.</li>
+    </ul>
+    <ul>
+      <li>
+        Annale : Bac 2024 contrôle, exercice 1 (figcaption, onfocus) —
+        /examen-ecrit/exam-bac2024-controle-ecrit
+      </li>
+      <li>
+        Annale : Bac 2025 contrôle, partie B exercice 1 (title) —
+        /examen-ecrit/exam-bac2025-controle-ecrit
+      </li>
+      <li>
+        Annale : Bac 2025 principale, partie B exercice 1 (hr, range, alt) —
+        /examen-ecrit/exam-bac2025-principale-ecrit
+      </li>
+      <li>
+        Annale : Bac 2023 principale (textarea, oninput) —
+        /examen-ecrit/exam-bac2023-principale-ecrit
+      </li>
+    </ul>
+  </section>
 </article>

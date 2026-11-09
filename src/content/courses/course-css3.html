@@ -356,4 +356,81 @@ button:active {
 }</code></pre>
     </div>
   </section>
+
+  <section id="css-annales" class="course-section">
+    <h2>7. Notions fréquentes des annales</h2>
+    <p>
+      Notions de CSS3 qui reviennent dans les épreuves écrites : transformations (skew, rotate),
+      cercle avec border-radius, graisse de police, liaison d'une feuille de style.
+    </p>
+    <div class="code-card">
+      <div class="code-card-header">
+        <span>Transformations : skew, rotate et scale</span>
+        <span class="lang-tag">CSS</span>
+      </div>
+      <pre><code class="language-css">img.incline { transform: skew(15deg, 15deg); }   /* incline : ni rotation ni déplacement */
+img.pivote   { transform: rotate(45deg); }         /* tourne de 45 degrés */
+video:hover  { transform: scale(1.2); }            /* agrandit de 20 % au survol */</code></pre>
+    </div>
+    <p>
+      skew(ax, ay) incline l'élément selon les axes X et Y. rotate(a) le fait tourner autour de son
+      centre. scale(k) change sa taille.
+    </p>
+    <div class="code-card">
+      <div class="code-card-header">
+        <span>Cercle et gras : border-radius et font-weight</span>
+        <span class="lang-tag">CSS</span>
+      </div>
+      <pre><code class="language-css">.pastille {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;       /* une boîte carrée devient un cercle */
+  font-weight: bold;        /* texte en gras */
+  text-transform: uppercase; /* texte en majuscules */
+}</code></pre>
+    </div>
+    <p>
+      border-radius: 50% arrondit les coins au maximum : sur un carré on obtient un cercle.
+      font-weight: bold met le texte en gras. text-transform change la casse du texte.
+    </p>
+    <div class="code-card">
+      <div class="code-card-header">
+        <span>Liaison d'une feuille de style externe</span>
+        <span class="lang-tag">HTML</span>
+      </div>
+      <pre><code class="language-html">&lt;head&gt;
+  &lt;meta charset="utf-8"&gt;
+  &lt;link rel="stylesheet" type="text/css" href="mesStyles.css"&gt;
+&lt;/head&gt;</code></pre>
+    </div>
+    <p>
+      La balise link, placée dans head, relie la page à la feuille de style : rel="stylesheet" et
+      href donnent le fichier.
+    </p>
+    <ul>
+      <li>Piège : skew incline, rotate fait tourner et translate déplace.</li>
+      <li>Piège : text-transform modifie la casse du texte, pas sa couleur ni sa forme.</li>
+      <li>
+        Piège : un sélecteur de classe commence par un point (.menu), un identifiant par # (#menu).
+      </li>
+    </ul>
+    <ul>
+      <li>
+        Annale : Bac 2024 contrôle, exercice 1 (skew, text-transform) —
+        /examen-ecrit/exam-bac2024-controle-ecrit
+      </li>
+      <li>
+        Annale : Bac 2024 principale, partie web (rotate, border-radius, font-weight) —
+        /examen-ecrit/exam-bac2024-principale-ecrit
+      </li>
+      <li>
+        Annale : Bac 2025 principale, partie B exercice 2 (font-weight, display) —
+        /examen-ecrit/exam-bac2025-principale-ecrit
+      </li>
+      <li>
+        Annale : Bac 2023 principale (link, sélecteurs) —
+        /examen-ecrit/exam-bac2023-principale-ecrit
+      </li>
+    </ul>
+  </section>
 </article>
