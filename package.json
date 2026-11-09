@@ -25,6 +25,7 @@
   "overrides": {
     "dompurify": "^3.4.17",
     "esbuild": "^0.28.2",
+    "minimatch@>=10 <11": "^11.0.1",
     "rolldown": "1.2.1"
   },
   "dependencies": {
@@ -85,7 +86,7 @@
     "tw-animate-css": "^1.3.4",
     "vaul": "^1.1.2",
     "vite-tsconfig-paths": "^6.0.2",
-    "zod": "^3.25.76"
+    "zod": "^4.6.6"
   },
   "devDependencies": {
     "@eslint/js": "^9.32.0",
