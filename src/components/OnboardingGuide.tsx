@@ -112,11 +112,11 @@ export function OnboardingGuide({ forceOpen = false, onClose }: OnboardingGuideP
     {
       title: "Auto-évaluation & Sauvegarde Garantie",
       subtitle: "Feedback immédiat et tampon local inviolable",
-      icon: <ShieldCheck className="h-8 w-8 text-emerald-500" />,
+      icon: <ShieldCheck className="h-8 w-8 text-emerald-400" />,
       content: (
         <div className="space-y-3 text-xs leading-relaxed text-muted-foreground">
           <div className="rounded-lg border border-emerald-500/30 bg-emerald-500/10 p-3 text-xs text-foreground flex items-start gap-2">
-            <HardDrive className="h-4 w-4 text-emerald-500 shrink-0 mt-0.5" />
+            <HardDrive className="h-4 w-4 text-emerald-400 shrink-0 mt-0.5" />
             <div>
               <strong>Principe n°4 : Ne jamais perdre votre travail</strong>
               <p className="text-[11px] text-muted-foreground mt-0.5">

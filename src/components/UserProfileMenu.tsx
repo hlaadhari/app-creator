@@ -149,7 +149,7 @@ export function UserProfileMenu({ onClassesChanged }: UserProfileMenuProps) {
               <DropdownMenuSeparator />
               <DropdownMenuGroup data-testid="role-preview-section">
                 <DropdownMenuLabel className="flex items-center gap-1.5 text-[11px] font-semibold text-muted-foreground py-1">
-                  <Eye className="h-3.5 w-3.5 text-amber-500" />
+                  <Eye className="h-3.5 w-3.5 text-amber-400" />
                   <span>Vue active</span>
                 </DropdownMenuLabel>
                 <DropdownMenuRadioGroup
@@ -234,8 +234,8 @@ export function UserProfileMenu({ onClassesChanged }: UserProfileMenuProps) {
                 {role === "admin" && (
                   <DropdownMenuItem asChild className="text-xs gap-2 cursor-pointer">
                     <a href="/admin">
-                      <Shield className="h-3.5 w-3.5 text-rose-500" />
-                      <span className="font-medium text-rose-500">Administration Centrale</span>
+                      <Shield className="h-3.5 w-3.5 text-rose-400" />
+                      <span className="font-medium text-rose-400">Administration Centrale</span>
                     </a>
                   </DropdownMenuItem>
                 )}

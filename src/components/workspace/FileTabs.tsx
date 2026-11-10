@@ -21,7 +21,7 @@ export function FileTabs({ ws }: { ws: WorkspaceState }) {
             <span
               className={
                 fileName.endsWith(".html")
-                  ? "text-orange-500 font-bold"
+                  ? "text-orange-400 font-bold"
                   : fileName.endsWith(".css")
                     ? "text-sky-400 font-bold"
                     : fileName.endsWith(".js")

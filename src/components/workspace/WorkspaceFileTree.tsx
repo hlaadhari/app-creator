@@ -37,7 +37,7 @@ export function WorkspaceFileTree({
       return <FileImage className="h-4 w-4 text-purple-400 shrink-0" />;
     }
     if (file.name.endsWith(".html")) {
-      return <span className="font-mono text-xs font-bold text-orange-500 shrink-0">&lt;&gt;</span>;
+      return <span className="font-mono text-xs font-bold text-orange-400 shrink-0">&lt;&gt;</span>;
     }
     if (file.name.endsWith(".css")) {
       return <span className="font-mono text-xs font-bold text-sky-400 shrink-0">#</span>;

@@ -27,10 +27,10 @@ export function RolePreviewBanner() {
       <div className="mx-auto max-w-6xl flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-2.5 flex-wrap">
           <span className="inline-flex items-center gap-1.5 rounded-md bg-amber-500/20 border border-amber-500/40 px-2 py-0.5 font-mono text-[11px] font-semibold">
-            <Eye className="h-3.5 w-3.5 text-amber-600 dark:text-amber-300 shrink-0" />
+            <Eye className="h-3.5 w-3.5 text-amber-400 shrink-0" />
             <span>Vue {roleLabel} simulée — quitter</span>
           </span>
-          <span className="text-[11px] text-amber-900/90 dark:text-amber-200/90">
+          <span className="text-[11px] text-amber-400/90 dark:text-amber-200/90">
             Rôle réel : <strong className="font-mono">Admin</strong> (RLS inchangée).{" "}
             {auth.allowSimulationWrites
               ? "Écritures en base explicitement autorisées."
@@ -48,12 +48,12 @@ export function RolePreviewBanner() {
           >
             {auth.allowSimulationWrites ? (
               <>
-                <Unlock className="h-3 w-3 text-amber-600 dark:text-amber-300" />
+                <Unlock className="h-3 w-3 text-amber-400" />
                 <span>Écritures autorisées</span>
               </>
             ) : (
               <>
-                <Lock className="h-3 w-3 text-amber-600 dark:text-amber-300" />
+                <Lock className="h-3 w-3 text-amber-400" />
                 <span>Écritures bloquées</span>
               </>
             )}

@@ -322,7 +322,7 @@ export function UserProfileDialog({
                 role="status"
                 className="rounded-lg border border-emerald-500/30 bg-emerald-500/10 p-3 text-xs text-emerald-400 flex items-center gap-2"
               >
-                <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-500" />
+                <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-400" />
                 <span>{profileSuccess}</span>
               </div>
             )}
@@ -424,7 +424,7 @@ export function UserProfileDialog({
                 role="status"
                 className="rounded-lg border border-emerald-500/30 bg-emerald-500/10 p-3 text-xs text-emerald-400 flex items-center gap-2"
               >
-                <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-500" />
+                <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-400" />
                 <span>{classSuccess}</span>
               </div>
             )}
@@ -440,8 +440,8 @@ export function UserProfileDialog({
             )}
 
             {cooldown > 0 && (
-              <div className="rounded-lg border border-amber-500/30 bg-amber-500/10 p-3 text-xs text-amber-700 dark:text-amber-300 flex items-center gap-2">
-                <Clock className="h-4 w-4 animate-spin text-amber-500 shrink-0" />
+              <div className="rounded-lg border border-amber-500/30 bg-amber-500/10 p-3 text-xs text-amber-400 flex items-center gap-2">
+                <Clock className="h-4 w-4 animate-spin text-amber-400 shrink-0" />
                 <span>
                   Protection anti brute-force active : réessayez dans <strong>{cooldown}s</strong>.
                 </span>
@@ -592,7 +592,7 @@ export function UserProfileDialog({
                 role="status"
                 className="rounded-lg border border-emerald-500/30 bg-emerald-500/10 p-3 text-xs text-emerald-400 flex items-center gap-2"
               >
-                <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-500" />
+                <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-400" />
                 <span>{passwordSuccess}</span>
               </div>
             )}

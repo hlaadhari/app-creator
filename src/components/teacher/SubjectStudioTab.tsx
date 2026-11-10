@@ -347,7 +347,7 @@ export function SubjectStudioTab() {
                   ) : (
                     <Badge
                       variant="outline"
-                      className="text-[10px] border-amber-500/30 text-amber-600"
+                      className="text-[10px] border-amber-500/30 text-amber-400"
                     >
                       Brouillon
                     </Badge>
@@ -399,7 +399,7 @@ export function SubjectStudioTab() {
               Version {version.numero} publiée (immuable)
             </Badge>
           ) : (
-            <Badge variant="outline" className="text-[10px] border-amber-500/30 text-amber-600">
+            <Badge variant="outline" className="text-[10px] border-amber-500/30 text-amber-400">
               Brouillon v{version.numero}
               {modifie ? " · non enregistré" : ""}
             </Badge>

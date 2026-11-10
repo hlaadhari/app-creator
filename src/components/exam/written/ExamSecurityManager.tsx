@@ -65,7 +65,7 @@ export const ExamSecurityManager: React.FC<ExamSecurityManagerProps> = ({
         <div className="flex items-center gap-3">
           <Badge
             variant="outline"
-            className="flex items-center gap-1.5 border-amber-500/30 bg-amber-500/10 text-amber-700 dark:text-amber-400 text-xs"
+            className="flex items-center gap-1.5 border-amber-500/30 bg-amber-500/10 text-amber-400 text-xs"
           >
             <ShieldAlert className="h-3.5 w-3.5" />
             Mode Examen Strict (Tuteur IA & Corrigés Neutralisés)
@@ -116,7 +116,7 @@ export const ExamSecurityManager: React.FC<ExamSecurityManagerProps> = ({
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-xs"
         >
           <div className="w-full max-w-md rounded-lg border bg-background p-6 shadow-xl animate-in fade-in-50 zoom-in-95">
-            <div className="flex items-center gap-2.5 text-amber-600 dark:text-amber-400 mb-3">
+            <div className="flex items-center gap-2.5 text-amber-400 mb-3">
               <AlertTriangle className="h-5 w-5" />
               <h3 className="text-base font-semibold text-foreground">
                 Confirmer la remise définitive

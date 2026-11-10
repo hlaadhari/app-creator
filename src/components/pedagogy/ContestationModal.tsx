@@ -116,7 +116,7 @@ export function ContestationModal({
             </Badge>
           </div>
           {critere.message && (
-            <p className="text-[11px] text-amber-600 dark:text-amber-400 bg-amber-500/10 p-2 rounded border border-amber-500/20">
+            <p className="text-[11px] text-amber-400 bg-amber-500/10 p-2 rounded border border-amber-500/20">
               Retour de la sonde : {critere.message}
             </p>
           )}
@@ -128,20 +128,20 @@ export function ContestationModal({
             <div
               className={`p-3 rounded-lg border text-xs flex items-start gap-2.5 ${
                 existingContestation.statut === "en_attente"
-                  ? "bg-amber-500/10 border-amber-500/30 text-amber-800 dark:text-amber-300"
+                  ? "bg-amber-500/10 border-amber-500/30 text-amber-400"
                   : existingContestation.statut === "acceptee"
-                    ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-800 dark:text-emerald-300"
-                    : "bg-rose-500/10 border-rose-500/30 text-rose-800 dark:text-rose-300"
+                    ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-400"
+                    : "bg-rose-500/10 border-rose-500/30 text-rose-400"
               }`}
             >
               {existingContestation.statut === "en_attente" && (
-                <Clock className="h-4 w-4 shrink-0 mt-0.5 text-amber-600" />
+                <Clock className="h-4 w-4 shrink-0 mt-0.5 text-amber-400" />
               )}
               {existingContestation.statut === "acceptee" && (
                 <CheckCircle2 className="h-4 w-4 shrink-0 mt-0.5 text-emerald-400" />
               )}
               {existingContestation.statut === "rejetee" && (
-                <ShieldAlert className="h-4 w-4 shrink-0 mt-0.5 text-rose-600" />
+                <ShieldAlert className="h-4 w-4 shrink-0 mt-0.5 text-rose-400" />
               )}
 
               <div className="space-y-1">
@@ -187,7 +187,7 @@ export function ContestationModal({
                 <span>Argumentez votre démarche technique</span>
                 <span
                   className={`font-mono font-medium ${
-                    isValidLength ? "text-emerald-400" : "text-amber-500"
+                    isValidLength ? "text-emerald-400" : "text-amber-400"
                   }`}
                 >
                   {charCount} / 10 caractères min.

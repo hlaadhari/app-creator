@@ -26,11 +26,11 @@ export function SeatGridAdmin({
       case "libre":
         return "bg-emerald-500/10 border-emerald-500/30 text-emerald-400 hover:border-emerald-500";
       case "pending":
-        return "bg-amber-500/15 border-amber-500/40 text-amber-700 dark:text-amber-300 hover:border-amber-500 animate-pulse";
+        return "bg-amber-500/15 border-amber-500/40 text-amber-400 hover:border-amber-500 animate-pulse";
       case "approved":
-        return "bg-blue-500/15 border-blue-500/40 text-blue-700 dark:text-blue-300 hover:border-blue-500";
+        return "bg-blue-500/15 border-blue-500/40 text-blue-400 hover:border-blue-500";
       case "live":
-        return "bg-purple-500/20 border-purple-500/50 text-purple-700 dark:text-purple-300 hover:border-purple-500";
+        return "bg-purple-500/20 border-purple-500/50 text-purple-400 hover:border-purple-500";
     }
   };
 
@@ -39,21 +39,11 @@ export function SeatGridAdmin({
       case "libre":
         return <span className="text-[10px] text-emerald-400 font-medium">Libre</span>;
       case "pending":
-        return (
-          <span className="text-[10px] text-amber-600 dark:text-amber-400 font-medium">
-            En attente
-          </span>
-        );
+        return <span className="text-[10px] text-amber-400 font-medium">En attente</span>;
       case "approved":
-        return (
-          <span className="text-[10px] text-blue-600 dark:text-blue-400 font-medium">Confirmé</span>
-        );
+        return <span className="text-[10px] text-blue-400 font-medium">Confirmé</span>;
       case "live":
-        return (
-          <span className="text-[10px] text-purple-600 dark:text-purple-400 font-medium">
-            En session
-          </span>
-        );
+        return <span className="text-[10px] text-purple-400 font-medium">En session</span>;
     }
   };
 
@@ -161,7 +151,7 @@ export function SeatGridAdmin({
                         e.stopPropagation();
                         void onRejectSeat(reservationId);
                       }}
-                      className="inline-flex items-center justify-center rounded border border-rose-500/40 bg-rose-500/10 hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 py-1 px-1.5 text-[10px] font-semibold cursor-pointer disabled:opacity-50"
+                      className="inline-flex items-center justify-center rounded border border-rose-500/40 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 py-1 px-1.5 text-[10px] font-semibold cursor-pointer disabled:opacity-50"
                       title="Refuser et libérer le poste"
                       aria-label={`Refuser directement le poste ${seat.seatNumber}`}
                     >
@@ -182,7 +172,7 @@ export function SeatGridAdmin({
                         e.stopPropagation();
                         void onRejectSeat(reservationId);
                       }}
-                      className="w-full inline-flex items-center justify-center gap-1 rounded border border-border/80 bg-background/70 hover:bg-rose-500/10 hover:text-rose-500 hover:border-rose-500/30 text-muted-foreground py-1 px-1.5 text-[10px] font-medium transition-colors cursor-pointer disabled:opacity-50"
+                      className="w-full inline-flex items-center justify-center gap-1 rounded border border-border/80 bg-background/70 hover:bg-rose-500/10 hover:text-rose-400 hover:border-rose-500/30 text-muted-foreground py-1 px-1.5 text-[10px] font-medium transition-colors cursor-pointer disabled:opacity-50"
                       aria-label={`Libérer le poste ${seat.seatNumber}`}
                     >
                       <RotateCcw className="h-2.5 w-2.5" />

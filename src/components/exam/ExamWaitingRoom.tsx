@@ -61,21 +61,21 @@ export function ExamWaitingRoom({
           </h4>
           <ul className="space-y-1.5 text-muted-foreground pl-1">
             <li className="flex items-start gap-2">
-              <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500 shrink-0 mt-0.5" />
+              <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400 shrink-0 mt-0.5" />
               <span>
                 <strong>Minuteur certifié :</strong> Le temps imparti est comptabilisé exclusivement
                 par l'horloge du serveur Supabase.
               </span>
             </li>
             <li className="flex items-start gap-2">
-              <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500 shrink-0 mt-0.5" />
+              <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400 shrink-0 mt-0.5" />
               <span>
                 <strong>Aides désactivées :</strong> Le tuteur IA et le système d'indices sont
                 rigoureusement masqués durant l'épreuve.
               </span>
             </li>
             <li className="flex items-start gap-2">
-              <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500 shrink-0 mt-0.5" />
+              <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400 shrink-0 mt-0.5" />
               <span>
                 <strong>Verrouillage absolu :</strong> À l'expiration du délai, l'éditeur bascule en
                 lecture seule et tout nouvel enregistrement est refusé (T-06).

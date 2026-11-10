@@ -246,7 +246,7 @@ export const WrittenExamEnvironment: React.FC<WrittenExamEnvironmentProps> = ({
                   <span>
                     QCM corrigé par le serveur : {copyState.scoreQcm ?? 0} / {copyState.maxQcm} pts
                   </span>
-                  <span className="block text-[11px] font-normal text-amber-600 dark:text-amber-400">
+                  <span className="block text-[11px] font-normal text-amber-400">
                     Questions ouvertes ({copyState.maxOuvert} pts) en attente de correction
                     enseignant
                   </span>
@@ -312,7 +312,7 @@ export const WrittenExamEnvironment: React.FC<WrittenExamEnvironmentProps> = ({
               ) : (
                 <Badge
                   variant="outline"
-                  className="text-xs gap-1 border-amber-500/40 text-amber-600"
+                  className="text-xs gap-1 border-amber-500/40 text-amber-400"
                 >
                   <Clock className="h-3 w-3" /> Correction enseignant en attente
                 </Badge>
@@ -332,7 +332,7 @@ export const WrittenExamEnvironment: React.FC<WrittenExamEnvironmentProps> = ({
                     </div>
                     <div className="mt-1 text-sm font-bold flex items-baseline justify-between">
                       {isPendingManual ? (
-                        <span className="text-xs font-medium text-amber-600 dark:text-amber-400">
+                        <span className="text-xs font-medium text-amber-400">
                           En attente ({sec.pointsMax} pts)
                         </span>
                       ) : (
@@ -386,11 +386,11 @@ export const WrittenExamEnvironment: React.FC<WrittenExamEnvironmentProps> = ({
                 onClick={() => setActiveTab(sec.id)}
                 className="text-xs px-3 py-1.5 flex items-center gap-2 cursor-pointer"
               >
-                {sec.type === "qcm" && <HelpCircle className="h-3.5 w-3.5 text-blue-500" />}
-                {sec.type === "modeling" && <Database className="h-3.5 w-3.5 text-emerald-500" />}
-                {sec.type === "sql" && <Code2 className="h-3.5 w-3.5 text-amber-500" />}
+                {sec.type === "qcm" && <HelpCircle className="h-3.5 w-3.5 text-blue-400" />}
+                {sec.type === "modeling" && <Database className="h-3.5 w-3.5 text-emerald-400" />}
+                {sec.type === "sql" && <Code2 className="h-3.5 w-3.5 text-amber-400" />}
                 {sec.type === "code_analysis" && (
-                  <BookOpen className="h-3.5 w-3.5 text-purple-500" />
+                  <BookOpen className="h-3.5 w-3.5 text-purple-400" />
                 )}
                 <span>{sec.title}</span>
                 <span className="text-[10px] text-muted-foreground font-mono">

@@ -65,7 +65,7 @@ export function TeacherRequestsQueue({ demandes, onProcessed }: TeacherRequestsQ
     <>
       <Card className="border-amber-500/30 bg-amber-500/5">
         <CardHeader className="pb-2">
-          <CardTitle className="text-xs font-mono uppercase tracking-wider text-amber-600 dark:text-amber-400 flex items-center gap-2">
+          <CardTitle className="text-xs font-mono uppercase tracking-wider text-amber-400 flex items-center gap-2">
             <UserCheck className="w-4 h-4" />
             <span>Demandes d'accès Enseignant à valider ({enAttente.length})</span>
           </CardTitle>

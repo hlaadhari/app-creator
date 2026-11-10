@@ -271,7 +271,7 @@ function AdminDashboardPage() {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background px-4">
         <div className="max-w-md w-full border rounded-xl p-8 bg-card text-center space-y-4 shadow-lg">
-          <div className="w-12 h-12 rounded-full bg-rose-500/10 text-rose-500 flex items-center justify-center mx-auto">
+          <div className="w-12 h-12 rounded-full bg-rose-500/10 text-rose-400 flex items-center justify-center mx-auto">
             <Lock className="w-6 h-6" />
           </div>
           <h1 className="text-xl font-bold text-foreground">Accès Réservé à l'Administration</h1>
@@ -305,7 +305,7 @@ function AdminDashboardPage() {
         breadcrumb={
           <>
             <div className="flex items-center gap-2">
-              <Shield className="w-5 h-5 text-rose-500" />
+              <Shield className="w-5 h-5 text-rose-400" />
               <h1 className="text-sm font-semibold tracking-tight">
                 Panneau d'Administration Centrale
               </h1>
@@ -314,8 +314,8 @@ function AdminDashboardPage() {
               variant="outline"
               className={`text-[10px] ${
                 isDemo
-                  ? "bg-amber-500/10 text-amber-500 border-amber-500/20"
-                  : "bg-rose-500/10 text-rose-500 border-rose-500/20"
+                  ? "bg-amber-500/10 text-amber-400 border-amber-500/20"
+                  : "bg-rose-500/10 text-rose-400 border-rose-500/20"
               }`}
             >
               {isDemo ? "Mode Démonstration Admin" : "Super-Administrateur"}
@@ -384,7 +384,7 @@ function AdminDashboardPage() {
 
           <Card>
             <CardContent className="p-4 flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-emerald-500/10 text-emerald-500 flex items-center justify-center shrink-0">
+              <div className="w-10 h-10 rounded-lg bg-emerald-500/10 text-emerald-400 flex items-center justify-center shrink-0">
                 <GraduationCap className="w-5 h-5" />
               </div>
               <div>
@@ -401,7 +401,7 @@ function AdminDashboardPage() {
 
           <Card>
             <CardContent className="p-4 flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-amber-500/10 text-amber-500 flex items-center justify-center shrink-0">
+              <div className="w-10 h-10 rounded-lg bg-amber-500/10 text-amber-400 flex items-center justify-center shrink-0">
                 <AlertTriangle className="w-5 h-5" />
               </div>
               <div>
@@ -413,7 +413,7 @@ function AdminDashboardPage() {
 
           <Card>
             <CardContent className="p-4 flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-rose-500/10 text-rose-500 flex items-center justify-center shrink-0">
+              <div className="w-10 h-10 rounded-lg bg-rose-500/10 text-rose-400 flex items-center justify-center shrink-0">
                 <ShieldCheck className="w-5 h-5" />
               </div>
               <div>
@@ -512,7 +512,7 @@ function AdminDashboardPage() {
                         <td className="p-3 font-mono text-muted-foreground">
                           {u.email}
                           {u.emailConfirme === false && (
-                            <span className="ml-2 text-[10px] text-amber-500">non confirmé</span>
+                            <span className="ml-2 text-[10px] text-amber-400">non confirmé</span>
                           )}
                         </td>
                         <td className="p-3">
@@ -520,7 +520,7 @@ function AdminDashboardPage() {
                             variant="outline"
                             className={`text-[10px] ${
                               u.role === "admin"
-                                ? "bg-rose-500/10 text-rose-500 border-rose-500/20"
+                                ? "bg-rose-500/10 text-rose-400 border-rose-500/20"
                                 : u.role === "enseignant"
                                   ? "bg-primary/10 text-primary border-primary/20"
                                   : "bg-muted text-muted-foreground"
@@ -532,12 +532,12 @@ function AdminDashboardPage() {
                         <td className="p-3 font-mono text-[11px]">
                           {u.role === "enseignant" ? (
                             u.statutValidation === "valide" ? (
-                              <span className="text-emerald-500 flex items-center gap-1">
+                              <span className="text-emerald-400 flex items-center gap-1">
                                 <CheckCircle2 className="w-3.5 h-3.5" />
                                 Validé
                               </span>
                             ) : (
-                              <span className="text-amber-500 flex items-center gap-1 font-semibold">
+                              <span className="text-amber-400 flex items-center gap-1 font-semibold">
                                 <Clock className="w-3.5 h-3.5" />
                                 En attente
                               </span>
@@ -607,7 +607,7 @@ function AdminDashboardPage() {
                 <div className="flex items-center justify-between">
                   <div>
                     <CardTitle className="text-sm font-semibold flex items-center gap-2">
-                      <ShieldCheck className="w-4 h-4 text-emerald-500" />
+                      <ShieldCheck className="w-4 h-4 text-emerald-400" />
                       <span>
                         Matrice Officielle des 14 Tests Négatifs de Sécurité (T-01 à T-14)
                       </span>
@@ -622,8 +622,8 @@ function AdminDashboardPage() {
                       !etatSysteme
                         ? "bg-muted text-muted-foreground"
                         : controlesOk === controles.length
-                          ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/20"
-                          : "bg-rose-500/10 text-rose-500 border-rose-500/20"
+                          ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
+                          : "bg-rose-500/10 text-rose-400 border-rose-500/20"
                     }`}
                   >
                     {etatSysteme
@@ -654,8 +654,8 @@ function AdminDashboardPage() {
                           <span
                             className={`rounded px-1.5 py-0.5 text-[10px] font-semibold ${
                               t.criticite === "Bloquant"
-                                ? "bg-rose-500/10 text-rose-500 border border-rose-500/20"
-                                : "bg-amber-500/10 text-amber-500 border border-amber-500/20"
+                                ? "bg-rose-500/10 text-rose-400 border border-rose-500/20"
+                                : "bg-amber-500/10 text-amber-400 border border-amber-500/20"
                             }`}
                           >
                             {t.criticite}
@@ -671,12 +671,12 @@ function AdminDashboardPage() {
                               CI
                             </span>
                           ) : statutDirect(t.code) === "ok" ? (
-                            <span className="inline-flex items-center gap-1 text-emerald-500 font-bold text-[11px] bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded">
+                            <span className="inline-flex items-center gap-1 text-emerald-400 font-bold text-[11px] bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded">
                               <CheckCircle2 className="w-3 h-3" />
                               OK en direct
                             </span>
                           ) : (
-                            <span className="inline-flex items-center gap-1 text-rose-500 font-bold text-[11px] bg-rose-500/10 border border-rose-500/20 px-2 py-0.5 rounded">
+                            <span className="inline-flex items-center gap-1 text-rose-400 font-bold text-[11px] bg-rose-500/10 border border-rose-500/20 px-2 py-0.5 rounded">
                               <ShieldAlert className="w-3 h-3" />
                               ÉCHEC
                             </span>
@@ -749,7 +749,7 @@ function AdminDashboardPage() {
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Droits clients sur solutions :</span>
                     <strong
-                      className={`font-mono ${etatSysteme && etatSysteme.droitsClientsCorriges > 0 ? "text-rose-500" : "text-foreground"}`}
+                      className={`font-mono ${etatSysteme && etatSysteme.droitsClientsCorriges > 0 ? "text-rose-400" : "text-foreground"}`}
                     >
                       {etatSysteme ? `${etatSysteme.droitsClientsCorriges} (T-04)` : "—"}
                     </strong>
@@ -767,7 +767,7 @@ function AdminDashboardPage() {
                 <CardHeader className="pb-2">
                   <CardTitle className="text-xs font-mono uppercase text-muted-foreground flex items-center justify-between">
                     <span className="flex items-center gap-1.5">
-                      <FileCode className="w-4 h-4 text-indigo-500" />
+                      <FileCode className="w-4 h-4 text-indigo-400" />
                       Moteur PHP 8.2 WASM
                     </span>
                     <span className="text-[10px] normal-case text-muted-foreground">
@@ -799,7 +799,7 @@ function AdminDashboardPage() {
                 <CardHeader className="pb-2">
                   <CardTitle className="text-xs font-mono uppercase text-muted-foreground flex items-center justify-between">
                     <span className="flex items-center gap-1.5">
-                      <Clock className="w-4 h-4 text-amber-500" />
+                      <Clock className="w-4 h-4 text-amber-400" />
                       Horloge Serveur NTP (T-08)
                     </span>
                     <span
@@ -871,7 +871,7 @@ function AdminDashboardPage() {
                         <td className="p-3">{e.dureeMinutes || 20} min</td>
                         <td className="p-3">
                           {e.examMode ? (
-                            <span className="rounded bg-rose-500/10 border border-rose-500/20 px-1.5 py-0.5 text-[10px] text-rose-500 font-semibold">
+                            <span className="rounded bg-rose-500/10 border border-rose-500/20 px-1.5 py-0.5 text-[10px] text-rose-400 font-semibold">
                               Examen Blanc
                             </span>
                           ) : (
@@ -879,7 +879,7 @@ function AdminDashboardPage() {
                           )}
                         </td>
                         <td className="p-3 text-right">
-                          <span className="inline-flex items-center gap-1 text-emerald-500 text-[11px] font-semibold">
+                          <span className="inline-flex items-center gap-1 text-emerald-400 text-[11px] font-semibold">
                             <Lock className="w-3 h-3" />
                             Version Scellée (T-13)
                           </span>

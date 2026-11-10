@@ -89,7 +89,7 @@ export function TeacherAccessRequest() {
   if (etatEffectif === "en_attente" && demande) {
     return (
       <div className="rounded-md border border-amber-500/30 bg-amber-500/5 p-3 text-left text-xs space-y-2">
-        <div className="flex items-center gap-2 font-semibold text-amber-600 dark:text-amber-400">
+        <div className="flex items-center gap-2 font-semibold text-amber-400">
           <Clock className="w-4 h-4" />
           Demande en attente de validation
         </div>
@@ -133,7 +133,7 @@ export function TeacherAccessRequest() {
       {(etatEffectif === "acceptee_role_manquant" || etatEffectif === "incoherence_role") && (
         <div
           role="alert"
-          className="rounded-md border border-amber-500/40 bg-amber-500/10 p-3 text-xs text-amber-700 dark:text-amber-300 space-y-2"
+          className="rounded-md border border-amber-500/40 bg-amber-500/10 p-3 text-xs text-amber-400 space-y-2"
         >
           <div className="flex items-center gap-2 font-semibold">
             <AlertTriangle className="w-4 h-4 shrink-0" />
@@ -154,7 +154,7 @@ export function TeacherAccessRequest() {
             size="sm"
             onClick={() => void handleVerifierStatut()}
             disabled={actualisationDroits}
-            className="h-7 text-xs gap-1.5 border-amber-500/40 text-amber-700 dark:text-amber-300"
+            className="h-7 text-xs gap-1.5 border-amber-500/40 text-amber-400"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${actualisationDroits ? "animate-spin" : ""}`} />
             {actualisationDroits

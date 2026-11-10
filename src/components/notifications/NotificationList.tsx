@@ -11,11 +11,11 @@ import {
 export const NOTIFICATIONS_VISIBLES = 5;
 
 const ICONES: Record<NotificationKind, ReactNode> = {
-  correction: <BookCheck className="h-4 w-4 text-emerald-500" />,
+  correction: <BookCheck className="h-4 w-4 text-emerald-400" />,
   tuteur: <Bot className="h-4 w-4 text-primary" />,
-  examen: <Clock className="h-4 w-4 text-amber-500" />,
-  invitation_classe: <Users className="h-4 w-4 text-sky-500" />,
-  synchronisation: <CloudOff className="h-4 w-4 text-amber-500" />,
+  examen: <Clock className="h-4 w-4 text-amber-400" />,
+  invitation_classe: <Users className="h-4 w-4 text-sky-400" />,
+  synchronisation: <CloudOff className="h-4 w-4 text-amber-400" />,
   systeme: <Bell className="h-4 w-4 text-muted-foreground" />,
 };
 
@@ -87,7 +87,7 @@ export function NotificationList({
         {chargement ? (
           <p className="p-4 text-xs text-muted-foreground">Chargement…</p>
         ) : erreur ? (
-          <p role="alert" className="p-4 text-xs text-rose-500">
+          <p role="alert" className="p-4 text-xs text-rose-400">
             Impossible de charger les notifications.
           </p>
         ) : visibles.length === 0 ? (

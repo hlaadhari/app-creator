@@ -44,7 +44,7 @@ export const RelationalModelBox: React.FC<RelationalModelBoxProps> = ({
           >
             <div className="mb-3 flex items-start justify-between gap-3">
               <div className="flex items-start gap-2.5">
-                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-blue-500/10 text-xs font-semibold text-blue-600 dark:text-blue-400">
+                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-blue-500/10 text-xs font-semibold text-blue-400">
                   {idx + 1}
                 </span>
                 <div>
@@ -96,7 +96,7 @@ export const RelationalModelBox: React.FC<RelationalModelBoxProps> = ({
                   onClick={() => insertToken(q.id, "#")}
                   className="h-7 text-xs font-mono px-2"
                 >
-                  <Key className="mr-1 h-3 w-3 text-amber-500" /> Clé Étrangère (#)
+                  <Key className="mr-1 h-3 w-3 text-amber-400" /> Clé Étrangère (#)
                 </Button>
               </div>
             )}
@@ -123,7 +123,7 @@ export const RelationalModelBox: React.FC<RelationalModelBoxProps> = ({
               <div
                 className={`mt-4 rounded-md p-3 text-xs border ${
                   res.isCorrect
-                    ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-800 dark:text-emerald-300"
+                    ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-400"
                     : "bg-destructive/10 border-destructive/20 text-destructive"
                 }`}
               >

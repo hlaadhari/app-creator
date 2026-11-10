@@ -73,7 +73,7 @@ export function ContestationsManager({
           <div className="flex items-center gap-2">
             <h2 className="text-base font-bold tracking-tight">Arbitrage des Contestations</h2>
             {pendingCount > 0 ? (
-              <Badge variant="outline" className="border-amber-500 text-amber-600 bg-amber-500/10">
+              <Badge variant="outline" className="border-amber-500 text-amber-400 bg-amber-500/10">
                 {pendingCount} en attente
               </Badge>
             ) : (
@@ -97,7 +97,7 @@ export function ContestationsManager({
                 <Calculator className="w-5 h-5" />
               </div>
               <div>
-                <p className="text-xs font-bold text-emerald-800 dark:text-emerald-300">
+                <p className="text-xs font-bold text-emerald-400">
                   Recalcul automatique instantané exécuté (PRD F-45)
                 </p>
                 <p className="text-xs text-emerald-400">
@@ -153,7 +153,7 @@ export function ContestationsManager({
                         {cont.critere_code}
                       </Badge>
                       {isPending ? (
-                        <Badge className="bg-amber-500/10 text-amber-600 border-amber-500/20 text-[10px]">
+                        <Badge className="bg-amber-500/10 text-amber-400 border-amber-500/20 text-[10px]">
                           En attente d'arbitrage
                         </Badge>
                       ) : isAccepted ? (

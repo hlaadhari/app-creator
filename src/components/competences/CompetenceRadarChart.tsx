@@ -126,9 +126,9 @@ export const CompetenceRadarChart: React.FC<CompetenceRadarChartProps> = ({ cate
               <span
                 className={`text-xs font-mono font-bold ${
                   cat.percentage >= 70
-                    ? "text-emerald-500"
+                    ? "text-emerald-400"
                     : cat.percentage >= 40
-                      ? "text-amber-500"
+                      ? "text-amber-400"
                       : "text-muted-foreground"
                 }`}
               >

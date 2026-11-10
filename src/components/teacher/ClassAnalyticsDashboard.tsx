@@ -119,7 +119,7 @@ export function ClassAnalyticsDashboard({
             <div>
               <p className="text-xs font-medium text-muted-foreground">Médiane de classe</p>
               <div className="flex items-baseline gap-2 mt-1">
-                <h3 className="text-2xl font-bold font-mono text-blue-500">
+                <h3 className="text-2xl font-bold font-mono text-blue-400">
                   {stats.mediane20.toFixed(1)} / 20
                 </h3>
               </div>
@@ -127,7 +127,7 @@ export function ClassAnalyticsDashboard({
                 Q1: {stats.q1_20.toFixed(1)} | Q3: {stats.q3_20.toFixed(1)}
               </p>
             </div>
-            <div className="w-10 h-10 rounded-lg bg-blue-500/10 text-blue-500 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-lg bg-blue-500/10 text-blue-400 flex items-center justify-center">
               <Users className="w-5 h-5" />
             </div>
           </CardContent>
@@ -141,7 +141,7 @@ export function ClassAnalyticsDashboard({
                 Taux de réussite (≥ 10/20)
               </p>
               <div className="flex items-baseline gap-2 mt-1">
-                <h3 className="text-2xl font-bold font-mono text-green-500">
+                <h3 className="text-2xl font-bold font-mono text-green-400">
                   {stats.tauxReussite}%
                 </h3>
               </div>
@@ -149,7 +149,7 @@ export function ClassAnalyticsDashboard({
                 {stats.tauxRendu}% copies rendues
               </p>
             </div>
-            <div className="w-10 h-10 rounded-lg bg-green-500/10 text-green-500 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-lg bg-green-500/10 text-green-400 flex items-center justify-center">
               <CheckCircle2 className="w-5 h-5" />
             </div>
           </CardContent>
@@ -285,7 +285,7 @@ export function ClassAnalyticsDashboard({
         <CardContent>
           {alerts.length === 0 ? (
             <div className="p-6 text-center border rounded-lg bg-muted/10">
-              <CheckCircle2 className="w-8 h-8 text-green-500 mx-auto mb-2" />
+              <CheckCircle2 className="w-8 h-8 text-green-400 mx-auto mb-2" />
               <p className="text-xs font-medium text-foreground">
                 Aucun blocage persistant détecté.
               </p>
@@ -321,7 +321,7 @@ export function ClassAnalyticsDashboard({
                         ) : alert.severite === "inactivite" ? (
                           <Badge
                             variant="outline"
-                            className="text-[10px] bg-amber-500/10 text-amber-500 border-amber-500/30"
+                            className="text-[10px] bg-amber-500/10 text-amber-400 border-amber-500/30"
                           >
                             <Clock className="w-3 h-3 mr-1 inline" />
                             Inactif ({alert.inactivityMinutes} min)
@@ -334,7 +334,7 @@ export function ClassAnalyticsDashboard({
                       </div>
                       <p className="text-xs text-foreground/90 font-medium">{alert.description}</p>
                       <p className="text-[11px] text-muted-foreground flex items-center gap-1">
-                        <Lightbulb className="w-3 h-3 text-amber-500 shrink-0" />
+                        <Lightbulb className="w-3 h-3 text-amber-400 shrink-0" />
                         <span>Action conseillée : {alert.actionConseillee}</span>
                       </p>
                     </div>
@@ -347,7 +347,7 @@ export function ClassAnalyticsDashboard({
                           onClick={() => onSuggestHint(alert.eleveId, alert.critereCode)}
                           className="text-xs h-7 gap-1"
                         >
-                          <Lightbulb className="w-3.5 h-3.5 text-amber-500" />
+                          <Lightbulb className="w-3.5 h-3.5 text-amber-400" />
                           Proposer indice
                         </Button>
                       )}
@@ -399,7 +399,7 @@ export function ClassAnalyticsDashboard({
                     variant="outline"
                     className={`text-[10px] ${
                       rec.urgence === "haute"
-                        ? "border-red-500 text-red-500"
+                        ? "border-red-500 text-red-400"
                         : "border-primary/40 text-primary"
                     }`}
                   >

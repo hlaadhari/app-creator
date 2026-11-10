@@ -43,14 +43,14 @@ export function SyncStatusBar({
     switch (status) {
       case "syncing":
         return (
-          <span className="flex items-center gap-1.5 text-blue-500 font-medium">
+          <span className="flex items-center gap-1.5 text-blue-400 font-medium">
             <Loader2 className="h-3 w-3 animate-spin" />
             <span>Synchronisation...</span>
           </span>
         );
       case "synced":
         return (
-          <span className="flex items-center gap-1.5 text-emerald-500 font-medium">
+          <span className="flex items-center gap-1.5 text-emerald-400 font-medium">
             <CheckCircle2 className="h-3 w-3" />
             <span>Synchronisé cloud (rev {rev})</span>
           </span>
@@ -60,7 +60,7 @@ export function SyncStatusBar({
           <button
             type="button"
             onClick={onConflictClick}
-            className="flex items-center gap-1.5 text-amber-500 hover:text-amber-600 font-semibold cursor-pointer animate-pulse underline"
+            className="flex items-center gap-1.5 text-amber-400 hover:text-amber-400 font-semibold cursor-pointer animate-pulse underline"
             title="Cliquer pour résoudre le conflit de révision"
             aria-label="Résoudre le conflit de révision"
           >
@@ -70,7 +70,7 @@ export function SyncStatusBar({
         );
       case "offline":
         return (
-          <span className="flex items-center gap-1.5 text-amber-500">
+          <span className="flex items-center gap-1.5 text-amber-400">
             <CloudOff className="h-3 w-3" />
             <span>Hors-ligne (tampon IndexedDB actif)</span>
           </span>
@@ -80,7 +80,7 @@ export function SyncStatusBar({
           <button
             type="button"
             onClick={onManualSync}
-            className="flex items-center gap-1.5 text-rose-500 hover:text-rose-600 font-medium cursor-pointer"
+            className="flex items-center gap-1.5 text-rose-400 hover:text-rose-400 font-medium cursor-pointer"
             title="Réessayer la synchronisation"
             aria-label="Réessayer la synchronisation"
           >
@@ -92,7 +92,7 @@ export function SyncStatusBar({
       case "pending":
       default:
         return (
-          <span className="flex items-center gap-1.5 text-emerald-500 font-medium">
+          <span className="flex items-center gap-1.5 text-emerald-400 font-medium">
             <HardDrive className="h-3 w-3" />
             <span>Tampon local garanti (IndexedDB)</span>
           </span>
@@ -109,7 +109,7 @@ export function SyncStatusBar({
         {/* Tolérance de synchronisation tardive (PRD F-20, F-52) */}
         {isLateSync && (
           <span
-            className="flex items-center gap-1 px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-600 dark:text-amber-400 font-medium text-[10px]"
+            className="flex items-center gap-1 px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-400 font-medium text-[10px]"
             title="Modifications enregistrées localement après l'échéance ou pendant une coupure, tolérées avec marquage d'audit"
           >
             <Clock className="h-2.5 w-2.5" />

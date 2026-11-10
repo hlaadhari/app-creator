@@ -23,19 +23,19 @@ export function SubjectTab({ ex, ws }: { ex: Exercise; ws: WorkspaceState }) {
             Bac 4ème SI (STI)
           </span>
           {ex.typeSujet === "annale_officielle" && (
-            <span className="rounded border border-rose-500/30 bg-rose-500/10 px-1.5 py-0.5 text-[10px] font-mono text-rose-500 font-semibold">
+            <span className="rounded border border-rose-500/30 bg-rose-500/10 px-1.5 py-0.5 text-[10px] font-mono text-rose-400 font-semibold">
               Annale {ex.sessionAnnee ? `${ex.sessionAnnee}` : "Officielle"}
               {ex.sessionLibelle ? ` • ${ex.sessionLibelle}` : ""}
             </span>
           )}
           {ex.typeSujet === "annale_adaptee" && (
-            <span className="rounded border border-purple-500/30 bg-purple-500/10 px-1.5 py-0.5 text-[10px] font-mono text-purple-600 dark:text-purple-400 font-semibold">
+            <span className="rounded border border-purple-500/30 bg-purple-500/10 px-1.5 py-0.5 text-[10px] font-mono text-purple-400 font-semibold">
               Annale Blanche {ex.sessionAnnee ? `${ex.sessionAnnee}` : ""}
               {ex.sessionLibelle ? ` • ${ex.sessionLibelle}` : ""}
             </span>
           )}
           {ex.typeSujet === "tp" && (
-            <span className="rounded border border-cyan-500/30 bg-cyan-500/10 px-1.5 py-0.5 text-[10px] font-mono text-cyan-600 dark:text-cyan-400 font-medium">
+            <span className="rounded border border-cyan-500/30 bg-cyan-500/10 px-1.5 py-0.5 text-[10px] font-mono text-cyan-400 font-medium">
               TP Synthèse{ex.sessionAnnee ? ` (${ex.sessionAnnee})` : ""}
             </span>
           )}
@@ -68,7 +68,7 @@ export function SubjectTab({ ex, ws }: { ex: Exercise; ws: WorkspaceState }) {
       <div className="border-t pt-3">
         <div className="flex items-center justify-between mb-2">
           <h3 className="text-xs font-mono uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
-            <Sparkles className="h-3.5 w-3.5 text-amber-500" />
+            <Sparkles className="h-3.5 w-3.5 text-amber-400" />
             <span>Indices progressifs (3 niveaux)</span>
           </h3>
           {!isExamMode && (
@@ -79,7 +79,7 @@ export function SubjectTab({ ex, ws }: { ex: Exercise; ws: WorkspaceState }) {
         </div>
 
         {isExamMode ? (
-          <div className="rounded border border-amber-500/30 bg-amber-500/10 p-3 text-xs text-amber-500">
+          <div className="rounded border border-amber-500/30 bg-amber-500/10 p-3 text-xs text-amber-400">
             <div className="flex items-center gap-1.5 font-semibold mb-1">
               <Lock className="h-3.5 w-3.5" />
               <span>Assistance neutralisée</span>

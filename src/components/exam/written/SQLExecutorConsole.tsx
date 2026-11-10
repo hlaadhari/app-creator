@@ -115,7 +115,7 @@ export const SQLExecutorConsole: React.FC<SQLExecutorConsoleProps> = ({
           >
             <div className="mb-3 flex items-start justify-between gap-3">
               <div className="flex items-start gap-2.5">
-                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-amber-500/10 text-xs font-semibold text-amber-600 dark:text-amber-400">
+                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-amber-500/10 text-xs font-semibold text-amber-400">
                   {idx + 1}
                 </span>
                 <div>
@@ -238,7 +238,7 @@ export const SQLExecutorConsole: React.FC<SQLExecutorConsoleProps> = ({
               <div
                 className={`mt-4 rounded-md p-3 text-xs border ${
                   res.isCorrect
-                    ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-800 dark:text-emerald-300"
+                    ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-400"
                     : "bg-destructive/10 border-destructive/20 text-destructive"
                 }`}
               >

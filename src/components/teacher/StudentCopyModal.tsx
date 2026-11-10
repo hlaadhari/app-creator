@@ -62,7 +62,7 @@ export function StudentCopyModal({
               </DialogTitle>
               <Badge
                 variant="outline"
-                className="bg-amber-500/10 text-amber-500 border-amber-500/30 flex items-center gap-1"
+                className="bg-amber-500/10 text-amber-400 border-amber-500/30 flex items-center gap-1"
               >
                 <Shield className="w-3 h-3" />
                 Lecture seule
@@ -123,7 +123,7 @@ export function StudentCopyModal({
             {/* Section Points de blocage / Critères */}
             {eleve.points_faibles && eleve.points_faibles.length > 0 && (
               <div className="mt-auto border-t pt-2 p-2">
-                <span className="text-[11px] font-semibold text-red-500 flex items-center gap-1 mb-1">
+                <span className="text-[11px] font-semibold text-red-400 flex items-center gap-1 mb-1">
                   <XCircle className="w-3.5 h-3.5" />
                   Difficultés détectées
                 </span>

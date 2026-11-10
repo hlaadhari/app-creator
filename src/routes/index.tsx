@@ -399,28 +399,28 @@ function Index() {
                     <span
                       className={`rounded px-1.5 py-0.5 text-[10px] font-mono font-medium ${
                         e.module === "Module A"
-                          ? "bg-blue-500/10 text-blue-500 border border-blue-500/20"
+                          ? "bg-blue-500/10 text-blue-400 border border-blue-500/20"
                           : e.module === "Module B"
-                            ? "bg-indigo-500/10 text-indigo-500 border border-indigo-500/20"
+                            ? "bg-indigo-500/10 text-indigo-400 border border-indigo-500/20"
                             : e.module === "Module C"
-                              ? "bg-amber-500/10 text-amber-500 border border-amber-500/20"
-                              : "bg-emerald-500/10 text-emerald-500 border border-emerald-500/20"
+                              ? "bg-amber-500/10 text-amber-400 border border-amber-500/20"
+                              : "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
                       }`}
                     >
                       {e.module || "Initiation"}
                     </span>
                     {e.typeSujet === "annale_officielle" && (
-                      <span className="rounded bg-rose-500/10 border border-rose-500/20 px-1.5 py-0.5 text-[10px] font-mono text-rose-500 font-semibold">
+                      <span className="rounded bg-rose-500/10 border border-rose-500/20 px-1.5 py-0.5 text-[10px] font-mono text-rose-400 font-semibold">
                         Annale {e.sessionAnnee || ""}
                       </span>
                     )}
                     {e.typeSujet === "annale_adaptee" && (
-                      <span className="rounded bg-purple-500/10 border border-purple-500/20 px-1.5 py-0.5 text-[10px] font-mono text-purple-600 dark:text-purple-400 font-semibold">
+                      <span className="rounded bg-purple-500/10 border border-purple-500/20 px-1.5 py-0.5 text-[10px] font-mono text-purple-400 font-semibold">
                         Blanc {e.sessionAnnee || ""}
                       </span>
                     )}
                     {e.typeSujet === "tp" && (
-                      <span className="rounded bg-cyan-500/10 border border-cyan-500/20 px-1.5 py-0.5 text-[10px] font-mono text-cyan-600 dark:text-cyan-400 font-medium">
+                      <span className="rounded bg-cyan-500/10 border border-cyan-500/20 px-1.5 py-0.5 text-[10px] font-mono text-cyan-400 font-medium">
                         TP
                       </span>
                     )}
@@ -435,30 +435,30 @@ function Index() {
                     <span
                       className={`hidden sm:inline-block rounded px-2 py-0.5 text-[10px] font-mono font-medium shrink-0 ${
                         e.module === "Module A"
-                          ? "bg-blue-500/10 text-blue-500 border border-blue-500/20"
+                          ? "bg-blue-500/10 text-blue-400 border border-blue-500/20"
                           : e.module === "Module B"
-                            ? "bg-indigo-500/10 text-indigo-500 border border-indigo-500/20"
+                            ? "bg-indigo-500/10 text-indigo-400 border border-indigo-500/20"
                             : e.module === "Module C"
-                              ? "bg-amber-500/10 text-amber-500 border border-amber-500/20"
-                              : "bg-emerald-500/10 text-emerald-500 border border-emerald-500/20"
+                              ? "bg-amber-500/10 text-amber-400 border border-amber-500/20"
+                              : "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
                       }`}
                     >
                       {e.module || "Initiation"}
                     </span>
                     {e.typeSujet === "annale_officielle" && (
-                      <span className="hidden sm:inline-block rounded bg-rose-500/10 border border-rose-500/20 px-2 py-0.5 text-[10px] font-mono text-rose-500 font-semibold shrink-0">
+                      <span className="hidden sm:inline-block rounded bg-rose-500/10 border border-rose-500/20 px-2 py-0.5 text-[10px] font-mono text-rose-400 font-semibold shrink-0">
                         Annale Officielle {e.sessionAnnee ? `${e.sessionAnnee}` : ""}
                         {e.sessionLibelle ? ` (${e.sessionLibelle})` : ""}
                       </span>
                     )}
                     {e.typeSujet === "annale_adaptee" && (
-                      <span className="hidden sm:inline-block rounded bg-purple-500/10 border border-purple-500/20 px-2 py-0.5 text-[10px] font-mono text-purple-600 dark:text-purple-400 font-semibold shrink-0">
+                      <span className="hidden sm:inline-block rounded bg-purple-500/10 border border-purple-500/20 px-2 py-0.5 text-[10px] font-mono text-purple-400 font-semibold shrink-0">
                         Annale Blanche {e.sessionAnnee ? `${e.sessionAnnee}` : ""}
                         {e.sessionLibelle ? ` (${e.sessionLibelle})` : ""}
                       </span>
                     )}
                     {e.typeSujet === "tp" && (
-                      <span className="hidden sm:inline-block rounded bg-cyan-500/10 border border-cyan-500/20 px-2 py-0.5 text-[10px] font-mono text-cyan-600 dark:text-cyan-400 font-medium shrink-0">
+                      <span className="hidden sm:inline-block rounded bg-cyan-500/10 border border-cyan-500/20 px-2 py-0.5 text-[10px] font-mono text-cyan-400 font-medium shrink-0">
                         TP Synthèse{e.sessionAnnee ? ` (Bac ${e.sessionAnnee})` : ""}
                       </span>
                     )}
@@ -500,7 +500,7 @@ function Index() {
                       const prog = progressMap[e.id];
                       if (prog?.status === "valide") {
                         return (
-                          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-500 border border-emerald-500/25 shrink-0">
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/25 shrink-0">
                             <CheckCircle2 className="w-3.5 h-3.5" />
                             <span>Validé (20/20)</span>
                           </span>
@@ -516,7 +516,7 @@ function Index() {
                               ? `${prog.score}/20`
                               : "En cours";
                         return (
-                          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-500/10 text-amber-500 border border-amber-500/25 shrink-0">
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-500/10 text-amber-400 border border-amber-500/25 shrink-0">
                             <span className="h-2 w-2 rounded-full bg-amber-500 animate-pulse" />
                             <span>En cours ({label})</span>
                           </span>

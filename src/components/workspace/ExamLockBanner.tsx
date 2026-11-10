@@ -11,7 +11,7 @@ export function ExamLockBanner({ ws }: { ws: WorkspaceState }) {
     setShowSolutionModal,
   } = ws;
   return isExamExpired ? (
-    <div className="bg-rose-500/15 border-b border-rose-500/30 px-3 py-2 text-xs text-rose-500 font-medium flex flex-wrap items-center justify-between gap-2">
+    <div className="bg-rose-500/15 border-b border-rose-500/30 px-3 py-2 text-xs text-rose-400 font-medium flex flex-wrap items-center justify-between gap-2">
       <div className="flex items-center gap-2 min-w-0">
         <Lock className="h-3.5 w-3.5 shrink-0" />
         <span>

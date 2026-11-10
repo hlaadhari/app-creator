@@ -27,7 +27,7 @@ export function ConflictModal({ open, conflict, onResolve }: ConflictModalProps)
     <Dialog open={open}>
       <DialogContent className="max-w-4xl max-h-[90vh] flex flex-col p-6 overflow-hidden">
         <DialogHeader className="pb-3 border-b">
-          <div className="flex items-center gap-2 text-amber-500 font-semibold text-lg">
+          <div className="flex items-center gap-2 text-amber-400 font-semibold text-lg">
             <AlertTriangle className="h-5 w-5" />
             <DialogTitle>Conflit de révision détecté ({conflict.fileName})</DialogTitle>
           </div>
@@ -89,7 +89,7 @@ export function ConflictModal({ open, conflict, onResolve }: ConflictModalProps)
           {activeTab === "side_by_side" ? (
             <div className="grid grid-cols-2 divide-x h-full">
               <div className="flex flex-col h-full overflow-hidden">
-                <div className="bg-amber-500/10 px-3 py-1.5 font-sans font-medium text-amber-700 dark:text-amber-300 border-b flex items-center justify-between">
+                <div className="bg-amber-500/10 px-3 py-1.5 font-sans font-medium text-amber-400 border-b flex items-center justify-between">
                   <span className="flex items-center gap-1.5">
                     <HardDrive className="h-3.5 w-3.5" />
                     Votre version locale (rev {conflict.localRev})
@@ -102,7 +102,7 @@ export function ConflictModal({ open, conflict, onResolve }: ConflictModalProps)
               </div>
 
               <div className="flex flex-col h-full overflow-hidden">
-                <div className="bg-blue-500/10 px-3 py-1.5 font-sans font-medium text-blue-700 dark:text-blue-300 border-b flex items-center justify-between">
+                <div className="bg-blue-500/10 px-3 py-1.5 font-sans font-medium text-blue-400 border-b flex items-center justify-between">
                   <span className="flex items-center gap-1.5">
                     <Cloud className="h-3.5 w-3.5" />
                     Version serveur (rev {conflict.remoteRev})
@@ -116,14 +116,14 @@ export function ConflictModal({ open, conflict, onResolve }: ConflictModalProps)
             </div>
           ) : activeTab === "local" ? (
             <div className="p-3">
-              <div className="text-xs font-semibold text-amber-600 mb-2">
+              <div className="text-xs font-semibold text-amber-400 mb-2">
                 Tampon local (rev {conflict.localRev}) :
               </div>
               <pre className="whitespace-pre-wrap">{conflict.localContent}</pre>
             </div>
           ) : (
             <div className="p-3">
-              <div className="text-xs font-semibold text-blue-600 mb-2">
+              <div className="text-xs font-semibold text-blue-400 mb-2">
                 Version distante (rev {conflict.remoteRev}) :
               </div>
               <pre className="whitespace-pre-wrap">{conflict.remoteContent}</pre>
@@ -143,7 +143,7 @@ export function ConflictModal({ open, conflict, onResolve }: ConflictModalProps)
               onClick={() => onResolve("keep_remote")}
               className="gap-1.5 border-blue-500/40 hover:bg-blue-500/10 text-xs"
             >
-              <Cloud className="h-3.5 w-3.5 text-blue-500" />
+              <Cloud className="h-3.5 w-3.5 text-blue-400" />
               Adopter la version du serveur (v{conflict.remoteRev})
             </Button>
             <Button

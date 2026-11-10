@@ -121,7 +121,7 @@ export function EvaluationResultsPane({
         <div
           className={`p-4 rounded-full border ${
             examLocked
-              ? "bg-rose-500/10 border-rose-500/30 text-rose-500"
+              ? "bg-rose-500/10 border-rose-500/30 text-rose-400"
               : "bg-primary/10 border-primary/20 text-primary"
           }`}
         >
@@ -269,7 +269,7 @@ export function EvaluationResultsPane({
       {/* Explication explicite du verrouillage post-échéance (#188) */}
       {examLocked && (
         <div className="rounded-lg border border-rose-500/30 bg-rose-500/10 p-3 text-xs space-y-2">
-          <div className="flex items-center gap-1.5 font-semibold text-rose-500">
+          <div className="flex items-center gap-1.5 font-semibold text-rose-400">
             <Lock className="h-3.5 w-3.5 shrink-0" />
             <span>
               {isOfficialExam
@@ -320,7 +320,7 @@ export function EvaluationResultsPane({
           <div className="flex items-baseline justify-center gap-1 my-1">
             <span
               className={`text-4xl font-mono font-bold ${
-                note20 >= 16 ? "text-emerald-500" : note20 >= 10 ? "text-primary" : "text-amber-500"
+                note20 >= 16 ? "text-emerald-400" : note20 >= 10 ? "text-primary" : "text-amber-400"
               }`}
             >
               {note20}
@@ -339,7 +339,7 @@ export function EvaluationResultsPane({
               </span>
             )}
             {latestDelta.progression === "regression" && (
-              <span className="flex items-center gap-1 text-rose-600 dark:text-rose-400">
+              <span className="flex items-center gap-1 text-rose-400">
                 <TrendingDown className="h-3.5 w-3.5" />
                 <span>{latestDelta.formattedNoteDelta} depuis la dernière vérification</span>
               </span>
@@ -360,7 +360,7 @@ export function EvaluationResultsPane({
           </div>
         )}
         {pointsNonVerifiables > 0 && !aucuneVerification && (
-          <p className="text-[11px] leading-relaxed text-amber-700 dark:text-amber-300">
+          <p className="text-[11px] leading-relaxed text-amber-400">
             {pointsNonVerifiables} point{pointsNonVerifiables > 1 ? "s" : ""} sur {totalPoints} ne
             sont pas vérifiables automatiquement : ils ne sont pas gagnés dans cette note et seront
             évalués par votre enseignant.
@@ -407,9 +407,9 @@ export function EvaluationResultsPane({
                     {!automatique ? (
                       <Info className="h-4 w-4 text-muted-foreground shrink-0 mt-0.5" />
                     ) : r.passed ? (
-                      <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0 mt-0.5" />
+                      <CheckCircle2 className="h-4 w-4 text-emerald-400 shrink-0 mt-0.5" />
                     ) : (
-                      <AlertCircle className="h-4 w-4 text-amber-500 shrink-0 mt-0.5" />
+                      <AlertCircle className="h-4 w-4 text-amber-400 shrink-0 mt-0.5" />
                     )}
                     <div>
                       <div className="flex items-center gap-1.5 flex-wrap">
@@ -419,12 +419,12 @@ export function EvaluationResultsPane({
                             variant="outline"
                             className={`text-[10px] px-1.5 py-0 h-4 font-normal ${
                               r.cause === "absent"
-                                ? "bg-rose-500/10 text-rose-600 border-rose-500/30"
+                                ? "bg-rose-500/10 text-rose-400 border-rose-500/30"
                                 : r.cause === "syntaxe"
-                                  ? "bg-purple-500/10 text-purple-600 border-purple-500/30"
+                                  ? "bg-purple-500/10 text-purple-400 border-purple-500/30"
                                   : r.cause === "execution"
                                     ? "bg-destructive/10 text-destructive border-destructive/30"
-                                    : "bg-amber-500/10 text-amber-600 border-amber-500/30"
+                                    : "bg-amber-500/10 text-amber-400 border-amber-500/30"
                             }`}
                           >
                             {r.cause === "absent" && "Élément absent"}
@@ -440,7 +440,7 @@ export function EvaluationResultsPane({
                             ? "text-muted-foreground"
                             : r.passed
                               ? "text-emerald-400"
-                              : "text-amber-700 dark:text-amber-300"
+                              : "text-amber-400"
                         }`}
                       >
                         {r.message}
@@ -480,7 +480,7 @@ export function EvaluationResultsPane({
                         return (
                           <div className="space-y-1.5 text-xs">
                             <div className="flex items-center justify-between">
-                              <span className="font-mono text-[11px] text-amber-600 dark:text-amber-400 font-medium flex items-center gap-1">
+                              <span className="font-mono text-[11px] text-amber-400 font-medium flex items-center gap-1">
                                 <Sparkles className="h-3 w-3" />
                                 <span>Indices progressifs ({currentLvl}/3)</span>
                               </span>
@@ -493,7 +493,7 @@ export function EvaluationResultsPane({
                                       [r.id]: (prev[r.id] ?? 0) + 1,
                                     }))
                                   }
-                                  className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/30 hover:bg-amber-500/20 cursor-pointer transition-colors"
+                                  className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded bg-amber-500/10 text-amber-400 border border-amber-500/30 hover:bg-amber-500/20 cursor-pointer transition-colors"
                                 >
                                   Débloquer niveau {currentLvl + 1}
                                 </button>
@@ -506,7 +506,7 @@ export function EvaluationResultsPane({
 
                             {currentLvl >= 1 && (
                               <div className="rounded bg-muted/60 border border-border p-2 text-[11px] leading-relaxed">
-                                <div className="font-semibold text-foreground text-[10px] uppercase font-mono tracking-wider text-amber-600 dark:text-amber-400 mb-0.5">
+                                <div className="font-semibold text-foreground text-[10px] uppercase font-mono tracking-wider text-amber-400 mb-0.5">
                                   Niveau 1 — Conceptuel
                                 </div>
                                 <p className="text-foreground/90">{critHints[0]}</p>
@@ -515,7 +515,7 @@ export function EvaluationResultsPane({
 
                             {currentLvl >= 2 && (
                               <div className="rounded bg-muted/60 border border-border p-2 text-[11px] leading-relaxed">
-                                <div className="font-semibold text-foreground text-[10px] uppercase font-mono tracking-wider text-blue-600 dark:text-blue-400 mb-0.5">
+                                <div className="font-semibold text-foreground text-[10px] uppercase font-mono tracking-wider text-blue-400 mb-0.5">
                                   Niveau 2 — Piste Syntaxique
                                 </div>
                                 <p className="text-foreground/90">{critHints[1]}</p>
@@ -524,7 +524,7 @@ export function EvaluationResultsPane({
 
                             {currentLvl >= 3 && (
                               <div className="rounded bg-muted/60 border border-border p-2 text-[11px] leading-relaxed">
-                                <div className="font-semibold text-foreground text-[10px] uppercase font-mono tracking-wider text-purple-600 dark:text-purple-400 mb-0.5">
+                                <div className="font-semibold text-foreground text-[10px] uppercase font-mono tracking-wider text-purple-400 mb-0.5">
                                   Niveau 3 — Extrait d'Illustration
                                 </div>
                                 <pre className="font-mono text-[10px] bg-background/80 border rounded p-1.5 overflow-x-auto text-foreground mt-1 whitespace-pre-wrap">
@@ -547,7 +547,7 @@ export function EvaluationResultsPane({
                         {contestation.statut === "en_attente" && (
                           <Badge
                             variant="outline"
-                            className="text-[10px] gap-1 bg-amber-500/10 text-amber-600 border-amber-500/30 cursor-pointer"
+                            className="text-[10px] gap-1 bg-amber-500/10 text-amber-400 border-amber-500/30 cursor-pointer"
                             onClick={() =>
                               setContestationTarget({
                                 id: r.id,
@@ -574,7 +574,7 @@ export function EvaluationResultsPane({
                         {contestation.statut === "rejetee" && (
                           <Badge
                             variant="outline"
-                            className="text-[10px] gap-1 bg-rose-500/10 text-rose-600 border-rose-500/30 cursor-pointer"
+                            className="text-[10px] gap-1 bg-rose-500/10 text-rose-400 border-rose-500/30 cursor-pointer"
                             onClick={() =>
                               setContestationTarget({
                                 id: r.id,

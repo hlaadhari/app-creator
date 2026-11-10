@@ -57,16 +57,16 @@ export function ExamCountdownBanner({
   // Styles visuels selon l'urgence ou le motif de clôture (#197)
   const getBannerColor = () => {
     if (isVoluntarySubmit) {
-      return "bg-emerald-500/15 border-emerald-500/40 text-emerald-800 dark:text-emerald-200";
+      return "bg-emerald-500/15 border-emerald-500/40 text-emerald-400 dark:text-emerald-200";
     }
     if (isTimeExpired) {
       return "bg-destructive/15 border-destructive/40 text-destructive";
     }
     if (countdown.isCritical) {
-      return "bg-rose-500/15 border-rose-500/40 text-rose-700 dark:text-rose-300 animate-pulse";
+      return "bg-rose-500/15 border-rose-500/40 text-rose-400 animate-pulse";
     }
     if (countdown.isWarning) {
-      return "bg-amber-500/15 border-amber-500/40 text-amber-800 dark:text-amber-200";
+      return "bg-amber-500/15 border-amber-500/40 text-amber-400 dark:text-amber-200";
     }
     return "bg-primary/10 border-primary/30 text-foreground";
   };
@@ -82,7 +82,7 @@ export function ExamCountdownBanner({
           ) : isTimeExpired ? (
             <Lock className="h-4 w-4 text-destructive" />
           ) : countdown.isCritical ? (
-            <ShieldAlert className="h-4 w-4 text-rose-600 dark:text-rose-400" />
+            <ShieldAlert className="h-4 w-4 text-rose-400" />
           ) : (
             <Clock className="h-4 w-4 text-primary" />
           )}
@@ -116,7 +116,7 @@ export function ExamCountdownBanner({
         </div>
 
         {countdown.isCritical && !countdown.isExpired && !isLocked && (
-          <div className="flex items-center gap-1 text-[11px] font-semibold text-rose-600 dark:text-rose-400">
+          <div className="flex items-center gap-1 text-[11px] font-semibold text-rose-400">
             <AlertCircle className="h-3.5 w-3.5" />
             <span>Dernières minutes !</span>
           </div>

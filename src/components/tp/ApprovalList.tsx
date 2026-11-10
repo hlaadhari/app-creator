@@ -57,7 +57,7 @@ export function ApprovalList({
             </div>
             <div
               className={`font-mono text-[11px] ${
-                isFull ? "text-rose-500 font-semibold" : "text-muted-foreground"
+                isFull ? "text-rose-400 font-semibold" : "text-muted-foreground"
               }`}
             >
               {isFull ? "Salle complète" : `${remainingCapacity} place(s) restante(s)`}
@@ -79,7 +79,7 @@ export function ApprovalList({
 
       {/* Alerte si capacité atteinte */}
       {isFull && pendingReservations.length > 0 && (
-        <div className="mt-4 flex items-center gap-2 p-3 rounded-md bg-rose-500/10 border border-rose-500/20 text-rose-600 dark:text-rose-400 text-xs">
+        <div className="mt-4 flex items-center gap-2 p-3 rounded-md bg-rose-500/10 border border-rose-500/20 text-rose-400 text-xs">
           <AlertCircle className="h-4 w-4 shrink-0" />
           <span>
             La capacité maximale du TP ({maxSeats} postes) est atteinte. Vous devez augmenter la
@@ -112,7 +112,7 @@ export function ApprovalList({
                 className="py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-accent/30 px-2 rounded-md transition-colors"
               >
                 <div className="flex items-center gap-3">
-                  <div className="h-9 w-9 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center font-semibold text-xs shrink-0">
+                  <div className="h-9 w-9 rounded-full bg-amber-500/10 text-amber-400 flex items-center justify-center font-semibold text-xs shrink-0">
                     <User className="h-4 w-4" />
                   </div>
                   <div>
@@ -122,7 +122,7 @@ export function ApprovalList({
                       </span>
                       <Badge
                         variant="outline"
-                        className="text-[11px] font-mono border-amber-500/30 text-amber-600 dark:text-amber-400"
+                        className="text-[11px] font-mono border-amber-500/30 text-amber-400"
                       >
                         Poste {String(demande.seatNumber).padStart(2, "0")}
                       </Badge>
@@ -143,7 +143,7 @@ export function ApprovalList({
                     variant="outline"
                     onClick={() => onReject(demande.id)}
                     disabled={isProcessing}
-                    className="h-8 gap-1 text-xs text-rose-600 hover:text-rose-700 hover:bg-rose-50 dark:hover:bg-rose-950/20 border-rose-300 dark:border-rose-800 cursor-pointer"
+                    className="h-8 gap-1 text-xs text-rose-400 hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/20 border-rose-300 dark:border-rose-800 cursor-pointer"
                     aria-label={`Refuser la demande du poste ${demande.seatNumber}`}
                   >
                     <X className="h-3.5 w-3.5" />
@@ -181,7 +181,7 @@ export function ApprovalList({
                 className="py-2 flex items-center justify-between gap-3 text-xs px-2 rounded hover:bg-accent/20"
               >
                 <div className="flex items-center gap-2.5 min-w-0">
-                  <Badge className="bg-blue-600/15 text-blue-600 dark:text-blue-400 border border-blue-500/30 font-mono text-[11px] shrink-0">
+                  <Badge className="bg-blue-600/15 text-blue-400 border border-blue-500/30 font-mono text-[11px] shrink-0">
                     Poste {String(conf.seatNumber).padStart(2, "0")}
                   </Badge>
                   <span className="font-medium text-foreground truncate">
@@ -193,7 +193,7 @@ export function ApprovalList({
                   variant="ghost"
                   onClick={() => onReject(conf.id)}
                   disabled={isProcessing}
-                  className="h-7 px-2 text-[11px] text-muted-foreground hover:text-rose-600 cursor-pointer shrink-0"
+                  className="h-7 px-2 text-[11px] text-muted-foreground hover:text-rose-400 cursor-pointer shrink-0"
                   aria-label={`Libérer le poste occupé ${conf.seatNumber}`}
                 >
                   Libérer le poste

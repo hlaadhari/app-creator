@@ -133,7 +133,7 @@ export const WrittenQCM: React.FC<WrittenQCMProps> = ({
               <div
                 className={`mt-4 rounded-md p-3 text-xs border ${
                   res.isCorrect
-                    ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-800 dark:text-emerald-300"
+                    ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-400"
                     : "bg-destructive/10 border-destructive/20 text-destructive"
                 }`}
               >

@@ -109,7 +109,7 @@ export function PedagogicalTutorPane({ context, onSelectCriterion }: Pedagogical
           <div>
             <h3 className="text-xs font-bold leading-none flex items-center gap-1.5">
               <span>Tuteur Pédagogique STI</span>
-              <Sparkles className="w-3 h-3 text-amber-500" />
+              <Sparkles className="w-3 h-3 text-amber-400" />
             </h3>
             <span className="text-[10px] text-muted-foreground">
               {isExam ? "Mode Examen Neutralisé" : "Accompagnement socratique guidé"}
