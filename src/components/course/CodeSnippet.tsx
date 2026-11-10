@@ -76,7 +76,7 @@ export function CodeSnippet({ snippet, onInsertCode, className = "" }: CodeSnipp
           <span className="text-xs font-medium text-foreground truncate">{snippet.title}</span>
           {snippet.targetFile && (
             <span
-              className="hidden sm:inline-flex items-center gap-1 text-[11px] font-mono text-muted-foreground/90 bg-background/50 px-1.5 py-0.5 rounded border border-border/50"
+              className="hidden sm:inline-flex items-center gap-1 text-[11px] font-mono text-muted-foreground bg-background/50 px-1.5 py-0.5 rounded border border-border/50"
               title={`Fichier cible recommandé : ${snippet.targetFile}`}
             >
               <FileCode2 className="h-3 w-3 text-primary" />
@@ -136,7 +136,11 @@ export function CodeSnippet({ snippet, onInsertCode, className = "" }: CodeSnipp
       </div>
 
       {/* Code préformaté */}
-      <pre className="p-3.5 m-0 text-xs font-mono overflow-x-auto leading-relaxed text-zinc-100 bg-[#0d1117] selection:bg-primary/30">
+      <pre
+        tabIndex={0}
+        aria-label="Extrait de code"
+        className="p-3.5 m-0 text-xs font-mono overflow-x-auto leading-relaxed text-zinc-100 bg-[#0d1117] selection:bg-primary/30"
+      >
         <code>{snippet.code}</code>
       </pre>
 

@@ -486,7 +486,7 @@ function Index() {
                   <div className="flex items-center gap-2 text-xs text-muted-foreground truncate mt-0.5">
                     <span className="truncate">{e.competence}</span>
                     {e.sourceReference && (
-                      <span className="hidden md:inline-block text-[10px] font-mono text-muted-foreground/75 shrink-0">
+                      <span className="hidden md:inline-block text-[10px] font-mono text-muted-foreground shrink-0">
                         • {e.sourceReference}
                       </span>
                     )}

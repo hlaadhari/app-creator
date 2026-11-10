@@ -453,7 +453,10 @@ function CoursPage() {
         ) : (
           <>
             {/* Sommaire des 6 Modules (5 Fiches Mémento + Module 6 Annales) */}
-            <aside className="hidden md:flex w-72 lg:w-80 shrink-0 h-full border-r bg-panel/70 flex-col p-3 space-y-3">
+            <aside
+              aria-label="Sommaire des modules"
+              className="hidden md:flex w-72 lg:w-80 shrink-0 h-full border-r bg-panel/70 flex-col p-3 space-y-3"
+            >
               <div>
                 <span className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground block mb-1">
                   Carnet STI-BAC INFO • 6 Modules

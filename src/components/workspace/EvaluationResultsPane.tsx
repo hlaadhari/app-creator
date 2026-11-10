@@ -463,7 +463,7 @@ export function EvaluationResultsPane({
                 {!r.passed && automatique && (
                   <div className="mt-2.5 pt-2 border-t border-border/50">
                     {examMode ? (
-                      <div className="flex items-center gap-1.5 text-[11px] font-mono text-muted-foreground/75">
+                      <div className="flex items-center gap-1.5 text-[11px] font-mono text-muted-foreground">
                         <Lock className="h-3 w-3" />
                         <span>Indices progressifs désactivés en mode examen (T-04 / T-06)</span>
                       </div>

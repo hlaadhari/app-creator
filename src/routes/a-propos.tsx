@@ -58,7 +58,7 @@ function AProposPage() {
               Code source publié sous{" "}
               <a
                 href={APP_INFO.licence.url}
-                className="text-primary underline-offset-2 hover:underline"
+                className="text-primary underline underline-offset-2"
                 target="_blank"
                 rel="noreferrer"
               >

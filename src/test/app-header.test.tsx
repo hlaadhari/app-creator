@@ -50,7 +50,7 @@ describe("AppHeader partagé (#241)", () => {
     expect(screen.getByText("Aller au contenu").getAttribute("href")).toBe("#contenu-principal");
     expect(screen.getByLabelText("Catalogue des sujets")).toBeDefined();
     expect(screen.getByLabelText("Mémento STI")).toBeDefined();
-    expect(screen.getByLabelText("Planning et Postes TP")).toBeDefined();
+    expect(screen.getByLabelText("Séances TP : planning et postes")).toBeDefined();
     expect(screen.queryByLabelText("Espace Enseignant")).toBeNull();
     expect(screen.queryByLabelText("Administration")).toBeNull();
     expect(screen.getByTestId("auth-modal")).toBeDefined();
@@ -58,7 +58,7 @@ describe("AppHeader partagé (#241)", () => {
 
   it("marque la page courante avec aria-current", () => {
     render(<AppHeader current="calendrier" />);
-    const lien = screen.getByLabelText("Planning et Postes TP").closest("a");
+    const lien = screen.getByLabelText("Séances TP : planning et postes").closest("a");
     expect(lien?.getAttribute("aria-current")).toBe("page");
     expect(screen.getByLabelText("Mémento STI").closest("a")?.getAttribute("aria-current")).toBe(
       null,
