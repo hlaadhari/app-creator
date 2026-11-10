@@ -134,8 +134,11 @@ describe("Issue #135 (UX-03) — Conformité sémantique des Routes (h1, main, a
     expect(content).toContain("<h1");
 
     // Boutons d'en-tête avec aria-label explicite pour mobile
-    expect(content).toContain('aria-label="Mémento STI"');
     expect(content).toContain('aria-label="Guide de démarrage"');
+
+    // Le bouton Mémento vit désormais dans l'en-tête partagé (#241)
+    const headerPath = path.resolve(process.cwd(), "src", "components", "layout", "AppHeader.tsx");
+    expect(fs.readFileSync(headerPath, "utf-8")).toContain('ariaLabel: "Mémento STI"');
   });
 
   it("la route '/cours' contient un h1 sémantique, un repère <main> unique et des aria-labels", () => {

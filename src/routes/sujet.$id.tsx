@@ -28,8 +28,6 @@ import {
 import { ReferenceSolutionModal } from "@/components/pedagogy/ReferenceSolutionModal";
 import { calculerCompteARebours, getTempsServeurSynchronise } from "@/lib/exam/server-clock";
 import type { EvaluationSummary } from "@/lib/evaluation/probe-runner";
-import { SproutLogo } from "@/components/SproutLogo";
-import { AuthModal } from "@/components/AuthModal";
 import { enregistrerNouvelleTentative } from "@/lib/pedagogy/attempts-service";
 import { MonacoEditorPane } from "@/components/workspace/MonacoEditorPane";
 import { WorkspaceFileTree } from "@/components/workspace/WorkspaceFileTree";
@@ -71,6 +69,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { PedagogicalTutorPane } from "@/components/workspace/PedagogicalTutorPane";
 import { CourseDrawer } from "@/components/course/CourseDrawer";
+import { AppHeader, MAIN_CONTENT_ID } from "@/components/layout/AppHeader";
 
 export const Route = createFileRoute("/sujet/$id")({
   loader: async ({ params }) => {
@@ -494,46 +493,43 @@ function WorkspaceView({ ex }: { ex: Exercise }) {
 
   return (
     <div className="flex h-screen flex-col bg-background text-foreground font-sans overflow-hidden">
-      {/* Header Principal : identité, fil d'Ariane, infos du sujet, chrono, profil (#240) */}
-      <header className="flex h-11 items-center justify-between gap-3 border-b bg-panel px-4 text-xs font-mono select-none shrink-0">
-        <div className="flex min-w-0 items-center gap-2">
-          <Link to="/" className="flex items-center gap-2 hover:opacity-85 transition-opacity">
-            <SproutLogo size="sm" showText={false} />
-            <span className="font-semibold text-xs tracking-tight">Labo STI</span>
-          </Link>
-          <Breadcrumb className="min-w-0">
-            <BreadcrumbList className="flex-nowrap gap-1 text-xs sm:gap-1.5">
-              <BreadcrumbSeparator />
-              <BreadcrumbItem className="hidden sm:inline-flex">
-                <BreadcrumbLink asChild>
-                  <Link to="/">Sujets</Link>
-                </BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator className="hidden sm:block" />
-              <BreadcrumbItem className="min-w-0">
-                <h1 className="font-medium text-foreground truncate max-w-[120px] sm:max-w-[260px] lg:max-w-[420px] text-xs inline">
-                  {ex.title}
-                </h1>
-              </BreadcrumbItem>
-            </BreadcrumbList>
-          </Breadcrumb>
-          <SubjectInfoPopover
-            sujetId={id}
-            typeSujet={ex.typeSujet}
-            sessionAnnee={ex.sessionAnnee}
-            baremeRepartition={baremeRepartition}
-          />
-          {isExamMode && (
-            <span className="ml-1 inline-flex items-center gap-1.5 rounded-full border border-rose-500/30 bg-rose-500/10 px-2.5 py-0.5 text-[11px] font-semibold text-rose-500">
-              <Lock className="h-3 w-3" />
-              <span className="hidden sm:inline">Mode Examen - Assistance Neutralisée</span>
-              <span className="sm:hidden">Examen</span>
-            </span>
-          )}
-        </div>
-
-        <div className="flex shrink-0 items-center gap-2">
-          {isExamMode && countdown && (
+      <AppHeader
+        hideNav
+        breadcrumb={
+          <>
+            <Breadcrumb className="min-w-0">
+              <BreadcrumbList className="flex-nowrap gap-1 text-xs sm:gap-1.5">
+                <BreadcrumbSeparator />
+                <BreadcrumbItem className="hidden sm:inline-flex">
+                  <BreadcrumbLink asChild>
+                    <Link to="/">Sujets</Link>
+                  </BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator className="hidden sm:block" />
+                <BreadcrumbItem className="min-w-0">
+                  <h1 className="font-medium text-foreground truncate max-w-[120px] sm:max-w-[260px] lg:max-w-[420px] text-xs inline">
+                    {ex.title}
+                  </h1>
+                </BreadcrumbItem>
+              </BreadcrumbList>
+            </Breadcrumb>
+            <SubjectInfoPopover
+              sujetId={id}
+              typeSujet={ex.typeSujet}
+              sessionAnnee={ex.sessionAnnee}
+              baremeRepartition={baremeRepartition}
+            />
+            {isExamMode && (
+              <span className="ml-1 inline-flex items-center gap-1.5 rounded-full border border-rose-500/30 bg-rose-500/10 px-2.5 py-0.5 text-[11px] font-semibold text-rose-500">
+                <Lock className="h-3 w-3" />
+                <span className="hidden sm:inline">Mode Examen - Assistance Neutralisée</span>
+                <span className="sm:hidden">Examen</span>
+              </span>
+            )}
+          </>
+        }
+        center={
+          isExamMode && countdown ? (
             <div
               className={`flex items-center gap-1.5 rounded border px-2.5 py-1 text-xs font-mono ${
                 countdown.isExpired
@@ -547,11 +543,9 @@ function WorkspaceView({ ex }: { ex: Exercise }) {
               <Clock className="h-3.5 w-3.5" />
               <span>{countdown.isExpired ? "00:00 (Échéance échue)" : countdown.formatted}</span>
             </div>
-          )}
-
-          <AuthModal />
-        </div>
-      </header>
+          ) : null
+        }
+      />
 
       {/* Bandeau consultation / révision sur écran < 1024px (WCAG 2.1 AA / UX-03) */}
       <div className="lg:hidden bg-amber-500/10 border-b border-amber-500/30 px-3 py-1.5 flex items-center justify-between text-[11px] font-mono text-amber-600 dark:text-amber-400">
@@ -572,7 +566,10 @@ function WorkspaceView({ ex }: { ex: Exercise }) {
       </div>
 
       {/* Corps du Workspace en 3 Panneaux */}
-      <main className="grid flex-1 min-h-0 grid-cols-1 lg:grid-cols-[320px_1fr_1fr] divide-x">
+      <main
+        id={MAIN_CONTENT_ID}
+        className="grid flex-1 min-h-0 grid-cols-1 lg:grid-cols-[320px_1fr_1fr] divide-x"
+      >
         {/* Panneau Latéral Gauche : Énoncé / Fichiers / Résultats */}
         <aside className="flex min-h-0 flex-col bg-panel">
           <div className="flex items-stretch border-b text-xs font-mono bg-panel/80 shrink-0">

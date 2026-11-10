@@ -36,6 +36,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { AppHeader, MAIN_CONTENT_ID } from "@/components/layout/AppHeader";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -298,65 +299,54 @@ function AdminDashboardPage() {
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col font-sans">
       {/* Barre supérieure Admin */}
-      <header className="border-b bg-card px-6 py-3 flex items-center justify-between shrink-0">
-        <div className="flex items-center gap-3">
-          <Link
-            to="/"
-            className="text-muted-foreground hover:text-foreground text-xs flex items-center gap-1 transition-colors"
-          >
-            <ArrowLeft className="w-3.5 h-3.5" />
-            Accueil
-          </Link>
-          <span className="text-muted-foreground">/</span>
-          <Link
-            to="/enseignant"
-            search={{ demo: isDemo ? "true" : undefined }}
-            className="text-muted-foreground hover:text-foreground text-xs flex items-center gap-1 transition-colors"
-          >
-            <GraduationCap className="w-3.5 h-3.5" />
-            Espace Enseignant
-          </Link>
-          <span className="text-muted-foreground">/</span>
-          <div className="flex items-center gap-2">
-            <Shield className="w-5 h-5 text-rose-500" />
-            <h1 className="text-sm font-semibold tracking-tight">
-              Panneau d'Administration Centrale
-            </h1>
-          </div>
-          <Badge
-            variant="outline"
-            className={`text-[10px] ${
-              isDemo
-                ? "bg-amber-500/10 text-amber-500 border-amber-500/20"
-                : "bg-rose-500/10 text-rose-500 border-rose-500/20"
-            }`}
-          >
-            {isDemo ? "Mode Démonstration Admin" : "Super-Administrateur"}
-          </Badge>
-        </div>
-
-        <div className="flex items-center gap-3 text-xs">
-          <span className="text-muted-foreground">
-            Connecté :{" "}
-            <strong className="text-foreground">
-              {isDemo
-                ? "Administrateur Système (Démo)"
-                : `${profile?.prenom || ""} ${profile?.nom || ""}`.trim() || user?.email || "Admin"}
-            </strong>
-          </span>
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={loadData}
-            className="h-8 text-xs gap-1.5"
-            disabled={loadingData}
-          >
-            <RefreshCw className={`w-3.5 h-3.5 ${loadingData ? "animate-spin" : ""}`} />
-            Actualiser
-          </Button>
-          {!isDemo && <AuthModal />}
-        </div>
-      </header>
+      <AppHeader
+        current="admin"
+        demo={isDemo}
+        breadcrumb={
+          <>
+            <div className="flex items-center gap-2">
+              <Shield className="w-5 h-5 text-rose-500" />
+              <h1 className="text-sm font-semibold tracking-tight">
+                Panneau d'Administration Centrale
+              </h1>
+            </div>
+            <Badge
+              variant="outline"
+              className={`text-[10px] ${
+                isDemo
+                  ? "bg-amber-500/10 text-amber-500 border-amber-500/20"
+                  : "bg-rose-500/10 text-rose-500 border-rose-500/20"
+              }`}
+            >
+              {isDemo ? "Mode Démonstration Admin" : "Super-Administrateur"}
+            </Badge>
+          </>
+        }
+        actions={
+          <>
+            <span className="hidden xl:inline text-muted-foreground">
+              Connecté :{" "}
+              <strong className="text-foreground">
+                {isDemo
+                  ? "Administrateur Système (Démo)"
+                  : `${profile?.prenom || ""} ${profile?.nom || ""}`.trim() ||
+                    user?.email ||
+                    "Admin"}
+              </strong>
+            </span>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={loadData}
+              className="h-8 text-xs gap-1.5"
+              disabled={loadingData}
+            >
+              <RefreshCw className={`w-3.5 h-3.5 ${loadingData ? "animate-spin" : ""}`} />
+              Actualiser
+            </Button>
+          </>
+        }
+      />
 
       {/* Bannière d'alerte ou message d'action */}
       {actionMessage && (
@@ -377,7 +367,7 @@ function AdminDashboardPage() {
       )}
 
       {/* Contenu principal */}
-      <main className="flex-1 p-6 max-w-7xl w-full mx-auto space-y-6">
+      <main id={MAIN_CONTENT_ID} className="flex-1 p-6 max-w-7xl w-full mx-auto space-y-6">
         {/* Cartes Métriques Synthétiques */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
           <Card>
