@@ -38,7 +38,6 @@ import { DatabasePanel } from "@/components/sql/DatabasePanel";
 import { PhpRunnerPanel } from "@/components/php/PhpRunnerPanel";
 import type { WorkspaceFile } from "@/components/workspace/types";
 import { calculerBaremeRepartition } from "@/lib/pedagogy/bareme-repartition";
-import { BaremeRepartitionBadge } from "@/components/workspace/BaremeRepartitionBadge";
 import {
   BookOpen,
   FolderTree,
@@ -49,13 +48,27 @@ import {
   HelpCircle,
   Clock,
   Save,
-  TrendingUp,
+  MoreHorizontal,
   Bot,
   Lock,
   Info,
 } from "lucide-react";
 import { SubjectCompetencesPill } from "@/components/competences/SubjectCompetencesPill";
-import { ProgressionModal } from "@/components/competences/ProgressionModal";
+import { SidebarTabButton } from "@/components/workspace/SidebarTabButton";
+import { SubjectInfoPopover } from "@/components/workspace/SubjectInfoPopover";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { PedagogicalTutorPane } from "@/components/workspace/PedagogicalTutorPane";
 import { CourseDrawer } from "@/components/course/CourseDrawer";
 
@@ -481,54 +494,45 @@ function WorkspaceView({ ex }: { ex: Exercise }) {
 
   return (
     <div className="flex h-screen flex-col bg-background text-foreground font-sans overflow-hidden">
-      {/* Header Principal */}
+      {/* Header Principal : identité, fil d'Ariane, infos du sujet, chrono, profil (#240) */}
       <header className="flex h-11 items-center justify-between gap-3 border-b bg-panel px-4 text-xs font-mono select-none shrink-0">
         <div className="flex min-w-0 items-center gap-2">
           <Link to="/" className="flex items-center gap-2 hover:opacity-85 transition-opacity">
             <SproutLogo size="sm" showText={false} />
             <span className="font-semibold text-xs tracking-tight">Labo STI</span>
           </Link>
-          <span className="text-muted-foreground/60">/</span>
-          <span className="text-muted-foreground">Sujets</span>
-          <span className="text-muted-foreground/60">/</span>
-          <h1 className="font-medium text-foreground truncate max-w-[120px] sm:max-w-[260px] lg:max-w-none text-xs inline">
-            {ex.title}
-          </h1>
-          <span className="rounded bg-primary/10 border border-primary/20 px-1.5 py-0.5 text-[10px] text-primary hidden md:inline">
-            SW_{id}
-          </span>
-          {ex.typeSujet === "annale_officielle" && (
-            <span className="hidden lg:inline-flex items-center gap-1 rounded border border-rose-500/20 bg-rose-500/10 px-2 py-0.5 text-[10px] text-rose-500 font-semibold">
-              Annale {ex.sessionAnnee || "Officielle"}
-            </span>
-          )}
-          {ex.typeSujet === "annale_adaptee" && (
-            <span className="hidden lg:inline-flex items-center gap-1 rounded border border-purple-500/20 bg-purple-500/10 px-2 py-0.5 text-[10px] text-purple-600 dark:text-purple-400 font-semibold">
-              Blanc {ex.sessionAnnee || "Adapté"}
-            </span>
-          )}
-          {ex.typeSujet === "tp" && (
-            <span className="hidden lg:inline-flex items-center gap-1 rounded border border-cyan-500/20 bg-cyan-500/10 px-2 py-0.5 text-[10px] text-cyan-600 dark:text-cyan-400 font-medium">
-              TP Synthèse
-            </span>
-          )}
+          <Breadcrumb className="min-w-0">
+            <BreadcrumbList className="flex-nowrap gap-1 text-xs sm:gap-1.5">
+              <BreadcrumbSeparator />
+              <BreadcrumbItem className="hidden sm:inline-flex">
+                <BreadcrumbLink asChild>
+                  <Link to="/">Sujets</Link>
+                </BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator className="hidden sm:block" />
+              <BreadcrumbItem className="min-w-0">
+                <h1 className="font-medium text-foreground truncate max-w-[120px] sm:max-w-[260px] lg:max-w-[420px] text-xs inline">
+                  {ex.title}
+                </h1>
+              </BreadcrumbItem>
+            </BreadcrumbList>
+          </Breadcrumb>
+          <SubjectInfoPopover
+            sujetId={id}
+            typeSujet={ex.typeSujet}
+            sessionAnnee={ex.sessionAnnee}
+            baremeRepartition={baremeRepartition}
+          />
           {isExamMode && (
-            <span className="ml-2 inline-flex items-center gap-1.5 rounded-full border border-rose-500/30 bg-rose-500/10 px-2.5 py-0.5 text-[11px] font-semibold text-rose-500">
+            <span className="ml-1 inline-flex items-center gap-1.5 rounded-full border border-rose-500/30 bg-rose-500/10 px-2.5 py-0.5 text-[11px] font-semibold text-rose-500">
               <Lock className="h-3 w-3" />
-              <span>Mode Examen - Assistance Neutralisée</span>
+              <span className="hidden sm:inline">Mode Examen - Assistance Neutralisée</span>
+              <span className="sm:hidden">Examen</span>
             </span>
           )}
         </div>
 
-        <div className="flex min-w-0 shrink items-center gap-2 overflow-x-auto no-scrollbar">
-          {baremeRepartition && (
-            <BaremeRepartitionBadge
-              repartition={baremeRepartition}
-              variant="detailed"
-              className="hidden lg:inline-flex"
-            />
-          )}
-
+        <div className="flex shrink-0 items-center gap-2">
           {isExamMode && countdown && (
             <div
               className={`flex items-center gap-1.5 rounded border px-2.5 py-1 text-xs font-mono ${
@@ -543,47 +547,6 @@ function WorkspaceView({ ex }: { ex: Exercise }) {
               <Clock className="h-3.5 w-3.5" />
               <span>{countdown.isExpired ? "00:00 (Échéance échue)" : countdown.formatted}</span>
             </div>
-          )}
-
-          <ProgressionModal
-            triggerButton={
-              <button
-                className="flex items-center gap-1.5 rounded border border-primary/30 bg-primary/10 px-2.5 py-1 text-primary hover:bg-primary/20 transition-colors cursor-pointer text-xs font-mono"
-                title="Consulter mon bilan de compétences et badges"
-                aria-label="Consulter mon bilan de compétences et badges"
-              >
-                <TrendingUp className="h-3 w-3" />
-                <span className="hidden md:inline">Bilan Compétences</span>
-              </button>
-            }
-          />
-
-          {!isExamMode && (
-            <button
-              onClick={() => setShowCourseDrawer(true)}
-              className="flex items-center gap-1.5 rounded border border-border/80 bg-background/80 hover:bg-accent/40 px-2.5 py-1 text-xs font-mono transition-colors cursor-pointer text-foreground"
-              title="Consulter le support de cours officiel et insérer des extraits de code"
-              aria-label="Consulter le support de cours officiel Mémento STI"
-            >
-              <BookOpen className="h-3 w-3 text-primary" />
-              <span className="hidden sm:inline">Mémento STI</span>
-            </button>
-          )}
-
-          {!isExamMode && (
-            <button
-              onClick={() => setSidebarTab("tuteur")}
-              className={`flex items-center gap-1.5 rounded border px-2.5 py-1 text-xs font-mono transition-colors cursor-pointer ${
-                sidebarTab === "tuteur"
-                  ? "border-primary bg-primary text-primary-foreground font-semibold"
-                  : "border-primary/30 bg-primary/10 text-primary hover:bg-primary/20"
-              }`}
-              title="Consulter le tuteur pédagogique d'aide contextuelle"
-              aria-label="Consulter le tuteur pédagogique STI"
-            >
-              <Bot className="h-3 w-3" />
-              <span className="hidden sm:inline">Tuteur STI</span>
-            </button>
           )}
 
           <AuthModal />
@@ -612,62 +575,51 @@ function WorkspaceView({ ex }: { ex: Exercise }) {
       <main className="grid flex-1 min-h-0 grid-cols-1 lg:grid-cols-[320px_1fr_1fr] divide-x">
         {/* Panneau Latéral Gauche : Énoncé / Fichiers / Résultats */}
         <aside className="flex min-h-0 flex-col bg-panel">
-          <div className="flex border-b text-xs font-mono bg-panel/80 shrink-0">
-            <button
+          <div className="flex items-stretch border-b text-xs font-mono bg-panel/80 shrink-0">
+            <SidebarTabButton
+              active={sidebarTab === "enonce"}
               onClick={() => setSidebarTab("enonce")}
-              aria-label="Afficher l'énoncé du sujet"
-              className={`flex-1 py-2 flex items-center justify-center gap-1.5 uppercase tracking-wider text-[11px] transition-colors ${
-                sidebarTab === "enonce"
-                  ? "border-b-2 border-primary text-foreground font-semibold bg-background/40"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              <BookOpen className="h-3.5 w-3.5" />
-              <span>Sujet</span>
-            </button>
-            <button
+              ariaLabel="Afficher l'énoncé du sujet"
+              label="Sujet"
+              icon={<BookOpen className="h-3.5 w-3.5" />}
+            />
+            <SidebarTabButton
+              active={sidebarTab === "fichiers"}
               onClick={() => setSidebarTab("fichiers")}
-              aria-label="Afficher l'arborescence des fichiers"
-              className={`flex-1 py-2 flex items-center justify-center gap-1.5 uppercase tracking-wider text-[11px] transition-colors ${
-                sidebarTab === "fichiers"
-                  ? "border-b-2 border-primary text-foreground font-semibold bg-background/40"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              <FolderTree className="h-3.5 w-3.5" />
-              <span>Fichiers</span>
-            </button>
-            <button
+              ariaLabel="Afficher l'arborescence des fichiers"
+              label="Fichiers"
+              icon={<FolderTree className="h-3.5 w-3.5" />}
+            />
+            <SidebarTabButton
+              active={sidebarTab === "resultats"}
               onClick={() => setSidebarTab("resultats")}
-              aria-label="Afficher les résultats de vérification"
-              className={`flex-1 py-2 flex items-center justify-center gap-1.5 uppercase tracking-wider text-[11px] transition-colors ${
-                sidebarTab === "resultats"
-                  ? "border-b-2 border-primary text-foreground font-semibold bg-background/40"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              <CheckCircle2 className="h-3.5 w-3.5" />
-              <span>Résultats</span>
-              {evaluationSummary &&
-                evaluationSummary.results.some((r) => r.automatique !== false) && (
+              ariaLabel="Afficher les résultats de vérification"
+              label="Résultats"
+              icon={<CheckCircle2 className="h-3.5 w-3.5" />}
+              badge={
+                evaluationSummary &&
+                evaluationSummary.results.some((r) => r.automatique !== false) ? (
                   <span className="ml-1 px-1 rounded-full bg-primary/20 text-[10px] text-primary">
                     {evaluationSummary.note20}/20
                   </span>
-                )}
-            </button>
+                ) : null
+              }
+            />
             {!isExamMode && (
               <button
+                type="button"
                 onClick={() => setSidebarTab("tuteur")}
                 aria-label="Afficher le tuteur pédagogique d'aide contextuelle"
-                className={`flex-1 py-2 flex items-center justify-center gap-1.5 uppercase tracking-wider text-[11px] transition-colors ${
+                aria-pressed={sidebarTab === "tuteur"}
+                title="Tuteur STI : dialogue socratique et questionnement guidé"
+                className={`flex shrink-0 items-center gap-1.5 border-l px-3 transition-colors cursor-pointer ${
                   sidebarTab === "tuteur"
-                    ? "border-b-2 border-primary text-foreground font-semibold bg-background/40"
-                    : "text-muted-foreground hover:text-foreground"
+                    ? "border-b-2 border-b-primary bg-primary/15 text-primary font-semibold"
+                    : "text-primary hover:bg-primary/10"
                 }`}
-                title="Dialogue socratique & questionnement guidé"
               >
-                <Bot className="h-3.5 w-3.5 text-primary" />
-                <span>Tuteur</span>
+                <Bot className="h-3.5 w-3.5" />
+                <span className="sr-only">Tuteur</span>
               </button>
             )}
           </div>
@@ -907,36 +859,8 @@ function WorkspaceView({ ex }: { ex: Exercise }) {
               })}
             </div>
 
-            {/* Actions de l'éditeur : Mémento, Réinitialiser & Vérifier mon code */}
+            {/* Actions de l'éditeur : action principale + menu secondaire (#240) */}
             <div className="flex items-center justify-end gap-1.5 px-2 py-1 shrink-0">
-              {!isExamMode && (
-                <button
-                  type="button"
-                  onClick={() => setShowCourseDrawer(true)}
-                  className="flex items-center gap-1.5 rounded border border-primary/35 bg-primary/10 hover:bg-primary/20 text-primary px-2.5 py-1 text-xs font-medium transition-colors cursor-pointer"
-                  title="Ouvrir le panneau Mémento Bac STI avec injection directe dans Monaco"
-                  aria-label="Ouvrir le cours et mémento"
-                >
-                  <BookOpen className="h-3 w-3" />
-                  <span className="hidden md:inline">📘 Cours & Mémento</span>
-                </button>
-              )}
-
-              <button
-                onClick={handleReset}
-                disabled={isExamExpired && examCadre === "officiel"}
-                className="flex items-center gap-1.5 rounded border bg-background/60 px-2.5 py-1 text-xs text-muted-foreground hover:text-foreground hover:bg-accent transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
-                title={
-                  isExamExpired && examCadre === "officiel"
-                    ? "Réinitialisation verrouillée : examen officiel clôturé par l'échéance serveur"
-                    : "Réinitialiser le fichier à l'état de départ"
-                }
-                aria-label="Réinitialiser le fichier à l'état de départ"
-              >
-                <RotateCcw className="h-3 w-3" />
-                <span className="hidden sm:inline">Réinitialiser</span>
-              </button>
-
               <button
                 onClick={handleVerify}
                 disabled={verifying || isExamExpired}
@@ -956,6 +880,44 @@ function WorkspaceView({ ex }: { ex: Exercise }) {
                   Ctrl ↵
                 </kbd>
               </button>
+
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button
+                    type="button"
+                    aria-label="Autres actions de l'éditeur"
+                    title="Autres actions"
+                    className="flex h-7 w-7 items-center justify-center rounded border bg-background/60 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground cursor-pointer"
+                  >
+                    <MoreHorizontal className="h-4 w-4" />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-60">
+                  {!isExamMode && (
+                    <DropdownMenuItem
+                      onSelect={() => setShowCourseDrawer(true)}
+                      className="text-xs gap-2 cursor-pointer"
+                      aria-label="Ouvrir le cours et mémento"
+                    >
+                      <BookOpen className="h-3.5 w-3.5 text-primary" />
+                      <span>Cours & Mémento STI</span>
+                    </DropdownMenuItem>
+                  )}
+                  <DropdownMenuItem
+                    onSelect={() => void handleReset()}
+                    disabled={isExamExpired && examCadre === "officiel"}
+                    className="text-xs gap-2 cursor-pointer"
+                    aria-label="Réinitialiser le fichier à l'état de départ"
+                  >
+                    <RotateCcw className="h-3.5 w-3.5" />
+                    <span>
+                      {isExamExpired && examCadre === "officiel"
+                        ? "Réinitialisation verrouillée (examen clôturé)"
+                        : "Réinitialiser aux fichiers de départ"}
+                    </span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </div>
 
