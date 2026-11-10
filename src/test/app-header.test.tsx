@@ -4,7 +4,10 @@ import { render, screen } from "@testing-library/react";
 import React from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const authState = vi.hoisted(() => ({ role: null as null | "admin" | "enseignant" | "eleve" }));
+const authState = vi.hoisted(() => ({
+  role: null as null | "admin" | "enseignant" | "eleve",
+  user: null as null | { id: string },
+}));
 
 vi.mock("@tanstack/react-router", () => ({
   Link: ({
@@ -24,8 +27,11 @@ vi.mock("@tanstack/react-router", () => ({
 vi.mock("@/components/AuthModal", () => ({
   AuthModal: () => <div data-testid="auth-modal" />,
 }));
+vi.mock("@/components/notifications/NotificationBell", () => ({
+  NotificationBell: () => <div data-testid="notification-bell-stub" />,
+}));
 vi.mock("@/lib/supabase/auth", () => ({
-  useAuth: () => ({ role: authState.role }),
+  useAuth: () => ({ role: authState.role, user: authState.user }),
 }));
 
 import { AppHeader } from "@/components/layout/AppHeader";
@@ -33,6 +39,8 @@ import { AppHeader } from "@/components/layout/AppHeader";
 describe("AppHeader partagé (#241)", () => {
   beforeEach(() => {
     authState.role = null;
+    authState.user = null;
+    vi.unstubAllEnvs();
   });
 
   it("expose le repère banner, le lien d'évitement et la navigation élève", () => {
@@ -75,6 +83,27 @@ describe("AppHeader partagé (#241)", () => {
     expect(screen.getByLabelText("Espace Enseignant")).toBeDefined();
     expect(screen.getByLabelText("Administration")).toBeDefined();
     expect(screen.queryByTestId("auth-modal")).toBeNull();
+  });
+
+  it("n'affiche la cloche que si le drapeau est activé, pour un utilisateur connecté hors démo", () => {
+    authState.user = { id: "u-1" };
+    const desactive = render(<AppHeader />);
+    expect(screen.queryByTestId("notification-bell-stub")).toBeNull();
+    desactive.unmount();
+    authState.user = null;
+
+    vi.stubEnv("VITE_NOTIFICATIONS_ENABLED", "true");
+    const { unmount } = render(<AppHeader />);
+    expect(screen.queryByTestId("notification-bell-stub")).toBeNull();
+    unmount();
+
+    authState.user = { id: "u-1" };
+    const connecte = render(<AppHeader />);
+    expect(screen.getByTestId("notification-bell-stub")).toBeDefined();
+    connecte.unmount();
+
+    render(<AppHeader demo />);
+    expect(screen.queryByTestId("notification-bell-stub")).toBeNull();
   });
 
   it("rend les slots breadcrumb, center et actions", () => {

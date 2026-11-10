@@ -227,7 +227,7 @@ function Index() {
               aria-label="Guide de démarrage"
             >
               <HelpCircle className="h-4 w-4" />
-              <span className="hidden sm:inline">Guide de démarrage</span>
+              <span>Guide de démarrage</span>
             </Button>
 
             <ProgressionModal />
@@ -389,7 +389,7 @@ function Index() {
                 key={e.id}
                 to="/sujet/$id"
                 params={{ id: e.id }}
-                className="group flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 rounded-lg border bg-card p-4 transition-all hover:border-primary hover:shadow-xs"
+                className="group flex min-w-0 flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 rounded-lg border bg-card p-4 transition-all hover:border-primary hover:shadow-xs"
               >
                 <div className="flex items-center gap-3">
                   <span className="font-mono text-xl font-bold text-muted-foreground/60 group-hover:text-primary transition-colors w-8">
@@ -478,7 +478,7 @@ function Index() {
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between sm:justify-end gap-3 shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0">
+                <div className="flex flex-wrap items-center justify-between sm:justify-end gap-3 shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0">
                   <div className="flex items-center gap-2">
                     {repartitionMap[e.id] ? (
                       <BaremeRepartitionBadge
@@ -495,7 +495,7 @@ function Index() {
                     </span>
                   </div>
 
-                  <div className="w-40 flex justify-end">
+                  <div className="sm:w-40 flex justify-end">
                     {(() => {
                       const prog = progressMap[e.id];
                       if (prog?.status === "valide") {
