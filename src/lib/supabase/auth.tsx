@@ -109,7 +109,7 @@ export function getRoleBadgeInfo(role: AppRole | null): RoleBadgeInfo {
     case "admin":
       return {
         label: "Admin",
-        badgeClass: "bg-rose-500/10 text-rose-500 border-rose-500/30",
+        badgeClass: "bg-rose-500/10 text-rose-400 border-rose-500/30",
         description:
           "Super-administrateur : gestion des comptes, habilitations enseignants et audit de sécurité.",
       };

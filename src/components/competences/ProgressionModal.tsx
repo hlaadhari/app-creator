@@ -114,7 +114,7 @@ export function ProgressionModal({
                   <div className="text-[10px] font-mono text-muted-foreground uppercase">
                     Badges
                   </div>
-                  <div className="text-base font-bold font-mono text-amber-500">
+                  <div className="text-base font-bold font-mono text-amber-400">
                     {report.badgesObtenusCount} / {report.badgesDisponiblesCount}
                   </div>
                 </div>
@@ -151,7 +151,7 @@ export function ProgressionModal({
                 {/* Points forts */}
                 <div className="rounded-lg border bg-card p-4">
                   <div className="flex items-center gap-2 mb-3">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                    <CheckCircle2 className="w-4 h-4 text-emerald-400" />
                     <h3 className="text-sm font-semibold text-foreground">
                       Points Forts ({report.pointsForts.length})
                     </h3>
@@ -188,7 +188,7 @@ export function ProgressionModal({
                 {/* Axes prioritaires */}
                 <div className="rounded-lg border bg-card p-4">
                   <div className="flex items-center gap-2 mb-3">
-                    <AlertTriangle className="w-4 h-4 text-amber-500" />
+                    <AlertTriangle className="w-4 h-4 text-amber-400" />
                     <h3 className="text-sm font-semibold text-foreground">
                       Axes de Révision Prioritaires ({report.axesPrioritaires.length})
                     </h3>
@@ -201,14 +201,14 @@ export function ProgressionModal({
                           className="flex items-center justify-between text-xs p-2 rounded-md bg-amber-500/5 border border-amber-500/10"
                         >
                           <div className="flex items-center gap-2 truncate">
-                            <span className="font-mono text-[10px] text-amber-600 dark:text-amber-400 font-bold">
+                            <span className="font-mono text-[10px] text-amber-400 font-bold">
                               {item.competence.code}
                             </span>
                             <span className="text-foreground truncate font-medium">
                               {item.competence.libelle}
                             </span>
                           </div>
-                          <span className="font-mono font-bold text-amber-600 dark:text-amber-400 shrink-0">
+                          <span className="font-mono font-bold text-amber-400 shrink-0">
                             {item.percentage}%
                           </span>
                         </div>
@@ -263,7 +263,7 @@ export function ProgressionModal({
               <div className="rounded-lg border bg-card p-4">
                 <div className="flex items-center justify-between mb-3">
                   <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
-                    <Sparkles className="w-4 h-4 text-amber-500" />
+                    <Sparkles className="w-4 h-4 text-amber-400" />
                     <span>Distinctions & Badges Débloqués</span>
                   </h3>
                   <span className="text-xs font-mono text-muted-foreground">

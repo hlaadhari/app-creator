@@ -334,13 +334,13 @@ export function DatabasePanel({
                   {queryResult.dialectWarnings.map((warn, i) => (
                     <div
                       key={i}
-                      className="p-2 rounded-md border border-amber-500/30 bg-amber-500/10 text-amber-900 dark:text-amber-200 text-xs flex items-start gap-2"
+                      className="p-2 rounded-md border border-amber-500/30 bg-amber-500/10 text-amber-400 dark:text-amber-200 text-xs flex items-start gap-2"
                     >
-                      <AlertTriangle className="h-4 w-4 text-amber-500 shrink-0 mt-0.5" />
+                      <AlertTriangle className="h-4 w-4 text-amber-400 shrink-0 mt-0.5" />
                       <div className="space-y-0.5">
                         <p className="font-semibold">{warn.titre}</p>
                         <p className="text-[11px] leading-relaxed">{warn.message}</p>
-                        <p className="text-[11px] font-medium text-amber-800 dark:text-amber-300">
+                        <p className="text-[11px] font-medium text-amber-400">
                           Conseil Bac STI : {warn.suggestion}
                         </p>
                       </div>

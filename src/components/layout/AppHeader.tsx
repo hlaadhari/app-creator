@@ -46,7 +46,7 @@ interface NavLinkSpec {
 const TONE_CLASSES: Record<NavLinkSpec["tone"], string> = {
   neutral: "text-foreground border-border hover:bg-accent/40",
   primary: "text-primary border-primary/30 hover:bg-primary/10",
-  danger: "text-rose-500 border-rose-500/30 hover:bg-rose-500/10",
+  danger: "text-rose-400 border-rose-500/30 hover:bg-rose-500/10",
 };
 
 /**

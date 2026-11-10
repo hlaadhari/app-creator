@@ -110,7 +110,7 @@ export function SidebarPanel({
         {sidebarTab === "resultats" && evaluationError && (
           <div
             role="alert"
-            className="m-3 rounded-md border border-rose-500/30 bg-rose-500/10 p-3 text-xs text-rose-500 space-y-2"
+            className="m-3 rounded-md border border-rose-500/30 bg-rose-500/10 p-3 text-xs text-rose-400 space-y-2"
           >
             <p>{evaluationError}</p>
             <button

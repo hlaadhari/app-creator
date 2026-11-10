@@ -107,7 +107,7 @@ export function SimilarityDiffModal({
               ) : pair.overallSimilarity >= 70 ? (
                 <Badge
                   variant="outline"
-                  className="text-[10px] bg-amber-500/10 text-amber-500 border-amber-500/30 gap-1"
+                  className="text-[10px] bg-amber-500/10 text-amber-400 border-amber-500/30 gap-1"
                 >
                   <AlertTriangle className="w-3 h-3" />
                   Similarité suspecte
@@ -134,7 +134,7 @@ export function SimilarityDiffModal({
                       f.similarity >= 85
                         ? "bg-destructive/20 text-destructive font-bold"
                         : f.similarity >= 70
-                          ? "bg-amber-500/20 text-amber-500"
+                          ? "bg-amber-500/20 text-amber-400"
                           : "text-muted-foreground"
                     }`}
                   >
@@ -223,7 +223,7 @@ export function SimilarityDiffModal({
                 variant="outline"
                 size="sm"
                 onClick={() => handleApplyVerdict("faux_positif")}
-                className="text-xs h-8 gap-1.5 border-green-600/30 text-green-600 hover:bg-green-600/10"
+                className="text-xs h-8 gap-1.5 border-green-600/30 text-green-400 hover:bg-green-600/10"
               >
                 <CheckCircle2 className="w-3.5 h-3.5" />
                 Classer sans suite (Faux positif)

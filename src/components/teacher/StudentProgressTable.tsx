@@ -168,7 +168,7 @@ export function StudentProgressTable({
                               eleve.score_source === "serveur" ||
                               eleve.score_source === "enseignant"
                                 ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/30"
-                                : "bg-amber-500/10 text-amber-600 border-amber-500/30"
+                                : "bg-amber-500/10 text-amber-400 border-amber-500/30"
                             }`}
                           >
                             {getLibelleSourceTentative(eleve.score_source)}
@@ -182,7 +182,7 @@ export function StudentProgressTable({
                       <span className="font-mono text-[11px] flex items-center gap-1">
                         {eleve.criteres_reussis === eleve.total_criteres &&
                         (eleve.total_criteres ?? 0) > 0 ? (
-                          <CheckCircle2 className="w-3.5 h-3.5 text-green-500" />
+                          <CheckCircle2 className="w-3.5 h-3.5 text-green-400" />
                         ) : null}
                         {eleve.criteres_reussis ?? 0} / {eleve.total_criteres ?? 0}
                       </span>
@@ -213,7 +213,7 @@ export function StudentProgressTable({
                           return (
                             <Badge
                               variant="outline"
-                              className="text-[10px] gap-1 py-0.5 px-2 bg-amber-500/10 text-amber-500 border-amber-500/30 font-medium"
+                              className="text-[10px] gap-1 py-0.5 px-2 bg-amber-500/10 text-amber-400 border-amber-500/30 font-medium"
                               title={inactivityAlert.description}
                             >
                               <Clock className="w-3 h-3" />
@@ -224,7 +224,7 @@ export function StudentProgressTable({
 
                         if (hasStruggles) {
                           return (
-                            <div className="flex items-center gap-1 text-[11px] text-amber-500">
+                            <div className="flex items-center gap-1 text-[11px] text-amber-400">
                               <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
                               <span
                                 className="truncate max-w-[150px]"
@@ -240,7 +240,7 @@ export function StudentProgressTable({
 
                         return (
                           <span className="text-muted-foreground text-[10px] flex items-center gap-1">
-                            <CheckCircle2 className="w-3 h-3 text-green-500/70" />
+                            <CheckCircle2 className="w-3 h-3 text-green-400/70" />
                             Progression fluide
                           </span>
                         );

@@ -200,7 +200,7 @@ export function PhpRunnerPanel({ files, activeFileName, className = "" }: PhpRun
         <div className="flex items-center gap-4 px-3 py-1.5 border-b bg-background font-mono text-[11px] text-muted-foreground shrink-0">
           <div className="flex items-center gap-1">
             {result.exitCode === 0 ? (
-              <CheckCircle className="w-3.5 h-3.5 text-emerald-500" />
+              <CheckCircle className="w-3.5 h-3.5 text-emerald-400" />
             ) : (
               <AlertCircle className="w-3.5 h-3.5 text-destructive" />
             )}

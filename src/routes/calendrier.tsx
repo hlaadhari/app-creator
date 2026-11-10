@@ -325,7 +325,7 @@ function CalendrierPage() {
               <div
                 role="alert"
                 data-testid="tp-reservation-error"
-                className="mb-6 flex items-center gap-2 p-3 rounded-md bg-rose-500/10 border border-rose-500/20 text-rose-600 dark:text-rose-400 text-xs"
+                className="mb-6 flex items-center gap-2 p-3 rounded-md bg-rose-500/10 border border-rose-500/20 text-rose-400 text-xs"
               >
                 <AlertCircle className="h-4 w-4 shrink-0" />
                 <span>{errorMessage}</span>

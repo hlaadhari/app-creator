@@ -792,7 +792,7 @@ export function TeacherDashboardPage() {
             </div>
             <Badge
               variant="outline"
-              className={`text-[10px] ${isDemo ? "bg-amber-500/10 text-amber-500 border-amber-500/20" : "bg-primary/10 text-primary border-primary/20"}`}
+              className={`text-[10px] ${isDemo ? "bg-amber-500/10 text-amber-400 border-amber-500/20" : "bg-primary/10 text-primary border-primary/20"}`}
             >
               {isDemo
                 ? "Mode Démonstration"
@@ -951,7 +951,7 @@ export function TeacherDashboardPage() {
                     <p className="text-xs text-muted-foreground font-medium">Moyenne formative</p>
                     <h3 className="text-2xl font-bold mt-1">{moyenneClasse}%</h3>
                   </div>
-                  <div className="w-10 h-10 rounded-lg bg-green-500/10 text-green-500 flex items-center justify-center">
+                  <div className="w-10 h-10 rounded-lg bg-green-500/10 text-green-400 flex items-center justify-center">
                     <Award className="w-5 h-5" />
                   </div>
                 </CardContent>
@@ -965,7 +965,7 @@ export function TeacherDashboardPage() {
                       {copiesRendues} / {totalEleves}
                     </h3>
                   </div>
-                  <div className="w-10 h-10 rounded-lg bg-blue-500/10 text-blue-500 flex items-center justify-center">
+                  <div className="w-10 h-10 rounded-lg bg-blue-500/10 text-blue-400 flex items-center justify-center">
                     <GraduationCap className="w-5 h-5" />
                   </div>
                 </CardContent>
@@ -980,7 +980,7 @@ export function TeacherDashboardPage() {
                     <div className="flex items-baseline gap-2 mt-1">
                       <h3
                         className={`text-2xl font-bold ${
-                          alerts.length > 0 ? "text-destructive" : "text-amber-500"
+                          alerts.length > 0 ? "text-destructive" : "text-amber-400"
                         }`}
                       >
                         {alerts.length > 0 ? alerts.length : elevesEnDifficulte}
@@ -996,7 +996,7 @@ export function TeacherDashboardPage() {
                     className={`w-10 h-10 rounded-lg flex items-center justify-center ${
                       alerts.length > 0
                         ? "bg-destructive/10 text-destructive animate-pulse"
-                        : "bg-amber-500/10 text-amber-500"
+                        : "bg-amber-500/10 text-amber-400"
                     }`}
                   >
                     <AlertTriangle className="w-5 h-5" />

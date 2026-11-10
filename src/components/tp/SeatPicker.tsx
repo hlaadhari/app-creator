@@ -59,11 +59,11 @@ export function SeatPicker({
       case "libre":
         return "bg-background border-border hover:border-primary text-foreground";
       case "pending":
-        return "bg-amber-500/10 border-amber-500/30 text-amber-700 dark:text-amber-300 cursor-not-allowed";
+        return "bg-amber-500/10 border-amber-500/30 text-amber-400 cursor-not-allowed";
       case "approved":
-        return "bg-blue-500/10 border-blue-500/30 text-blue-700 dark:text-blue-300 cursor-not-allowed";
+        return "bg-blue-500/10 border-blue-500/30 text-blue-400 cursor-not-allowed";
       case "live":
-        return "bg-purple-500/15 border-purple-500/30 text-purple-700 dark:text-purple-300 cursor-not-allowed";
+        return "bg-purple-500/15 border-purple-500/30 text-purple-400 cursor-not-allowed";
     }
   };
 
@@ -86,7 +86,7 @@ export function SeatPicker({
                       Accès autorisé
                     </Badge>
                   </div>
-                  <p className="text-xs text-emerald-800 dark:text-emerald-300 mt-1">
+                  <p className="text-xs text-emerald-400 mt-1">
                     Votre poste est validé. Vous pouvez dès à présent entrer dans le bac à sable de
                     programmation pour réaliser votre TP.
                   </p>
@@ -106,18 +106,18 @@ export function SeatPicker({
           {isPending && (
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-amber-500/10 border border-amber-500/20 p-4 rounded-lg">
               <div className="flex items-start gap-3">
-                <Clock className="h-5 w-5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5 animate-spin" />
+                <Clock className="h-5 w-5 text-amber-400 shrink-0 mt-0.5 animate-spin" />
                 <div>
                   <div className="font-semibold text-sm text-amber-950 dark:text-amber-100 flex items-center gap-2">
                     <span>⏳ Réservation en attente de validation par l'enseignant</span>
                     <Badge
                       variant="outline"
-                      className="border-amber-500 text-amber-600 dark:text-amber-300 font-mono text-[10px]"
+                      className="border-amber-500 text-amber-400 font-mono text-[10px]"
                     >
                       Poste {String(myReservation.seatNumber).padStart(2, "0")}
                     </Badge>
                   </div>
-                  <p className="text-xs text-amber-800 dark:text-amber-300 mt-1">
+                  <p className="text-xs text-amber-400 mt-1">
                     L'attribution définitive et l'accès à l'IDE nécessitent la validation de votre
                     professeur. Veuillez patienter ou vérifier auprès de lui.
                   </p>
@@ -129,7 +129,7 @@ export function SeatPicker({
                   size="sm"
                   onClick={() => onCancelReservation(myReservation.id)}
                   disabled={isSubmitting}
-                  className="text-xs border-amber-500/40 text-amber-800 dark:text-amber-200 hover:bg-amber-500/10 cursor-pointer"
+                  className="text-xs border-amber-500/40 text-amber-400 dark:text-amber-200 hover:bg-amber-500/10 cursor-pointer"
                 >
                   Annuler la demande
                 </Button>
@@ -148,12 +148,12 @@ export function SeatPicker({
 
           {isRejected && (
             <div className="flex items-start gap-3 bg-rose-500/10 border border-rose-500/20 p-4 rounded-lg">
-              <XCircle className="h-5 w-5 text-rose-600 dark:text-rose-400 shrink-0 mt-0.5" />
+              <XCircle className="h-5 w-5 text-rose-400 shrink-0 mt-0.5" />
               <div>
                 <div className="font-semibold text-sm text-rose-950 dark:text-rose-100">
                   Demande refusée pour le Poste {String(myReservation.seatNumber).padStart(2, "0")}
                 </div>
-                <p className="text-xs text-rose-800 dark:text-rose-300 mt-1">
+                <p className="text-xs text-rose-400 mt-1">
                   L'enseignant a libéré ce poste. Veuillez choisir un autre siège disponible dans la
                   liste ci-dessous.
                 </p>
@@ -225,13 +225,9 @@ export function SeatPicker({
                   {seat.status === "libre" ? (
                     <span className="text-[10px] text-emerald-400 font-medium">Libre</span>
                   ) : seat.status === "pending" ? (
-                    <span className="text-[10px] text-amber-600 dark:text-amber-400 font-medium">
-                      Attente
-                    </span>
+                    <span className="text-[10px] text-amber-400 font-medium">Attente</span>
                   ) : (
-                    <span className="text-[10px] text-blue-600 dark:text-blue-400 font-medium">
-                      Occupé
-                    </span>
+                    <span className="text-[10px] text-blue-400 font-medium">Occupé</span>
                   )}
                 </div>
 

@@ -26,7 +26,7 @@ export function BaremeRepartitionBadge({
         </span>
         {hasManuel && (
           <span
-            className="rounded px-1.5 py-0.5 bg-sky-500/10 text-sky-600 dark:text-sky-400 border border-sky-500/20"
+            className="rounded px-1.5 py-0.5 bg-sky-500/10 text-sky-400 border border-sky-500/20"
             title="Points évalués par l'enseignant"
           >
             {pointsEnseignant} pts enseignant
@@ -48,7 +48,7 @@ export function BaremeRepartitionBadge({
       </span>
       {hasManuel && (
         <span
-          className="inline-flex items-center gap-1 rounded bg-sky-500/10 text-sky-600 dark:text-sky-400 border border-sky-500/20 px-2 py-0.5 text-[11px]"
+          className="inline-flex items-center gap-1 rounded bg-sky-500/10 text-sky-400 border border-sky-500/20 px-2 py-0.5 text-[11px]"
           title="Points évalués et validés par l'enseignant"
         >
           <UserCheck className="h-3 w-3" />

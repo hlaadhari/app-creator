@@ -54,7 +54,7 @@ export function SproutLogo({
       {showText && (
         <div className="flex flex-col leading-none">
           <div className={`font-semibold tracking-tight ${textSizes[size]}`}>
-            <span className="text-emerald-500">{title}</span>
+            <span className="text-emerald-400">{title}</span>
           </div>
           {subtitle && (
             <span className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground mt-0.5">

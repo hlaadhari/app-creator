@@ -47,7 +47,7 @@ export function WorkspaceHeader({ ex, ws }: { ex: Exercise; ws: WorkspaceState }
             baremeRepartition={baremeRepartition}
           />
           {isExamMode && (
-            <span className="ml-1 inline-flex items-center gap-1.5 rounded-full border border-rose-500/30 bg-rose-500/10 px-2.5 py-0.5 text-[11px] font-semibold text-rose-500">
+            <span className="ml-1 inline-flex items-center gap-1.5 rounded-full border border-rose-500/30 bg-rose-500/10 px-2.5 py-0.5 text-[11px] font-semibold text-rose-400">
               <Lock className="h-3 w-3" />
               <span className="hidden sm:inline">Mode Examen - Assistance Neutralisée</span>
               <span className="sm:hidden">Examen</span>

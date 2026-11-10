@@ -152,7 +152,7 @@ export function SimilarityAnalysisTab({
               <h3 className="text-2xl font-bold font-mono mt-1">{matrixResult.totalPaires}</h3>
               <p className="text-[10px] text-muted-foreground mt-0.5">Matrice croisée complète</p>
             </div>
-            <div className="w-10 h-10 rounded-lg bg-blue-500/10 text-blue-500 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-lg bg-blue-500/10 text-blue-400 flex items-center justify-center">
               <Sliders className="w-5 h-5" />
             </div>
           </CardContent>
@@ -192,14 +192,14 @@ export function SimilarityAnalysisTab({
           <CardContent className="p-4 flex items-center justify-between">
             <div>
               <p className="text-xs font-medium text-muted-foreground">Arbitrages enregistrés</p>
-              <h3 className="text-2xl font-bold font-mono text-green-600 mt-1">
+              <h3 className="text-2xl font-bold font-mono text-green-400 mt-1">
                 {pairesArbitreesCount} / {Math.max(1, pairesSuspectesCount)}
               </h3>
               <p className="text-[10px] text-muted-foreground mt-0.5">
                 Dossiers traités par l'enseignant
               </p>
             </div>
-            <div className="w-10 h-10 rounded-lg bg-green-500/10 text-green-500 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-lg bg-green-500/10 text-green-400 flex items-center justify-center">
               <CheckCircle2 className="w-5 h-5" />
             </div>
           </CardContent>
@@ -326,7 +326,7 @@ export function SimilarityAnalysisTab({
                               pair.overallSimilarity >= 85
                                 ? "text-destructive"
                                 : isAboveThreshold
-                                  ? "text-amber-500"
+                                  ? "text-amber-400"
                                   : "text-foreground"
                             }
                           >
@@ -339,7 +339,7 @@ export function SimilarityAnalysisTab({
                           ) : isAboveThreshold ? (
                             <Badge
                               variant="outline"
-                              className="text-[10px] h-4 px-1 py-0 bg-amber-500/10 text-amber-500 border-amber-500/30"
+                              className="text-[10px] h-4 px-1 py-0 bg-amber-500/10 text-amber-400 border-amber-500/30"
                             >
                               Suspect
                             </Badge>
@@ -358,7 +358,7 @@ export function SimilarityAnalysisTab({
                               f.similarity >= 85
                                 ? "bg-destructive/10 text-destructive border-destructive/20 font-bold"
                                 : f.similarity >= 70
-                                  ? "bg-amber-500/10 text-amber-500 border-amber-500/20"
+                                  ? "bg-amber-500/10 text-amber-400 border-amber-500/20"
                                   : "bg-muted/40 text-muted-foreground border-border"
                             }`}
                           >
@@ -377,7 +377,7 @@ export function SimilarityAnalysisTab({
                       ) : pair.verdictProf === "faux_positif" ? (
                         <Badge
                           variant="outline"
-                          className="text-[10px] bg-green-500/10 text-green-600 border-green-600/30 gap-1 font-medium"
+                          className="text-[10px] bg-green-500/10 text-green-400 border-green-600/30 gap-1 font-medium"
                         >
                           <Check className="w-3 h-3" />
                           Classé sans suite

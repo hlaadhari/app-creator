@@ -17,28 +17,28 @@ export const CompetenceProgressBar: React.FC<CompetenceProgressBarProps> = ({
   const colorStyles = {
     maitrise: {
       bar: "bg-emerald-500",
-      text: "text-emerald-500",
+      text: "text-emerald-400",
       bg: "bg-emerald-500/10",
       border: "border-emerald-500/20",
       label: "Maîtrisé",
     },
     acquis: {
       bar: "bg-blue-500",
-      text: "text-blue-500",
+      text: "text-blue-400",
       bg: "bg-blue-500/10",
       border: "border-blue-500/20",
       label: "Acquis",
     },
     en_cours: {
       bar: "bg-amber-500",
-      text: "text-amber-500",
+      text: "text-amber-400",
       bg: "bg-amber-500/10",
       border: "border-amber-500/20",
       label: "En cours",
     },
     non_acquis: {
       bar: "bg-rose-500/80",
-      text: "text-rose-500",
+      text: "text-rose-400",
       bg: "bg-rose-500/10",
       border: "border-rose-500/20",
       label: "À travailler",
@@ -82,7 +82,7 @@ export const CompetenceProgressBar: React.FC<CompetenceProgressBarProps> = ({
             <span className="font-medium text-sm text-foreground">{competence.libelle}</span>
             {premierCoupSucces && (
               <span
-                className="inline-flex items-center gap-1 text-[10px] text-amber-500 font-medium px-1.5 py-0.5 rounded bg-amber-500/10"
+                className="inline-flex items-center gap-1 text-[10px] text-amber-400 font-medium px-1.5 py-0.5 rounded bg-amber-500/10"
                 title="Critère validé dès la première tentative sans aide"
               >
                 <Sparkles className="w-3 h-3" />
@@ -120,7 +120,7 @@ export const CompetenceProgressBar: React.FC<CompetenceProgressBarProps> = ({
                 {nbSucces} succès sur {nbTentatives} essai{nbTentatives > 1 ? "s" : ""}
               </span>
             ) : nbTentatives > 0 ? (
-              <span className="inline-flex items-center gap-1 text-amber-500">
+              <span className="inline-flex items-center gap-1 text-amber-400">
                 <AlertCircle className="w-3 h-3" />
                 {nbTentatives} essai{nbTentatives > 1 ? "s" : ""} (non validé)
               </span>

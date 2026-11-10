@@ -180,7 +180,7 @@ export const WrittenExamCopiesTab: React.FC<WrittenExamCopiesTabProps> = ({
                     ) : copy.statut === "remise" ? (
                       <Badge
                         variant="outline"
-                        className="text-[10px] gap-1 border-amber-500/40 text-amber-600"
+                        className="text-[10px] gap-1 border-amber-500/40 text-amber-400"
                       >
                         <Clock className="w-3 h-3" />À corriger (QCM : {copy.scoreQcm ?? 0}/
                         {copy.maxQcm})

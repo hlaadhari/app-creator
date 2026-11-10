@@ -120,7 +120,7 @@ export function InvitationsManager({
             </div>
 
             {error && (
-              <div className="p-2 text-xs text-red-500 bg-red-500/10 border border-red-500/20 rounded flex items-center gap-2">
+              <div className="p-2 text-xs text-red-400 bg-red-500/10 border border-red-500/20 rounded flex items-center gap-2">
                 <AlertCircle className="w-4 h-4 shrink-0" />
                 {error}
               </div>
@@ -214,14 +214,14 @@ export function InvitationsManager({
                       ) : isExpired ? (
                         <Badge
                           variant="outline"
-                          className="text-amber-500 border-amber-500/30 text-[10px]"
+                          className="text-amber-400 border-amber-500/30 text-[10px]"
                         >
                           Expiré
                         </Badge>
                       ) : isFull ? (
                         <Badge
                           variant="outline"
-                          className="text-red-500 border-red-500/30 text-[10px]"
+                          className="text-red-400 border-red-500/30 text-[10px]"
                         >
                           Complet
                         </Badge>
@@ -252,7 +252,7 @@ export function InvitationsManager({
                     >
                       {copiedId === inv.id ? (
                         <>
-                          <Check className="w-3.5 h-3.5 text-green-500" />
+                          <Check className="w-3.5 h-3.5 text-green-400" />
                           Copié
                         </>
                       ) : (

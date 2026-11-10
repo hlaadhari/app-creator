@@ -87,7 +87,7 @@ export function MonacoEditorPane({
   if (!isMounted && loadTimedOut) {
     return (
       <div className="flex flex-1 flex-col bg-editor min-h-0 h-full w-full">
-        <p className="px-3 py-1.5 text-[11px] font-mono text-amber-500 border-b" role="status">
+        <p className="px-3 py-1.5 text-[11px] font-mono text-amber-400 border-b" role="status">
           L'éditeur avancé tarde à charger : saisie en mode texte simple (votre travail est
           conservé).
         </p>

@@ -111,7 +111,7 @@ export function AttemptsTimelineDrawer({
                               ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/30"
                               : attempt.note20 >= 10
                                 ? "bg-primary/10 text-primary border-primary/30"
-                                : "bg-amber-500/10 text-amber-600 border-amber-500/30"
+                                : "bg-amber-500/10 text-amber-400 border-amber-500/30"
                           }`}
                         >
                           {attempt.note20} / 20
@@ -124,7 +124,7 @@ export function AttemptsTimelineDrawer({
                               delta.progression === "amelioration"
                                 ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/30"
                                 : delta.progression === "regression"
-                                  ? "bg-rose-500/10 text-rose-600 border-rose-500/30"
+                                  ? "bg-rose-500/10 text-rose-400 border-rose-500/30"
                                   : "bg-muted text-muted-foreground border-border"
                             }`}
                           >
@@ -154,7 +154,7 @@ export function AttemptsTimelineDrawer({
                             key={crit.id}
                             className={`flex items-center justify-between p-1.5 rounded transition-colors ${
                               crit.ok
-                                ? "bg-emerald-500/5 text-emerald-800 dark:text-emerald-300"
+                                ? "bg-emerald-500/5 text-emerald-400"
                                 : "bg-muted/40 text-muted-foreground"
                             }`}
                           >
@@ -174,7 +174,7 @@ export function AttemptsTimelineDrawer({
                                 </span>
                               )}
                               {isNewFail && (
-                                <span className="text-rose-600 font-bold bg-rose-500/20 px-1 rounded">
+                                <span className="text-rose-400 font-bold bg-rose-500/20 px-1 rounded">
                                   - Perdu
                                 </span>
                               )}
