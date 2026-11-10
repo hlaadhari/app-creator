@@ -5,6 +5,7 @@
   "framework": null,
   "outputDirectory": ".vercel/output",
   "cleanUrls": true,
+  "regions": ["cdg1"],
   "headers": [
     {
       "source": "/(.*)",
