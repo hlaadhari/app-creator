@@ -6,13 +6,17 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 const mocks = vi.hoisted(() => ({
   serveurRev: 1,
   conflitsServeur: 0,
+  lots: [] as { chemin: string; expectedRev: number }[][],
   distants: [] as { chemin: string; contenu: string; rev: number; updated_at: string }[],
   local: null as unknown,
 }));
 
 vi.mock("@/integrations/supabase/client", () => ({
   supabase: {
-    auth: { getUser: () => Promise.resolve({ data: { user: { id: "u1" } }, error: null }) },
+    auth: {
+      getUser: () => Promise.resolve({ data: { user: { id: "u1" } }, error: null }),
+      getSession: () => Promise.resolve({ data: { session: { user: { id: "u1" } } }, error: null }),
+    },
   },
 }));
 
@@ -25,6 +29,30 @@ vi.mock("@/lib/supabase/projets", () => ({
   getOrCreateProjet: () => Promise.resolve("p1"),
   chargerFichiersDistants: () => Promise.resolve(mocks.distants),
   // Même contrat que sauvegarder_fichier : refuse si la révision attendue n'est pas la courante.
+  // Même contrat que sauvegarder_fichiers : tout ou rien, conflit détecté avant l'écriture.
+  sauvegarderFichiersDistants: async (
+    _p: string,
+    fichiers: { chemin: string; contenu: string; expectedRev: number }[],
+  ) => {
+    await new Promise((r) => setTimeout(r, 5));
+    mocks.lots.push(fichiers.map(({ chemin, expectedRev }) => ({ chemin, expectedRev })));
+    const enConflit = fichiers.find((f) => f.expectedRev !== mocks.serveurRev);
+    if (enConflit) {
+      mocks.conflitsServeur += 1;
+      return {
+        ok: false,
+        conflict: {
+          fileName: enConflit.chemin,
+          remoteRev: mocks.serveurRev,
+          remoteContent: "distant",
+        },
+      };
+    }
+    mocks.serveurRev += 1;
+    const revs: Record<string, number> = {};
+    for (const f of fichiers) revs[f.chemin] = mocks.serveurRev;
+    return { ok: true, revs };
+  },
   sauvegarderFichierDistant: async (_p: string, _c: string, _t: string, expected: number) => {
     await new Promise((r) => setTimeout(r, 5));
     if (expected !== mocks.serveurRev) {
@@ -48,6 +76,7 @@ describe("useBufferSync : conflits de révision (#201)", () => {
   beforeEach(() => {
     mocks.serveurRev = 1;
     mocks.conflitsServeur = 0;
+    mocks.lots = [];
     mocks.distants = [];
     mocks.local = null;
   });
@@ -72,6 +101,32 @@ describe("useBufferSync : conflits de révision (#201)", () => {
     expect(mocks.conflitsServeur).toBe(0);
     expect(result.current.conflict).toBeNull();
     expect(result.current.syncStatus).toBe("synced");
+  });
+
+  it("n'envoie qu'un appel par synchronisation, avec seulement les fichiers modifiés (#255)", async () => {
+    const { result } = monter();
+    await waitFor(() => expect(result.current.isLoaded).toBe(true));
+
+    act(() => result.current.updateFileContent("index.html", "<h1>v1</h1>"));
+    await act(async () => {
+      await result.current.triggerManualSync();
+    });
+    expect(mocks.lots).toHaveLength(1);
+    expect(mocks.lots[0]?.map((f) => f.chemin)).toEqual(["index.html"]);
+
+    // Rien n'a changé depuis : aucun appel réseau supplémentaire
+    await act(async () => {
+      await result.current.triggerManualSync();
+    });
+    expect(mocks.lots).toHaveLength(1);
+    expect(result.current.syncStatus).toBe("synced");
+
+    act(() => result.current.updateFileContent("index.html", "<h1>v2</h1>"));
+    await act(async () => {
+      await result.current.triggerManualSync();
+    });
+    expect(mocks.lots).toHaveLength(2);
+    expect(mocks.conflitsServeur).toBe(0);
   });
 
   it("adopte sans conflit le travail distant quand le fichier local est encore le départ", async () => {

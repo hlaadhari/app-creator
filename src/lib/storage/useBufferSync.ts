@@ -6,6 +6,7 @@ import { arbitrerRevisionDistante, createCoalescingQueue } from "./sync-utils";
 import {
   getOrCreateProjet,
   sauvegarderFichierDistant,
+  sauvegarderFichiersDistants,
   chargerFichiersDistants,
 } from "@/lib/supabase/projets";
 import { isSimulationWriteBlocked } from "@/lib/supabase/auth";
@@ -23,9 +24,26 @@ function detectLanguage(fileName: string): "html" | "css" | "javascript" | "php"
 interface UseBufferSyncOptions {
   exerciseId: string;
   starterFiles: Record<string, string>;
+  /** Délai sans frappe avant la synchronisation distante (plus long en examen pour alléger le serveur). */
+  debounceMs?: number;
 }
 
-export function useBufferSync({ exerciseId, starterFiles }: UseBufferSyncOptions) {
+/** Décalage aléatoire (0 à 500 ms) : évite que toute une classe synchronise à la même milliseconde. */
+const GIGUE_MAX_MS = 500;
+const REPRISE_BASE_MS = 2000;
+const REPRISE_MAX_MS = 60000;
+
+/** Délai de reprise après une erreur : exponentiel plafonné, avec gigue (« full jitter »). */
+export function delaiReprise(tentative: number, hasard: () => number = Math.random): number {
+  const plafond = Math.min(REPRISE_MAX_MS, REPRISE_BASE_MS * 2 ** Math.max(0, tentative - 1));
+  return Math.round(plafond / 2 + (hasard() * plafond) / 2);
+}
+
+export function useBufferSync({
+  exerciseId,
+  starterFiles,
+  debounceMs = 1000,
+}: UseBufferSyncOptions) {
   // État local des fichiers
   const [files, setFiles] = useState<Record<string, WorkspaceFile>>(() => {
     const init: Record<string, WorkspaceFile> = {};
@@ -52,6 +70,9 @@ export function useBufferSync({ exerciseId, starterFiles }: UseBufferSyncOptions
   const fileRevs = useRef<Record<string, number>>({});
   const projetIdRef = useRef<string | null>(null);
   const pendingSyncTimer = useRef<NodeJS.Timeout | null>(null);
+  // Contenu du dernier envoi réussi, par fichier : sert à n'envoyer que ce qui a changé.
+  const syncedContent = useRef<Record<string, string>>({});
+  const tentativesReprise = useRef(0);
   const isOnline = useRef<boolean>(typeof navigator !== "undefined" ? navigator.onLine : true);
   const starterFilesRef = useRef(starterFiles);
   starterFilesRef.current = starterFiles;
@@ -125,6 +146,7 @@ export function useBufferSync({ exerciseId, starterFiles }: UseBufferSyncOptions
               rf.chemin in filesRef.current;
             if (!hasLocal) {
               fileRevs.current[rf.chemin] = rf.rev;
+              syncedContent.current[rf.chemin] = rf.contenu;
               adoptes[rf.chemin] = rf.contenu;
               continue;
             }
@@ -158,6 +180,9 @@ export function useBufferSync({ exerciseId, starterFiles }: UseBufferSyncOptions
             // identique ou départ intact : on adopte la révision distante sans rien perdre
             fileRevs.current[rf.chemin] = rf.rev;
             if (decision === "depart_intact") adoptes[rf.chemin] = rf.contenu;
+            if (decision === "depart_intact" || localContent === rf.contenu) {
+              syncedContent.current[rf.chemin] = rf.contenu;
+            }
           }
 
           if (Object.keys(adoptes).length > 0) {
@@ -198,10 +223,11 @@ export function useBufferSync({ exerciseId, starterFiles }: UseBufferSyncOptions
       return;
     }
 
+    // getSession lit la session locale (aucun appel réseau) : la sécurité est assurée côté serveur par la RPC.
     const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    if (!user) {
+      data: { session },
+    } = await supabase.auth.getSession();
+    if (!session?.user) {
       setSyncStatus("local");
       return;
     }
@@ -216,50 +242,72 @@ export function useBufferSync({ exerciseId, starterFiles }: UseBufferSyncOptions
       projetIdRef.current = pId;
     }
 
+    // Seuls les fichiers modifiés depuis la dernière synchronisation réussie sont envoyés.
+    const aEnvoyer = Object.entries(files)
+      .filter(
+        ([name, file]) => file.type === "text" && syncedContent.current[name] !== file.content,
+      )
+      .map(([name, file]) => ({
+        chemin: name,
+        contenu: file.content,
+        expectedRev: fileRevs.current[name] ?? 1,
+      }));
+
+    if (aEnvoyer.length === 0) {
+      setSyncStatus("synced");
+      return;
+    }
+
     setSyncStatus("syncing");
 
     try {
-      let maxRev = rev;
-      let hadConflict = false;
+      const res = await sauvegarderFichiersDistants(pId, aEnvoyer);
 
-      for (const [name, file] of Object.entries(files)) {
-        if (file.type !== "text") continue; // On ne synchronise que les fichiers texte en phase actuelle
-
-        const expectedRev = fileRevs.current[name] ?? 1;
-        const res = await sauvegarderFichierDistant(pId, name, file.content, expectedRev);
-
-        if (res.conflict) {
-          hadConflict = true;
-          setConflict({
-            fileName: name,
-            localContent: file.content,
-            remoteContent: res.remoteContent || "",
-            localRev: expectedRev,
-            remoteRev: res.remoteRev || expectedRev + 1,
-          });
-          setSyncStatus("conflict");
-          break;
-        }
-
-        if (res.ok && res.newRev) {
-          fileRevs.current[name] = res.newRev;
-          if (res.newRev > maxRev) maxRev = res.newRev;
-        }
-      }
-
-      if (!hadConflict) {
-        setRev(maxRev);
-        setSyncStatus("synced");
-
-        // Sauvegarder l'état synchronisé dans IndexedDB
-        await persistToLocalBuffer({
-          syncStatus: "synced",
-          rev: maxRev,
-          lastServerSyncAt: Date.now(),
+      if (res.conflict) {
+        const local = aEnvoyer.find((f) => f.chemin === res.conflict!.fileName);
+        setConflict({
+          fileName: res.conflict.fileName,
+          localContent: local?.contenu ?? "",
+          remoteContent: res.conflict.remoteContent,
+          localRev: local?.expectedRev ?? 1,
+          remoteRev: res.conflict.remoteRev,
         });
+        setSyncStatus("conflict");
+        return;
       }
+
+      if (!res.ok || !res.revs) {
+        throw new Error(res.error || "Échec de la synchronisation");
+      }
+
+      let maxRev = rev;
+      for (const f of aEnvoyer) {
+        const nouvelle = res.revs[f.chemin];
+        if (typeof nouvelle === "number") {
+          fileRevs.current[f.chemin] = nouvelle;
+          if (nouvelle > maxRev) maxRev = nouvelle;
+        }
+        syncedContent.current[f.chemin] = f.contenu;
+      }
+
+      tentativesReprise.current = 0;
+      setRev(maxRev);
+      setSyncStatus("synced");
+
+      // Sauvegarder l'état synchronisé dans IndexedDB
+      await persistToLocalBuffer({
+        syncStatus: "synced",
+        rev: maxRev,
+        lastServerSyncAt: Date.now(),
+      });
     } catch {
       setSyncStatus("error");
+      // Reprise automatique avec délai croissant et gigue : évite la tempête de requêtes si le serveur sature.
+      tentativesReprise.current += 1;
+      if (pendingSyncTimer.current) clearTimeout(pendingSyncTimer.current);
+      pendingSyncTimer.current = setTimeout(() => {
+        void syncQueueRef.current?.();
+      }, delaiReprise(tentativesReprise.current));
     }
   }, [exerciseId, files, persistToLocalBuffer, rev]);
 
@@ -273,16 +321,19 @@ export function useBufferSync({ exerciseId, starterFiles }: UseBufferSyncOptions
   }
   const triggerSync = useCallback(() => syncQueueRef.current!(), []);
 
-  // 4. Déclenchement de la synchronisation asynchrone vers Supabase (avec debounce 1s)
+  // 4. Déclenchement de la synchronisation asynchrone vers Supabase (avec debounce configurable et gigue)
   const scheduleRemoteSync = useCallback(() => {
     if (pendingSyncTimer.current) {
       clearTimeout(pendingSyncTimer.current);
     }
 
-    pendingSyncTimer.current = setTimeout(() => {
-      void triggerSync();
-    }, 1000);
-  }, [triggerSync]);
+    pendingSyncTimer.current = setTimeout(
+      () => {
+        void triggerSync();
+      },
+      debounceMs + Math.random() * GIGUE_MAX_MS,
+    );
+  }, [triggerSync, debounceMs]);
 
   // 5. Initialisation depuis le tampon local IndexedDB
   useEffect(() => {
@@ -465,6 +516,7 @@ export function useBufferSync({ exerciseId, starterFiles }: UseBufferSyncOptions
         };
       });
       fileRevs.current[conflict.fileName] = conflict.remoteRev;
+      syncedContent.current[conflict.fileName] = conflict.remoteContent;
       setRev(conflict.remoteRev);
       setConflict(null);
       setSyncStatus("synced");
@@ -486,6 +538,7 @@ export function useBufferSync({ exerciseId, starterFiles }: UseBufferSyncOptions
         );
         if (res.ok && res.newRev) {
           nextRev = res.newRev;
+          syncedContent.current[conflict.fileName] = conflict.localContent;
         }
       }
 

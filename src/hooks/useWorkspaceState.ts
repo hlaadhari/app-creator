@@ -29,7 +29,11 @@ export function useWorkspaceState(ex: Exercise) {
   const premierFichier = Object.keys(ex.starter)[0] ?? FICHIER_PAR_DEFAUT;
 
   // Écriture prioritaire dans IndexedDB (labo_sti_buffer), synchronisation asynchrone
-  const buffer = useBufferSync({ exerciseId: id, starterFiles: ex.starter });
+  const buffer = useBufferSync({
+    exerciseId: id,
+    starterFiles: ex.starter,
+    debounceMs: isExamMode ? 2500 : 1000,
+  });
   const { files, setFiles, updateFileContent, updateBestScore, syncStatus } = buffer;
 
   const exam = useExamClock({ exerciseId: id, dureeMinutes: ex.dureeMinutes, isExamMode });
