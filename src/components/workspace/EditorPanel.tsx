@@ -1,3 +1,4 @@
+import { BookOpen } from "lucide-react";
 import type { WorkspaceState } from "@/hooks/useWorkspaceState";
 import { EditorToolbar } from "@/components/workspace/EditorToolbar";
 import { ExamLockBanner } from "@/components/workspace/ExamLockBanner";
@@ -9,10 +10,13 @@ export function EditorPanel({
   ws,
   hidden = false,
   mobile = false,
+  onOpenSidebar,
 }: {
   ws: WorkspaceState;
   hidden?: boolean;
   mobile?: boolean;
+  /** Tablette : ouvre l'énoncé et les fichiers dans un tiroir latéral. */
+  onOpenSidebar?: (() => void) | undefined;
 }) {
   const {
     activeFileName,
@@ -24,12 +28,44 @@ export function EditorPanel({
     handleVerify,
     setCursorPos,
   } = ws;
+  const stacked = Boolean(onOpenSidebar);
+  const sujetButton = onOpenSidebar ? (
+    <button
+      type="button"
+      onClick={onOpenSidebar}
+      aria-label="Ouvrir l'énoncé et les fichiers"
+      className="flex shrink-0 items-center gap-1.5  rounded border bg-background/60 px-2.5 py-1.5 text-xs font-medium text-foreground transition-colors hover:bg-accent cursor-pointer"
+    >
+      <BookOpen className="h-3.5 w-3.5 text-primary" />
+      <span>Sujet</span>
+    </button>
+  ) : null;
   return (
-    <section className={`${hidden ? "hidden" : "flex"} min-h-0 flex-1 flex-col bg-editor`}>
+    <section
+      data-testid="workspace-editor"
+      className={`${hidden ? "hidden" : "flex"} min-h-0 flex-1 flex-col bg-editor`}
+    >
       {/* Barre d'onglets de fichiers et actions d'évaluation */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b bg-panel text-xs font-mono shrink-0 select-none px-1 gap-1">
-        <FileTabs ws={ws} />
-        <EditorToolbar ws={ws} compact={mobile} />
+      <div
+        className={`flex flex-col justify-between border-b bg-panel text-xs font-mono shrink-0 select-none px-1 gap-1 ${
+          stacked ? "" : "sm:flex-row sm:items-center"
+        }`}
+      >
+        {stacked ? (
+          <>
+            {/* Tablette : bouton « Sujet » et actions sur une ligne, onglets de fichiers dessous */}
+            <div className="flex items-center justify-between gap-1">
+              {sujetButton}
+              <EditorToolbar ws={ws} compact={mobile} />
+            </div>
+            <FileTabs ws={ws} />
+          </>
+        ) : (
+          <>
+            <FileTabs ws={ws} />
+            <EditorToolbar ws={ws} compact={mobile} />
+          </>
+        )}
       </div>
 
       <ExamLockBanner ws={ws} />

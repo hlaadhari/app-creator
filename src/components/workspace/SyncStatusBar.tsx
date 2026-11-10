@@ -102,7 +102,7 @@ export function SyncStatusBar({
 
   return (
     <footer className="h-6 shrink-0 bg-background border-t border-border px-3 flex items-center justify-between text-[11px] text-muted-foreground select-none">
-      <div className="flex items-center gap-4">
+      <div className="flex min-w-0 items-center gap-4 overflow-hidden whitespace-nowrap">
         {/* Statut de synchronisation */}
         <div className="flex items-center gap-2">{getStatusBadge()}</div>
 
@@ -118,10 +118,12 @@ export function SyncStatusBar({
         )}
 
         {/* Dernier horodatage local */}
-        <span className="text-muted-foreground/80">Enregistré : {formatTime(lastSavedAt)}</span>
+        <span className="hidden text-muted-foreground/80 md:inline">
+          Enregistré : {formatTime(lastSavedAt)}
+        </span>
       </div>
 
-      <div className="flex items-center gap-4">
+      <div className="hidden shrink-0 items-center gap-4 sm:flex">
         {/* Curseur et fichier actif */}
         <span>{activeFileName}</span>
         <span className="font-mono">

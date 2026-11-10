@@ -63,8 +63,9 @@ export function AuthModal({ onClassesChanged }: AuthModalProps = {}) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" size="sm">
-          Connexion / Inscription
+        <Button variant="outline" size="sm" aria-label="Connexion / Inscription">
+          <span className="sm:hidden">Connexion</span>
+          <span className="hidden sm:inline">Connexion / Inscription</span>
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
