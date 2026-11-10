@@ -208,9 +208,11 @@ export async function getClassInvitations(classId: string): Promise<ClassInvitat
  */
 export function genererCodeInvitationFormat(): string {
   const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  // CSPRNG : 32 symboles divisent 256, donc `& 31` n'introduit aucun biais.
+  const octets = crypto.getRandomValues(new Uint8Array(4));
   let randomPart = "";
-  for (let i = 0; i < 4; i++) {
-    randomPart += chars.charAt(Math.floor(Math.random() * chars.length));
+  for (const octet of octets) {
+    randomPart += chars.charAt(octet & 31);
   }
   return `STI-${randomPart}`;
 }
