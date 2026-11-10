@@ -115,7 +115,7 @@ export const CompetenceProgressBar: React.FC<CompetenceProgressBarProps> = ({
         <div className="flex items-center justify-between text-[11px] font-mono text-muted-foreground mt-1.5">
           <span>
             {nbSucces > 0 ? (
-              <span className="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400">
+              <span className="inline-flex items-center gap-1 text-emerald-400">
                 <CheckCircle2 className="w-3 h-3" />
                 {nbSucces} succès sur {nbTentatives} essai{nbTentatives > 1 ? "s" : ""}
               </span>
@@ -125,7 +125,7 @@ export const CompetenceProgressBar: React.FC<CompetenceProgressBarProps> = ({
                 {nbTentatives} essai{nbTentatives > 1 ? "s" : ""} (non validé)
               </span>
             ) : (
-              <span className="text-muted-foreground/60">Non encore testé</span>
+              <span className="text-muted-foreground">Non encore testé</span>
             )}
           </span>
           <span>Formule v1.0</span>

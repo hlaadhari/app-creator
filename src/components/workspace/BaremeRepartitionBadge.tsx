@@ -19,7 +19,7 @@ export function BaremeRepartitionBadge({
     return (
       <div className={`inline-flex items-center gap-1.5 text-[10px] font-mono ${className}`}>
         <span
-          className="rounded px-1.5 py-0.5 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20"
+          className="rounded px-1.5 py-0.5 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
           title="Points vérifiés automatiquement par les sondes du bac à sable"
         >
           {pointsAuto} pts auto
@@ -40,7 +40,7 @@ export function BaremeRepartitionBadge({
   return (
     <div className={`inline-flex items-center gap-2 text-xs font-mono ${className}`}>
       <span
-        className="inline-flex items-center gap-1 rounded bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 px-2 py-0.5 text-[11px]"
+        className="inline-flex items-center gap-1 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-0.5 text-[11px]"
         title="Points vérifiés automatiquement par les sondes de test"
       >
         <CheckCircle2 className="h-3 w-3" />

@@ -63,7 +63,7 @@ export const BadgesShowcase: React.FC<BadgesShowcaseProps> = ({ definitions, stu
                   <IconComponent className="w-5 h-5" />
                 </div>
                 {owned ? (
-                  <span className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                  <span className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
                     Débloqué
                   </span>
                 ) : (

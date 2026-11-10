@@ -138,7 +138,7 @@ export const SQLExecutorConsole: React.FC<SQLExecutorConsoleProps> = ({
                 {isAnswered && (
                   <Badge
                     variant="secondary"
-                    className="text-xs bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-500/20"
+                    className="text-xs bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
                   >
                     <CheckCircle2 className="mr-1 h-3 w-3" /> Rédigé
                   </Badge>
@@ -194,7 +194,7 @@ export const SQLExecutorConsole: React.FC<SQLExecutorConsoleProps> = ({
                 ) : (
                   <div>
                     {output.successMsg && (
-                      <div className="mb-2 text-emerald-700 dark:text-emerald-400 font-medium flex items-center gap-1.5">
+                      <div className="mb-2 text-emerald-400 font-medium flex items-center gap-1.5">
                         <CheckCircle2 className="h-3.5 w-3.5" />
                         {output.successMsg}
                       </div>

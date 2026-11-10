@@ -91,7 +91,7 @@ export function ApprovalList({
       {/* Liste des demandes */}
       {pendingReservations.length === 0 ? (
         <div className="py-8 text-center text-sm text-muted-foreground">
-          <Clock className="h-8 w-8 mx-auto mb-2 text-muted-foreground/60" />
+          <Clock className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
           Aucune demande en attente pour cette séance.
         </div>
       ) : (

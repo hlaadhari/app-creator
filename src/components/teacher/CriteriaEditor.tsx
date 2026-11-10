@@ -304,7 +304,7 @@ export function CriteriaEditor({ criteres, onChange, disabled }: Props) {
             </div>
             <div className="flex items-center gap-1.5 shrink-0">
               {etat === "auto" ? (
-                <Badge className="gap-1 text-[10px] bg-emerald-500/10 text-emerald-600 border-emerald-500/20">
+                <Badge className="gap-1 text-[10px] bg-emerald-500/10 text-emerald-400 border-emerald-500/20">
                   <CheckCircle2 className="w-3 h-3" />
                   Vérifiable
                 </Badge>

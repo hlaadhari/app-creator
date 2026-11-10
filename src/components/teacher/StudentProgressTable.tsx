@@ -167,7 +167,7 @@ export function StudentProgressTable({
                             className={`text-[9px] px-1.5 py-0 h-4 ${
                               eleve.score_source === "serveur" ||
                               eleve.score_source === "enseignant"
-                                ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/30"
+                                ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/30"
                                 : "bg-amber-500/10 text-amber-600 border-amber-500/30"
                             }`}
                           >

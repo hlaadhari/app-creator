@@ -77,7 +77,7 @@ export function TeacherAccessRequest() {
 
   if (etatEffectif === "habilite") {
     return (
-      <div className="rounded-md border border-emerald-500/30 bg-emerald-500/5 p-3 text-xs text-emerald-600 dark:text-emerald-400 space-y-2">
+      <div className="rounded-md border border-emerald-500/30 bg-emerald-500/5 p-3 text-xs text-emerald-400 space-y-2">
         <div className="flex items-center gap-2 font-semibold">
           <CheckCircle2 className="w-4 h-4" />
           <span>Demande acceptée : votre habilitation enseignant est validée.</span>

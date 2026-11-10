@@ -230,7 +230,7 @@ export const WrittenExamEnvironment: React.FC<WrittenExamEnvironmentProps> = ({
                   <span
                     className={
                       copyState.noteFinale >= copyState.baremeTotal / 2
-                        ? "text-emerald-700 dark:text-emerald-400"
+                        ? "text-emerald-400"
                         : "text-destructive"
                     }
                   >
@@ -286,7 +286,7 @@ export const WrittenExamEnvironment: React.FC<WrittenExamEnvironmentProps> = ({
         <div className="rounded-lg border bg-card p-5 shadow-xs space-y-4 animate-in fade-in-50">
           <div className="flex flex-wrap items-center justify-between gap-2 border-b pb-3">
             <div className="flex items-center gap-2">
-              <CheckCircle2 className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+              <CheckCircle2 className="h-5 w-5 text-emerald-400" />
               <h3 className="text-base font-semibold text-foreground">
                 Relevé de Notes & Bilan par Exercice
               </h3>
@@ -294,7 +294,7 @@ export const WrittenExamEnvironment: React.FC<WrittenExamEnvironmentProps> = ({
             <div className="flex items-center gap-2">
               {copyState.hashSha256 && (
                 <Badge variant="outline" className="text-[10px] font-mono gap-1">
-                  <ShieldCheck className="h-3 w-3 text-emerald-600" />
+                  <ShieldCheck className="h-3 w-3 text-emerald-400" />
                   Empreinte : {copyState.hashSha256.slice(0, 12)}…
                 </Badge>
               )}

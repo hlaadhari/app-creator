@@ -108,7 +108,7 @@ export function AttemptsTimelineDrawer({
                           variant="secondary"
                           className={`font-mono text-xs px-2 py-0.5 ${
                             attempt.note20 >= 16
-                              ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/30"
+                              ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/30"
                               : attempt.note20 >= 10
                                 ? "bg-primary/10 text-primary border-primary/30"
                                 : "bg-amber-500/10 text-amber-600 border-amber-500/30"
@@ -122,7 +122,7 @@ export function AttemptsTimelineDrawer({
                           <div
                             className={`flex items-center gap-1 text-[11px] font-mono px-2 py-0.5 rounded border ${
                               delta.progression === "amelioration"
-                                ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/30"
+                                ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/30"
                                 : delta.progression === "regression"
                                   ? "bg-rose-500/10 text-rose-600 border-rose-500/30"
                                   : "bg-muted text-muted-foreground border-border"
@@ -160,7 +160,7 @@ export function AttemptsTimelineDrawer({
                           >
                             <div className="flex items-center gap-2 truncate">
                               {crit.ok ? (
-                                <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
+                                <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400 shrink-0" />
                               ) : (
                                 <AlertCircle className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
                               )}
@@ -169,7 +169,7 @@ export function AttemptsTimelineDrawer({
 
                             <div className="flex items-center gap-1.5 font-mono text-[10px] shrink-0 ml-2">
                               {isNewSuccess && (
-                                <span className="text-emerald-600 font-bold bg-emerald-500/20 px-1 rounded">
+                                <span className="text-emerald-400 font-bold bg-emerald-500/20 px-1 rounded">
                                   + Gagné
                                 </span>
                               )}

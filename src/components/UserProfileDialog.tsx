@@ -320,7 +320,7 @@ export function UserProfileDialog({
             {profileSuccess && (
               <div
                 role="status"
-                className="rounded-lg border border-emerald-500/30 bg-emerald-500/10 p-3 text-xs text-emerald-700 dark:text-emerald-300 flex items-center gap-2"
+                className="rounded-lg border border-emerald-500/30 bg-emerald-500/10 p-3 text-xs text-emerald-400 flex items-center gap-2"
               >
                 <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-500" />
                 <span>{profileSuccess}</span>
@@ -422,7 +422,7 @@ export function UserProfileDialog({
             {classSuccess && (
               <div
                 role="status"
-                className="rounded-lg border border-emerald-500/30 bg-emerald-500/10 p-3 text-xs text-emerald-700 dark:text-emerald-300 flex items-center gap-2"
+                className="rounded-lg border border-emerald-500/30 bg-emerald-500/10 p-3 text-xs text-emerald-400 flex items-center gap-2"
               >
                 <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-500" />
                 <span>{classSuccess}</span>
@@ -570,7 +570,7 @@ export function UserProfileDialog({
               </div>
             ) : (
               <div className="rounded-lg border border-emerald-500/30 bg-emerald-500/5 p-4 text-xs space-y-2">
-                <div className="flex items-center gap-2 font-semibold text-emerald-600 dark:text-emerald-400">
+                <div className="flex items-center gap-2 font-semibold text-emerald-400">
                   <CheckCircle2 className="h-4 w-4" />
                   <span>
                     Votre compte dispose des privilèges{" "}
@@ -590,7 +590,7 @@ export function UserProfileDialog({
             {passwordSuccess && (
               <div
                 role="status"
-                className="rounded-lg border border-emerald-500/30 bg-emerald-500/10 p-3 text-xs text-emerald-700 dark:text-emerald-300 flex items-center gap-2"
+                className="rounded-lg border border-emerald-500/30 bg-emerald-500/10 p-3 text-xs text-emerald-400 flex items-center gap-2"
               >
                 <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-500" />
                 <span>{passwordSuccess}</span>

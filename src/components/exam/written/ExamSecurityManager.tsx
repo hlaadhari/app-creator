@@ -85,7 +85,7 @@ export const ExamSecurityManager: React.FC<ExamSecurityManagerProps> = ({
             motifCloture === "remise_volontaire" ? (
               <Badge
                 variant="secondary"
-                className="flex items-center gap-1.5 text-xs border-emerald-500/30 bg-emerald-500/15 text-emerald-700 dark:text-emerald-300"
+                className="flex items-center gap-1.5 text-xs border-emerald-500/30 bg-emerald-500/15 text-emerald-400"
               >
                 <CheckCircle2 className="h-3.5 w-3.5" /> Copie Scellée (Remise volontaire)
               </Badge>

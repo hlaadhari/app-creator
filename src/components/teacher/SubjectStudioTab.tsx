@@ -340,7 +340,7 @@ export function SubjectStudioTab() {
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
                   {s.publiee ? (
-                    <Badge className="gap-1 text-[10px] bg-emerald-600/10 text-emerald-600 border-emerald-600/20">
+                    <Badge className="gap-1 text-[10px] bg-emerald-600/10 text-emerald-400 border-emerald-600/20">
                       <Lock className="w-3 h-3" />
                       Publiée
                     </Badge>
@@ -394,7 +394,7 @@ export function SubjectStudioTab() {
           </Button>
           <h2 className="text-base font-bold tracking-tight">{version.titre || "Nouveau sujet"}</h2>
           {verrouille ? (
-            <Badge className="gap-1 text-[10px] bg-emerald-600/10 text-emerald-600 border-emerald-600/20">
+            <Badge className="gap-1 text-[10px] bg-emerald-600/10 text-emerald-400 border-emerald-600/20">
               <Lock className="w-3 h-3" />
               Version {version.numero} publiée (immuable)
             </Badge>
@@ -477,7 +477,7 @@ export function SubjectStudioTab() {
           role={message.ok ? "status" : "alert"}
           className={`p-3 rounded-lg text-xs border ${
             message.ok
-              ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20"
+              ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
               : "bg-destructive/10 text-destructive border-destructive/20"
           }`}
         >
@@ -697,7 +697,7 @@ export function SubjectStudioTab() {
                               Aucun critère
                             </Badge>
                           ) : res.success ? (
-                            <Badge className="bg-emerald-500/10 text-emerald-600 border-emerald-500/20 gap-1 text-[10px]">
+                            <Badge className="bg-emerald-500/10 text-emerald-400 border-emerald-500/20 gap-1 text-[10px]">
                               <CheckCircle2 className="w-3 h-3" />
                               Conforme ({res.criteresPasses}/{res.totalCriteres})
                             </Badge>
@@ -722,7 +722,7 @@ export function SubjectStudioTab() {
                 <div
                   className={`p-3 rounded-lg text-xs border ${
                     report.readyToPublish
-                      ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-600"
+                      ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-400"
                       : "bg-destructive/10 border-destructive/20 text-destructive"
                   }`}
                 >

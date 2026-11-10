@@ -82,7 +82,7 @@ export const WrittenQCM: React.FC<WrittenQCMProps> = ({
                 {isAnswered && (
                   <Badge
                     variant="secondary"
-                    className="text-xs bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-500/20"
+                    className="text-xs bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
                   >
                     <CheckCircle2 className="mr-1 h-3 w-3" /> Répondu
                   </Badge>
