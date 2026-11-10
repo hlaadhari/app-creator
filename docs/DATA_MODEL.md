@@ -388,3 +388,14 @@ Un critère JSON (`criteres.sonde`) peut porter `"correction": "enseignant"` : i
 ## Vérification par cas « js_test_cas » (issue #102)
 
 Critère JSON `{"type": "js_test_cas", "function_name": "verif1", "cas": [...]}`. Chaque cas : `saisies` (id de champ → texte, booléen pour une case, ou date relative `+10j` / `-1j`), `appel` (fonction, sinon `function_name`), puis `attendu` (retour true/false), `etat` (état de champs après l'appel) ou `texte` (texte affiché). Tous les cas doivent réussir ; les champs sont restaurés après chaque cas ; un champ ou une fonction absents font échouer le cas. Si tous les cas attendent « false », la vérification est refusée (le code de départ la satisferait).
+
+## Centre de notifications (migration 0037, issue #245)
+
+Table `notifications` : `id`, `user_id` (→ `profiles`, suppression en cascade), `kind` (`correction`, `tuteur`, `examen`, `invitation_classe`, `synchronisation`, `systeme`), `title` (1 à 160 caractères), `body` (≤ 1000, optionnel), `href` (chemin interne uniquement, jamais d'URL absolue ni de `//`, contrainte CHECK), `read_at` (null = non lue) et `created_at`. Index sur `(user_id, created_at desc)` et index partiel sur les non lues.
+
+- **Lecture** : chaque utilisateur ne voit que ses propres lignes (`user_id = auth.uid()`), sans exception pour l'enseignant ni l'administrateur.
+- **Écriture** : aucun `INSERT` ni `DELETE` pour `anon`/`authenticated`. Les notifications sont créées par la fonction `public.creer_notification(...)` (`SECURITY DEFINER`, exécutable par `service_role` uniquement) ou par des triggers serveur.
+- **Mise à jour** : seul `read_at` est modifiable côté client (`GRANT UPDATE (read_at)` au niveau colonne), pour marquer lu ou non lu.
+- **Temps réel** : la table est ajoutée à la publication `supabase_realtime` ; les diffusions respectent la RLS.
+
+Aucun producteur n'est encore branché : la cloche affiche ce que `creer_notification` écrit. Brancher les événements (résultats de correction, tuteur, échéance, invitation de classe, conflit de synchronisation) fera l'objet d'issues dédiées.

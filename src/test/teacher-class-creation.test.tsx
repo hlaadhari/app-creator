@@ -56,6 +56,9 @@ vi.mock("@/components/AuthModal", () => ({
   AuthModal: () => <div data-testid="auth-modal-mock" />,
 }));
 
+vi.mock("@/components/notifications/NotificationBell", () => ({
+  NotificationBell: () => null,
+}));
 vi.mock("@/components/tp/TpSessionManager", () => ({
   TpSessionManager: () => <div data-testid="tp-session-manager-mock" />,
 }));

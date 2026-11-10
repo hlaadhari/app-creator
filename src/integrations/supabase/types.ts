@@ -707,6 +707,47 @@ export type Database = {
           },
         ];
       };
+      notifications: {
+        Row: {
+          body: string | null;
+          created_at: string;
+          href: string | null;
+          id: string;
+          kind: string;
+          read_at: string | null;
+          title: string;
+          user_id: string;
+        };
+        Insert: {
+          body?: string | null;
+          created_at?: string;
+          href?: string | null;
+          id?: string;
+          kind: string;
+          read_at?: string | null;
+          title: string;
+          user_id: string;
+        };
+        Update: {
+          body?: string | null;
+          created_at?: string;
+          href?: string | null;
+          id?: string;
+          kind?: string;
+          read_at?: string | null;
+          title?: string;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "notifications_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       passages_examen: {
         Row: {
           created_at: string;

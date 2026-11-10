@@ -53,24 +53,27 @@ Chaque test négatif doit être implémenté sous forme d'un test automatisé en
 
 ## 3. Matrice de Permissions RLS (PostgreSQL)
 
-| Table               | Rôle Anonyme (`anon`) | Rôle Élève (`eleve`)                  | Rôle Enseignant (`enseignant`)                      | Service Role (`service_role`) |
-| ------------------- | --------------------- | ------------------------------------- | --------------------------------------------------- | ----------------------------- |
-| `profiles`          | Aucun                 | Lecture / MAJ propre profil           | Lecture élèves de ses classes                       | Accès total                   |
-| `user_roles`        | Aucun                 | Lecture ses rôles                     | Lecture ses rôles                                   | Accès total                   |
-| `classes`           | Aucun                 | Lecture ses classes                   | CRUD ses propres classes                            | Accès total                   |
-| `class_invitations` | Aucun                 | Utilisation via RPC                   | CRUD pour ses classes                               | Accès total                   |
-| `sujets`            | Lecture publique      | Lecture publique                      | Lecture publique + CRUD ses brouillons              | Accès total                   |
-| `sujet_versions`    | Lecture si publiée    | Lecture si publiée                    | Lecture si publiée + CRUD ses versions non publiées | Accès total                   |
-| `criteres`          | **Aucun**             | Lecture via RPC / après déblocage     | Lecture/écriture sur ses versions non publiées      | Accès total                   |
-| `solutions`         | **Aucun**             | **Aucun**                             | Lecture sur ses sujets                              | Accès total                   |
-| `indices`           | Aucun                 | Lecture si débloqué (RPC)             | Lecture tous ses sujets                             | Accès total                   |
-| `projets`           | Aucun                 | CRUD ses propres projets              | Lecture projets de ses élèves                       | Accès total                   |
-| `projet_fichiers`   | Aucun                 | CRUD ses propres fichiers             | Lecture fichiers de ses élèves                      | Accès total                   |
-| `tentatives`        | Aucun                 | Insertion / Lecture ses tentatives    | Lecture tentatives de ses élèves                    | Accès total                   |
-| `snapshots`         | Aucun                 | Lecture ses snapshots                 | Lecture snapshots de ses élèves                     | Accès total                   |
-| `sessions_examen`   | Aucun                 | Lecture si inscrit                    | CRUD ses propres sessions                           | Accès total                   |
-| `passages_examen`   | Aucun                 | Lecture son passage                   | Lecture/MAJ passage de sa session                   | Accès total                   |
-| `notes`             | Aucun                 | Lecture note finale après publication | CRUD notes de ses élèves                            | Accès total                   |
+| Table               | Rôle Anonyme (`anon`) | Rôle Élève (`eleve`)                              | Rôle Enseignant (`enseignant`)                      | Service Role (`service_role`) |
+| ------------------- | --------------------- | ------------------------------------------------- | --------------------------------------------------- | ----------------------------- |
+| `profiles`          | Aucun                 | Lecture / MAJ propre profil                       | Lecture élèves de ses classes                       | Accès total                   |
+| `user_roles`        | Aucun                 | Lecture ses rôles                                 | Lecture ses rôles                                   | Accès total                   |
+| `classes`           | Aucun                 | Lecture ses classes                               | CRUD ses propres classes                            | Accès total                   |
+| `class_invitations` | Aucun                 | Utilisation via RPC                               | CRUD pour ses classes                               | Accès total                   |
+| `sujets`            | Lecture publique      | Lecture publique                                  | Lecture publique + CRUD ses brouillons              | Accès total                   |
+| `sujet_versions`    | Lecture si publiée    | Lecture si publiée                                | Lecture si publiée + CRUD ses versions non publiées | Accès total                   |
+| `criteres`          | **Aucun**             | Lecture via RPC / après déblocage                 | Lecture/écriture sur ses versions non publiées      | Accès total                   |
+| `solutions`         | **Aucun**             | **Aucun**                                         | Lecture sur ses sujets                              | Accès total                   |
+| `indices`           | Aucun                 | Lecture si débloqué (RPC)                         | Lecture tous ses sujets                             | Accès total                   |
+| `projets`           | Aucun                 | CRUD ses propres projets                          | Lecture projets de ses élèves                       | Accès total                   |
+| `projet_fichiers`   | Aucun                 | CRUD ses propres fichiers                         | Lecture fichiers de ses élèves                      | Accès total                   |
+| `tentatives`        | Aucun                 | Insertion / Lecture ses tentatives                | Lecture tentatives de ses élèves                    | Accès total                   |
+| `snapshots`         | Aucun                 | Lecture ses snapshots                             | Lecture snapshots de ses élèves                     | Accès total                   |
+| `sessions_examen`   | Aucun                 | Lecture si inscrit                                | CRUD ses propres sessions                           | Accès total                   |
+| `passages_examen`   | Aucun                 | Lecture son passage                               | Lecture/MAJ passage de sa session                   | Accès total                   |
+| `notes`             | Aucun                 | Lecture note finale après publication             | CRUD notes de ses élèves                            | Accès total                   |
+| `notifications`     | **Aucun**             | Lecture / marquage lu de ses seules notifications | Idem (aucun accès aux notifications d'autrui)       | Accès total                   |
+
+**Test négatif complémentaire — notifications (#245, `supabase/tests/07_notifications.sql`)** : un élève ne lit pas les notifications d'un autre élève (ni par filtre sur `user_id`, ni par identifiant), un administrateur ne lit que les siennes, `anon` n'a aucun accès, aucun `INSERT`/`DELETE` n'est possible côté client, `creer_notification` est refusée aux rôles `authenticated` et `anon`, seul `read_at` est modifiable (titre et `user_id` protégés), et les liens absolus ou `//` sont refusés par contrainte.
 
 ---
 

@@ -1,9 +1,11 @@
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
-import { BookOpen, Calendar, GraduationCap, LayoutGrid, Shield } from "lucide-react";
+import { BookOpen, Calendar, GraduationCap, LayoutGrid, Menu, Shield } from "lucide-react";
 import { AuthModal } from "@/components/AuthModal";
+import { NotificationBell } from "@/components/notifications/NotificationBell";
 import { SproutLogo } from "@/components/SproutLogo";
 import { Button } from "@/components/ui/button";
+import { Sheet, SheetContent, SheetDescription, SheetTitle } from "@/components/ui/sheet";
 import { useAuth } from "@/lib/supabase/auth";
 
 export const MAIN_CONTENT_ID = "contenu-principal";
@@ -61,7 +63,8 @@ export function AppHeader({
   authSlot,
   hideNav = false,
 }: AppHeaderProps) {
-  const { role } = useAuth();
+  const { role, user } = useAuth();
+  const [menuOpen, setMenuOpen] = useState(false);
   const isTeacher = demo || role === "enseignant" || role === "admin";
   const isAdmin = demo || role === "admin";
 
@@ -112,6 +115,36 @@ export function AppHeader({
     });
   }
 
+  const lienNavigation = (l: NavLinkSpec, dansMenu: boolean) => (
+    <Link
+      key={l.key}
+      to={l.to}
+      {...(l.to === "/enseignant" || l.to === "/admin"
+        ? demo
+          ? { search: { demo: "true" } }
+          : {}
+        : {})}
+      aria-current={current === l.key ? "page" : undefined}
+      onClick={dansMenu ? () => setMenuOpen(false) : undefined}
+    >
+      <Button
+        variant="outline"
+        size="sm"
+        aria-label={l.ariaLabel}
+        className={`gap-1.5 text-xs ${dansMenu ? "h-11 w-full justify-start" : "h-8"} ${
+          TONE_CLASSES[l.tone]
+        } ${current === l.key ? "bg-accent/60 font-semibold" : ""}`}
+      >
+        {l.icon}
+        <span className={dansMenu ? "" : "hidden lg:inline"}>{l.label}</span>
+      </Button>
+    </Link>
+  );
+
+  // Mobile (< 768 px) : navigation et actions de page rangées dans un menu en tiroir,
+  // pour que l'en-tête garde la place du logo, de la cloche et du profil.
+  const aMenu = !hideNav || Boolean(actions);
+
   return (
     <>
       <a
@@ -137,40 +170,49 @@ export function AppHeader({
         {center && <div className="flex min-w-0 items-center justify-center">{center}</div>}
 
         <div className="flex shrink-0 items-center gap-2 text-xs">
-          {actions}
+          {actions && <div className="hidden items-center gap-2 md:flex">{actions}</div>}
           {!hideNav && (
-            <nav aria-label="Navigation principale" className="flex items-center gap-1.5">
-              {links.map((l) => (
-                <Link
-                  key={l.key}
-                  to={l.to}
-                  {...(l.to === "/enseignant" || l.to === "/admin"
-                    ? demo
-                      ? { search: { demo: "true" } }
-                      : {}
-                    : {})}
-                  aria-current={current === l.key ? "page" : undefined}
-                >
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    aria-label={l.ariaLabel}
-                    className={`h-8 gap-1.5 text-xs ${TONE_CLASSES[l.tone]} ${
-                      current === l.key ? "bg-accent/60 font-semibold" : ""
-                    }`}
-                  >
-                    {l.icon}
-                    <span className="hidden lg:inline">{l.label}</span>
-                  </Button>
-                </Link>
-              ))}
+            <nav aria-label="Navigation principale" className="hidden items-center gap-1.5 md:flex">
+              {links.map((l) => lienNavigation(l, false))}
             </nav>
           )}
-          {/* Emplacement réservé à la cloche de notifications (#245) */}
-          <div data-slot="notifications" className="contents" />
+          {/* Centre de notifications (#245) : utilisateur connecté, hors démonstration */}
+          {user && !demo && <NotificationBell />}
+          {aMenu && (
+            <button
+              type="button"
+              onClick={() => setMenuOpen(true)}
+              aria-label="Ouvrir le menu de navigation"
+              className="flex h-11 w-11 items-center justify-center rounded border bg-background/60 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground cursor-pointer md:hidden"
+            >
+              <Menu className="h-4 w-4" />
+            </button>
+          )}
           {authSlot ?? (demo ? null : <AuthModal />)}
         </div>
       </header>
+      {aMenu && (
+        <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
+          <SheetContent side="left" className="w-[min(320px,90vw)] gap-0 p-0 sm:max-w-none">
+            <SheetTitle className="border-b px-4 py-3 text-sm">Menu</SheetTitle>
+            <SheetDescription className="sr-only">
+              Navigation principale et actions de la page.
+            </SheetDescription>
+            <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto p-4">
+              {!hideNav && (
+                <nav aria-label="Navigation principale (menu)" className="flex flex-col gap-2">
+                  {links.map((l) => lienNavigation(l, true))}
+                </nav>
+              )}
+              {actions && (
+                <div className="flex flex-col items-stretch gap-2 border-t pt-4 [&>*]:w-full">
+                  {actions}
+                </div>
+              )}
+            </div>
+          </SheetContent>
+        </Sheet>
+      )}
     </>
   );
 }
