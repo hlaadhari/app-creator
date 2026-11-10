@@ -90,7 +90,7 @@ export function AppHeader({
       key: "calendrier",
       to: "/calendrier",
       label: "Séances TP",
-      ariaLabel: "Planning et Postes TP",
+      ariaLabel: "Séances TP : planning et postes",
       icon: <Calendar className="h-4 w-4 text-primary" />,
       tone: "neutral",
     },

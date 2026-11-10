@@ -449,6 +449,7 @@ export function CourseNotebookTutor({ activeCategoryId }: NotebookTutorChatProps
 
   return (
     <aside
+      aria-label="Tuteur Carnet STI-BAC INFO"
       className="flex flex-col h-full bg-panel/95 border-l border-border text-foreground"
       data-testid="course-notebook-tutor"
     >

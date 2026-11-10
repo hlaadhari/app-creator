@@ -47,7 +47,10 @@ export function CourseSidebar({
   const cleanQuery = searchQuery.trim().toLowerCase();
 
   return (
-    <aside className={`flex flex-col bg-panel/90 border-r min-h-0 select-none ${className}`}>
+    <aside
+      aria-label="Recherche dans le cours"
+      className={`flex flex-col bg-panel/90 border-r min-h-0 select-none ${className}`}
+    >
       {/* En-tête du volet */}
       <div className="p-3 border-b shrink-0 bg-panel/60">
         <div className="flex items-center gap-2 mb-2.5">
