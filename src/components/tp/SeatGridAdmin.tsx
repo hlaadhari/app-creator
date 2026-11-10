@@ -37,11 +37,7 @@ export function SeatGridAdmin({
   const getStatusBadge = (status: SeatInfo["status"]) => {
     switch (status) {
       case "libre":
-        return (
-          <span className="text-[10px] text-emerald-400 font-medium">
-            Libre
-          </span>
-        );
+        return <span className="text-[10px] text-emerald-400 font-medium">Libre</span>;
       case "pending":
         return (
           <span className="text-[10px] text-amber-600 dark:text-amber-400 font-medium">

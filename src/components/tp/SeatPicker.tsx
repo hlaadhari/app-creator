@@ -223,9 +223,7 @@ export function SeatPicker({
                     Poste {String(seat.seatNumber).padStart(2, "0")}
                   </span>
                   {seat.status === "libre" ? (
-                    <span className="text-[10px] text-emerald-400 font-medium">
-                      Libre
-                    </span>
+                    <span className="text-[10px] text-emerald-400 font-medium">Libre</span>
                   ) : seat.status === "pending" ? (
                     <span className="text-[10px] text-amber-600 dark:text-amber-400 font-medium">
                       Attente
