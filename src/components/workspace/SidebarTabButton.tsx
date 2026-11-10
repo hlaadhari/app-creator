@@ -28,7 +28,7 @@ export function SidebarTabButton({
       onClick={onClick}
       aria-label={ariaLabel}
       aria-pressed={active}
-      className={`flex-1 py-2 flex items-center justify-center gap-1.5 uppercase tracking-wider text-[11px] transition-colors cursor-pointer ${
+      className={`flex-1 py-2 max-md:min-h-11 flex items-center justify-center gap-1.5 uppercase tracking-wider text-[11px] transition-colors cursor-pointer ${
         active
           ? "border-b-2 border-primary text-foreground font-semibold bg-background/40"
           : "text-muted-foreground hover:text-foreground"

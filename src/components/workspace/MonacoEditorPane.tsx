@@ -11,6 +11,8 @@ interface MonacoEditorPaneProps {
   onSave?: () => void;
   onVerify?: () => void;
   onCursorChange?: (line: number, column: number) => void;
+  /** Mise en page mobile : police 14 px. */
+  mobile?: boolean;
 }
 
 export function MonacoEditorPane({
@@ -22,6 +24,7 @@ export function MonacoEditorPane({
   onSave,
   onVerify,
   onCursorChange,
+  mobile = false,
 }: MonacoEditorPaneProps) {
   const [isMounted, setIsMounted] = useState(false);
   const [loadTimedOut, setLoadTimedOut] = useState(false);
@@ -141,7 +144,7 @@ export function MonacoEditorPane({
         }
         options={{
           readOnly,
-          fontSize: 13.5,
+          fontSize: mobile ? 14 : 13.5,
           fontFamily: "'JetBrains Mono', 'IBM Plex Sans', Menlo, Monaco, Consolas, monospace",
           fontLigatures: true,
           lineHeight: 22,

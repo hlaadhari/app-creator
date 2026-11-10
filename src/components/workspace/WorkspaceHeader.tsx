@@ -1,8 +1,10 @@
 import { Link } from "@tanstack/react-router";
-import { Clock, Lock } from "lucide-react";
+import { Lock } from "lucide-react";
 import type { Exercise } from "@/lib/exercises";
 import type { WorkspaceState } from "@/hooks/useWorkspaceState";
 import { AppHeader } from "@/components/layout/AppHeader";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { ExamCountdownBadge } from "@/components/workspace/ExamCountdownBadge";
 import { SubjectInfoPopover } from "@/components/workspace/SubjectInfoPopover";
 import {
   Breadcrumb,
@@ -16,6 +18,7 @@ import {
 export function WorkspaceHeader({ ex, ws }: { ex: Exercise; ws: WorkspaceState }) {
   const id = ex.id;
   const { baremeRepartition, isExamMode, countdown } = ws;
+  const isMobile = useIsMobile();
   return (
     <AppHeader
       hideNav
@@ -53,21 +56,7 @@ export function WorkspaceHeader({ ex, ws }: { ex: Exercise; ws: WorkspaceState }
         </>
       }
       center={
-        isExamMode && countdown ? (
-          <div
-            className={`flex items-center gap-1.5 rounded border px-2.5 py-1 text-xs font-mono ${
-              countdown.isExpired
-                ? "border-rose-500/40 bg-rose-500/15 text-rose-500 font-bold animate-pulse"
-                : countdown.isCritical
-                  ? "border-amber-500/40 bg-amber-500/15 text-amber-500 font-bold"
-                  : "border-border bg-background/50 text-foreground"
-            }`}
-            title="Temps d'épreuve officiel synchronisé avec l'horloge serveur (PRD F-50, T-06)"
-          >
-            <Clock className="h-3.5 w-3.5" />
-            <span>{countdown.isExpired ? "00:00 (Échéance échue)" : countdown.formatted}</span>
-          </div>
-        ) : null
+        isExamMode && countdown && !isMobile ? <ExamCountdownBadge countdown={countdown} /> : null
       }
     />
   );

@@ -12,7 +12,7 @@ export function FileTabs({ ws }: { ws: WorkspaceState }) {
             key={fileName}
             onClick={() => setActiveFileName(fileName)}
             aria-label={`Ouvrir le fichier ${fileName}`}
-            className={`flex items-center gap-2 border-r px-3.5 py-2 transition-colors border-t-2 shrink-0 cursor-pointer ${
+            className={`flex items-center gap-2 border-r px-3.5 py-2 max-md:min-h-11 transition-colors border-t-2 shrink-0 cursor-pointer ${
               isActive
                 ? "bg-editor text-foreground border-t-primary font-medium"
                 : "text-muted-foreground hover:bg-accent/40 border-t-transparent"
