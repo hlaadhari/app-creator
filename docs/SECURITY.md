@@ -73,7 +73,7 @@ Chaque test négatif doit être implémenté sous forme d'un test automatisé en
 | `notes`             | Aucun                 | Lecture note finale après publication             | CRUD notes de ses élèves                            | Accès total                   |
 | `notifications`     | **Aucun**             | Lecture / marquage lu de ses seules notifications | Idem (aucun accès aux notifications d'autrui)       | Accès total                   |
 
-**Test négatif complémentaire — notifications (#245, `supabase/tests/07_notifications.sql`)** : un élève ne lit pas les notifications d'un autre élève (ni par filtre sur `user_id`, ni par identifiant), un administrateur ne lit que les siennes, `anon` n'a aucun accès, aucun `INSERT`/`DELETE` n'est possible côté client, `creer_notification` est refusée aux rôles `authenticated` et `anon`, seul `read_at` est modifiable (titre et `user_id` protégés), et les liens absolus ou `//` sont refusés par contrainte.
+**Test négatif complémentaire — notifications (#245, `supabase/tests/08_notifications.sql`)** : un élève ne lit pas les notifications d'un autre élève (ni par filtre sur `user_id`, ni par identifiant), un administrateur ne lit que les siennes, `anon` n'a aucun accès, aucun `INSERT`/`DELETE` n'est possible côté client, `creer_notification` est refusée aux rôles `authenticated` et `anon`, seul `read_at` est modifiable (titre et `user_id` protégés), et les liens absolus ou `//` sont refusés par contrainte.
 
 ---
 

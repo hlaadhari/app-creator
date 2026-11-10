@@ -142,3 +142,70 @@ export async function sauvegarderFichierDistant(
     return { ok: false, error: String(err) };
   }
 }
+
+export interface FichierASauvegarder {
+  chemin: string;
+  contenu: string;
+  expectedRev: number;
+}
+
+export interface LotSyncResult {
+  ok: boolean;
+  /** Nouvelle révision par chemin de fichier. */
+  revs?: Record<string, number>;
+  conflict?: {
+    fileName: string;
+    remoteRev: number;
+    remoteContent: string;
+  };
+  error?: string;
+}
+
+/**
+ * Sauvegarde en un seul appel tous les fichiers modifiés (RPC `sauvegarder_fichiers`).
+ * Les conflits de révision sont détectés avant toute écriture : en cas de conflit, rien n'est
+ * enregistré et le premier fichier concerné est renvoyé avec son contenu serveur (T-18).
+ */
+export async function sauvegarderFichiersDistants(
+  projetId: string,
+  fichiers: FichierASauvegarder[],
+): Promise<LotSyncResult> {
+  try {
+    const { data, error } = await supabase.rpc("sauvegarder_fichiers", {
+      _projet_id: projetId,
+      _fichiers: fichiers.map((f) => ({
+        chemin: f.chemin,
+        contenu: f.contenu,
+        expected_rev: f.expectedRev,
+      })),
+    });
+
+    if (error) {
+      return { ok: false, error: error.message || "Erreur lors de la sauvegarde distante." };
+    }
+
+    const res = data as {
+      ok?: boolean;
+      revs?: Record<string, number>;
+      conflit?: { chemin: string; rev: number | null; contenu: string | null };
+    } | null;
+
+    if (res?.ok && res.revs) return { ok: true, revs: res.revs };
+
+    if (res?.conflit) {
+      return {
+        ok: false,
+        conflict: {
+          fileName: res.conflit.chemin,
+          remoteRev: res.conflit.rev ?? 1,
+          remoteContent: res.conflit.contenu ?? "",
+        },
+        error: "Conflit de révision : une version plus récente existe sur le serveur.",
+      };
+    }
+
+    return { ok: false, error: "Réponse inattendue du serveur." };
+  } catch (err) {
+    return { ok: false, error: String(err) };
+  }
+}
