@@ -2,6 +2,7 @@ import { useState, type ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
 import { BookOpen, Calendar, GraduationCap, LayoutGrid, Menu, Shield } from "lucide-react";
 import { AuthModal } from "@/components/AuthModal";
+import { notificationsActivees } from "@/lib/notifications/config";
 import { NotificationBell } from "@/components/notifications/NotificationBell";
 import { SproutLogo } from "@/components/SproutLogo";
 import { Button } from "@/components/ui/button";
@@ -177,7 +178,7 @@ export function AppHeader({
             </nav>
           )}
           {/* Centre de notifications (#245) : utilisateur connecté, hors démonstration */}
-          {user && !demo && <NotificationBell />}
+          {user && !demo && notificationsActivees() && <NotificationBell />}
           {aMenu && (
             <button
               type="button"

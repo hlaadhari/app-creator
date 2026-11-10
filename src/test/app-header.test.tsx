@@ -40,6 +40,7 @@ describe("AppHeader partagé (#241)", () => {
   beforeEach(() => {
     authState.role = null;
     authState.user = null;
+    vi.unstubAllEnvs();
   });
 
   it("expose le repère banner, le lien d'évitement et la navigation élève", () => {
@@ -84,7 +85,14 @@ describe("AppHeader partagé (#241)", () => {
     expect(screen.queryByTestId("auth-modal")).toBeNull();
   });
 
-  it("affiche la cloche de notifications pour un utilisateur connecté, pas en démo", () => {
+  it("n'affiche la cloche que si le drapeau est activé, pour un utilisateur connecté hors démo", () => {
+    authState.user = { id: "u-1" };
+    const desactive = render(<AppHeader />);
+    expect(screen.queryByTestId("notification-bell-stub")).toBeNull();
+    desactive.unmount();
+    authState.user = null;
+
+    vi.stubEnv("VITE_NOTIFICATIONS_ENABLED", "true");
     const { unmount } = render(<AppHeader />);
     expect(screen.queryByTestId("notification-bell-stub")).toBeNull();
     unmount();

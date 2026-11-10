@@ -398,4 +398,4 @@ Table `notifications` : `id`, `user_id` (→ `profiles`, suppression en cascade)
 - **Mise à jour** : seul `read_at` est modifiable côté client (`GRANT UPDATE (read_at)` au niveau colonne), pour marquer lu ou non lu.
 - **Temps réel** : la table est ajoutée à la publication `supabase_realtime` ; les diffusions respectent la RLS.
 
-Aucun producteur n'est encore branché : la cloche affiche ce que `creer_notification` écrit. Brancher les événements (résultats de correction, tuteur, échéance, invitation de classe, conflit de synchronisation) fera l'objet d'issues dédiées.
+La cloche de l'interface n'est affichée que si `VITE_NOTIFICATIONS_ENABLED=true` au build : à n'activer qu'une fois la migration appliquée sur le projet Supabase visé (sinon la table absente renvoie des 404). Aucun producteur n'est encore branché : la cloche affiche ce que `creer_notification` écrit. Brancher les événements (résultats de correction, tuteur, échéance, invitation de classe, conflit de synchronisation) fera l'objet d'issues dédiées.
