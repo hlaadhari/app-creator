@@ -19,7 +19,6 @@ import {
   BookOpen,
 } from "lucide-react";
 import { useAuth } from "@/lib/supabase/auth";
-import { getStudentProgressionReport } from "@/lib/competences/competences-service";
 import { OFFICIAL_BADGES } from "@/lib/competences/referentiel";
 import type { StudentProgressionReport, CompetenceCategory } from "@/lib/competences/types";
 import { CompetenceProgressBar } from "./CompetenceProgressBar";
@@ -50,6 +49,8 @@ export function ProgressionModal({
   const loadReport = React.useCallback(async () => {
     setLoading(true);
     try {
+      // Chargé à l'ouverture seulement : garde le service hors du bundle de l'accueil (#266)
+      const { getStudentProgressionReport } = await import("@/lib/competences/competences-service");
       const data = await getStudentProgressionReport(user?.id);
       setReport(data);
     } finally {
