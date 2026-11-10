@@ -19,10 +19,9 @@ async function ouvrir(page: Page) {
 }
 
 async function sansDebordement(page: Page) {
-  const debordement = await page.evaluate(
-    () => document.documentElement.scrollWidth - window.innerWidth,
-  );
-  expect(debordement, "débordement horizontal (px)").toBeLessThanOrEqual(0);
+  // innerWidth s'élargit quand le contenu déborde (viewport de mise en page) : il doit rester égal à l'écran.
+  const largeur = await page.evaluate(() => window.innerWidth);
+  expect(largeur, "largeur de mise en page (px)").toBeLessThanOrEqual(page.viewportSize()!.width);
 }
 
 for (const [nom, viewport] of [

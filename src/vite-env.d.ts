@@ -2,3 +2,8 @@
 declare const __APP_VERSION__: string;
 declare const __APP_COMMIT__: string;
 declare const __APP_BUILD_DATE__: string;
+
+interface ImportMetaEnv {
+  /** « true » pour afficher la cloche de notifications (migration 0037 appliquée, #245). */
+  readonly VITE_NOTIFICATIONS_ENABLED?: string;
+}

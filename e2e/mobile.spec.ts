@@ -7,6 +7,19 @@ import { expect, test } from "@playwright/test";
 test.use({ viewport: { width: 375, height: 812 }, hasTouch: true, isMobile: true });
 
 const CIBLE_TACTILE_MIN = 44;
+const LARGEUR_ECRAN = 375;
+
+/**
+ * Sur mobile, un contenu plus large que l'écran élargit le viewport de mise en page :
+ * `scrollWidth - innerWidth` vaut alors 0 alors que la page déborde. On vérifie donc
+ * que `innerWidth` est resté égal à la largeur de l'écran.
+ */
+async function sansDebordement(page: import("@playwright/test").Page) {
+  const largeur = await page.evaluate(() => window.innerWidth);
+  expect(largeur, "largeur de mise en page (px) : la page déborde de l'écran").toBeLessThanOrEqual(
+    LARGEUR_ECRAN,
+  );
+}
 
 async function hauteur(locator: ReturnType<import("@playwright/test").Page["locator"]>) {
   const box = await locator.boundingBox();
@@ -45,11 +58,7 @@ test.describe("Workspace mobile (#243)", () => {
       { timeout: 15_000 },
     );
 
-    // Aucun débordement horizontal à aucune étape
-    const debordement = await page.evaluate(
-      () => document.documentElement.scrollWidth - window.innerWidth,
-    );
-    expect(debordement, "débordement horizontal (px)").toBeLessThanOrEqual(0);
+    await sansDebordement(page);
   });
 
   test("l'ancien bandeau « Mode consultation » n'est plus affiché sur mobile", async ({ page }) => {
@@ -58,5 +67,13 @@ test.describe("Workspace mobile (#243)", () => {
       timeout: 30_000,
     });
     await expect(page.getByText(/Mode consultation/i)).toBeHidden();
+  });
+
+  test("accueil et cours tiennent dans l'écran, sans débordement horizontal", async ({ page }) => {
+    for (const route of ["/", "/cours"]) {
+      await page.goto(route);
+      await expect(page.locator("main").first()).toBeVisible({ timeout: 30_000 });
+      await sansDebordement(page);
+    }
   });
 });
