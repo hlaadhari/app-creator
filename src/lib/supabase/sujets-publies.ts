@@ -47,11 +47,42 @@ export function exerciceDepuisSujetPublie(s: SujetPublieServeur): Exercise {
   };
 }
 
-/** Renvoie null si le sujet n'existe pas, n'est pas publié, ou n'a aucun critère livrable. */
-export async function chargerSujetPublie(sujetId: string): Promise<Exercise | null> {
+/**
+ * Mémoire à court terme (#261) : le chargeur de la route et le composant demandent tous deux le
+ * même sujet, et chaque rechargement relançait l'appel. On partage l'appel en cours et on garde le
+ * résultat 60 s. Seuls les sujets trouvés sont conservés : un échec ou un sujet absent est
+ * redemandé la fois suivante. Une version publiée est immuable, une nouvelle version apparaît donc
+ * au plus 60 s plus tard.
+ */
+const DUREE_MEMOIRE_MS = 60_000;
+const memoire = new Map<string, { expireA: number; promesse: Promise<Exercise | null> }>();
+
+export function viderMemoireSujetsPublies(): void {
+  memoire.clear();
+}
+
+async function chargerDepuisServeur(sujetId: string): Promise<Exercise | null> {
   const { data, error } = await rpc("sujet_publie_pour_eleve", { _sujet_id: sujetId });
   if (error) throw new Error(`Chargement du sujet impossible : ${error.message}`);
   const sujet = data as SujetPublieServeur | null;
   if (!sujet || sujet.criteres.length === 0) return null;
   return exerciceDepuisSujetPublie(sujet);
+}
+
+/** Renvoie null si le sujet n'existe pas, n'est pas publié, ou n'a aucun critère livrable. */
+export function chargerSujetPublie(sujetId: string): Promise<Exercise | null> {
+  const present = memoire.get(sujetId);
+  if (present && present.expireA > Date.now()) return present.promesse;
+
+  const promesse = chargerDepuisServeur(sujetId);
+  memoire.set(sujetId, { expireA: Date.now() + DUREE_MEMOIRE_MS, promesse });
+  promesse.then(
+    (exercice) => {
+      if (exercice === null && memoire.get(sujetId)?.promesse === promesse) memoire.delete(sujetId);
+    },
+    () => {
+      if (memoire.get(sujetId)?.promesse === promesse) memoire.delete(sujetId);
+    },
+  );
+  return promesse;
 }

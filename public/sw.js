@@ -56,11 +56,26 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  // Ressources statiques (JS, CSS, WASM, polices, icônes) : Stale-While-Revalidate
-  if (
-    url.pathname.startsWith("/assets/") ||
-    /\.(js|css|wasm|woff2?|svg|png|jpg|ico)$/.test(url.pathname)
-  ) {
+  // Fichiers de /assets/ : leur nom contient un hash du contenu, ils ne changent donc jamais
+  // (en-tête « immutable » côté Vercel). Cache d'abord : aucune requête réseau quand le fichier est
+  // déjà là, ce qui évite à une classe entière de retélécharger les bundles à chaque visite.
+  if (url.pathname.startsWith("/assets/")) {
+    event.respondWith(
+      caches.open(CACHE_NAME).then(async (cache) => {
+        const cached = await cache.match(request);
+        if (cached) return cached;
+        const response = await fetch(request);
+        if (response && response.status === 200) {
+          cache.put(request, response.clone());
+        }
+        return response;
+      }),
+    );
+    return;
+  }
+
+  // Autres ressources statiques (polices, icônes, fichiers sans hash) : Stale-While-Revalidate
+  if (/\.(js|css|wasm|woff2?|svg|png|jpg|ico)$/.test(url.pathname)) {
     event.respondWith(
       caches.open(CACHE_NAME).then(async (cache) => {
         const cached = await cache.match(request);
