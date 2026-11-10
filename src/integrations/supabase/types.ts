@@ -1390,6 +1390,10 @@ export type Database = {
       nb_indices: { Args: { _version_id: string }; Returns: number };
       obtenir_horloge_serveur: { Args: never; Returns: string };
       rejoindre_classe: { Args: { _code: string }; Returns: Json };
+      sauvegarder_fichiers: {
+        Args: { _fichiers: Json; _projet_id: string };
+        Returns: Json;
+      };
       sauvegarder_fichier: {
         Args: {
           _chemin: string;
