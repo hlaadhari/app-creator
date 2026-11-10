@@ -1,10 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useState, useMemo } from "react";
+import { lazy, Suspense, useEffect, useState, useMemo } from "react";
 import { SproutLogo } from "@/components/SproutLogo";
 import { AuthModal } from "@/components/AuthModal";
 import { AppFooter } from "@/components/AppIdentity";
 import { JoinClassModal } from "@/components/JoinClassModal";
-import { OnboardingGuide } from "@/components/OnboardingGuide";
 import { getSujetsCatalog, type RemoteSujet } from "@/lib/supabase/sujets";
 import { getMesClasses, type ClassInfo } from "@/lib/supabase/classes";
 import { getAllBuffers } from "@/lib/storage/indexeddb";
@@ -37,6 +36,12 @@ import {
   BookOpen,
   Calendar,
 } from "lucide-react";
+
+// Guide d'accueil chargé à part et monté au repos du navigateur : il ne concurrence plus
+// le premier affichage (il était l'élément LCP des nouveaux visiteurs, #266).
+const OnboardingGuide = lazy(() =>
+  import("@/components/OnboardingGuide").then((m) => ({ default: m.OnboardingGuide })),
+);
 
 export const Route = createFileRoute("/")({
   loader: async () => {
@@ -82,6 +87,16 @@ function Index() {
   >({});
   const [mesClasses, setMesClasses] = useState<ClassInfo[]>([]);
   const [showGuide, setShowGuide] = useState(false);
+  const [guideMontable, setGuideMontable] = useState(false);
+  useEffect(() => {
+    const monter = () => setGuideMontable(true);
+    if (typeof window.requestIdleCallback === "function") {
+      const id = window.requestIdleCallback(monter, { timeout: 2000 });
+      return () => window.cancelIdleCallback(id);
+    }
+    const id = window.setTimeout(monter, 1200);
+    return () => window.clearTimeout(id);
+  }, []);
   const [dernierTravail, setDernierTravail] = useState<DernierTravailEnCours | null>(null);
 
   const epreuvesEcrites = useMemo(
@@ -571,7 +586,11 @@ function Index() {
 
       <AppFooter />
 
-      <OnboardingGuide forceOpen={showGuide} onClose={() => setShowGuide(false)} />
+      {(guideMontable || showGuide) && (
+        <Suspense fallback={null}>
+          <OnboardingGuide forceOpen={showGuide} onClose={() => setShowGuide(false)} />
+        </Suspense>
+      )}
     </div>
   );
 }
