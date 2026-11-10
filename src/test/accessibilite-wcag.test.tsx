@@ -157,7 +157,7 @@ describe("Issue #135 (UX-03) — Conformité sémantique des Routes (h1, main, a
     expect(content).toContain('aria-label="Fermer le menu"');
   });
 
-  it("la route '/sujet/$id' contient un h1, un repère <main>, une région aria-live et le bandeau mobile", () => {
+  it("la route '/sujet/$id' contient un h1, un repère <main>, une région aria-live et une mise en page adaptative", () => {
     // Le workspace est découpé (#242) : la route délègue à WorkspaceShell et WorkspaceHeader.
     const content = [
       path.resolve(process.cwd(), "src", "routes", "sujet.$id.tsx"),
@@ -179,9 +179,9 @@ describe("Issue #135 (UX-03) — Conformité sémantique des Routes (h1, main, a
     expect(content).toContain('role="status"');
     expect(content).toContain("accessibilityMessage");
 
-    // Bandeau consultation / révision pour petits écrans < 1024px
-    expect(content).toContain("lg:hidden");
-    expect(content).toContain("Mode consultation");
-    expect(content).toContain("Écran ≥ 1024 px recommandé");
+    // L'ancien bandeau « Écran ≥ 1024 px recommandé » est remplacé par des mises en page
+    // dédiées mobile / tablette / desktop (#243, #244).
+    expect(content).not.toContain("Mode consultation");
+    expect(content).toContain("useWorkspaceLayout");
   });
 });

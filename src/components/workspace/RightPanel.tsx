@@ -7,7 +7,10 @@ import { PreviewSandbox } from "@/components/workspace/PreviewSandbox";
 export function RightPanel({ ws, hidden = false }: { ws: WorkspaceState; hidden?: boolean }) {
   const { files, activeFileName, hasSql, hasPhp, rightPanelTab, setRightPanelTab } = ws;
   return (
-    <section className={`${hidden ? "hidden" : "flex"} min-h-0 flex-1 flex-col bg-background`}>
+    <section
+      data-testid="workspace-preview"
+      className={`${hidden ? "hidden" : "flex"} min-h-0 flex-1 flex-col bg-background`}
+    >
       {(hasSql || hasPhp) && (
         <div className="flex border-b bg-panel text-xs font-mono shrink-0 select-none">
           <button

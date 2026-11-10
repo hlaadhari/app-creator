@@ -41,7 +41,10 @@ export function SidebarPanel({
     restartingExam,
   } = ws;
   return (
-    <aside className={`${hidden ? "hidden" : "flex"} min-h-0 flex-1 flex-col bg-panel`}>
+    <aside
+      data-testid="workspace-sidebar"
+      className={`${hidden ? "hidden" : "flex"} min-h-0 flex-1 flex-col bg-panel`}
+    >
       <div className="flex items-stretch border-b text-xs font-mono bg-panel/80 shrink-0">
         <SidebarTabButton
           active={sidebarTab === "enonce"}
