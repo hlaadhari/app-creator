@@ -19,31 +19,43 @@
 -- Idempotente.
 -- =============================================================================
 
--- Fonctions d'API et d'aide RLS : réservées aux utilisateurs connectés
-revoke execute on function public.debloquer_indice(uuid)                 from public, anon;
-revoke execute on function public.debloquer_solution(uuid, text)         from public, anon;
-revoke execute on function public.est_eleve_de_enseignant(uuid)          from public, anon;
-revoke execute on function public.est_enseignant_classe(uuid)            from public, anon;
-revoke execute on function public.est_enseignant_session(uuid)           from public, anon;
-revoke execute on function public.est_membre_classe(uuid)                from public, anon;
-revoke execute on function public.lancer_coup_denvoi_examen(uuid)        from public, anon;
-revoke execute on function public.rejoindre_classe(text)                 from public, anon;
+-- Les fonctions sont désignées par leur nom et résolues dans pg_proc : certaines (ex.
+-- est_enseignant_session) existent en production sans avoir été créées par une migration du dépôt ;
+-- une base reconstruite à partir des seules migrations ne les a pas, et la migration doit passer
+-- dans les deux cas.
+do $$
+declare
+  _f record;
+begin
+  -- Fonctions d'API et d'aide RLS : réservées aux utilisateurs connectés
+  for _f in
+    select p.oid::regprocedure as sig from pg_proc p
+    where p.pronamespace = 'public'::regnamespace
+      and p.proname in ('debloquer_indice', 'debloquer_solution', 'est_eleve_de_enseignant',
+                        'est_enseignant_classe', 'est_enseignant_session', 'est_membre_classe',
+                        'lancer_coup_denvoi_examen', 'rejoindre_classe')
+  loop
+    execute format('revoke execute on function %s from public, anon', _f.sig);
+    execute format('grant execute on function %s to authenticated', _f.sig);
+  end loop;
 
-grant execute on function public.debloquer_indice(uuid)                  to authenticated;
-grant execute on function public.debloquer_solution(uuid, text)          to authenticated;
-grant execute on function public.est_eleve_de_enseignant(uuid)           to authenticated;
-grant execute on function public.est_enseignant_classe(uuid)             to authenticated;
-grant execute on function public.est_enseignant_session(uuid)            to authenticated;
-grant execute on function public.est_membre_classe(uuid)                 to authenticated;
-grant execute on function public.lancer_coup_denvoi_examen(uuid)         to authenticated;
-grant execute on function public.rejoindre_classe(text)                  to authenticated;
+  -- Fonctions de déclencheur : aucun appel client
+  for _f in
+    select p.oid::regprocedure as sig from pg_proc p
+    where p.pronamespace = 'public'::regnamespace
+      and p.proname in ('attribuer_badges_apres_note_officielle', 'handle_new_user',
+                        'recalculer_maitrise_apres_tentative', 'verifier_capacite_tp_reservation')
+  loop
+    execute format('revoke execute on function %s from public, anon, authenticated', _f.sig);
+  end loop;
 
--- Fonctions de déclencheur : aucun appel client
-revoke execute on function public.attribuer_badges_apres_note_officielle()  from public, anon, authenticated;
-revoke execute on function public.handle_new_user()                         from public, anon, authenticated;
-revoke execute on function public.recalculer_maitrise_apres_tentative()     from public, anon, authenticated;
-revoke execute on function public.verifier_capacite_tp_reservation()        from public, anon, authenticated;
-
--- Fonctions publiques par conception : droits rappelés explicitement
-grant execute on function public.sujet_publie_pour_eleve(text)           to anon, authenticated;
-grant execute on function public.nb_indices(uuid)                        to anon, authenticated;
+  -- Fonctions publiques par conception : droits rappelés explicitement
+  for _f in
+    select p.oid::regprocedure as sig from pg_proc p
+    where p.pronamespace = 'public'::regnamespace
+      and p.proname in ('sujet_publie_pour_eleve', 'nb_indices')
+  loop
+    execute format('grant execute on function %s to anon, authenticated', _f.sig);
+  end loop;
+end;
+$$;
