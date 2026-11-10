@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import type { WorkspaceFile } from "@/components/workspace/types";
 import type { ProjectBuffer, BufferFile, SyncStatus, ConflictData } from "./types";
 import { getFromBuffer, saveToBuffer } from "./indexeddb";
-import { arbitrerRevisionDistante, createCoalescingQueue } from "./sync-utils";
+import { arbitrerRevisionDistante, createCoalescingQueue, delaiReprise } from "./sync-utils";
 import {
   getOrCreateProjet,
   sauvegarderFichierDistant,
@@ -30,14 +30,8 @@ interface UseBufferSyncOptions {
 
 /** Décalage aléatoire (0 à 500 ms) : évite que toute une classe synchronise à la même milliseconde. */
 const GIGUE_MAX_MS = 500;
-const REPRISE_BASE_MS = 2000;
-const REPRISE_MAX_MS = 60000;
 
-/** Délai de reprise après une erreur : exponentiel plafonné, avec gigue (« full jitter »). */
-export function delaiReprise(tentative: number, hasard: () => number = Math.random): number {
-  const plafond = Math.min(REPRISE_MAX_MS, REPRISE_BASE_MS * 2 ** Math.max(0, tentative - 1));
-  return Math.round(plafond / 2 + (hasard() * plafond) / 2);
-}
+export { delaiReprise };
 
 export function useBufferSync({
   exerciseId,

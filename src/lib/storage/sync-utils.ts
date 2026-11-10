@@ -53,3 +53,12 @@ export function arbitrerRevisionDistante(p: {
   if (p.starterContent !== undefined && p.localContent === p.starterContent) return "depart_intact";
   return "conflit";
 }
+
+const REPRISE_BASE_MS = 2000;
+const REPRISE_MAX_MS = 60000;
+
+/** Délai de reprise après une erreur : exponentiel plafonné, avec gigue (« full jitter »). */
+export function delaiReprise(tentative: number, hasard: () => number = Math.random): number {
+  const plafond = Math.min(REPRISE_MAX_MS, REPRISE_BASE_MS * 2 ** Math.max(0, tentative - 1));
+  return Math.round(plafond / 2 + (hasard() * plafond) / 2);
+}

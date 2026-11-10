@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback } from "react";
+import React, { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import {
   BookOpen,
   CheckCircle2,
@@ -29,6 +29,7 @@ import {
   type WrittenExamCopyState,
   type WrittenExamMotifCloture,
 } from "@/lib/exam/written-exam-service";
+import { creerSauvegardeBrouillon, remettreAvecReprise } from "@/lib/exam/written-exam-sync";
 import { WrittenQCM } from "./WrittenQCM";
 import { RelationalModelBox } from "./RelationalModelBox";
 import { SQLExecutorConsole } from "./SQLExecutorConsole";
@@ -50,6 +51,8 @@ export const WrittenExamEnvironment: React.FC<WrittenExamEnvironmentProps> = ({
   const manifest = useMemo(() => masquerCorrigeManifestEcrit(rawManifest), [rawManifest]);
 
   const [answers, setAnswers] = useState<Record<string, unknown>>({});
+  // Dernières réponses, lisibles sans attendre le prochain rendu (envoi différé et remise).
+  const answersRef = useRef<Record<string, unknown>>({});
   const [activeTab, setActiveTab] = useState<string>(manifest.sections[0]?.id || "section-0");
   const [isLocked, setIsLocked] = useState(false);
   const [motifCloture, setMotifCloture] = useState<WrittenExamMotifCloture>(null);
@@ -75,6 +78,7 @@ export const WrittenExamEnvironment: React.FC<WrittenExamEnvironmentProps> = ({
         setIsLocked(state.isLocked);
         setMotifCloture(state.motifCloture);
         if (Object.keys(state.reponses).length > 0) {
+          answersRef.current = state.reponses;
           setAnswers(state.reponses);
         }
       },
@@ -84,6 +88,30 @@ export const WrittenExamEnvironment: React.FC<WrittenExamEnvironmentProps> = ({
       cancelled = true;
     };
   }, [manifest.id, manifest.duration]);
+
+  // Brouillon envoyé en différé (#263) : une requête en vol au plus, toujours les dernières réponses.
+  const brouillon = useMemo(
+    () =>
+      creerSauvegardeBrouillon({
+        enregistrer: (reponses) => sauvegarderBrouillonExamenEcrit(manifest.id, reponses),
+        onVerrou: () => setIsLocked(true),
+      }),
+    [manifest.id],
+  );
+
+  // Dès que l'onglet passe en arrière-plan ou se ferme, on n'attend plus la fin du délai.
+  useEffect(() => {
+    const viderSiMasque = () => {
+      if (document.visibilityState === "hidden") void brouillon.vider();
+    };
+    document.addEventListener("visibilitychange", viderSiMasque);
+    window.addEventListener("pagehide", viderSiMasque);
+    return () => {
+      document.removeEventListener("visibilitychange", viderSiMasque);
+      window.removeEventListener("pagehide", viderSiMasque);
+      void brouillon.vider();
+    };
+  }, [brouillon]);
 
   // Dénombrement des questions et réponses pour la progression
   const allQuestions = useMemo(() => {
@@ -105,23 +133,12 @@ export const WrittenExamEnvironment: React.FC<WrittenExamEnvironmentProps> = ({
   const handleAnswerChange = useCallback(
     (questionId: string, value: unknown) => {
       if (isLocked) return;
-      setAnswers((prev) => {
-        const next = {
-          ...prev,
-          [questionId]: value,
-        };
-        void sauvegarderBrouillonExamenEcrit(manifest.id, next).then((res) => {
-          if (res.isLocked) {
-            setIsLocked(true);
-            if (res.motifCloture) {
-              setMotifCloture(res.motifCloture);
-            }
-          }
-        });
-        return next;
-      });
+      const next = { ...answersRef.current, [questionId]: value };
+      answersRef.current = next;
+      setAnswers(next);
+      brouillon.planifier(next);
     },
-    [isLocked, manifest.id],
+    [isLocked, brouillon],
   );
 
   const handleFinalSubmit = useCallback(
@@ -131,7 +148,18 @@ export const WrittenExamEnvironment: React.FC<WrittenExamEnvironmentProps> = ({
       setSubmitError(null);
 
       try {
-        const sealedState = await remettreCopieExamenEcrit(manifest.id, answers, motif);
+        // La remise embarque les dernières réponses ; un brouillon encore en route sera simplement
+        // refusé par le serveur une fois la copie scellée.
+        const sealedState = await remettreAvecReprise({
+          examId: manifest.id,
+          reponses: answersRef.current,
+          motif,
+          remettre: remettreCopieExamenEcrit,
+          recuperer: demarrerOuRecupererCopieExamenEcrit,
+          onNouvelEssai: () =>
+            setSubmitError("Connexion instable : nouvelle tentative de remise en cours…"),
+        });
+        setSubmitError(null);
         setCopyState(sealedState);
         setIsLocked(true);
         setMotifCloture(sealedState.motifCloture ?? motif);
@@ -148,7 +176,7 @@ export const WrittenExamEnvironment: React.FC<WrittenExamEnvironmentProps> = ({
         setIsSubmitting(false);
       }
     },
-    [answers, isLocked, isSubmitting, manifest.id, onEvaluationCompleted],
+    [isLocked, isSubmitting, manifest.id, onEvaluationCompleted],
   );
 
   const evaluationResult = copyState?.evaluationDetail ?? null;
