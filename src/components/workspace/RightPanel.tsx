@@ -4,10 +4,10 @@ import { PhpRunnerPanel } from "@/components/php/PhpRunnerPanel";
 import { PreviewSandbox } from "@/components/workspace/PreviewSandbox";
 
 /** Panneau droit : aperçu en bac à sable, base SQL et console PHP. */
-export function RightPanel({ ws }: { ws: WorkspaceState }) {
+export function RightPanel({ ws, hidden = false }: { ws: WorkspaceState; hidden?: boolean }) {
   const { files, activeFileName, hasSql, hasPhp, rightPanelTab, setRightPanelTab } = ws;
   return (
-    <section className="flex min-h-0 flex-col bg-background">
+    <section className={`${hidden ? "hidden" : "flex"} min-h-0 flex-1 flex-col bg-background`}>
       {(hasSql || hasPhp) && (
         <div className="flex border-b bg-panel text-xs font-mono shrink-0 select-none">
           <button

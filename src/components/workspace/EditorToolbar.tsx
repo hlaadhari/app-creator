@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 /** Action principale « Vérifier mon code » + menu secondaire (cours, réinitialisation). */
-export function EditorToolbar({ ws }: { ws: WorkspaceState }) {
+export function EditorToolbar({ ws, compact = false }: { ws: WorkspaceState; compact?: boolean }) {
   const {
     handleVerify,
     handleReset,
@@ -20,25 +20,27 @@ export function EditorToolbar({ ws }: { ws: WorkspaceState }) {
   } = ws;
   return (
     <div className="flex items-center justify-end gap-1.5 px-2 py-1 shrink-0">
-      <button
-        onClick={handleVerify}
-        disabled={verifying || isExamExpired}
-        className="flex items-center gap-1.5 rounded bg-emerald-600 hover:bg-emerald-500 text-white font-medium px-3 py-1 shadow-xs transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-        title={
-          isExamExpired
-            ? examCadre === "officiel"
-              ? "Vérification verrouillée : l'échéance serveur de l'examen officiel est dépassée"
-              : "Vérification en pause : relancez le chronomètre d'entraînement pour vérifier votre code"
-            : "Vérifier mon code (Ctrl + Entrée)"
-        }
-        aria-label="Vérifier mon code"
-      >
-        <Play className="h-3 w-3 fill-current" />
-        <span>{verifying ? "Vérification..." : "Vérifier mon code"}</span>
-        <kbd className="hidden sm:inline-block rounded bg-emerald-700/60 px-1 py-0.2 text-[9px] font-mono text-emerald-100 border border-emerald-500/40">
-          Ctrl ↵
-        </kbd>
-      </button>
+      {!compact && (
+        <button
+          onClick={handleVerify}
+          disabled={verifying || isExamExpired}
+          className="flex items-center gap-1.5 rounded bg-emerald-600 hover:bg-emerald-500 text-white font-medium px-3 py-1 shadow-xs transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+          title={
+            isExamExpired
+              ? examCadre === "officiel"
+                ? "Vérification verrouillée : l'échéance serveur de l'examen officiel est dépassée"
+                : "Vérification en pause : relancez le chronomètre d'entraînement pour vérifier votre code"
+              : "Vérifier mon code (Ctrl + Entrée)"
+          }
+          aria-label="Vérifier mon code"
+        >
+          <Play className="h-3 w-3 fill-current" />
+          <span>{verifying ? "Vérification..." : "Vérifier mon code"}</span>
+          <kbd className="hidden sm:inline-block rounded bg-emerald-700/60 px-1 py-0.2 text-[9px] font-mono text-emerald-100 border border-emerald-500/40">
+            Ctrl ↵
+          </kbd>
+        </button>
+      )}
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
@@ -46,7 +48,7 @@ export function EditorToolbar({ ws }: { ws: WorkspaceState }) {
             type="button"
             aria-label="Autres actions de l'éditeur"
             title="Autres actions"
-            className="flex h-7 w-7 items-center justify-center rounded border bg-background/60 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground cursor-pointer"
+            className="flex h-7 w-7 max-md:h-11 max-md:w-11 items-center justify-center rounded border bg-background/60 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground cursor-pointer"
           >
             <MoreHorizontal className="h-4 w-4" />
           </button>

@@ -5,7 +5,15 @@ import { FileTabs } from "@/components/workspace/FileTabs";
 import { MonacoEditorPane } from "@/components/workspace/MonacoEditorPane";
 
 /** Panneau central : onglets de fichiers, actions, éditeur Monaco ou visionneuse d'asset. */
-export function EditorPanel({ ws }: { ws: WorkspaceState }) {
+export function EditorPanel({
+  ws,
+  hidden = false,
+  mobile = false,
+}: {
+  ws: WorkspaceState;
+  hidden?: boolean;
+  mobile?: boolean;
+}) {
   const {
     activeFileName,
     currentFile,
@@ -17,11 +25,11 @@ export function EditorPanel({ ws }: { ws: WorkspaceState }) {
     setCursorPos,
   } = ws;
   return (
-    <section className="flex min-h-0 flex-col bg-editor">
+    <section className={`${hidden ? "hidden" : "flex"} min-h-0 flex-1 flex-col bg-editor`}>
       {/* Barre d'onglets de fichiers et actions d'évaluation */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b bg-panel text-xs font-mono shrink-0 select-none px-1 gap-1">
         <FileTabs ws={ws} />
-        <EditorToolbar ws={ws} />
+        <EditorToolbar ws={ws} compact={mobile} />
       </div>
 
       <ExamLockBanner ws={ws} />
@@ -44,6 +52,7 @@ export function EditorPanel({ ws }: { ws: WorkspaceState }) {
           </div>
         ) : (
           <MonacoEditorPane
+            mobile={mobile}
             value={currentFile.content}
             onChange={(newContent) => updateFileContent(activeFileName, newContent)}
             language={editorLanguage}

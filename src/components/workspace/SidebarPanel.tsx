@@ -8,7 +8,15 @@ import { SubjectTab } from "@/components/workspace/SubjectTab";
 import { WorkspaceFileTree } from "@/components/workspace/WorkspaceFileTree";
 
 /** Panneau latéral gauche : énoncé, fichiers, résultats et tuteur. */
-export function SidebarPanel({ ex, ws }: { ex: Exercise; ws: WorkspaceState }) {
+export function SidebarPanel({
+  ex,
+  ws,
+  hidden = false,
+}: {
+  ex: Exercise;
+  ws: WorkspaceState;
+  hidden?: boolean;
+}) {
   const id = ex.id;
   // Normalisation du dossier : Travail_Eleve/SW_<id> (F-16)
   const folderName = `Travail_Eleve/SW_${id.replace(/[^a-zA-Z0-9_-]/g, "")}`;
@@ -33,7 +41,7 @@ export function SidebarPanel({ ex, ws }: { ex: Exercise; ws: WorkspaceState }) {
     restartingExam,
   } = ws;
   return (
-    <aside className="flex min-h-0 flex-col bg-panel">
+    <aside className={`${hidden ? "hidden" : "flex"} min-h-0 flex-1 flex-col bg-panel`}>
       <div className="flex items-stretch border-b text-xs font-mono bg-panel/80 shrink-0">
         <SidebarTabButton
           active={sidebarTab === "enonce"}
