@@ -158,8 +158,14 @@ describe("Issue #135 (UX-03) — Conformité sémantique des Routes (h1, main, a
   });
 
   it("la route '/sujet/$id' contient un h1, un repère <main>, une région aria-live et le bandeau mobile", () => {
-    const sujetPath = path.resolve(process.cwd(), "src", "routes", "sujet.$id.tsx");
-    const content = fs.readFileSync(sujetPath, "utf-8");
+    // Le workspace est découpé (#242) : la route délègue à WorkspaceShell et WorkspaceHeader.
+    const content = [
+      path.resolve(process.cwd(), "src", "routes", "sujet.$id.tsx"),
+      path.resolve(process.cwd(), "src", "components", "workspace", "WorkspaceShell.tsx"),
+      path.resolve(process.cwd(), "src", "components", "workspace", "WorkspaceHeader.tsx"),
+    ]
+      .map((chemin) => fs.readFileSync(chemin, "utf-8"))
+      .join("\n");
 
     // h1 sémantique
     expect(content).toContain("<h1");
