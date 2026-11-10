@@ -46,8 +46,8 @@ export function SubjectTab({ ex, ws }: { ex: Exercise; ws: WorkspaceState }) {
           )}
         </div>
         {ex.sourceReference && (
-          <div className="mt-1.5 text-[11px] font-mono text-muted-foreground/80 flex items-center gap-1">
-            <span className="text-muted-foreground/60">Source :</span>
+          <div className="mt-1.5 text-[11px] font-mono text-muted-foreground flex items-center gap-1">
+            <span className="text-muted-foreground">Source :</span>
             <span>{ex.sourceReference}</span>
           </div>
         )}

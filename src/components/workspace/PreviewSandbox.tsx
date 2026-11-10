@@ -147,7 +147,7 @@ export function PreviewSandbox({ files, className = "" }: PreviewSandboxProps) {
       <div className="flex items-center justify-between border-b bg-panel px-3 py-1.5 text-xs font-mono">
         <div className="flex items-center gap-2 text-muted-foreground">
           <span className="font-semibold text-foreground">Aperçu en direct</span>
-          <span className="text-[10px] text-muted-foreground/80 hidden sm:inline">
+          <span className="text-[10px] text-muted-foreground hidden sm:inline">
             (Isolation sandbox étanche)
           </span>
         </div>

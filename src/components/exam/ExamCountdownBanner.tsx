@@ -78,7 +78,7 @@ export function ExamCountdownBanner({
       <div className="flex items-center gap-2.5">
         <div className="flex h-7 w-7 items-center justify-center rounded-full bg-background/80 shadow-xs">
           {isVoluntarySubmit ? (
-            <CheckCircle2 className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+            <CheckCircle2 className="h-4 w-4 text-emerald-400" />
           ) : isTimeExpired ? (
             <Lock className="h-4 w-4 text-destructive" />
           ) : countdown.isCritical ? (

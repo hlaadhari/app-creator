@@ -31,7 +31,7 @@ export function CourseSearch({ value, onChange, className = "" }: CourseSearchPr
           onChange={(e) => onChange(e.target.value)}
           placeholder="Rechercher une notion (ex: mysqli, verif, CHECK...)"
           aria-label="Rechercher une notion dans le cours"
-          className="w-full pl-9 pr-8 py-1.5 text-xs bg-background/80 border rounded-md focus:outline-none focus:ring-1 focus:ring-primary text-foreground placeholder:text-muted-foreground/60 transition-colors"
+          className="w-full pl-9 pr-8 py-1.5 text-xs bg-background/80 border rounded-md focus:outline-none focus:ring-1 focus:ring-primary text-foreground placeholder:text-muted-foreground transition-colors"
         />
         {value && (
           <button
@@ -48,7 +48,7 @@ export function CourseSearch({ value, onChange, className = "" }: CourseSearchPr
 
       {/* Raccourcis de recherche rapide */}
       <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5 text-[10px]">
-        <span className="text-muted-foreground/70 shrink-0 flex items-center gap-0.5">
+        <span className="text-muted-foreground shrink-0 flex items-center gap-0.5">
           <Sparkles className="h-2.5 w-2.5 text-primary" />
           Suggestions:
         </span>

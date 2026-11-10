@@ -205,7 +205,7 @@ export function WorkspaceFileTree({
       </div>
 
       {/* Guide glisser-déposer */}
-      <div className="p-2 border-t text-[10px] text-muted-foreground/80 font-mono text-center">
+      <div className="p-2 border-t text-[10px] text-muted-foreground font-mono text-center">
         <span>Glissez des images ou fichiers ici</span>
       </div>
     </div>

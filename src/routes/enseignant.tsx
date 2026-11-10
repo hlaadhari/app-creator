@@ -1057,7 +1057,7 @@ export function TeacherDashboardPage() {
                   >
                     <MessageSquareWarning className="w-3.5 h-3.5" />
                     <span>Contestations</span>
-                    <span className="hidden md:inline text-muted-foreground/70">(F-44)</span>
+                    <span className="hidden md:inline text-muted-foreground">(F-44)</span>
                   </TabsTrigger>
                   <TabsTrigger
                     value="similarity"
@@ -1151,7 +1151,7 @@ export function TeacherDashboardPage() {
           </div>
         ) : (
           <div className="text-center py-16 border rounded-xl bg-card space-y-3">
-            <Users className="w-10 h-10 mx-auto text-muted-foreground/60" />
+            <Users className="w-10 h-10 mx-auto text-muted-foreground" />
             <h3 className="text-sm font-semibold">Aucune classe pour l'instant</h3>
             <p className="text-xs text-muted-foreground max-w-sm mx-auto">
               Créez votre première classe pour générer des codes d'accès et suivre le travail de vos

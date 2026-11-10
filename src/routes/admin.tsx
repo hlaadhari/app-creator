@@ -350,7 +350,7 @@ function AdminDashboardPage() {
 
       {/* Bannière d'alerte ou message d'action */}
       {actionMessage && (
-        <div className="bg-emerald-500/10 border-b border-emerald-500/20 px-6 py-2 text-xs text-emerald-600 dark:text-emerald-400 font-medium flex items-center gap-2">
+        <div className="bg-emerald-500/10 border-b border-emerald-500/20 px-6 py-2 text-xs text-emerald-400 font-medium flex items-center gap-2">
           <CheckCircle2 className="w-4 h-4 shrink-0" />
           <span>{actionMessage}</span>
         </div>
@@ -543,7 +543,7 @@ function AdminDashboardPage() {
                               </span>
                             )
                           ) : (
-                            <span className="text-muted-foreground/60">—</span>
+                            <span className="text-muted-foreground">—</span>
                           )}
                         </td>
                         <td className="p-3 text-muted-foreground font-mono text-[11px]">
@@ -875,7 +875,7 @@ function AdminDashboardPage() {
                               Examen Blanc
                             </span>
                           ) : (
-                            <span className="text-muted-foreground/60">—</span>
+                            <span className="text-muted-foreground">—</span>
                           )}
                         </td>
                         <td className="p-3 text-right">

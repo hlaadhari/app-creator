@@ -125,7 +125,7 @@ export function getRoleBadgeInfo(role: AppRole | null): RoleBadgeInfo {
       return {
         label: "Élève",
         badgeClass:
-          "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/30",
+          "bg-emerald-500/10 text-emerald-400 border-emerald-500/30",
         description:
           "Compte élève : entraînement sur le catalogue Bac STI, sauvegarde automatique et adhésion aux classes.",
       };

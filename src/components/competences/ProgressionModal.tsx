@@ -164,14 +164,14 @@ export function ProgressionModal({
                           className="flex items-center justify-between text-xs p-2 rounded-md bg-emerald-500/5 border border-emerald-500/10"
                         >
                           <div className="flex items-center gap-2 truncate">
-                            <span className="font-mono text-[10px] text-emerald-600 dark:text-emerald-400 font-bold">
+                            <span className="font-mono text-[10px] text-emerald-400 font-bold">
                               {item.competence.code}
                             </span>
                             <span className="text-foreground truncate font-medium">
                               {item.competence.libelle}
                             </span>
                           </div>
-                          <span className="font-mono font-bold text-emerald-600 dark:text-emerald-400 shrink-0">
+                          <span className="font-mono font-bold text-emerald-400 shrink-0">
                             {item.percentage}%
                           </span>
                         </div>
@@ -215,7 +215,7 @@ export function ProgressionModal({
                       ))}
                     </div>
                   ) : (
-                    <p className="text-xs text-emerald-600 dark:text-emerald-400 font-medium">
+                    <p className="text-xs text-emerald-400 font-medium">
                       Bravo ! Aucune compétence critique en difficulté.
                     </p>
                   )}

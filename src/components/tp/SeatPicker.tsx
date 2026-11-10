@@ -75,7 +75,7 @@ export function SeatPicker({
           {isApproved && (
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-emerald-500/10 border border-emerald-500/20 p-4 rounded-lg">
               <div className="flex items-start gap-3">
-                <CheckCircle2 className="h-5 w-5 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
+                <CheckCircle2 className="h-5 w-5 text-emerald-400 shrink-0 mt-0.5" />
                 <div>
                   <div className="font-semibold text-sm text-emerald-950 dark:text-emerald-100 flex items-center gap-2">
                     <span>
@@ -223,7 +223,7 @@ export function SeatPicker({
                     Poste {String(seat.seatNumber).padStart(2, "0")}
                   </span>
                   {seat.status === "libre" ? (
-                    <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-medium">
+                    <span className="text-[10px] text-emerald-400 font-medium">
                       Libre
                     </span>
                   ) : seat.status === "pending" ? (

@@ -70,7 +70,7 @@ export function CourseSidebar({
             onChange={(e) => onSearchChange(e.target.value)}
             placeholder="Rechercher (ex: mysqli, verif...)"
             aria-label="Rechercher dans le sommaire du cours"
-            className="w-full pl-8 pr-7 py-1.5 text-xs bg-background/60 border rounded-md focus:outline-none focus:ring-1 focus:ring-primary text-foreground placeholder:text-muted-foreground/60 transition-colors"
+            className="w-full pl-8 pr-7 py-1.5 text-xs bg-background/60 border rounded-md focus:outline-none focus:ring-1 focus:ring-primary text-foreground placeholder:text-muted-foreground transition-colors"
           />
           {searchQuery && (
             <button
@@ -126,7 +126,7 @@ export function CourseSidebar({
                 </div>
                 <ChevronRight
                   className={`h-3.5 w-3.5 shrink-0 transition-transform ${
-                    isActive ? "rotate-90 text-primary" : "text-muted-foreground/60"
+                    isActive ? "rotate-90 text-primary" : "text-muted-foreground"
                   }`}
                 />
               </button>

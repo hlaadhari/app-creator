@@ -96,7 +96,7 @@ export function ReferenceSolutionModal({
             {!examMode && !error && files.length > 0 && (
               <Badge
                 variant="outline"
-                className="text-[11px] gap-1 bg-emerald-500/10 text-emerald-600 border-emerald-500/30"
+                className="text-[11px] gap-1 bg-emerald-500/10 text-emerald-400 border-emerald-500/30"
               >
                 <Sparkles className="h-3 w-3" />
                 Validé par l'inspection STI

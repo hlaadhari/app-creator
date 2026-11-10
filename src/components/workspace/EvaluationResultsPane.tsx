@@ -333,7 +333,7 @@ export function EvaluationResultsPane({
         {latestDelta && latestDelta.formattedNoteDelta !== "1re tentative" && (
           <div className="flex items-center justify-center gap-1.5 text-xs font-medium">
             {latestDelta.progression === "amelioration" && (
-              <span className="flex items-center gap-1 text-emerald-600 dark:text-emerald-400">
+              <span className="flex items-center gap-1 text-emerald-400">
                 <TrendingUp className="h-3.5 w-3.5" />
                 <span>{latestDelta.formattedNoteDelta} depuis la dernière vérification</span>
               </span>
@@ -439,7 +439,7 @@ export function EvaluationResultsPane({
                           !automatique
                             ? "text-muted-foreground"
                             : r.passed
-                              ? "text-emerald-700 dark:text-emerald-300"
+                              ? "text-emerald-400"
                               : "text-amber-700 dark:text-amber-300"
                         }`}
                       >
@@ -451,7 +451,7 @@ export function EvaluationResultsPane({
                   <span
                     className={`font-mono text-xs font-semibold px-2 py-0.5 rounded border shrink-0 ${
                       r.passed
-                        ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/30"
+                        ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/30"
                         : "bg-muted text-muted-foreground border-border"
                     }`}
                   >
@@ -565,7 +565,7 @@ export function EvaluationResultsPane({
                         {contestation.statut === "acceptee" && (
                           <Badge
                             variant="outline"
-                            className="text-[10px] gap-1 bg-emerald-500/10 text-emerald-600 border-emerald-500/30"
+                            className="text-[10px] gap-1 bg-emerald-500/10 text-emerald-400 border-emerald-500/30"
                           >
                             <CheckCircle2 className="h-2.5 w-2.5" />
                             <span>Contestation acceptée (+ points validés)</span>

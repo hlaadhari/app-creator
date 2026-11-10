@@ -311,7 +311,7 @@ function Index() {
                   <div className="font-medium text-sm text-foreground">{c.nom}</div>
                   <div className="flex items-center justify-between text-xs text-muted-foreground mt-2 font-mono">
                     <span>{c.annee}</span>
-                    <span className="text-[10px] bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 px-1.5 py-0.5 rounded border border-emerald-500/20">
+                    <span className="text-[10px] bg-emerald-500/10 text-emerald-400 px-1.5 py-0.5 rounded border border-emerald-500/20">
                       Inscrit
                     </span>
                   </div>
@@ -392,7 +392,7 @@ function Index() {
                 className="group flex min-w-0 flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 rounded-lg border bg-card p-4 transition-all hover:border-primary hover:shadow-xs"
               >
                 <div className="flex items-center gap-3">
-                  <span className="font-mono text-xl font-bold text-muted-foreground/60 group-hover:text-primary transition-colors w-8">
+                  <span className="font-mono text-xl font-bold text-muted-foreground group-hover:text-primary transition-colors w-8">
                     {String(i + 1).padStart(2, "0")}
                   </span>
                   <div className="flex flex-wrap items-center gap-1.5 sm:hidden">
@@ -523,7 +523,7 @@ function Index() {
                         );
                       }
                       return (
-                        <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 text-xs font-mono text-muted-foreground/60 shrink-0">
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 text-xs font-mono text-muted-foreground shrink-0">
                           <span className="h-1.5 w-1.5 rounded-full bg-muted-foreground/30" />
                           <span>Non commencé</span>
                         </span>

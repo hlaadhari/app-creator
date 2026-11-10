@@ -361,7 +361,7 @@ export function DatabasePanel({
                   </div>
                 ) : queryResult.rows.length === 0 ? (
                   <div className="flex items-center justify-between text-xs text-muted-foreground p-2">
-                    <span className="flex items-center gap-1.5 text-emerald-600">
+                    <span className="flex items-center gap-1.5 text-emerald-400">
                       <CheckCircle className="h-4 w-4" />
                       Requête exécutée avec succès ({queryResult.rowsAffected} ligne(s) affectée(s))
                     </span>

@@ -24,7 +24,7 @@ export function SeatGridAdmin({
   const getStatusColor = (status: SeatInfo["status"]) => {
     switch (status) {
       case "libre":
-        return "bg-emerald-500/10 border-emerald-500/30 text-emerald-600 dark:text-emerald-400 hover:border-emerald-500";
+        return "bg-emerald-500/10 border-emerald-500/30 text-emerald-400 hover:border-emerald-500";
       case "pending":
         return "bg-amber-500/15 border-amber-500/40 text-amber-700 dark:text-amber-300 hover:border-amber-500 animate-pulse";
       case "approved":
@@ -38,7 +38,7 @@ export function SeatGridAdmin({
     switch (status) {
       case "libre":
         return (
-          <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-medium">
+          <span className="text-[10px] text-emerald-400 font-medium">
             Libre
           </span>
         );

@@ -118,7 +118,7 @@ export function SyncStatusBar({
         )}
 
         {/* Dernier horodatage local */}
-        <span className="hidden text-muted-foreground/80 md:inline">
+        <span className="hidden text-muted-foreground md:inline">
           Enregistré : {formatTime(lastSavedAt)}
         </span>
       </div>

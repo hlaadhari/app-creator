@@ -172,7 +172,7 @@ export const WrittenExamCopiesTab: React.FC<WrittenExamCopiesTabProps> = ({
                     {copy.statut === "corrigee" ? (
                       <Badge
                         variant="secondary"
-                        className="text-[10px] gap-1 bg-emerald-500/15 text-emerald-700 dark:text-emerald-300"
+                        className="text-[10px] gap-1 bg-emerald-500/15 text-emerald-400"
                       >
                         <CheckCircle2 className="w-3 h-3" />
                         Corrigée ({copy.noteFinale}/{copy.baremeTotal})
@@ -230,7 +230,7 @@ export const WrittenExamCopiesTab: React.FC<WrittenExamCopiesTabProps> = ({
                   <div className="flex items-center gap-2">
                     {selectedCopy.hashSha256 && (
                       <Badge variant="outline" className="text-[10px] font-mono gap-1">
-                        <ShieldCheck className="w-3 h-3 text-emerald-600" />
+                        <ShieldCheck className="w-3 h-3 text-emerald-400" />
                         {selectedCopy.hashSha256.slice(0, 10)}…
                       </Badge>
                     )}
@@ -245,7 +245,7 @@ export const WrittenExamCopiesTab: React.FC<WrittenExamCopiesTabProps> = ({
                     role="alert"
                     className={`rounded-md border px-3 py-2 text-xs flex items-center gap-2 ${
                       feedbackMsg.type === "ok"
-                        ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300"
+                        ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-400"
                         : "border-destructive/40 bg-destructive/10 text-destructive"
                     }`}
                   >

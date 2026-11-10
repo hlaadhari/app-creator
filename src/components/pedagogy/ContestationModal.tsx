@@ -138,7 +138,7 @@ export function ContestationModal({
                 <Clock className="h-4 w-4 shrink-0 mt-0.5 text-amber-600" />
               )}
               {existingContestation.statut === "acceptee" && (
-                <CheckCircle2 className="h-4 w-4 shrink-0 mt-0.5 text-emerald-600" />
+                <CheckCircle2 className="h-4 w-4 shrink-0 mt-0.5 text-emerald-400" />
               )}
               {existingContestation.statut === "rejetee" && (
                 <ShieldAlert className="h-4 w-4 shrink-0 mt-0.5 text-rose-600" />
@@ -187,7 +187,7 @@ export function ContestationModal({
                 <span>Argumentez votre démarche technique</span>
                 <span
                   className={`font-mono font-medium ${
-                    isValidLength ? "text-emerald-600 dark:text-emerald-400" : "text-amber-500"
+                    isValidLength ? "text-emerald-400" : "text-amber-500"
                   }`}
                 >
                   {charCount} / 10 caractères min.

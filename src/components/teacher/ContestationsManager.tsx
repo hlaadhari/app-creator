@@ -93,14 +93,14 @@ export function ContestationsManager({
         <Card className="border-emerald-500/30 bg-emerald-500/10">
           <CardContent className="p-4 flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-lg bg-emerald-500/20 text-emerald-600 flex items-center justify-center">
+              <div className="w-9 h-9 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center">
                 <Calculator className="w-5 h-5" />
               </div>
               <div>
                 <p className="text-xs font-bold text-emerald-800 dark:text-emerald-300">
                   Recalcul automatique instantané exécuté (PRD F-45)
                 </p>
-                <p className="text-xs text-emerald-700 dark:text-emerald-400">
+                <p className="text-xs text-emerald-400">
                   Critère neutralisé pour toute la classe. {lastRecalcul.eleves_impactes} note(s)
                   réajustée(s). Moyenne de classe : {lastRecalcul.moyenne_avant}/20 ➔{" "}
                   <strong>{lastRecalcul.moyenne_apres}/20</strong>.
@@ -157,7 +157,7 @@ export function ContestationsManager({
                           En attente d'arbitrage
                         </Badge>
                       ) : isAccepted ? (
-                        <Badge className="bg-emerald-500/10 text-emerald-600 border-emerald-500/20 text-[10px]">
+                        <Badge className="bg-emerald-500/10 text-emerald-400 border-emerald-500/20 text-[10px]">
                           Acceptée & Critère Neutralisé
                         </Badge>
                       ) : (
@@ -204,7 +204,7 @@ export function ContestationsManager({
           })
         ) : (
           <div className="text-center py-12 border rounded-xl bg-card space-y-2">
-            <HelpCircle className="w-8 h-8 mx-auto text-muted-foreground/60" />
+            <HelpCircle className="w-8 h-8 mx-auto text-muted-foreground" />
             <p className="text-xs text-muted-foreground">
               Aucune contestation enregistrée pour cette classe.
             </p>
