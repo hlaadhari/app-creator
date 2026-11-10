@@ -19,6 +19,7 @@ import { VideoPlayerModal } from "@/components/course/VideoPlayerModal";
 import { SproutLogo } from "@/components/SproutLogo";
 import { AuthModal } from "@/components/AuthModal";
 import { Button } from "@/components/ui/button";
+import { AppHeader, MAIN_CONTENT_ID } from "@/components/layout/AppHeader";
 import {
   ArrowLeft,
   BookOpen,
@@ -179,8 +180,10 @@ function CoursPage() {
   return (
     <div className="flex flex-col h-screen w-screen overflow-hidden bg-background text-foreground">
       {/* Barre de navigation supérieure */}
-      <header className="h-12 border-b flex items-center justify-between px-4 bg-panel/85 backdrop-blur shrink-0 z-20 gap-2">
-        <div className="flex items-center gap-3 min-w-0">
+      <AppHeader
+        current="cours"
+        hideNav={false}
+        leading={
           <button
             onClick={() => setMobileSidebarOpen(!mobileSidebarOpen)}
             className="md:hidden p-1.5 rounded hover:bg-accent text-muted-foreground hover:text-foreground cursor-pointer"
@@ -189,19 +192,8 @@ function CoursPage() {
           >
             {mobileSidebarOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
           </button>
-
-          <Link
-            to="/"
-            className="flex items-center gap-2 hover:opacity-85 transition-opacity shrink-0"
-          >
-            <SproutLogo size="sm" showText={false} />
-            <span className="font-bold text-xs tracking-tight text-foreground hidden sm:inline">
-              Labo STI
-            </span>
-          </Link>
-
-          <div className="h-4 w-[1px] bg-border mx-1 hidden sm:block shrink-0" />
-
+        }
+        breadcrumb={
           <div className="flex items-center gap-1.5 shrink-0">
             <BookOpen className="h-4 w-4 text-primary shrink-0" />
             <h1 className="text-xs font-semibold text-foreground">Carnet STI-BAC INFO</h1>
@@ -209,87 +201,76 @@ function CoursPage() {
               10 Vidéos • 262 Sources
             </span>
           </div>
-        </div>
-
-        {/* Sélecteur de mode d'affichage : Fiches Mémento | Manuel Complet | Annales */}
-        <div className="flex items-center gap-1 bg-background/60 p-0.5 rounded-lg border border-border overflow-x-auto max-w-full">
-          <button
-            type="button"
-            onClick={() => setViewMode("memento")}
-            className={`flex items-center gap-1 px-2.5 sm:px-3 py-1 rounded-md text-xs font-medium transition-colors cursor-pointer whitespace-nowrap ${
-              viewMode === "memento"
-                ? "bg-primary text-primary-foreground font-semibold shadow-xs"
-                : "text-muted-foreground hover:text-foreground"
-            }`}
-          >
-            <Layers className="h-3.5 w-3.5 shrink-0" />
-            <span>Fiches Mémento</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => setViewMode("manuel")}
-            className={`flex items-center gap-1 px-2.5 sm:px-3 py-1 rounded-md text-xs font-medium transition-colors cursor-pointer whitespace-nowrap ${
-              viewMode === "manuel"
-                ? "bg-primary text-primary-foreground font-semibold shadow-xs"
-                : "text-muted-foreground hover:text-foreground"
-            }`}
-          >
-            <FileText className="h-3.5 w-3.5 shrink-0" />
-            <span>Manuel Complet</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => setViewMode("annales")}
-            className={`flex items-center gap-1 px-2.5 sm:px-3 py-1 rounded-md text-xs font-medium transition-colors cursor-pointer whitespace-nowrap ${
-              viewMode === "annales"
-                ? "bg-primary text-primary-foreground font-semibold shadow-xs"
-                : "text-muted-foreground hover:text-foreground"
-            }`}
-          >
-            <Film className="h-3.5 w-3.5 shrink-0" />
-            <span>Annales</span>
-          </button>
-        </div>
-
-        <div className="flex items-center gap-1.5 shrink-0">
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={() => setRevisionGuideOpen(true)}
-            className="gap-1.5 text-xs h-8 cursor-pointer hidden sm:inline-flex"
-            title="Consulter ou télécharger le Guide de Révision Synthétique - 4ème Bac STI"
-          >
-            <FileDown className="h-3.5 w-3.5 text-primary" />
-            <span className="hidden xl:inline">Guide de Révision Synthétique</span>
-            <span className="xl:hidden">Guide STI</span>
-          </Button>
-
-          <Button
-            type="button"
-            variant={tutorOpen ? "default" : "outline"}
-            size="sm"
-            onClick={() => setTutorOpen((o) => !o)}
-            className="gap-1.5 text-xs h-8 cursor-pointer"
-            title="Ouvrir/Fermer le Tuteur IA du Carnet STI-BAC INFO"
-          >
-            <Bot className="h-3.5 w-3.5" />
-            <span className="hidden md:inline">Tuteur STI-BAC</span>
-          </Button>
-
-          <Link to="/">
-            <Button
-              variant="ghost"
-              size="sm"
-              className="gap-1.5 text-xs text-muted-foreground hover:text-foreground h-8"
+        }
+        center={
+          <div className="flex items-center gap-1 bg-background/60 p-0.5 rounded-lg border border-border overflow-x-auto max-w-full">
+            <button
+              type="button"
+              onClick={() => setViewMode("memento")}
+              className={`flex items-center gap-1 px-2.5 sm:px-3 py-1 rounded-md text-xs font-medium transition-colors cursor-pointer whitespace-nowrap ${
+                viewMode === "memento"
+                  ? "bg-primary text-primary-foreground font-semibold shadow-xs"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
             >
-              <ArrowLeft className="h-3.5 w-3.5" />
-              <span className="hidden sm:inline">Retour aux Sujets</span>
+              <Layers className="h-3.5 w-3.5 shrink-0" />
+              <span>Fiches Mémento</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setViewMode("manuel")}
+              className={`flex items-center gap-1 px-2.5 sm:px-3 py-1 rounded-md text-xs font-medium transition-colors cursor-pointer whitespace-nowrap ${
+                viewMode === "manuel"
+                  ? "bg-primary text-primary-foreground font-semibold shadow-xs"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              <FileText className="h-3.5 w-3.5 shrink-0" />
+              <span>Manuel Complet</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setViewMode("annales")}
+              className={`flex items-center gap-1 px-2.5 sm:px-3 py-1 rounded-md text-xs font-medium transition-colors cursor-pointer whitespace-nowrap ${
+                viewMode === "annales"
+                  ? "bg-primary text-primary-foreground font-semibold shadow-xs"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              <Film className="h-3.5 w-3.5 shrink-0" />
+              <span>Annales</span>
+            </button>
+          </div>
+        }
+        actions={
+          <>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => setRevisionGuideOpen(true)}
+              className="gap-1.5 text-xs h-8 cursor-pointer hidden sm:inline-flex"
+              title="Consulter ou télécharger le Guide de Révision Synthétique - 4ème Bac STI"
+            >
+              <FileDown className="h-3.5 w-3.5 text-primary" />
+              <span className="hidden xl:inline">Guide de Révision Synthétique</span>
+              <span className="xl:hidden">Guide STI</span>
             </Button>
-          </Link>
-          <AuthModal />
-        </div>
-      </header>
+
+            <Button
+              type="button"
+              variant={tutorOpen ? "default" : "outline"}
+              size="sm"
+              onClick={() => setTutorOpen((o) => !o)}
+              className="gap-1.5 text-xs h-8 cursor-pointer"
+              title="Ouvrir/Fermer le Tuteur IA du Carnet STI-BAC INFO"
+            >
+              <Bot className="h-3.5 w-3.5" />
+              <span className="hidden md:inline">Tuteur STI-BAC</span>
+            </Button>
+          </>
+        }
+      />
 
       {/* Sommaire Flottant / Sticky Navigation : accès direct aux 6 modules + filtres rapides */}
       <nav
@@ -443,7 +424,7 @@ function CoursPage() {
       )}
 
       {/* Contenu principal + Volet Tuteur IA Carnet STI-BAC INFO */}
-      <main className="flex flex-1 min-h-0 relative">
+      <main id={MAIN_CONTENT_ID} className="flex flex-1 min-h-0 relative">
         {viewMode === "manuel" ? (
           <>
             <div className="hidden md:flex w-72 lg:w-80 shrink-0 h-full border-r">

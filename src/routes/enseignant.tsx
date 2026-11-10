@@ -63,6 +63,7 @@ import { telechargerExportPronote } from "@/lib/export/pronote-export";
 import { SimilarityAnalysisTab } from "@/components/teacher/SimilarityAnalysisTab";
 import { TeacherAccessRequest } from "@/components/teacher/TeacherAccessRequest";
 import { AuthModal } from "@/components/AuthModal";
+import { AppHeader, MAIN_CONTENT_ID } from "@/components/layout/AppHeader";
 import { estModeDemo } from "@/lib/demo-mode";
 import type { StudentCopyData } from "@/lib/similarity/types";
 
@@ -780,66 +781,52 @@ export function TeacherDashboardPage() {
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col">
       {/* Barre supérieure Enseignant */}
-      <header className="border-b bg-card px-6 py-3 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <Link
-            to="/"
-            className="text-muted-foreground hover:text-foreground text-xs flex items-center gap-1 transition-colors"
-          >
-            <ArrowLeft className="w-3.5 h-3.5" />
-            Espace élève
-          </Link>
-          <span className="text-muted-foreground">/</span>
-          <div className="flex items-center gap-2">
-            <GraduationCap className="w-5 h-5 text-primary" />
-            <h1 className="text-sm font-semibold tracking-tight">Tableau de Bord Enseignant</h1>
-          </div>
-          <Badge
-            variant="outline"
-            className={`text-[10px] ${isDemo ? "bg-amber-500/10 text-amber-500 border-amber-500/20" : "bg-primary/10 text-primary border-primary/20"}`}
-          >
-            {isDemo
-              ? "Mode Démonstration"
-              : role === "admin"
-                ? "Administrateur"
-                : "Enseignant certifié"}
-          </Badge>
-        </div>
-
-        <div className="flex items-center gap-3 text-xs">
-          <span className="text-muted-foreground">
-            Connecté :{" "}
-            <strong className="text-foreground">
-              {isDemo
-                ? "Professeur (Démo)"
-                : `${profile?.prenom || ""} ${profile?.nom || ""}`.trim() ||
-                  user?.email ||
-                  "Enseignant"}
-            </strong>
-          </span>
-          {(role === "admin" || isDemo) && (
-            <Link
-              to="/admin"
-              search={isDemo ? { demo: "true" } : {}}
-              className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-md border border-primary/30 bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
+      <AppHeader
+        current="enseignant"
+        demo={isDemo}
+        breadcrumb={
+          <>
+            <div className="flex items-center gap-2">
+              <GraduationCap className="w-5 h-5 text-primary" />
+              <h1 className="text-sm font-semibold tracking-tight">Tableau de Bord Enseignant</h1>
+            </div>
+            <Badge
+              variant="outline"
+              className={`text-[10px] ${isDemo ? "bg-amber-500/10 text-amber-500 border-amber-500/20" : "bg-primary/10 text-primary border-primary/20"}`}
             >
-              <Shield className="w-3.5 h-3.5" />
-              Espace Admin
-            </Link>
-          )}
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={() => selectedClassId && loadClassDetails(selectedClassId)}
-            className="h-8 text-xs gap-1.5"
-            disabled={loadingData}
-          >
-            <RefreshCw className={`w-3.5 h-3.5 ${loadingData ? "animate-spin" : ""}`} />
-            Actualiser
-          </Button>
-          {!isDemo && <AuthModal />}
-        </div>
-      </header>
+              {isDemo
+                ? "Mode Démonstration"
+                : role === "admin"
+                  ? "Administrateur"
+                  : "Enseignant certifié"}
+            </Badge>
+          </>
+        }
+        actions={
+          <>
+            <span className="hidden xl:inline text-muted-foreground">
+              Connecté :{" "}
+              <strong className="text-foreground">
+                {isDemo
+                  ? "Professeur (Démo)"
+                  : `${profile?.prenom || ""} ${profile?.nom || ""}`.trim() ||
+                    user?.email ||
+                    "Enseignant"}
+              </strong>
+            </span>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => selectedClassId && loadClassDetails(selectedClassId)}
+              className="h-8 text-xs gap-1.5"
+              disabled={loadingData}
+            >
+              <RefreshCw className={`w-3.5 h-3.5 ${loadingData ? "animate-spin" : ""}`} />
+              Actualiser
+            </Button>
+          </>
+        }
+      />
 
       {erreurChargement && (
         <div
@@ -855,7 +842,7 @@ export function TeacherDashboardPage() {
       )}
 
       {/* Contenu principal */}
-      <main className="flex-1 p-6 max-w-7xl w-full mx-auto space-y-6">
+      <main id={MAIN_CONTENT_ID} className="flex-1 p-6 max-w-7xl w-full mx-auto space-y-6">
         {/* Sélecteur de classe */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b pb-4">
           <div className="flex flex-wrap items-center gap-2">

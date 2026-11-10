@@ -20,6 +20,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { SproutLogo } from "@/components/SproutLogo";
 import { AuthModal } from "@/components/AuthModal";
+import { AppHeader, MAIN_CONTENT_ID } from "@/components/layout/AppHeader";
 import {
   Calendar,
   Clock,
@@ -228,44 +229,10 @@ function CalendrierPage() {
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col">
       {/* En-tête de navigation */}
-      <header className="border-b px-6 py-3.5 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <Link
-            to="/"
-            className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1 transition-colors"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            <span>Accueil</span>
-          </Link>
-          <span className="text-muted-foreground">/</span>
-          <SproutLogo size="sm" subtitle="Planning TP & Postes" />
-        </div>
-
-        <div className="flex items-center gap-3">
-          {isTeacherOrAdmin && (
-            <Link to="/enseignant">
-              <Button
-                variant="outline"
-                size="sm"
-                className="gap-1.5 text-xs text-primary border-primary/30 hover:bg-primary/10"
-              >
-                <GraduationCap className="h-4 w-4" />
-                <span className="hidden sm:inline">Espace Enseignant</span>
-              </Button>
-            </Link>
-          )}
-
-          <Link to="/cours">
-            <Button
-              variant="outline"
-              size="sm"
-              className="gap-1.5 text-xs text-foreground border-border hover:bg-accent/40"
-            >
-              <BookOpen className="h-4 w-4 text-primary" />
-              <span className="hidden sm:inline">Mémento STI</span>
-            </Button>
-          </Link>
-
+      <AppHeader
+        current="calendrier"
+        subtitle="Planning TP & Postes"
+        actions={
           <Button
             variant="ghost"
             size="sm"
@@ -276,13 +243,11 @@ function CalendrierPage() {
             <RefreshCw className={`h-3.5 w-3.5 ${isLoading ? "animate-spin" : ""}`} />
             <span className="hidden sm:inline">Actualiser</span>
           </Button>
-
-          <AuthModal />
-        </div>
-      </header>
+        }
+      />
 
       {/* Contenu principal */}
-      <main className="flex-1 mx-auto max-w-6xl w-full px-6 py-8">
+      <main id={MAIN_CONTENT_ID} className="flex-1 mx-auto max-w-6xl w-full px-6 py-8">
         {/* Bandeau de bascule Enseignant / Admin : Supervision & Validation vs Vue Élève */}
         {isTeacherOrAdmin && (
           <div className="mb-6 rounded-xl border border-primary/30 bg-primary/5 p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">

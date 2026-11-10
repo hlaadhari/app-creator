@@ -23,6 +23,7 @@ import {
 } from "@/lib/pedagogy/bareme-repartition";
 import { RepriseRapideBanner } from "@/components/workspace/RepriseRapideBanner";
 import { BaremeRepartitionBadge } from "@/components/workspace/BaremeRepartitionBadge";
+import { AppHeader, MAIN_CONTENT_ID } from "@/components/layout/AppHeader";
 import {
   HelpCircle,
   GraduationCap,
@@ -212,85 +213,31 @@ function Index() {
 
   return (
     <div className="min-h-screen">
-      <header className="border-b px-6 py-3.5 flex items-center justify-between">
-        <SproutLogo size="sm" subtitle="Baccalauréat STI" />
-        <div className="flex items-center gap-3">
-          {/* Mémento & Support de cours officiel */}
-          <Link to="/cours">
+      <AppHeader
+        current="catalogue"
+        subtitle="Baccalauréat STI"
+        authSlot={<AuthModal onClassesChanged={loadData} />}
+        actions={
+          <>
             <Button
-              variant="outline"
+              variant="ghost"
               size="sm"
-              className="gap-1.5 text-xs text-foreground border-border hover:bg-accent/40"
-              aria-label="Mémento STI"
+              onClick={() => setShowGuide(true)}
+              className="gap-1.5 text-xs text-muted-foreground hover:text-foreground"
+              aria-label="Guide de démarrage"
             >
-              <BookOpen className="h-4 w-4 text-primary" />
-              <span className="hidden sm:inline">Mémento STI</span>
+              <HelpCircle className="h-4 w-4" />
+              <span className="hidden sm:inline">Guide de démarrage</span>
             </Button>
-          </Link>
 
-          {/* Planning des Séances TP & Réservation de Postes (Issue #161) */}
-          <Link to="/calendrier">
-            <Button
-              variant="outline"
-              size="sm"
-              className="gap-1.5 text-xs text-foreground border-border hover:bg-accent/40"
-              aria-label="Planning et Postes TP"
-            >
-              <Calendar className="h-4 w-4 text-primary" />
-              <span className="hidden sm:inline">Séances TP</span>
-            </Button>
-          </Link>
+            <ProgressionModal />
 
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setShowGuide(true)}
-            className="gap-1.5 text-xs text-muted-foreground hover:text-foreground"
-            aria-label="Guide de démarrage"
-          >
-            <HelpCircle className="h-4 w-4" />
-            <span className="hidden sm:inline">Guide de démarrage</span>
-          </Button>
+            {user && <JoinClassModal onClassJoined={loadData} />}
+          </>
+        }
+      />
 
-          {/* Espace Enseignant réservé aux rôles enseignant et admin connectés */}
-          {(role === "enseignant" || role === "admin") && (
-            <Link to="/enseignant">
-              <Button
-                variant="outline"
-                size="sm"
-                className="gap-1.5 text-xs text-primary border-primary/30 hover:bg-primary/10"
-                aria-label="Espace Enseignant"
-              >
-                <GraduationCap className="h-4 w-4" />
-                <span className="hidden sm:inline">Espace Enseignant</span>
-              </Button>
-            </Link>
-          )}
-
-          {/* Espace Administration réservé aux administrateurs connectés */}
-          {role === "admin" && (
-            <Link to="/admin">
-              <Button
-                variant="outline"
-                size="sm"
-                className="gap-1.5 text-xs text-rose-500 border-rose-500/30 hover:bg-rose-500/10"
-                aria-label="Administration"
-              >
-                <Shield className="h-4 w-4" />
-                <span className="hidden sm:inline">Administration</span>
-              </Button>
-            </Link>
-          )}
-
-          <ProgressionModal />
-
-          {user && <JoinClassModal onClassJoined={loadData} />}
-
-          <AuthModal onClassesChanged={loadData} />
-        </div>
-      </header>
-
-      <main className="mx-auto max-w-4xl px-6 py-12">
+      <main id={MAIN_CONTENT_ID} className="mx-auto max-w-4xl px-6 py-12">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
           <div>
             <p className="font-mono text-xs uppercase tracking-wider text-primary">
