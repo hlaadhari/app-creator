@@ -233,22 +233,17 @@ function Index() {
         subtitle="Baccalauréat STI"
         authSlot={<AuthModal onClassesChanged={loadData} />}
         actions={
-          <>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setShowGuide(true)}
-              className="gap-1.5 text-xs text-muted-foreground hover:text-foreground"
-              aria-label="Guide de démarrage"
-            >
-              <HelpCircle className="h-4 w-4" />
-              <span>Guide de démarrage</span>
-            </Button>
-
-            <ProgressionModal />
-
-            {user && <JoinClassModal onClassJoined={loadData} />}
-          </>
+          // En-tête allégé : le bilan et « Rejoindre une classe » sont déjà dans le corps de page.
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setShowGuide(true)}
+            className="h-8 w-8 text-muted-foreground hover:text-foreground"
+            aria-label="Guide de démarrage"
+            title="Guide de démarrage"
+          >
+            <HelpCircle className="h-4 w-4" />
+          </Button>
         }
       />
 
@@ -281,8 +276,9 @@ function Index() {
               }
             />
 
-            {!user && (
+            {(!user || mesClasses.length === 0) && (
               <JoinClassModal
+                onClassJoined={loadData}
                 triggerButton={
                   <Button
                     size="sm"
