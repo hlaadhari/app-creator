@@ -108,6 +108,26 @@
           "explanation": "La balise link, placée dans head, relie la page à la feuille de style : rel=\"stylesheet\" et href donnent le fichier."
         }
       ]
+    },
+    {
+      "id": "css-pseudo-classes",
+      "title": "6. Pseudo-classes :hover et :focus",
+      "description": "Réagir au survol et à la saisie : mettre en évidence le champ actif d'un formulaire.",
+      "keyPoints": [
+        "Piège : l'ordre des pseudo-classes d'un lien compte (:link, :visited, :hover, :active).",
+        "Piège : :focus s'applique au champ actif (input, textarea, select), pas au survol de la souris.",
+        "À retenir : une pseudo-classe s'écrit collée au sélecteur : input:focus, sans espace."
+      ],
+      "snippets": [
+        {
+          "title": "Mettre en évidence le champ actif avec :focus",
+          "language": "css",
+          "targetFile": "style.css",
+          "keywords": ["focus", ":focus", "pseudo-classe", "input", "outline", "hover"],
+          "code": "input:focus {\n  border: 2px solid #2563eb;\n  background-color: #eff6ff;\n  outline: none;\n}\ninput:hover {\n  border-color: #93c5fd;\n}",
+          "explanation": ":focus cible l'élément qui reçoit la saisie, :hover celui que la souris survole. Les deux se combinent avec n'importe quel sélecteur."
+        }
+      ]
     }
   ]
 }
