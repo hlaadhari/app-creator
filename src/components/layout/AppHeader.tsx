@@ -44,9 +44,9 @@ interface NavLinkSpec {
 }
 
 const TONE_CLASSES: Record<NavLinkSpec["tone"], string> = {
-  neutral: "text-foreground border-border hover:bg-accent/40",
-  primary: "text-primary border-primary/30 hover:bg-primary/10",
-  danger: "text-rose-400 border-rose-500/30 hover:bg-rose-500/10",
+  neutral: "text-foreground border-transparent hover:bg-accent/40",
+  primary: "text-primary border-transparent hover:bg-primary/10",
+  danger: "text-rose-400 border-transparent hover:bg-rose-500/10",
 };
 
 /**
@@ -129,15 +129,16 @@ export function AppHeader({
       onClick={dansMenu ? () => setMenuOpen(false) : undefined}
     >
       <Button
-        variant="outline"
+        variant={dansMenu ? "outline" : "ghost"}
         size="sm"
         aria-label={l.ariaLabel}
-        className={`gap-1.5 text-xs ${dansMenu ? "h-11 w-full justify-start" : "h-8"} ${
+        {...(dansMenu ? {} : { title: l.ariaLabel })}
+        className={`gap-1.5 text-xs ${dansMenu ? "h-11 w-full justify-start" : "h-8 rounded-none border-b-2 px-2"} ${
           TONE_CLASSES[l.tone]
-        } ${current === l.key ? "bg-accent/60 font-semibold" : ""}`}
+        } ${current === l.key ? (dansMenu ? "bg-accent/60 font-semibold" : "border-b-primary font-semibold") : ""}`}
       >
         {l.icon}
-        <span className={dansMenu ? "" : "hidden lg:inline"}>{l.label}</span>
+        <span className={dansMenu ? "" : "hidden xl:inline"}>{l.label}</span>
       </Button>
     </Link>
   );
