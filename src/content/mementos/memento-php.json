@@ -100,6 +100,75 @@
           "explanation": "mysqli_num_rows concerne le résultat d'un SELECT ; mysqli_affected_rows($con) concerne un INSERT, UPDATE ou DELETE ; mysqli_error($con) renvoie le message d'erreur."
         }
       ]
+    },
+    {
+      "id": "php-requete-session",
+      "title": "5. Requête HTTP, $_GET, $_SERVER et sessions",
+      "description": "Lire une requête GET ou POST, savoir quelle méthode a été utilisée et conserver l'utilisateur entre deux pages avec une session.",
+      "keyPoints": [
+        "Piège : $_GET lit les paramètres de l'URL (?id=5), $_POST ceux du corps de la requête ; le nom du champ doit correspondre exactement à l'attribut name.",
+        "Piège : session_start() doit être appelée avant toute sortie HTML (avant le premier <html> ou echo), sinon la session échoue.",
+        "À retenir : $_SESSION est un tableau conservé côté serveur ; il faut session_start() sur chaque page qui l'utilise."
+      ],
+      "snippets": [
+        {
+          "title": "$_GET, $_POST et méthode de la requête ($_SERVER)",
+          "language": "php",
+          "targetFile": "traitement.php",
+          "keywords": ["$_GET", "$_POST", "$_SERVER", "REQUEST_METHOD", "isset", "requête"],
+          "code": "<?php\nif ($_SERVER[\"REQUEST_METHOD\"] == \"POST\") {\n  $cin = trim($_POST[\"cin\"]);          // formulaire method=\"post\"\n} elseif (isset($_GET[\"id\"])) {\n  $id = (int) $_GET[\"id\"];             // lien traitement.php?id=5\n}\n?>",
+          "explanation": "$_SERVER['REQUEST_METHOD'] indique la méthode HTTP utilisée. $_GET contient les paramètres passés dans l'URL, $_POST les champs du formulaire en method=\"post\"."
+        },
+        {
+          "title": "Session : session_start et $_SESSION",
+          "language": "php",
+          "targetFile": "connexion.php",
+          "keywords": [
+            "session_start",
+            "$_SESSION",
+            "session",
+            "authentification",
+            "session_destroy"
+          ],
+          "code": "<?php\nsession_start();                       // toujours avant tout affichage\nif (isset($_POST[\"cin\"])) {\n  $_SESSION[\"cin\"] = $_POST[\"cin\"];    // mémorise l'utilisateur\n}\nif (!isset($_SESSION[\"cin\"])) {\n  header(\"Location: authentification.php\"); // accès refusé : retour à la connexion\n  exit();\n}\necho \"Bonjour \" . $_SESSION[\"cin\"];\n?>",
+          "explanation": "session_start() ouvre ou reprend la session. $_SESSION conserve des valeurs d'une page à l'autre. header(\"Location: ...\") redirige, suivi de exit() pour arrêter le script."
+        }
+      ]
+    },
+    {
+      "id": "php-securite-prepare",
+      "title": "6. Sécuriser les requêtes : échappement et requêtes préparées",
+      "description": "Protéger une requête contre l'injection SQL avec mysqli_real_escape_string ou, mieux, avec les requêtes préparées procédurales.",
+      "keyPoints": [
+        "Piège : concaténer directement $_POST dans une requête SQL permet l'injection (' OR '1'='1).",
+        "Piège : mysqli_stmt_bind_param liste les types dans l'ordre des ? : s (chaîne), i (entier), d (réel).",
+        "À retenir : l'échappement protège une valeur textuelle ; la requête préparée sépare la requête des données."
+      ],
+      "snippets": [
+        {
+          "title": "Échapper une valeur : mysqli_real_escape_string",
+          "language": "php",
+          "targetFile": "traitement.php",
+          "keywords": ["mysqli_real_escape_string", "injection", "sécurité", "escape", "SQL"],
+          "code": "<?php\n$nom = mysqli_real_escape_string($cnx, trim($_POST[\"nom\"]));\n$res = mysqli_query($cnx, \"SELECT * FROM eleve WHERE nom = '$nom'\");\n?>",
+          "explanation": "mysqli_real_escape_string($con, $chaine) neutralise les caractères spéciaux (apostrophes) avant l'insertion dans une requête."
+        },
+        {
+          "title": "Requête préparée : mysqli_prepare et mysqli_stmt_bind_param",
+          "language": "php",
+          "targetFile": "traitement.php",
+          "keywords": [
+            "mysqli_prepare",
+            "mysqli_stmt_bind_param",
+            "mysqli_stmt_execute",
+            "mysqli_stmt_get_result",
+            "requête préparée",
+            "mysqli_fetch_assoc"
+          ],
+          "code": "<?php\n$stmt = mysqli_prepare($cnx, \"SELECT nom, prenom FROM eleve WHERE cin = ?\");\nmysqli_stmt_bind_param($stmt, \"s\", $cin);   // s = chaîne\nmysqli_stmt_execute($stmt);\n$res = mysqli_stmt_get_result($stmt);\nwhile ($ligne = mysqli_fetch_assoc($res)) {\n  echo $ligne[\"nom\"] . \" \" . $ligne[\"prenom\"];\n}\n?>",
+          "explanation": "Le ? marque la place de la valeur. bind_param associe la variable avec son type, execute lance la requête, get_result récupère les lignes que mysqli_fetch_assoc lit sous forme de tableau associatif."
+        }
+      ]
     }
   ]
 }

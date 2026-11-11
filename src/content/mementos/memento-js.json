@@ -100,6 +100,34 @@
           "explanation": "innerHTML affecte un contenu HTML (balises interprétées) à un élément comme span ou div. value lit ou modifie le contenu d'un champ de saisie."
         }
       ]
+    },
+    {
+      "id": "js-regex",
+      "title": "5. Contrôle par expression régulière et sélecteurs",
+      "description": "Vérifier un format (CIN, code, lettres) avec une expression régulière et cibler un élément avec querySelector.",
+      "keyPoints": [
+        "Piège : sans ^ et $, l'expression accepte une chaîne qui contient seulement une partie valide (« ab12345678cd »).",
+        "Piège : test() renvoie true/false ; il faut inverser la condition pour bloquer la saisie (if (!exp.test(valeur)) ...).",
+        "À retenir : /^[0-9]{8}$/ signifie exactement 8 chiffres du début à la fin."
+      ],
+      "snippets": [
+        {
+          "title": "Valider un CIN avec une expression régulière",
+          "language": "javascript",
+          "targetFile": "controle.js",
+          "keywords": ["regex", "expression régulière", "test", "CIN", "RegExp", "/^[0-9]{8}$/"],
+          "code": "function verif() {\n  var cin = document.getElementById(\"cin\").value;\n  var exp = /^[0-9]{8}$/;               // exactement 8 chiffres\n  if (!exp.test(cin)) {\n    alert(\"CIN invalide : 8 chiffres exigés\");\n    return false;                        // bloque l'envoi du formulaire\n  }\n  return true;\n}",
+          "explanation": "^ marque le début, $ la fin, [0-9] un chiffre, {8} la répétition. exp.test(chaine) renvoie true si la chaîne respecte le format."
+        },
+        {
+          "title": "Cibler un élément : querySelector",
+          "language": "javascript",
+          "targetFile": "controle.js",
+          "keywords": ["querySelector", "getElementById", "sélecteur", "DOM", "innerHTML"],
+          "code": "var champ = document.querySelector(\"#nom\");        // par id\nvar boutons = document.querySelectorAll(\".btn\");    // toutes les classes .btn\nchamp.style.border = \"2px solid red\";               // signaler une erreur\nchamp.focus();                                       // place le curseur dans le champ",
+          "explanation": "querySelector accepte un sélecteur CSS (#id, .classe, balise) et renvoie le premier élément trouvé ; querySelectorAll renvoie la liste complète."
+        }
+      ]
     }
   ]
 }

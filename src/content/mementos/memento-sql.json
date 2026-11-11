@@ -94,6 +94,26 @@
           "code": "SELECT s.libelle, COUNT(c.cin) AS effectif\nFROM section s\nLEFT JOIN candidat c ON c.code_sec = s.code_sec\nGROUP BY s.code_sec, s.libelle;\n\nSELECT ROUND(100 * SUM(moyenne >= 10) / COUNT(*), 1) AS pourcentage_admis\nFROM candidat;\n\nSELECT cin, nom FROM candidat\nWHERE date_naiss BETWEEN '2006-01-01' AND '2006-12-31';"
         }
       ]
+    },
+    {
+      "id": "sql-types-distinct",
+      "title": "6. Types de dates, DISTINCT et ORDER BY",
+      "description": "Choisir entre DATE et DATETIME, supprimer les doublons avec DISTINCT et trier le résultat.",
+      "keyPoints": [
+        "Piège : DATE ne mémorise pas l'heure ; DATETIME mémorise la date et l'heure.",
+        "Piège : DISTINCT s'applique à toute la ligne sélectionnée, pas à une seule colonne.",
+        "À retenir : ORDER BY trie en ordre croissant par défaut ; DESC inverse l'ordre."
+      ],
+      "snippets": [
+        {
+          "title": "DATETIME, DISTINCT et ORDER BY",
+          "language": "sql",
+          "targetFile": "requetes.sql",
+          "keywords": ["DATETIME", "DISTINCT", "ORDER BY", "DESC", "DATE", "doublons"],
+          "code": "CREATE TABLE connexion (\n  numco INT PRIMARY KEY,\n  cin CHAR(8) NOT NULL,\n  dateco DATETIME NOT NULL\n);\n\n-- chaque CIN une seule fois, trié par CIN décroissant\nSELECT DISTINCT cin FROM connexion ORDER BY cin DESC;\n\n-- connexions d'un jour donné\nSELECT * FROM connexion WHERE dateco >= '2025-06-02' AND dateco < '2025-06-03';",
+          "explanation": "DATETIME mémorise date et heure. DISTINCT retire les lignes identiques du résultat. ORDER BY colonne [DESC] trie le résultat."
+        }
+      ]
     }
   ]
 }
