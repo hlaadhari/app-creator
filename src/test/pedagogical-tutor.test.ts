@@ -201,6 +201,16 @@ describe("Tuteur Pédagogique d'Aide Contextuelle (Issue #35 - PRD §15, F-56, T
       expect(resEvent.blocked).toBe(false);
       expect(resEvent.message.content).toContain("addEventListener");
       expect(resEvent.message.content).toContain("preventDefault");
+
+      const resMail = await interagirAvecTuteur("comment configurer l'envoi de mail", {
+        ...defaultContext,
+        activeFile: "index.html",
+        fileContent: "<article><Mail mailto:eleve@exemple.tn></article>",
+      });
+      expect(resMail.blocked).toBe(false);
+      expect(resMail.message.content).toContain("mailto:");
+      expect(resMail.message.content).toContain('<a href="mailto:');
+      expect(resMail.message.content).toContain("balise `<Mail>` non valide");
     });
 
     it("affiche un repli honnête explicite pour une salutation ou une question hors sujet", async () => {
