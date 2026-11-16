@@ -201,7 +201,7 @@ export function CourseModuleView({
                 Module 6 • Annales Pratiques & Projets Full-Stack
               </span>
               <span className="text-xs text-muted-foreground">
-                Carnet STI-BAC INFO • Sessions 2023, 2025 & 2026
+                Carnet STI-BAC INFO • Sessions 2023–2025 & Annales Blanches 2026
               </span>
             </div>
             <h2 className="text-2xl font-extrabold text-foreground tracking-tight">
@@ -209,7 +209,7 @@ export function CourseModuleView({
             </h2>
             <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed max-w-2xl">
               Visionnez les résolutions complètes pas-à-pas : Projet Web Full-Stack, Correction Bac
-              2025 (Droits d'accès) et Correction Bac 2026 (Bijoux Aurythia).
+              2025 (Droits d'accès) et Annale Blanche 2026 (Bijoux Aurythia).
             </p>
           </div>
 
@@ -405,15 +405,15 @@ interface ChatEntry {
 }
 
 /**
- * Tuteur IA connecté à la base de connaissances du Carnet "STI-BAC INFO" (262 sources)
+ * Tuteur IA connecté à la base de connaissances du Carnet "STI-BAC INFO" & des Fiches Mémento
  */
 export function CourseNotebookTutor({ activeCategoryId }: NotebookTutorChatProps) {
   const [messages, setMessages] = useState<ChatEntry[]>([
     {
       id: "welcome-nb",
       role: "assistant",
-      text: "Bonjour ! Je suis le Tuteur IA connecté au carnet **STI-BAC INFO (262 sources de cours et d'annales Bac STI)**.\n\nPosez-moi une question sur le programme officiel (HTML5, CSS3, `controle.js`, PHP `mysqli_*`, contraintes SQL ou corrigés Bac 2025/2026).",
-      sourceRef: "Carnet STI-BAC INFO • 262 sources indexées",
+      text: "Bonjour ! Je suis le Tuteur IA connecté au carnet **STI-BAC INFO (cours, fiches mémento et annales Bac STI)**.\n\nPosez-moi une question sur le programme officiel (HTML5, CSS3, `controle.js`, PHP `mysqli_*`, contraintes SQL, jointures ou corrigés Bac 2025 / Annales Blanches 2026).",
+      sourceRef: "Carnet STI-BAC INFO • Programme Officiel 4ème STI",
       followUps: [
         "Comment contrôler un CIN à 8 chiffres en JS ?",
         "Quelle est la syntaxe procédurale mysqli_query ?",
@@ -466,7 +466,7 @@ export function CourseNotebookTutor({ activeCategoryId }: NotebookTutorChatProps
             </h3>
             <span className="text-[10px] font-mono text-emerald-400 flex items-center gap-1">
               <GraduationCap className="w-3 h-3" />
-              262 sources officielles connectées
+              Mémento & Annales Bac STI connectés
             </span>
           </div>
         </div>

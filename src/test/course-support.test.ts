@@ -238,7 +238,7 @@ describe("Support de Cours Interactif & Mémento Bac STI (feat/course-support-ht
       }
     });
 
-    it("connecte le Tuteur IA aux 262 sources du carnet STI-BAC INFO avec réponses alignées sur le programme", async () => {
+    it("connecte le Tuteur IA du cours au programme officiel STI et gère les 12 questions de l'audit (#276, #278)", async () => {
       const { queryNotebookKnowledgeBase } = await import("@/content/notebook-sti");
 
       const rJs = queryNotebookKnowledgeBase(
@@ -258,6 +258,51 @@ describe("Support de Cours Interactif & Mémento Bac STI (feat/course-support-ht
       );
       expect(rAnnales.answer).toContain("Bac 2025");
       expect(rAnnales.answer).toContain("Aurythia");
+
+      // Audit Issue #276 : les questions de cours doivent renvoyer la bonne fiche quel que soit l'onglet actif
+      const rFk = queryNotebookKnowledgeBase("c'est quoi une clé étrangère", "html5");
+      expect(rFk.id).toBe("kb-sql-cle-etrangere");
+      expect(rFk.answer).toContain("FOREIGN KEY");
+
+      const rLeftJoin = queryNotebookKnowledgeBase(
+        "explique la jointure externe LEFT JOIN",
+        "html5",
+      );
+      expect(rLeftJoin.id).toBe("kb-sql-jointures");
+      expect(rLeftJoin.answer).toContain("LEFT JOIN");
+
+      const rTable = queryNotebookKnowledgeBase("comment faire un tableau html", "html5");
+      expect(rTable.id).toBe("kb-html-tableaux");
+      expect(rTable.answer).toContain("<table>");
+
+      const rCard = queryNotebookKnowledgeBase("qu'est-ce qu'une cardinalité", "html5");
+      expect(rCard.id).toBe("kb-sql-cardinalites");
+      expect(rCard.answer).toContain("1:N");
+
+      const rLike = queryNotebookKnowledgeBase("LIKE", "html5");
+      expect(rLike.id).toBe("kb-sql-like");
+      expect(rLike.answer).toContain("%");
+
+      const rPct = queryNotebookKnowledgeBase("pourcentage SQL", "html5");
+      expect(rPct.id).toBe("kb-sql-pourcentage");
+      expect(rPct.answer).toContain("100");
+
+      const rSub = queryNotebookKnowledgeBase("sous-requête IN", "html5");
+      expect(rSub.id).toBe("kb-sql-sous-requetes");
+      expect(rSub.answer).toContain("NOT IN");
+
+      const rAddEvent = queryNotebookKnowledgeBase(
+        "je n'arrive pas à comprendre addEventListener",
+        "html5",
+      );
+      expect(rAddEvent.id).toBe("kb-js-evenements");
+      expect(rAddEvent.answer).toContain("addEventListener");
+
+      // Repli honnête explicite sur "bonjour" ou requête hors sujet
+      const rBonjour = queryNotebookKnowledgeBase("bonjour", "html5");
+      expect(rBonjour.isFallback).toBe(true);
+      expect(rBonjour.id).toBe("kb-fallback");
+      expect(rBonjour.answer).toContain("Je n'ai pas de fiche sur ce sujet");
     });
   });
   describe("Modélisation et requêtes SQL avancées des annales (#205)", () => {

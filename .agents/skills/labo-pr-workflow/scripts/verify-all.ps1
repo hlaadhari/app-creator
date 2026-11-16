@@ -1,6 +1,8 @@
 #!/usr/bin/env pwsh
 $ErrorActionPreference = "Stop"
 
+if (Test-Path ".vercel") { Remove-Item -Recurse -Force ".vercel" }
+
 Write-Host "==> [1/6] Format check (Prettier)..." -ForegroundColor Cyan
 bun run format:check
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
