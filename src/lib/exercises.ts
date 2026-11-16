@@ -143,15 +143,22 @@ export const initialExercises: Exercise[] = [
         label: "Fond du bouton rgb(0, 102, 204)",
         points: 3,
         fail: "La couleur de fond de #valider n'est pas rgb(0, 102, 204) (#0066cc).",
-        check: (d, w) =>
-          css(w, d.getElementById("valider"), "background-color") === "rgb(0, 102, 204)",
+        check: (d, w) => {
+          const val = css(w, d.getElementById("valider"), "background-color").toLowerCase();
+          return val === "rgb(0, 102, 204)" || val === "#0066cc";
+        },
       },
       {
         id: "color",
         label: "Texte du bouton en blanc",
         points: 2,
         fail: "La couleur du texte de #valider doit être blanche.",
-        check: (d, w) => css(w, d.getElementById("valider"), "color") === "rgb(255, 255, 255)",
+        check: (d, w) => {
+          const val = css(w, d.getElementById("valider"), "color").toLowerCase();
+          return (
+            val === "rgb(255, 255, 255)" || val === "white" || val === "#ffffff" || val === "#fff"
+          );
+        },
       },
       {
         id: "radius",
@@ -166,10 +173,10 @@ export const initialExercises: Exercise[] = [
       },
       {
         id: "padding",
-        label: "Padding non nul",
+        label: "Padding explicite (>= 6px)",
         points: 1,
-        fail: "Ajoutez un padding au bouton.",
-        check: (d, w) => parseFloat(css(w, d.getElementById("valider"), "padding-top")) > 0,
+        fail: "Ajoutez un padding d'au moins 6px au bouton (ex: padding: 10px 20px;).",
+        check: (d, w) => parseFloat(css(w, d.getElementById("valider"), "padding-top")) >= 6,
       },
       {
         id: "center",
