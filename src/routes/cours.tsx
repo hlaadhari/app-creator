@@ -198,7 +198,7 @@ function CoursPage() {
             <BookOpen className="h-4 w-4 text-primary shrink-0" />
             <h1 className="text-xs font-semibold text-foreground">Carnet STI-BAC INFO</h1>
             <span className="hidden xl:inline text-[10px] px-1.5 py-0.2 rounded bg-primary/10 text-primary border border-primary/20 font-mono shrink-0">
-              10 Vidéos • 262 Sources
+              10 Vidéos • 5 Fiches Mémento
             </span>
           </div>
         }

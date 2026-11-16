@@ -140,4 +140,80 @@ describe("Tuteur Pédagogique d'Aide Contextuelle (Issue #35 - PRD §15, F-56, T
       expect(res.message.content).toContain("T-06");
     });
   });
+
+  describe("4. Diagnostic Réel du Code Élève & Repli Honnête (Issue #276)", () => {
+    it("adapte le diagnostic au contenu réel de fileContent pour un même critère en échec", async () => {
+      const resSansSelecteur = await interagirAvecTuteur("Pourquoi mon critère échoue ?", {
+        ...defaultContext,
+        fileContent: "console.log('test');",
+      });
+      const resSansValue = await interagirAvecTuteur("Pourquoi mon critère échoue ?", {
+        ...defaultContext,
+        fileContent: "const champ = document.getElementById('cin');",
+      });
+      const resSansLength = await interagirAvecTuteur("Pourquoi mon critère échoue ?", {
+        ...defaultContext,
+        fileContent: "const cin = document.getElementById('cin').value;",
+      });
+      const resSansIsNaN = await interagirAvecTuteur("Pourquoi mon critère échoue ?", {
+        ...defaultContext,
+        fileContent: "const cin = document.getElementById('cin').value; if (cin.length !== 8) {}",
+      });
+      const resSansReturnFalse = await interagirAvecTuteur("Pourquoi mon critère échoue ?", {
+        ...defaultContext,
+        fileContent:
+          "const cin = document.getElementById('cin').value; if (cin.length !== 8 || isNaN(cin)) { alert('err'); }",
+      });
+
+      // Les réponses doivent être différentes selon le code soumis par l'élève
+      expect(resSansSelecteur.message.content).not.toBe(resSansValue.message.content);
+      expect(resSansValue.message.content).not.toBe(resSansLength.message.content);
+      expect(resSansLength.message.content).not.toBe(resSansIsNaN.message.content);
+      expect(resSansIsNaN.message.content).not.toBe(resSansReturnFalse.message.content);
+
+      expect(resSansSelecteur.message.content).toContain("aucune sélection de champ");
+      expect(resSansValue.message.content).toContain(".value");
+      expect(resSansLength.message.content).toContain(".length !== 8");
+      expect(resSansIsNaN.message.content).toContain("isNaN");
+      expect(resSansReturnFalse.message.content).toContain("return false;");
+      // Aucun bloc de code ne doit déclencher l'avertissement anti-fuite
+      expect(resSansReturnFalse.message.isWarning).toBeFalsy();
+      expect(resSansReturnFalse.message.content).toContain("/cours");
+    });
+
+    it("répond avec précision aux questions de cours du référentiel STI posées dans l'atelier", async () => {
+      const resFk = await interagirAvecTuteur("c'est quoi une clé étrangère", defaultContext);
+      expect(resFk.blocked).toBe(false);
+      expect(resFk.message.content).toContain("FOREIGN KEY");
+      expect(resFk.message.content).toContain("/cours");
+
+      const resJoin = await interagirAvecTuteur(
+        "explique la jointure externe LEFT JOIN",
+        defaultContext,
+      );
+      expect(resJoin.blocked).toBe(false);
+      expect(resJoin.message.content).toContain("LEFT JOIN");
+
+      const resEvent = await interagirAvecTuteur(
+        "je n'arrive pas à comprendre addEventListener",
+        defaultContext,
+      );
+      expect(resEvent.blocked).toBe(false);
+      expect(resEvent.message.content).toContain("addEventListener");
+      expect(resEvent.message.content).toContain("preventDefault");
+    });
+
+    it("affiche un repli honnête explicite pour une salutation ou une question hors sujet", async () => {
+      const resBonjour = await interagirAvecTuteur("bonjour", defaultContext);
+      expect(resBonjour.blocked).toBe(false);
+      expect(resBonjour.message.content).toContain("Je n'ai pas de fiche sur ce sujet");
+
+      const resHorsSujet = await interagirAvecTuteur(
+        "quelle est la météo demain à Tunis ?",
+        defaultContext,
+      );
+      expect(resHorsSujet.blocked).toBe(false);
+      expect(resHorsSujet.message.content).toContain("Je n'ai pas de fiche sur ce sujet");
+    });
+  });
 });

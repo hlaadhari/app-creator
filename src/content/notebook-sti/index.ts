@@ -1,11 +1,13 @@
+import { MEMENTO_CARDS } from "@/content/mementos";
+
 /**
- * Ressources Pédagogiques du Carnet "STI-BAC INFO" (262 sources officielles)
+ * Ressources Pédagogiques du Carnet "STI-BAC INFO" (Programme Officiel 4ème STI)
  *
  * Contient :
- * 1. Les 10 capsules vidéo/audio interactives par chapitre et annales Bac 2025/2026
+ * 1. Les 10 capsules vidéo/audio interactives par chapitre et annales Bac (2023–2025 & Annales Blanches 2026)
  * 2. Les jeux de Flashcards de révision rapide (BDR, contraintes, HTML5, CSS3, JS, MySQLi)
  * 3. Les Quiz interactifs de validation de fin de chapitre
- * 4. La base de connaissances indexée (262 sources) pour le Tuteur IA du module /cours
+ * 4. La base de connaissances indexée pour le Tuteur IA du module /cours
  */
 
 export type NotebookCategoryId = "html5" | "css3" | "js" | "php" | "sql" | "annales";
@@ -70,10 +72,11 @@ export interface NotebookKnowledgeSource {
   answer: string;
   codeSnippet?: string | undefined;
   followUps: string[];
+  isFallback?: boolean | undefined;
 }
 
 /**
- * 1. LES 10 CAPSULES VIDÉO GÉNÉRÉES DU CARNET "STI-BAC INFO"
+ * 1. LES 10 CAPSULES VIDÉO DU CARNET "STI-BAC INFO"
  */
 export const NOTEBOOK_VIDEOS: NotebookVideoCapsule[] = [
   {
@@ -623,14 +626,14 @@ if (mysqli_num_rows($resU) == 0) {
     moduleId: "annales",
     title: "Correction Bac 2026 - Bijoux Aurythia",
     subtitle:
-      "Corrigé guidé Session 2026 (8h30) : ajout de bijou, évaluation d'expert et liste des pièces originales",
+      "Corrigé guidé Annale Blanche 2026 (8h30) : ajout de bijou, évaluation d'expert et liste des pièces originales",
     duration: "09:40",
     durationSeconds: 580,
-    badge: "Capsule #8 • Annales 2026",
-    notebookRef: "Carnet STI-BAC INFO • Sources #245 à #253 (Session 2026 - 8h30)",
+    badge: "Capsule #8 • Annale Blanche 2026",
+    notebookRef: "Carnet STI-BAC INFO • Annale Blanche 2026 (Sujet d'entraînement Labo STI)",
     relatedSubjectId: "exam-bac2026-bijoux-aurythia",
     summary:
-      "Correction intégrale du sujet Bac STI 2026 (Bijoux Aurythia) : validation du code bijou et de sa composition dans mesControles.js, insertion dans ajout.php, enregistrement de l'évaluation d'expert dans evaluation.php et consultation filtrée dans liste.php.",
+      "Correction intégrale du sujet d'entraînement type Bac STI 2026 (Bijoux Aurythia) : validation du code bijou et de sa composition dans mesControles.js, insertion dans ajout.php, enregistrement de l'évaluation d'expert dans evaluation.php et consultation filtrée dans liste.php.",
     keyTakeaways: [
       "Vérifier le format du code bijou (lettres majuscules suivies de chiffres) et la positivité du poids/prix dans mesControles.js.",
       "Dans evaluation.php, contrôler que le bijou existe et que l'expert n'a pas déjà évalué ce même bijou avant l'INSERT.",
@@ -756,8 +759,8 @@ export const REVISION_GUIDE_STI: {
   sections: RevisionGuideSection[];
 } = {
   title: "Guide de Révision Synthétique - 4ème Bac STI",
-  subtitle: "Récapitulatif officiel issu du Carnet de connaissances STI-BAC INFO (262 sources)",
-  version: "Édition Examen Pratique 2025–2026",
+  subtitle: "Récapitulatif structuré du programme officiel STI (HTML5, CSS3, JS, PHP, SQL)",
+  version: "Édition Examen Pratique STI",
   sections: [
     {
       id: "guide-html",
@@ -783,7 +786,7 @@ export const REVISION_GUIDE_STI: {
         "Centrer un formulaire ou un tableau de largeur fixe avec margin: 0 auto;.",
         "Placer transition: transform 0.3s ease; sur l'élément normal et transform: scale(1.05); sur :hover.",
       ],
-      essentialSyntax: `.L1 { display: inline-block; width: 180px; font-weight: bold; }
+      essentialSyntax: `.L1 { display: inline-block; width: 160px; font-weight: bold; }
 form { width: 550px; margin: 20px auto; padding: 15px; border-radius: 10px; }
 .b1 { transition: transform 0.3s ease, opacity 0.3s ease; }
 .b1:hover { transform: scale(1.05); opacity: 0.95; }`,
@@ -807,7 +810,7 @@ form { width: 550px; margin: 20px auto; padding: 15px; border-radius: 10px; }
     },
     {
       id: "guide-php",
-      title: "4. PHP 8.2 & Interfaçage MySQLi Procédural",
+      title: "4. PHP & Interfaçage MySQLi Procédural",
       badge: "Module 4 • PHP / MySQLi",
       goldenRules: [
         "Utiliser exclusivement les fonctions procédurales : mysqli_connect, mysqli_query, mysqli_num_rows, mysqli_fetch_array, mysqli_affected_rows, mysqli_close.",
@@ -1608,50 +1611,88 @@ export const NOTEBOOK_QUIZZES: Record<NotebookCategoryId, NotebookQuizQuestion[]
 };
 
 /**
- * 4. BASE DE CONNAISSANCES DU TUTEUR IA ("STI-BAC INFO" - 262 SOURCES)
+ * 4. BASE DE CONNAISSANCES DU TUTEUR DU COURS (PROGRAMME OFFICIEL 4ème STI)
  */
 export const NOTEBOOK_KNOWLEDGE_BASE: NotebookKnowledgeSource[] = [
   {
     id: "kb-html-form",
     moduleId: "html5",
     title: "Formulaires HTML5 & Liaison JS/PHP",
-    sourceRef: "Carnet STI-BAC INFO • Sources #12–#35 (HTML5 & Formulaires)",
+    sourceRef: "Mémento & Cours Officiel STI • Module 1 (HTML5 & Formulaires)",
     keywords: [
       "form",
       "formulaire",
       "onsubmit",
       "input",
       "name",
-      "id",
       "select",
       "radio",
       "checkbox",
       "iframe",
       "target",
-      "html",
+      "action",
+      "method",
+      "label",
+      "fieldset",
     ],
     answer:
-      'D\'après le carnet **STI-BAC INFO (Sources #12–#35)**, un formulaire conforme au Bac STI repose sur 3 règles :\n1. **Balise `<form>`** : toujours écrire `<form action="script.php" method="post" onsubmit="return verif();">`.\n2. **Double attribut `id` + `name`** : `id` sert à `document.getElementById()` dans `controle.js`, tandis que `name` alimente `$_POST[\'...\']` en PHP.\n3. **Ciblage d\'iframe** : si la page principale comporte `<iframe name="cadre">`, les liens du menu utilisent `target="cadre"`.',
+      'Dans le programme officiel **4ème STI (Module HTML5)**, un formulaire conforme au Bac STI repose sur 3 règles :\n1. **Balise `<form>`** : toujours écrire `<form action="script.php" method="post" onsubmit="return verif();">`.\n2. **Double attribut `id` + `name`** : `id` sert à `document.getElementById()` dans `controle.js`, tandis que `name` alimente `$_POST[\'...\']` en PHP.\n3. **Ciblage d\'iframe** : si la page principale comporte `<iframe name="cadre">`, les liens du menu utilisent `target="cadre"`.',
     codeSnippet: `<form action="location.php" method="post" onsubmit="return verif2();">
   <label for="codehab">Code Habit :</label>
   <input type="number" id="codehab" name="codehab" required>
   <input type="submit" value="Louer">
 </form>`,
     followUps: [
+      "Comment faire un tableau HTML avec thead et tbody ?",
       "Comment vérifier une liste déroulante <select> en JS ?",
-      "Comment récupérer une checkbox en PHP avec isset() ?",
       "Pourquoi faut-il écrire return verif() dans onsubmit ?",
+    ],
+  },
+  {
+    id: "kb-html-tableaux",
+    moduleId: "html5",
+    title: "Tableaux HTML5 : <table>, <thead>, <tbody>, <tr>, <th>, <td>",
+    sourceRef: "Mémento & Cours Officiel STI • Module 1 (Tableaux Structurés HTML5)",
+    keywords: [
+      "tableau",
+      "tableaux",
+      "table",
+      "thead",
+      "tbody",
+      "tfoot",
+      "tr",
+      "th",
+      "td",
+      "colspan",
+      "rowspan",
+      "caption",
+      "cellule",
+      "ligne",
+      "colonne",
+    ],
+    answer:
+      'Pour construire un **tableau HTML5** conforme au programme STI :\n- **`<table>`** enveloppe le tableau et **`<caption>`** définit son titre.\n- **`<thead>`** regroupe la ligne d\'en-tête contenant des cellules **`<th>`** (titres de colonnes en gras et centrés par défaut).\n- **`<tbody>`** contient les lignes de données **`<tr>`**, chacune découpée en cellules **`<td>`**.\n- **`colspan="2"`** fusionne horizontalement 2 colonnes ; **`rowspan="2"`** fusionne verticalement 2 lignes.',
+    codeSnippet: `<table border="1">
+  <caption>Liste des tarifs</caption>
+  <thead>
+    <tr><th>Code</th><th>Désignation</th><th>Prix (DT)</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>H01</td><td>Caftan traditionnel</td><td>120</td></tr>
+  </tbody>
+</table>`,
+    followUps: [
+      "Comment afficher un tableau HTML dynamiquement en PHP avec while ?",
+      "Comment styliser les bordures d'un tableau en CSS avec border-collapse ?",
     ],
   },
   {
     id: "kb-css-boxmodel",
     moduleId: "css3",
-    title: "Modèle de Boîte CSS3, Labels & Animations",
-    sourceRef: "Carnet STI-BAC INFO • Sources #43–#96 (Architecte Web CSS3)",
+    title: "Modèle de Boîte CSS3, Flexbox, Labels & Transitions",
+    sourceRef: "Mémento & Cours Officiel STI • Module 2 (Mise en forme CSS3)",
     keywords: [
-      "css",
       "style",
-      "label",
       "inline-block",
       "margin",
       "padding",
@@ -1661,12 +1702,15 @@ export const NOTEBOOK_KNOWLEDGE_BASE: NotebookKnowledgeSource[] = [
       "transition",
       "centrer",
       "box-model",
+      "flexbox",
+      "display flex",
+      "border-collapse",
     ],
     answer:
-      "Selon le carnet **STI-BAC INFO (Sources #43–#96)** :\n- **Alignement des `<label>`** : appliquez `display: inline-block; width: 180px;` pour que tous les champs de saisie soient alignés verticalement.\n- **Centrage d'un bloc** : définissez une largeur (`width: 550px;`) puis `margin: 20px auto;`.\n- **Animation au survol** : placez `transition: transform 0.3s ease;` sur l'élément normal et `transform: scale(1.05);` sur `:hover`.",
+      "Dans le **Module 2 (CSS3)** du programme STI :\n- **Alignement des `<label>`** : appliquez `display: inline-block; width: 160px;` pour aligner tous les champs de saisie verticalement.\n- **Centrage d'un bloc** : définissez une largeur (`width: 550px;`) puis `margin: 20px auto;`.\n- **Animation au survol** : placez `transition: transform 0.3s ease;` sur l'élément normal et `transform: scale(1.05);` sur `:hover`.",
     codeSnippet: `label {
   display: inline-block;
-  width: 180px;
+  width: 160px;
 }
 input[type="submit"] {
   transition: transform 0.3s ease;
@@ -1676,17 +1720,44 @@ input[type="submit"]:hover {
 }`,
     followUps: [
       "Quelle est la différence entre .L1 et #titre ?",
-      "Comment ajouter une ombre portée box-shadow ?",
+      "Comment styliser un champ actif avec la pseudo-classe :focus ?",
+    ],
+  },
+  {
+    id: "kb-css-focus-selecteurs",
+    moduleId: "css3",
+    title: "Sélecteurs CSS3 (.classe, #id) & Pseudo-classes (:focus, :hover)",
+    sourceRef: "Mémento & Cours Officiel STI • Module 2 (Sélecteurs & États Interactifs)",
+    keywords: [
+      "selecteur",
+      "classe",
+      "identifiant",
+      "focus",
+      "pseudo-classe",
+      "outline",
+      "box-shadow",
+      "#titre",
+      ".l1",
+    ],
+    answer:
+      "En **CSS3 (programme STI)** :\n- **`.classe`** cible tous les éléments portant `class=\"classe\"` (ex. `.L1`), tandis que **`#id`** cible l'unique élément portant `id=\"id\"` (ex. `#titre`).\n- **`:focus`** s'applique lorsqu'un champ `<input>` ou `<select>` reçoit le curseur clavier/souris.\n- **`:hover`** s'applique au survol du pointeur de la souris.",
+    codeSnippet: `#titre { text-align: center; text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.25); }
+input:focus, select:focus {
+  border-color: #2563eb;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.25);
+}`,
+    followUps: [
+      "Pourquoi width ne fonctionne pas sur un <label> sans inline-block ?",
+      "Quelle différence entre skew et rotate en CSS3 ?",
     ],
   },
   {
     id: "kb-js-verif",
     moduleId: "js",
     title: "Validation Client dans controle.js (CIN, Listes, Radio)",
-    sourceRef: "Carnet STI-BAC INFO • Sources #97–#148 (JS : Gardien du Formulaire)",
+    sourceRef: "Mémento & Cours Officiel STI • Module 3 (Validation DOM JavaScript)",
     keywords: [
-      "js",
-      "javascript",
       "verif",
       "cin",
       "length",
@@ -1697,9 +1768,11 @@ input[type="submit"]:hover {
       "alert",
       "return false",
       "alpha",
+      "chiffres",
+      "getelementbyid",
     ],
     answer:
-      "D'après le carnet **STI-BAC INFO (Sources #97–#148)**, le patron canonique de `verif()` dans `controle.js` vérifie successivement :\n1. **Le numéro CIN (8 chiffres)** : `if (cin.length !== 8 || isNaN(cin) || (cin.charAt(0) !== '0' && cin.charAt(0) !== '1')) { alert('...'); return false; }`\n2. **Les listes `<select>`** : `if (document.getElementById('cat').selectedIndex === 0) { alert('...'); return false; }`\n3. **Les boutons radio** : `if (!r1.checked && !r2.checked) { alert('...'); return false; }`\n4. **Validation finale** : terminer par `return true;`.",
+      "Dans le **Module 3 (JavaScript)**, le patron canonique de `verif()` dans `controle.js` vérifie successivement :\n1. **Le numéro CIN (8 chiffres)** : `if (cin.length !== 8 || isNaN(cin) || (cin.charAt(0) !== '0' && cin.charAt(0) !== '1')) { alert('...'); return false; }`\n2. **Les listes `<select>`** : `if (document.getElementById('cat').selectedIndex === 0) { alert('...'); return false; }`\n3. **Les boutons radio** : `if (!r1.checked && !r2.checked) { alert('...'); return false; }`\n4. **Validation finale** : terminer par `return true;`.",
     codeSnippet: `function verif2() {
   var cin = document.getElementById("cin").value;
   var duree = Number(document.getElementById("duree").value);
@@ -1714,30 +1787,92 @@ input[type="submit"]:hover {
   return true;
 }`,
     followUps: [
-      "Comment tester qu'une chaîne ne contient que des lettres ?",
-      "Comment vérifier un numéro de téléphone de 8 chiffres ?",
+      "Comment fonctionne addEventListener par rapport à onsubmit ?",
+      "Comment tester un format avec une expression régulière RegExp ?",
+    ],
+  },
+  {
+    id: "kb-js-evenements",
+    moduleId: "js",
+    title: "Écouteurs d'Événements DOM : addEventListener, submit & preventDefault",
+    sourceRef: "Mémento & Cours Officiel STI • Module 3 (Événements DOM & Formulaires)",
+    keywords: [
+      "addeventlistener",
+      "preventdefault",
+      "evenement",
+      "event",
+      "listener",
+      "ecouteur",
+      "submit",
+      "click",
+      "change",
+      "input",
+      "onblur",
+    ],
+    answer:
+      "En **JavaScript DOM**, **`element.addEventListener(type, fonction)`** attache un écouteur d'événement sans modifier le HTML :\n1. **Sur un formulaire (`submit`)** : si une saisie est invalide, appelez **`event.preventDefault()`** pour empêcher l'envoi au serveur PHP.\n2. **Équivalence Bac STI** : `<form onsubmit=\"return verif();\">` avec `return false;` dans `verif()` produit le même blocage que `form.addEventListener('submit', function(e) { if (!verif()) e.preventDefault(); });`.\n3. **Autres événements fréquents** : `'click'` (bouton), `'change'` (liste `<select>`), `'input'` (saisie en direct).",
+    codeSnippet: `const form = document.querySelector("form");
+form.addEventListener("submit", function (event) {
+  if (!verif()) {
+    event.preventDefault(); // Bloque l'envoi du formulaire
+  }
+});`,
+    followUps: [
+      "Comment contrôler un CIN de 8 chiffres en JS ?",
+      "Quelle différence entre getElementById et querySelector ?",
+    ],
+  },
+  {
+    id: "kb-js-regex",
+    moduleId: "js",
+    title: "Expressions Régulières (RegExp) & Sélecteurs querySelector en JS",
+    sourceRef: "Mémento & Cours Officiel STI • Module 3 (RegExp & DOM Moderne)",
+    keywords: [
+      "regex",
+      "regexp",
+      "expression reguliere",
+      "test",
+      "queryselector",
+      "queryselectorall",
+      "motif",
+      "alphabetique",
+    ],
+    answer:
+      "En **JavaScript (Module 3)** :\n- **`/motif/.test(chaine)`** renvoie `true` si la chaîne respecte l'expression régulière : par exemple `/^[01][0-9]{7}$/.test(cin)` vérifie un CIN de 8 chiffres commençant par 0 ou 1, et `/^[A-Za-zÀ-ÿ\\s]+$/.test(nom)` vérifie un nom alphabétique.\n- **`document.querySelector(selecteur)`** accepte tout sélecteur CSS (`'#cin'`, `'input[name=\"genre\"]:checked'`, `'.erreur'`).",
+    codeSnippet: `const cin = document.querySelector("#cin").value.trim();
+if (!/^[01][0-9]{7}$/.test(cin)) {
+  alert("CIN invalide : 8 chiffres commençant par 0 ou 1.");
+  return false;
+}`,
+    followUps: [
+      "Comment contrôler un CIN sans RegExp avec length et isNaN ?",
+      "Comment utiliser addEventListener sur un formulaire ?",
     ],
   },
   {
     id: "kb-php-mysqli",
     moduleId: "php",
-    title: "PHP 8.2 & Interfaçage MySQLi Procédural",
-    sourceRef: "Carnet STI-BAC INFO • Sources #149–#198 (PHP & MySQL : Le Voyage)",
+    title: "PHP & Interfaçage MySQLi Procédural",
+    sourceRef: "Mémento & Cours Officiel STI • Module 4 (PHP & MySQLi Procédural)",
     keywords: [
-      "php",
       "mysqli",
+      "mysqli_connect",
+      "mysqli_query",
+      "mysqli_num_rows",
+      "mysqli_fetch_array",
+      "mysqli_affected_rows",
+      "mysqli_close",
       "connect",
       "query",
       "num_rows",
       "fetch_array",
       "affected_rows",
       "post",
-      "extract",
       "pdo",
       "serveur",
     ],
     answer:
-      "Le carnet **STI-BAC INFO (Sources #149–#198)** rappelle que **seule l'extension MySQLi procédurale** est acceptée au Bac STI (`PDO` et `$mysqli->query` sont hors-programme) :\n1. Connexion : `$cnx = mysqli_connect('localhost', 'root', '', 'bd');`\n2. Contrôle d'existence (`SELECT`) : `$res = mysqli_query($cnx, $sql);` puis `mysqli_num_rows($res)` et `mysqli_fetch_array($res)`.\n3. Écriture (`INSERT` / `UPDATE`) : vérifier avec `mysqli_affected_rows($cnx)`.\n4. Fermeture : `mysqli_close($cnx);`.",
+      "Dans le programme officiel **4ème STI (Module 4 PHP)**, **seule l'extension MySQLi procédurale** est attendue aux épreuves du Bac STI (`PDO` est hors-programme) :\n1. Connexion : `$cnx = mysqli_connect('localhost', 'root', '', 'bd');`\n2. Contrôle d'existence (`SELECT`) : `$res = mysqli_query($cnx, $sql);` puis `mysqli_num_rows($res)` et `mysqli_fetch_array($res)` (ou `mysqli_fetch_assoc($res)`).\n3. Écriture (`INSERT` / `UPDATE`) : vérifier avec `mysqli_affected_rows($cnx)`.\n4. Fermeture : `mysqli_close($cnx);`.",
     codeSnippet: `$cnx = mysqli_connect("localhost", "root", "", "bd_habits");
 $res = mysqli_query($cnx, "SELECT disponible FROM habit WHERE codehab = $codehab");
 if (mysqli_num_rows($res) == 0) {
@@ -1754,31 +1889,240 @@ if (mysqli_num_rows($res) == 0) {
 }`,
     followUps: [
       "Quand utiliser mysqli_num_rows vs mysqli_affected_rows ?",
-      "Comment afficher un tableau HTML à partir d'un SELECT ?",
+      "Comment utiliser les sessions PHP ($_SESSION) et sécuriser les entrées ?",
+    ],
+  },
+  {
+    id: "kb-php-sessions-securite",
+    moduleId: "php",
+    title: "Superglobales ($_POST, $_GET, $_SESSION) & Requêtes Préparées MySQLi",
+    sourceRef: "Mémento & Cours Officiel STI • Module 4 (Superglobales & Sécurité PHP)",
+    keywords: [
+      "session",
+      "session_start",
+      "$_session",
+      "$_get",
+      "$_post",
+      "$_server",
+      "superglobale",
+      "mysqli_prepare",
+      "mysqli_stmt_bind_param",
+      "mysqli_real_escape_string",
+      "mysqli_fetch_assoc",
+      "injection sql",
+    ],
+    answer:
+      "En **PHP (Module 4)** :\n- **Superglobales** : `$_POST` récupère les champs d'un formulaire `method=\"post\"`, `$_GET` lit les paramètres d'URL (`?id=5`), et `$_SESSION` conserve les données utilisateur entre plusieurs pages après un appel obligatoire à **`session_start()`** en tout début de script.\n- **Sécurité SQL** : utilisez `mysqli_real_escape_string($cnx, $val)` ou une requête préparée (`mysqli_prepare` + `mysqli_stmt_bind_param` + `mysqli_stmt_execute`) pour prévenir toute injection SQL.",
+    codeSnippet: `<?php
+session_start();
+$_SESSION["cin_client"] = $_POST["cin"] ?? "";
+$stmt = mysqli_prepare($cnx, "SELECT nom FROM client WHERE cin = ?");
+mysqli_stmt_bind_param($stmt, "s", $_SESSION["cin_client"]);
+mysqli_stmt_execute($stmt);
+?>`,
+    followUps: [
+      "Syntaxe procédurale mysqli_query",
+      "Comment récupérer une checkbox en PHP avec isset() ?",
+    ],
+  },
+  {
+    id: "kb-sql-cle-etrangere",
+    moduleId: "sql",
+    title: "Clé Étrangère (FOREIGN KEY ... REFERENCES) & Intégrité Référentielle",
+    sourceRef: "Mémento & Cours Officiel STI • Module 5 (Contraintes Référentielles SQL)",
+    keywords: [
+      "cle etrangere",
+      "cles etrangeres",
+      "foreign key",
+      "references",
+      "integrite referentielle",
+      "on delete cascade",
+      "on update cascade",
+      "table parente",
+      "table fille",
+    ],
+    answer:
+      "Une **clé étrangère (`FOREIGN KEY`)** est une colonne (ou un groupe de colonnes) d'une table fille qui fait référence à la **clé primaire (`PRIMARY KEY`)** d'une table parente afin de garantir l'**intégrité référentielle** :\n- **Rôle** : elle interdit d'insérer dans la table fille une valeur qui n'existe pas dans la table parente (ex. impossible d'enregistrer une location pour un `cin` absent de la table `client`).\n- **Syntaxe `CREATE TABLE`** : `FOREIGN KEY (cin) REFERENCES client(cin) ON DELETE CASCADE`.\n- **Ajout avec `ALTER TABLE`** : `ALTER TABLE location ADD CONSTRAINT fk_cli FOREIGN KEY (cin) REFERENCES client(cin);`.",
+    codeSnippet: `CREATE TABLE location (
+  numloc INT PRIMARY KEY AUTO_INCREMENT,
+  codehab INT NOT NULL,
+  cin CHAR(8) NOT NULL,
+  FOREIGN KEY (codehab) REFERENCES habit(codehab) ON DELETE CASCADE,
+  FOREIGN KEY (cin) REFERENCES client(cin) ON DELETE CASCADE
+);`,
+    followUps: [
+      "Qu'est-ce qu'une cardinalité (1:N, N:M) en BD ?",
+      "Explique la jointure externe LEFT JOIN",
+    ],
+  },
+  {
+    id: "kb-sql-cardinalites",
+    moduleId: "sql",
+    title: "Modélisation Relationnelle : Cardinalités (1:1, 1:N, N:M) & Schéma",
+    sourceRef: "Mémento & Cours Officiel STI • Module 5 (Modèle Relationnel & Cardinalités)",
+    keywords: [
+      "cardinalite",
+      "cardinalites",
+      "association",
+      "1:n",
+      "n:m",
+      "1..n",
+      "0..n",
+      "un a plusieurs",
+      "plusieurs a plusieurs",
+      "entite",
+      "modele relationnel",
+      "table porteuse",
+    ],
+    answer:
+      "En **conception de base de données relationnelle (Module 5)**, la **cardinalité** indique le nombre minimal et maximal d'occurrences d'une entité participant à une association :\n1. **Relation `1:N` (un-à-plusieurs, ex. `1..1` — `0..N`)** : un client peut passer plusieurs locations, mais une location appartient à un seul client. **Règle de passage** : la clé primaire du côté `1` (`client.cin`) migre comme **clé étrangère** dans la table du côté `N` (`location`).\n2. **Relation `N:M` (plusieurs-à-plusieurs, ex. `0..N` — `0..N`)** : elle se traduit par une **table d'association** (ex. `droit` ou `reservation`) dont la **clé primaire composée** regroupe les clés étrangères des deux tables reliées.",
+    codeSnippet: `-- Association 1:N : Categorie (1) <---> (N) Habit
+-- La clé primaire codecat migre dans habit comme clé étrangère :
+CREATE TABLE habit (
+  codehab INT PRIMARY KEY,
+  codecat INT NOT NULL,
+  FOREIGN KEY (codecat) REFERENCES categorie(codecat)
+);`,
+    followUps: [
+      "C'est quoi une clé étrangère ?",
+      "Comment déclarer une clé primaire composée en SQL ?",
+    ],
+  },
+  {
+    id: "kb-sql-jointures",
+    moduleId: "sql",
+    title: "Jointures SQL : INNER JOIN (interne) et LEFT JOIN (jointure externe)",
+    sourceRef: "Mémento & Cours Officiel STI • Module 5 (Jointures Multi-Tables)",
+    keywords: [
+      "jointure",
+      "jointures",
+      "jointure externe",
+      "jointure interne",
+      "left join",
+      "left outer join",
+      "right join",
+      "inner join",
+      "join",
+      "correspondance",
+    ],
+    answer:
+      "En **SQL (Module 5)**, une jointure combine les colonnes de plusieurs tables via la condition `ON tableA.cle = tableB.cle` :\n- **`INNER JOIN` (jointure interne)** : retourne **uniquement** les lignes ayant une correspondance dans les deux tables.\n- **`LEFT JOIN` (jointure externe gauche)** : retourne **toutes les lignes de la table de gauche** (même celles sans correspondance dans la table de droite, dont les colonnes valent alors `NULL`).\n- **Astuce Bac STI** : utilisez `LEFT JOIN ... WHERE tableDroite.cle IS NULL` pour trouver les éléments n'ayant encore aucun enregistrement lié (ex. habits jamais loués) ou `COUNT(tableDroite.cle)` pour afficher `0` au lieu d'exclure la ligne.",
+    codeSnippet: `-- Tous les clients, y compris ceux qui n'ont effectué aucune location (nb_loc = 0)
+SELECT c.cin, c.nom, COUNT(l.numloc) AS nb_loc
+FROM client c
+LEFT JOIN location l ON c.cin = l.cin
+GROUP BY c.cin, c.nom;`,
+    followUps: [
+      "Comment écrire une sous-requête avec IN ou NOT IN ?",
+      "Comment calculer un pourcentage en SQL ?",
+    ],
+  },
+  {
+    id: "kb-sql-sous-requetes",
+    moduleId: "sql",
+    title: "Sous-Requêtes SQL : IN (SELECT ...), NOT IN et Sous-Requêtes Scalaires",
+    sourceRef: "Mémento & Cours Officiel STI • Module 5 (Requêtes Imbriquées SQL)",
+    keywords: [
+      "sous-requete",
+      "sous requete",
+      "sous-requetes",
+      "requete imbriquee",
+      "not in",
+      "in (select",
+      "in select",
+      "scalaire",
+      "imbriquee",
+      "in",
+    ],
+    answer:
+      "Une **sous-requête (requête imbriquée)** est un `SELECT` placé entre parenthèses à l'intérieur de la clause `WHERE` ou `HAVING` d'une requête principale :\n1. **Sous-requête de liste avec `IN` / `NOT IN`** : teste si une valeur appartient (ou non) à l'ensemble retourné par le sous-`SELECT` (ex. clients n'ayant jamais loué : `WHERE cin NOT IN (SELECT cin FROM location)`).\n2. **Sous-requête scalaire (`=`, `>`, `<`)** : compare une colonne à une valeur unique calculée par `MAX()`, `MIN()` ou `AVG()` (ex. `WHERE prix = (SELECT MAX(prix) FROM habit)`).",
+    codeSnippet: `-- Clients n'ayant effectué aucune location (avec sous-requête NOT IN)
+SELECT cin, nom, tel
+FROM client
+WHERE cin NOT IN (SELECT DISTINCT cin FROM location);`,
+    followUps: [
+      "Quelle différence entre NOT IN et LEFT JOIN ... IS NULL ?",
+      "Comment calculer un pourcentage en SQL avec une sous-requête ?",
+    ],
+  },
+  {
+    id: "kb-sql-like",
+    moduleId: "sql",
+    title: "Opérateur SQL LIKE : Filtrage par Motif avec les Jokers % et _",
+    sourceRef: "Mémento & Cours Officiel STI • Module 5 (Filtres de Chaînes SQL)",
+    keywords: [
+      "like",
+      "not like",
+      "joker",
+      "motif",
+      "commence par",
+      "termine par",
+      "contient",
+      "%",
+    ],
+    answer:
+      "En **SQL**, l'opérateur **`LIKE`** s'utilise dans la clause `WHERE` pour rechercher un motif dans une colonne texte (`CHAR` ou `VARCHAR`) à l'aide de deux caractères jokers :\n- **`%` (pourcent)** : remplace **zéro, un ou plusieurs** caractères quelconques.\n- **`_` (souligné)** : remplace **exactement un seul** caractère.\n- Exemples : `'A%'` (commence par A), `'%tunis%'` (contient « tunis »), `'_0%'` (2e caractère égal à `0`).",
+    codeSnippet: `-- Clients dont le nom commence par 'Ben' et dont le téléphone commence par '9'
+SELECT cin, nom, tel
+FROM client
+WHERE nom LIKE 'Ben%' AND tel LIKE '9_______';`,
+    followUps: [
+      "Comment filtrer un intervalle avec BETWEEN ... AND ?",
+      "Comment utiliser une sous-requête IN en SQL ?",
+    ],
+  },
+  {
+    id: "kb-sql-pourcentage",
+    moduleId: "sql",
+    title: "Calcul de Pourcentage & Fonctions d'Agrégation en SQL (COUNT, SUM, AVG)",
+    sourceRef: "Mémento & Cours Officiel STI • Module 5 (Statistiques & Pourcentages SQL)",
+    keywords: [
+      "pourcentage",
+      "pourcent",
+      "ratio",
+      "proportion",
+      "taux",
+      "round",
+      "avg",
+      "sum",
+      "count",
+      "statistique",
+    ],
+    answer:
+      "Pour calculer un **pourcentage en SQL** (par catégorie ou par rapport au total de la table) :\n1. Multipliez l'agrégat du groupe par **`100.0`** (ou `100`) et divisez-le par une **sous-requête scalaire** comptant le total général : `100.0 * COUNT(*) / (SELECT COUNT(*) FROM table)`.\n2. Vous pouvez arrondir le résultat avec **`ROUND(valeur, 2)`** pour obtenir 2 décimales.\n3. Pour un taux conditionnel dans un même groupe, utilisez `100.0 * SUM(CASE WHEN disponible = 'O' THEN 1 ELSE 0 END) / COUNT(*)`.",
+    codeSnippet: `-- Pourcentage d'habits par catégorie par rapport au stock total
+SELECT codecat,
+       COUNT(*) AS nb_habits,
+       ROUND(100.0 * COUNT(*) / (SELECT COUNT(*) FROM habit), 2) AS pourcentage
+FROM habit
+GROUP BY codecat;`,
+    followUps: [
+      "Quelle est la différence entre WHERE et HAVING ?",
+      "Comment utiliser une sous-requête IN en SQL ?",
     ],
   },
   {
     id: "kb-sql-contraintes",
     moduleId: "sql",
-    title: "Contraintes d'Intégrité SQL, Clés Composées & Agrégats",
-    sourceRef: "Carnet STI-BAC INFO • Sources #199–#234 (Maitriser BD & SQL)",
+    title: "Contraintes d'Intégrité SQL, Clés Composées & Regroupements (GROUP BY / HAVING)",
+    sourceRef: "Mémento & Cours Officiel STI • Module 5 (LDD, Contraintes & Agrégats SQL)",
     keywords: [
-      "sql",
       "create table",
       "primary key",
-      "foreign key",
-      "references",
+      "cle primaire",
+      "cle composee",
       "check",
       "char",
       "varchar",
       "group by",
       "having",
-      "join",
       "cascade",
       "contrainte",
+      "alter table",
+      "between",
     ],
     answer:
-      "D'après le carnet **STI-BAC INFO (Sources #199–#234)** :\n- **Clé primaire composée** : se déclare en fin de table via `PRIMARY KEY (col1, col2)`.\n- **Clé étrangère** : `FOREIGN KEY (codehab) REFERENCES habit(codehab) ON DELETE CASCADE`.\n- **Contrainte de domaine** : `CHECK (disponible IN ('O', 'N'))` ou `CHECK (duree BETWEEN 1 AND 4)`.\n- **Regroupement** : `WHERE` filtre les lignes avant `GROUP BY`, tandis que `HAVING` filtre sur le résultat de `COUNT()`, `SUM()` ou `AVG()`.",
+      "Dans le **Module 5 (BD & SQL)** du programme STI :\n- **Clé primaire composée** : se déclare en fin de table via `PRIMARY KEY (col1, col2)`.\n- **Clé étrangère** : `FOREIGN KEY (codehab) REFERENCES habit(codehab) ON DELETE CASCADE`.\n- **Contrainte de domaine** : `CHECK (disponible IN ('O', 'N'))` ou `CHECK (duree BETWEEN 1 AND 4)`.\n- **Regroupement** : `WHERE` filtre les lignes avant `GROUP BY`, tandis que `HAVING` filtre sur le résultat de `COUNT()`, `SUM()` ou `AVG()`.",
     codeSnippet: `CREATE TABLE location (
   dateloc DATE NOT NULL,
   numloc INT AUTO_INCREMENT,
@@ -1797,8 +2141,9 @@ if (mysqli_num_rows($res) == 0) {
   {
     id: "kb-annales-2025-2026",
     moduleId: "annales",
-    title: "Corrigés des Annales Bac 2025 (Droits d'accès) & Bac 2026 (Bijoux Aurythia / Marivana)",
-    sourceRef: "Carnet STI-BAC INFO • Sources #235–#262 (Annales Officielles 2023–2026)",
+    title:
+      "Corrigés Bac 2025 (Droits d'accès) & Annales Blanches 2026 (Bijoux Aurythia / Marivana)",
+    sourceRef: "Carnet STI-BAC INFO • Annales Officielles 2023–2025 & Annales Blanches 2026",
     keywords: [
       "bac",
       "2025",
@@ -1811,11 +2156,12 @@ if (mysqli_num_rows($res) == 0) {
       "croisiere",
       "annales",
       "correction",
+      "corrige",
       "examen",
     ],
     answer:
-      "Le carnet **STI-BAC INFO (Sources #235–#262)** regroupe les corrigés officiels :\n- **Bac 2025 (Droits d'accès)** : gestion des cases à cocher (`isset($_POST['lec']) ? 1 : 0`) dans `droit.php` et jointure 3 tables (`utilisateur`, `document`, `droit`) dans `affichage.php`.\n- **Bac 2026 (Bijoux Aurythia)** : ajout d'un bijou (`ajout.php`), contrôle de non-duplication d'évaluation par expert (`evaluation.php`) et calcul de moyenne `AVG(note)` (`liste.php`).\n- **Bac 2026 (Croisières Marivana)** : contrôle du quota de places (`nbplaces >= $nb`) suivi de `INSERT INTO reservation` et `UPDATE croisiere SET nbplaces = nbplaces - $nb`.",
-    codeSnippet: `// Bac 2026 - Croisières Marivana : décrémentation du quota après réservation
+      "Le module **Annales & Projets Full-Stack** regroupe les corrigés d'épreuves officielles et les sujets blancs :\n- **Bac 2025 officiel (Droits d'accès)** : gestion des cases à cocher (`isset($_POST['lec']) ? 1 : 0`) dans `droit.php` et jointure 3 tables (`utilisateur`, `document`, `droit`) dans `affichage.php`.\n- **Bac 2026 — Annale Blanche (Bijoux Aurythia)** : ajout d'un bijou (`ajout.php`), contrôle de non-duplication d'évaluation par expert (`evaluation.php`) et calcul de moyenne `AVG(note)` (`liste.php`).\n- **Bac 2026 — Annale Blanche (Croisières Marivana)** : contrôle du quota de places (`nbplaces >= $nb`) suivi de `INSERT INTO reservation` et `UPDATE croisiere SET nbplaces = nbplaces - $nb`.",
+    codeSnippet: `// Annale Blanche Bac 2026 - Croisières Marivana : décrémentation du quota après réservation
 mysqli_query($cnx, "INSERT INTO reservation VALUES ('$numCrois', '$cin', $nbPlaces, '$dateRes')");
 mysqli_query($cnx, "UPDATE croisiere SET nbplaces = nbplaces - $nbPlaces WHERE numcrois = '$numCrois'");`,
     followUps: [
@@ -1828,7 +2174,7 @@ mysqli_query($cnx, "UPDATE croisiere SET nbplaces = nbplaces - $nbPlaces WHERE n
     id: "kb-html-annales",
     moduleId: "html5",
     title: "Notions HTML5 des annales : figcaption, range, hr, alt, title, textarea, oninput",
-    sourceRef: "Annales Bac 2023-2025 (HTML5)",
+    sourceRef: "Annales Bac 2023–2025 (HTML5)",
     keywords: [
       "figcaption",
       "range",
@@ -1841,16 +2187,16 @@ mysqli_query($cnx, "UPDATE croisiere SET nbplaces = nbplaces - $nbPlaces WHERE n
       "figure",
     ],
     answer:
-      "Notions d'HTML5 fréquentes : **figcaption** (légende de figure), **alt** (description alternative) et **title** (infobulle), **hr** (ligne horizontale), **input type=range** (curseur min-max), **textarea** (zone multiligne) et les événements **onfocus**, **onblur**, **oninput**.",
+      "Notions d'HTML5 fréquentes dans les épreuves écrites et pratiques : **figcaption** (légende de `<figure>`), **alt** (description alternative d'image) et **title** (infobulle au survol), **hr** (ligne de séparation horizontale), **input type=\"range\"** (curseur numérique min-max), **textarea** (zone de saisie multiligne) et les événements **onfocus**, **onblur**, **oninput**.",
     codeSnippet:
       '<figure><img src="robot.jpg" alt="Robot" title="Notre robot"><figcaption>Figure 1</figcaption></figure>\n<input type="range" min="0" max="5"><hr>',
-    followUps: ["Quelle différence entre alt et title ?", "Quand se déclenche onfocus ?"],
+    followUps: ["Quelle différence entre alt et title ?", "Comment faire un tableau HTML ?"],
   },
   {
     id: "kb-css-annales",
     moduleId: "css3",
     title: "Notions CSS3 des annales : skew, rotate, border-radius, font-weight, link",
-    sourceRef: "Annales Bac 2023-2025 (CSS3)",
+    sourceRef: "Annales Bac 2023–2025 (CSS3)",
     keywords: [
       "skew",
       "rotate",
@@ -1862,7 +2208,7 @@ mysqli_query($cnx, "UPDATE croisiere SET nbplaces = nbplaces - $nbPlaces WHERE n
       "text-transform",
     ],
     answer:
-      "Notions de CSS3 fréquentes : **transform** (skew incline, rotate tourne, scale agrandit), **border-radius: 50%** (cercle), **font-weight** (gras), **text-transform** (casse) et la liaison **link rel=stylesheet**.",
+      'Notions de CSS3 fréquentes : **transform** (`skew` incline, `rotate` tourne, `scale` agrandit), **border-radius: 50%** (cercle), **font-weight** (graisse du texte), **text-transform** (casse majuscule/minuscule) et la liaison **`<link rel="stylesheet">`**.',
     codeSnippet:
       "img { transform: skew(15deg, 15deg); }\n.pastille { border-radius: 50%; font-weight: bold; }",
     followUps: ["Quelle différence entre skew et rotate ?", "Comment obtenir un cercle ?"],
@@ -1871,10 +2217,10 @@ mysqli_query($cnx, "UPDATE croisiere SET nbplaces = nbplaces - $nbPlaces WHERE n
     id: "kb-js-annales",
     moduleId: "js",
     title: "Notions JavaScript des annales : indexOf, substr, charAt, toUpperCase, innerHTML",
-    sourceRef: "Annales Bac 2023-2025 (JavaScript)",
+    sourceRef: "Annales Bac 2023–2025 (JavaScript)",
     keywords: ["indexof", "substr", "charat", "touppercase", "innerhtml", "trim", "replace"],
     answer:
-      "Notions de JavaScript fréquentes : **indexOf** (position, -1 si absent), **substr(début, longueur)**, **charAt(i)**, **toUpperCase()**, **trim()**, **replace** et **innerHTML** pour écrire dans un conteneur.",
+      "Notions de JavaScript fréquentes : **indexOf** (position d'une sous-chaîne, `-1` si absente), **substr(début, longueur)**, **charAt(i)**, **toUpperCase()**, **trim()**, **replace()** et **innerHTML** pour écrire dans un conteneur DOM.",
     codeSnippet:
       'let d = ch.indexOf("#", 0);\nlet mot = ch.substr(d + 1, 5);\ndocument.getElementById("info").innerHTML = mot;',
     followUps: ["Quelle différence entre substr et substring ?", "innerHTML ou value ?"],
@@ -1883,61 +2229,342 @@ mysqli_query($cnx, "UPDATE croisiere SET nbplaces = nbplaces - $nbPlaces WHERE n
     id: "kb-php-annales",
     moduleId: "php",
     title: "Notions PHP des annales : (int), count, isset, require, str_replace, mysqli_num_rows",
-    sourceRef: "Annales Bac 2023-2025 (PHP)",
-    keywords: [
-      "(int)",
-      "transtypage",
-      "count",
-      "isset",
-      "require",
-      "str_replace",
-      "mysqli_num_rows",
-      "mysqli_affected_rows",
-    ],
+    sourceRef: "Annales Bac 2023–2025 (PHP)",
+    keywords: ["(int)", "transtypage", "count", "isset", "require", "str_replace", "include"],
     answer:
-      "Notions de PHP fréquentes : **(int)** (tronque), **count** (taille d'un tableau), **isset** (variable définie), **require** (arrêt si fichier absent), **str_replace** (remplacement), **mysqli_num_rows** (lignes d'un SELECT) et **mysqli_affected_rows** (lignes touchées par INSERT, UPDATE, DELETE).",
+      "Notions de PHP fréquentes : **(int)** (transtypage entier par troncature), **count()** (taille d'un tableau), **isset()** (teste si une variable ou clé `$_POST` est définie), **require** (arrêt fatal si fichier absent), **str_replace()** (remplacement de sous-chaîne), **mysqli_num_rows** (nombre de lignes d'un `SELECT`) et **mysqli_affected_rows** (lignes modifiées par `INSERT`, `UPDATE`, `DELETE`).",
     codeSnippet: '$X = (int) 2.99;\nif (mysqli_num_rows($res) == 0) { echo "Aucun résultat"; }',
     followUps: ["require ou include ?", "Quand utiliser mysqli_affected_rows ?"],
   },
 ];
 
+const STOP_WORDS_FR = new Set([
+  "le",
+  "la",
+  "les",
+  "un",
+  "une",
+  "des",
+  "du",
+  "de",
+  "d",
+  "l",
+  "au",
+  "aux",
+  "en",
+  "dans",
+  "sur",
+  "sous",
+  "avec",
+  "sans",
+  "pour",
+  "par",
+  "et",
+  "ou",
+  "mais",
+  "donc",
+  "car",
+  "ni",
+  "que",
+  "qui",
+  "quoi",
+  "quel",
+  "quelle",
+  "quels",
+  "quelles",
+  "ce",
+  "cet",
+  "cette",
+  "ces",
+  "c",
+  "est",
+  "sont",
+  "etre",
+  "avoir",
+  "ai",
+  "as",
+  "a",
+  "je",
+  "tu",
+  "il",
+  "elle",
+  "on",
+  "nous",
+  "vous",
+  "ils",
+  "elles",
+  "me",
+  "te",
+  "se",
+  "moi",
+  "toi",
+  "mon",
+  "ma",
+  "mes",
+  "ton",
+  "ta",
+  "tes",
+  "son",
+  "sa",
+  "ses",
+  "ne",
+  "n",
+  "pas",
+  "plus",
+  "comment",
+  "pourquoi",
+  "quand",
+  "faire",
+  "fait",
+  "fais",
+  "explique",
+  "expliquer",
+  "expliquez",
+  "comprendre",
+  "comprends",
+  "arrive",
+  "aider",
+  "aide",
+  "aidez",
+  "bonjour",
+  "salut",
+  "bonsoir",
+  "hello",
+  "coucou",
+  "merci",
+  "svp",
+  "stp",
+  "peux",
+  "peut",
+  "veux",
+  "voudrais",
+  "sujet",
+  "question",
+]);
+
+const GENERIC_MODULE_TERMS = new Set([
+  "html",
+  "html5",
+  "css",
+  "css3",
+  "js",
+  "javascript",
+  "php",
+  "sql",
+  "bd",
+  "base",
+  "donnees",
+]);
+
+function normalizeSearchText(text: string): string {
+  return text
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/['’`]/g, " ")
+    .replace(/[^a-z0-9_#%.:()-]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function tokenizeSearchText(normalized: string): string[] {
+  if (!normalized) return [];
+  return normalized
+    .split(" ")
+    .map((t) => t.replace(/^[.,;:!?()-]+|[.,;:!?()-]+$/g, ""))
+    .filter((t) => t.length > 0);
+}
+
+function buildHonestFallbackSource(
+  query: string,
+  activeModuleId: NotebookCategoryId,
+): NotebookKnowledgeSource {
+  const cleanQuery = query.trim();
+  const displayQuery = cleanQuery.length > 0 ? `« ${cleanQuery} »` : "votre message";
+  return {
+    id: "kb-fallback",
+    moduleId: activeModuleId,
+    isFallback: true,
+    title: "Sujet non trouvé dans les fiches du tuteur",
+    sourceRef: "Repli honnête • Aucune fiche directe pour cette requête",
+    keywords: [],
+    answer: `Je n'ai pas de fiche sur ce sujet dans le tuteur du cours pour ${displayQuery}.\n\n- **Reformulez avec un mot-clé précis du programme 4ème STI** : par exemple \`clé étrangère\`, \`LEFT JOIN\`, \`tableau HTML\`, \`cardinalité\`, \`LIKE\`, \`pourcentage SQL\`, \`sous-requête IN\`, \`addEventListener\`, \`CIN\` ou \`mysqli_query\`.\n- **Utilisez la barre de recherche du mémento** en haut à gauche pour filtrer tous les extraits de code des 5 modules.`,
+    followUps: [
+      "C'est quoi une clé étrangère ?",
+      "Explique la jointure externe LEFT JOIN",
+      "Comment faire un tableau HTML ?",
+      "Comment contrôler un CIN de 8 chiffres en JS ?",
+    ],
+  };
+}
+
 /**
- * Interroge la base de connaissances des 262 sources du carnet "STI-BAC INFO"
+ * Interroge la base de connaissances du tuteur de cours (/cours) avec :
+ * - normalisation des accents et de la casse,
+ * - filtrage des mots vides et salutations,
+ * - correspondance par frontières de mots pour éviter les faux positifs de sous-chaînes,
+ * - recherche de secours dans MEMENTO_CARDS,
+ * - repli honnête explicite (`isFallback: true`) si le score de pertinence est insuffisant.
  */
 export function queryNotebookKnowledgeBase(
   query: string,
   activeModuleId: NotebookCategoryId = "html5",
 ): NotebookKnowledgeSource {
-  const q = query.trim().toLowerCase();
+  const rawLower = query.trim().toLowerCase();
+  const normQuery = normalizeSearchText(query);
+  const allTokens = tokenizeSearchText(normQuery);
 
-  if (q.length > 0) {
-    let bestMatch: NotebookKnowledgeSource | null = null;
-    let bestScore = 0;
+  // Conserver les jetons techniques (même courts comme "in", "hr", "js") non présents dans STOP_WORDS_FR
+  const meaningfulTokens = allTokens.filter((t) => !STOP_WORDS_FR.has(t));
 
-    for (const entry of NOTEBOOK_KNOWLEDGE_BASE) {
-      let score = 0;
-      for (const kw of entry.keywords) {
-        if (q.includes(kw.toLowerCase())) {
-          score += 3;
+  if (meaningfulTokens.length === 0) {
+    return buildHonestFallbackSource(query, activeModuleId);
+  }
+
+  const tokenSet = new Set(allTokens);
+  const meaningfulSet = new Set(meaningfulTokens);
+
+  let bestMatch: NotebookKnowledgeSource | null = null;
+  let bestScore = 0;
+
+  for (const entry of NOTEBOOK_KNOWLEDGE_BASE) {
+    let score = 0;
+    const normTitle = normalizeSearchText(entry.title);
+    const titleTokens = new Set(tokenizeSearchText(normTitle));
+
+    for (const kw of entry.keywords) {
+      const rawKw = kw.toLowerCase().trim();
+      const normKw = normalizeSearchText(kw);
+      if (!normKw) continue;
+
+      const kwParts = tokenizeSearchText(normKw);
+      const isGeneric = kwParts.length === 1 && GENERIC_MODULE_TERMS.has(kwParts[0] ?? "");
+
+      if (rawKw === "(int)" || rawKw === "%") {
+        if (rawLower.includes(rawKw)) {
+          score += 6;
         }
+        continue;
       }
-      if (entry.title.toLowerCase().includes(q)) score += 4;
-      if (entry.moduleId === activeModuleId) score += 1;
 
-      if (score > bestScore) {
-        bestScore = score;
-        bestMatch = entry;
+      if (kwParts.length > 1) {
+        // Expression multi-mots (ex: "cle etrangere", "left join", "sous-requete", "create table")
+        const phraseMatch =
+          normQuery.includes(normKw) || kwParts.every((part) => tokenSet.has(part));
+        if (phraseMatch) {
+          score += 7;
+        }
+      } else {
+        const singleKw = kwParts[0] ?? normKw;
+        if (singleKw.length <= 3) {
+          // Mot-clé court ("in", "hr", "alt", "cin", "sql") : correspondance exacte de jeton uniquement
+          if (tokenSet.has(singleKw)) {
+            score += isGeneric ? 1 : 5;
+          }
+        } else {
+          // Mot-clé de 4+ lettres : correspondance exacte ou préfixe/pluriel (ex: cardinalite / cardinalites)
+          const matchedToken = meaningfulTokens.some(
+            (t) =>
+              t === singleKw ||
+              (t.length >= 4 &&
+                singleKw.length >= 4 &&
+                (t.startsWith(singleKw) || singleKw.startsWith(t))),
+          );
+          if (matchedToken) {
+            score += isGeneric ? 1 : 5;
+          }
+        }
       }
     }
 
-    if (bestMatch && bestScore >= 2) {
-      return bestMatch;
+    // Bonus sur les mots significatifs présents dans le titre de la fiche
+    for (const tok of meaningfulTokens) {
+      if (GENERIC_MODULE_TERMS.has(tok)) continue;
+      if (tok.length <= 3) {
+        if (titleTokens.has(tok)) score += 2;
+      } else {
+        for (const tt of titleTokens) {
+          if (tt === tok || (tt.length >= 4 && (tt.startsWith(tok) || tok.startsWith(tt)))) {
+            score += 2;
+            break;
+          }
+        }
+      }
+    }
+
+    // Tie-breaker léger pour le module actif UNIQUEMENT si un vrai mot-clé de contenu a matché
+    if (score >= 4 && entry.moduleId === activeModuleId) {
+      score += 0.5;
+    }
+
+    if (score > bestScore) {
+      bestScore = score;
+      bestMatch = entry;
     }
   }
 
-  // Fallback sur la source correspondant au chapitre actif
-  return (
-    NOTEBOOK_KNOWLEDGE_BASE.find((k) => k.moduleId === activeModuleId) ??
-    (NOTEBOOK_KNOWLEDGE_BASE[0] as NotebookKnowledgeSource)
-  );
+  if (bestMatch && bestScore >= 4) {
+    return bestMatch;
+  }
+
+  // Recherche de secours dans les fiches MEMENTO_CARDS si aucun article principal n'a atteint le seuil
+  let bestMementoScore = 0;
+  let bestMementoMatch: NotebookKnowledgeSource | null = null;
+
+  for (const card of MEMENTO_CARDS) {
+    for (const sec of card.sections) {
+      for (const snip of sec.snippets) {
+        let mScore = 0;
+        const normSnipTitle = normalizeSearchText(snip.title);
+        for (const kw of snip.keywords) {
+          const normKw = normalizeSearchText(kw);
+          if (!normKw || GENERIC_MODULE_TERMS.has(normKw)) continue;
+          if (normKw.length <= 3) {
+            if (meaningfulSet.has(normKw)) mScore += 4;
+          } else if (
+            meaningfulTokens.some(
+              (t) =>
+                t === normKw ||
+                (t.length >= 4 &&
+                  normKw.length >= 4 &&
+                  (t.startsWith(normKw) || normKw.startsWith(t))),
+            )
+          ) {
+            mScore += 4;
+          }
+        }
+        for (const tok of meaningfulTokens) {
+          if (tok.length >= 4 && !GENERIC_MODULE_TERMS.has(tok) && normSnipTitle.includes(tok)) {
+            mScore += 3;
+          }
+        }
+        if (mScore > bestMementoScore && mScore >= 4) {
+          bestMementoScore = mScore;
+          bestMementoMatch = {
+            id: `kb-memento-${card.id}-${sec.id}`,
+            moduleId: card.id,
+            title: `${snip.title} (${card.shortTitle})`,
+            sourceRef: `Fiche Mémento ${card.badge} • ${sec.title}`,
+            keywords: snip.keywords,
+            answer:
+              snip.explanation ??
+              `Extrait issu de la fiche mémento **${card.title}** (${sec.title}).`,
+            codeSnippet: snip.code,
+            followUps: [
+              "C'est quoi une clé étrangère ?",
+              "Explique la jointure externe LEFT JOIN",
+              "Comment faire un tableau HTML ?",
+            ],
+          };
+        }
+      }
+    }
+  }
+
+  if (bestMementoMatch) {
+    return bestMementoMatch;
+  }
+
+  // Repli honnête explicite : ne jamais renvoyer silencieusement une fiche hors sujet
+  return buildHonestFallbackSource(query, activeModuleId);
 }
