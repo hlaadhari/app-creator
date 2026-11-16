@@ -114,6 +114,15 @@ function diagnostiquerCodeEleve(
     if (hasForm && !hasOnsubmit) {
       return `**Diagnostic de \`${fileLabel}\`** : votre balise \`<form>\` est présente mais ne contient pas \`onsubmit="return verif();"\` pour bloquer l'envoi en cas d'erreur JS.`;
     }
+    const hasMailtoHref = /<a\b[^>]*href\s*=\s*["']mailto:/i.test(code);
+    const hasRawMailtoOrMailTag =
+      /<mail\b/i.test(code) || (/mailto:/i.test(code) && !hasMailtoHref);
+    if (hasRawMailtoOrMailTag) {
+      return `**Diagnostic de \`${fileLabel}\`** : vous utilisez \`mailto:\` (ou une balise \`<Mail>\` non valide) sans passer par une balise de lien \`<a href="mailto:...">\`.`;
+    }
+    if (hasMailtoHref) {
+      return `**Diagnostic de \`${fileLabel}\`** : votre lien \`<a href="mailto:...">\` est bien déclaré. Vérifiez le texte visible entre \`<a>\` et \`</a>\`.`;
+    }
   }
 
   return `**Diagnostic de \`${fileLabel}\`** (${code.split("\n").length} ligne(s)) : examinez l'instruction où les données sont lues et transformées avant l'affichage ou le retour.`;
@@ -218,8 +227,12 @@ function genererReponseMaieutique(
       ? kbMatch.codeSnippet.split("\n")[0]?.trim()
       : undefined;
     const snippetBlock = shortSnippet ? `\n\n**Exemple de syntaxe** :\n\`${shortSnippet}\`` : "";
+    const htmlDiag =
+      kbMatch.id === "kb-html-liens-mailto"
+        ? `\n\n${diagnostiquerCodeEleve(context.fileContent, context.activeFile, "html")}`
+        : "";
     return {
-      texte: `**${kbMatch.title}** *(Réf. \`/cours\` : ${kbMatch.sourceRef})*\n\n${kbMatch.answer}${snippetBlock}\n\n**Question pour votre code (\`${context.activeFile || "atelier"}\`)** : comment pouvez-vous appliquer cette règle aux identifiants ou tables de votre exercice actuel ?`,
+      texte: `**${kbMatch.title}** *(Réf. \`/cours\` : ${kbMatch.sourceRef})*\n\n${kbMatch.answer}${snippetBlock}${htmlDiag}\n\n**Question pour votre code (\`${context.activeFile || "atelier"}\`)** : comment pouvez-vous appliquer cette règle aux identifiants ou tables de votre exercice actuel ?`,
       followUps: kbMatch.followUps,
     };
   }
