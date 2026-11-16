@@ -8,6 +8,7 @@ import {
   BookOpen,
   ExternalLink,
   GraduationCap,
+  Loader2,
   Play,
   RotateCcw,
   FileDown,
@@ -31,6 +32,8 @@ import {
   type NotebookCategoryId,
   type NotebookVideoCapsule,
 } from "@/content/notebook-sti";
+import { NOTEBOOK_LM_PUBLIC_URL } from "@/lib/tutor/course-gemini";
+import { askCourseNotebookTutor } from "@/lib/tutor/course-tutor-fn";
 
 interface RevisionGuideModalProps {
   isOpen: boolean;
@@ -422,10 +425,11 @@ export function CourseNotebookTutor({ activeCategoryId }: NotebookTutorChatProps
     },
   ]);
   const [input, setInput] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleAsk = (questionText?: string) => {
+  const handleAsk = async (questionText?: string) => {
     const q = (questionText ?? input).trim();
-    if (!q) return;
+    if (!q || isLoading) return;
 
     const userMsg: ChatEntry = {
       id: `u-${Date.now()}`,
@@ -433,18 +437,33 @@ export function CourseNotebookTutor({ activeCategoryId }: NotebookTutorChatProps
       text: q,
     };
 
-    const kbResult = queryNotebookKnowledgeBase(q, activeCategoryId);
-    const botMsg: ChatEntry = {
-      id: `b-${Date.now() + 1}`,
-      role: "assistant",
-      text: kbResult.answer,
-      sourceRef: kbResult.sourceRef,
-      codeSnippet: kbResult.codeSnippet,
-      followUps: kbResult.followUps,
-    };
-
-    setMessages((prev) => [...prev, userMsg, botMsg]);
+    setMessages((prev) => [...prev, userMsg]);
     setInput("");
+    setIsLoading(true);
+
+    try {
+      let kbResult = queryNotebookKnowledgeBase(q, activeCategoryId);
+      try {
+        const serverResponse = await askCourseNotebookTutor({
+          data: { query: q, activeCategoryId },
+        });
+        kbResult = serverResponse.source;
+      } catch {
+        // Repli silencieux sur la base de connaissances locale si hors-ligne ou sans RPC serveur
+      }
+
+      const botMsg: ChatEntry = {
+        id: `b-${Date.now() + 1}`,
+        role: "assistant",
+        text: kbResult.answer,
+        sourceRef: kbResult.sourceRef,
+        codeSnippet: kbResult.codeSnippet,
+        followUps: kbResult.followUps,
+      };
+      setMessages((prev) => [...prev, botMsg]);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -454,32 +473,44 @@ export function CourseNotebookTutor({ activeCategoryId }: NotebookTutorChatProps
       data-testid="course-notebook-tutor"
     >
       {/* En-tête du Tuteur Carnet STI-BAC INFO */}
-      <div className="p-3 border-b bg-background/80 flex items-center justify-between shrink-0">
-        <div className="flex items-center gap-2">
-          <div className="w-7 h-7 rounded-lg bg-primary/15 text-primary border border-primary/30 flex items-center justify-center">
+      <div className="p-3 border-b bg-background/80 flex items-center justify-between gap-2 shrink-0">
+        <div className="flex items-center gap-2 min-w-0">
+          <div className="w-7 h-7 rounded-lg bg-primary/15 text-primary border border-primary/30 flex items-center justify-center shrink-0">
             <Bot className="w-4 h-4" />
           </div>
-          <div>
-            <h3 className="text-xs font-bold flex items-center gap-1.5">
-              <span>Tuteur IA — STI-BAC INFO</span>
-              <Sparkles className="w-3 h-3 text-amber-400" />
+          <div className="min-w-0">
+            <h3 className="text-xs font-bold flex items-center gap-1.5 truncate">
+              <span className="truncate">Tuteur IA — STI-BAC INFO</span>
+              <Sparkles className="w-3 h-3 text-amber-400 shrink-0" />
             </h3>
-            <span className="text-[10px] font-mono text-emerald-400 flex items-center gap-1">
-              <GraduationCap className="w-3 h-3" />
-              Mémento & Annales Bac STI connectés
+            <span className="text-[10px] font-mono text-emerald-400 flex items-center gap-1 truncate">
+              <GraduationCap className="w-3 h-3 shrink-0" />
+              Mémento, Gemini & Annales connectés
             </span>
           </div>
         </div>
 
-        <button
-          type="button"
-          onClick={() => setMessages((prev) => (prev.length > 0 ? [prev[0] as ChatEntry] : []))}
-          className="p-1.5 rounded text-muted-foreground hover:text-foreground hover:bg-accent cursor-pointer"
-          title="Réinitialiser la discussion"
-          aria-label="Réinitialiser la discussion"
-        >
-          <RotateCcw className="w-3.5 h-3.5" />
-        </button>
+        <div className="flex items-center gap-1 shrink-0">
+          <a
+            href={NOTEBOOK_LM_PUBLIC_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1 px-2 py-1 rounded text-[10px] font-medium bg-primary/10 hover:bg-primary/20 text-primary border border-primary/25 transition-colors"
+            title="Ouvrir le NotebookLM public STI dans un nouvel onglet (compte Google requis)"
+          >
+            <ExternalLink className="w-3 h-3" />
+            <span className="hidden xl:inline">NotebookLM</span>
+          </a>
+          <button
+            type="button"
+            onClick={() => setMessages((prev) => (prev.length > 0 ? [prev[0] as ChatEntry] : []))}
+            className="p-1.5 rounded text-muted-foreground hover:text-foreground hover:bg-accent cursor-pointer"
+            title="Réinitialiser la discussion"
+            aria-label="Réinitialiser la discussion"
+          >
+            <RotateCcw className="w-3.5 h-3.5" />
+          </button>
+        </div>
       </div>
 
       {/* Fil de discussion */}
@@ -514,8 +545,9 @@ export function CourseNotebookTutor({ activeCategoryId }: NotebookTutorChatProps
                   <button
                     key={idx}
                     type="button"
-                    onClick={() => handleAsk(f)}
-                    className="text-[10px] px-2 py-1 rounded-md bg-primary/10 hover:bg-primary/20 text-primary border border-primary/25 text-left transition-colors cursor-pointer"
+                    disabled={isLoading}
+                    onClick={() => void handleAsk(f)}
+                    className="text-[10px] px-2 py-1 rounded-md bg-primary/10 hover:bg-primary/20 text-primary border border-primary/25 text-left transition-colors cursor-pointer disabled:opacity-50"
                   >
                     {f}
                   </button>
@@ -524,13 +556,19 @@ export function CourseNotebookTutor({ activeCategoryId }: NotebookTutorChatProps
             )}
           </div>
         ))}
+        {isLoading && (
+          <div className="rounded-lg p-3 text-xs bg-background/90 border border-border mr-2 flex items-center gap-2 text-muted-foreground">
+            <Loader2 className="w-3.5 h-3.5 animate-spin text-primary" />
+            <span>Consultation du tuteur STI...</span>
+          </div>
+        )}
       </div>
 
       {/* Zone de saisie */}
       <form
         onSubmit={(e) => {
           e.preventDefault();
-          handleAsk();
+          void handleAsk();
         }}
         className="p-3 border-t bg-background/80 flex items-center gap-2 shrink-0"
       >
@@ -538,18 +576,24 @@ export function CourseNotebookTutor({ activeCategoryId }: NotebookTutorChatProps
           type="text"
           value={input}
           onChange={(e) => setInput(e.target.value)}
+          disabled={isLoading}
           placeholder="Question sur le carnet STI-BAC INFO..."
           aria-label="Poser une question au tuteur STI-BAC"
-          className="flex-1 px-3 py-1.5 text-xs bg-panel border border-border rounded-md focus:outline-none focus:ring-1 focus:ring-primary text-foreground"
+          className="flex-1 px-3 py-1.5 text-xs bg-panel border border-border rounded-md focus:outline-none focus:ring-1 focus:ring-primary text-foreground disabled:opacity-60"
         />
         <Button
           type="submit"
           size="sm"
+          disabled={isLoading}
           className="h-8 px-2.5 cursor-pointer"
           title="Envoyer"
           aria-label="Envoyer la question"
         >
-          <Send className="w-3.5 h-3.5" />
+          {isLoading ? (
+            <Loader2 className="w-3.5 h-3.5 animate-spin" />
+          ) : (
+            <Send className="w-3.5 h-3.5" />
+          )}
         </Button>
       </form>
     </aside>
