@@ -1,0 +1,335 @@
+{
+  "id": "exam-bac2024-blanc-ecrit",
+  "title": "Bac Blanc 2024 - Épreuve Écrite Systèmes & Technologies de l'Informatique",
+  "referentiel_id": "bac-si-tn",
+  "type_sujet": "annale_officielle",
+  "source_reference": "Ministère de l'Éducation — Bac Blanc STI Tunisie",
+  "statut_validation": "valide_pedagogiquement",
+  "session_annee": 2024,
+  "session_libelle": "Bac Blanc",
+  "exam_type": "written",
+  "session_type": "blanc",
+  "year": 2024,
+  "duration": 180,
+  "exam_mode": true,
+  "bareme_total": 20,
+  "category": "Module C - Épreuves Écrites",
+  "level": "Moyen",
+  "tags": [
+    "Bac Blanc 2024",
+    "HTML5/CSS3",
+    "JavaScript",
+    "PHP",
+    "SQL DDL/DML",
+    "Normalisation",
+    "Épreuve Écrite"
+  ],
+  "sections": [
+    {
+      "id": "ex1-qcm",
+      "title": "Exercice N° 1 (Partie 1) : QCM HTML5, CSS, JS, PHP & SQL (2.5 pts)",
+      "type": "qcm",
+      "description": "Choisissez la bonne réponse pour chaque question.",
+      "points": 2.5,
+      "questions": [
+        {
+          "id": "EX1-Q1",
+          "question": "En HTML5, quel événement se déclenche lorsqu'un élément perd le focus ?",
+          "options": [
+            { "id": "opt-onfocus", "label": "onfocus" },
+            { "id": "opt-onblur", "label": "onblur" },
+            { "id": "opt-onload", "label": "onload" }
+          ],
+          "points": 0.5,
+          "multiple": false,
+          "correctAnswers": ["opt-onblur"],
+          "explanation": "onblur se déclenche à la perte de focus."
+        },
+        {
+          "id": "EX1-Q2",
+          "question": "En CSS, quelle règle permet d'effectuer une translation horizontale d'un élément de 100px ?",
+          "options": [
+            { "id": "opt-transform", "label": "transform: translate(100px);" },
+            { "id": "opt-trans-rev", "label": "translate: transform(100px);" },
+            { "id": "opt-translate", "label": "translate: 100px;" }
+          ],
+          "points": 0.5,
+          "multiple": false,
+          "correctAnswers": ["opt-transform"],
+          "explanation": "La propriété CSS standard est transform: translate(100px);."
+        },
+        {
+          "id": "EX1-Q3",
+          "question": "En JavaScript, quelle méthode permet de modifier le numéro du mois d'une variable de type Date ?",
+          "options": [
+            { "id": "opt-getmonth", "label": "getMonth()" },
+            { "id": "opt-getdate", "label": "getDate()" },
+            { "id": "opt-setmonth", "label": "setMonth()" }
+          ],
+          "points": 0.5,
+          "multiple": false,
+          "correctAnswers": ["opt-setmonth"],
+          "explanation": "setMonth() modifie le mois d'un objet Date."
+        },
+        {
+          "id": "EX1-Q4",
+          "question": "En PHP, dans quel cas la fonction isset($a) retourne-t-elle false ?",
+          "options": [
+            { "id": "opt-null", "label": "Si la variable $a est nulle (NULL)" },
+            { "id": "opt-zero", "label": "Si la variable $a est égale à 0" },
+            { "id": "opt-nonnull", "label": "Si la variable $a est non nulle" }
+          ],
+          "points": 0.5,
+          "multiple": false,
+          "correctAnswers": ["opt-null"],
+          "explanation": "isset($a) retourne false si $a n'est pas définie ou vaut NULL."
+        },
+        {
+          "id": "EX1-Q5",
+          "question": "En SQL, l'ajout d'une contrainte UNIQUE(NomClient) suivie de deux insertions avec 'AHMED' provoque une violation de :",
+          "options": [
+            { "id": "opt-table", "label": "Contrainte d'intégrité de table (unicité)" },
+            { "id": "opt-ref", "label": "Contrainte d'intégrité référentielle" },
+            { "id": "opt-dom", "label": "Contrainte d'intégrité de domaine" }
+          ],
+          "points": 0.5,
+          "multiple": false,
+          "correctAnswers": ["opt-table"],
+          "explanation": "UNIQUE garantit l'unicité entre lignes d'une même table."
+        }
+      ]
+    },
+    {
+      "id": "ex1-assoc",
+      "title": "Exercice N° 1 (Parties 2 & 3) : Fonctions & Propriétés CSS (1.25 pt)",
+      "type": "code_analysis",
+      "description": "Correspondance entre descriptions, fonctions JS/PHP/SQL et propriétés CSS.",
+      "points": 1.25,
+      "questions": [
+        {
+          "id": "EX1-FCT",
+          "prompt": "Associer dans l'ordre les fonctions aux 5 descriptions : (1) vérifier si chaîne est un nombre (JS), (2) valider date (PHP), (3) date/heure système (SQL), (4) convertir chaîne en entier (JS), (5) formater date (PHP).",
+          "language": "javascript",
+          "points": 0.75,
+          "expectedAnswer": "isNaN, checkdate, Now, parseInt, date",
+          "expectedKeywords": ["isNaN", "checkdate", "Now", "parseInt", "date"],
+          "explanation": "1: isNaN(), 2: checkdate(), 3: Now(), 4: parseInt(), 5: date()."
+        },
+        {
+          "id": "EX1-CSS",
+          "prompt": "Compléter les 5 propriétés CSS : text-align, position, filter, display, transform avec les valeurs adaptées (center, absolute, invert(), inline-block, rotate(90deg)).",
+          "language": "css",
+          "points": 0.5,
+          "expectedAnswer": "center, absolute, invert(), inline-block, rotate(90deg)",
+          "expectedKeywords": ["center", "absolute", "invert", "inline-block", "rotate"],
+          "explanation": "text-align: center; position: absolute; filter: invert(); display: inline-block; transform: rotate(90deg);"
+        }
+      ]
+    },
+    {
+      "id": "ex2-client",
+      "title": "Exercice N° 2 : Formulaire BD_Gestion (HTML, JS & PHP) (3.25 pts)",
+      "type": "code_analysis",
+      "description": "Ajout d'un nouveau client dans BD_Gestion : formulaire HTML, verif() en JS et ajoutClient.php.",
+      "points": 3.25,
+      "questions": [
+        {
+          "id": "EX2-HTML",
+          "prompt": "Compléter les 5 attributs du formulaire HTML : (1) action, (2) method, (3) onsubmit, (4) type bouton Valider, (5) type bouton Annuler.",
+          "language": "html",
+          "points": 1.25,
+          "expectedAnswer": "ajoutClient.php, POST, return Verif(), submit, reset",
+          "expectedKeywords": ["ajoutClient.php", "POST", "Verif()", "submit", "reset"],
+          "explanation": "action=\"ajoutClient.php\", method=\"POST\", onsubmit=\"return Verif()\", submit, reset."
+        },
+        {
+          "id": "EX2-JS",
+          "prompt": "Donner les 4 expressions JS de verif() : longueur de mat, 2 premiers caractères de mat, suppression des espaces de nmpr, position de l'espace dans nmpr2.",
+          "language": "javascript",
+          "points": 1.0,
+          "expectedAnswer": "mat.length ; mat.substr(0, 2) ; nmpr.trim() ; nmpr2.indexOf(\" \")",
+          "expectedKeywords": ["mat.length", "substr", "trim", "indexOf"],
+          "explanation": "mat.length, mat.substr(0, 2), nmpr.trim(), nmpr2.indexOf(\" \")."
+        },
+        {
+          "id": "EX2-PHP",
+          "prompt": "Donner les 4 expressions PHP de ajoutClient.php : position de l'espace dans $nompre, extraction du nom, mise en majuscule, remplacement dans $nompre.",
+          "language": "php",
+          "points": 1.0,
+          "expectedAnswer": "strpos($nompre, \" \") ; substr($nompre, 0, $p) ; strtoupper($nom) ; str_replace($nom, $nommajus, $nompre)",
+          "expectedKeywords": ["strpos", "substr", "strtoupper", "str_replace"],
+          "explanation": "strpos($nompre, \" \"), substr($nompre, 0, $p), strtoupper($nom), str_replace($nom, $nommajus, $nompre)."
+        }
+      ]
+    },
+    {
+      "id": "ex3-streaming-ddl",
+      "title": "Exercice N° 3 (Parties 1 & 2-II) : Streaming_HD — Cardinalités & LDD (3.5 pts)",
+      "type": "modeling",
+      "description": "Interprétation du schéma Streaming_HD et requêtes de définition de données (ALTER / CREATE).",
+      "points": 3.5,
+      "questions": [
+        {
+          "id": "EX3-VF",
+          "prompt": "Indiquer Vrai ou Faux dans l'ordre : (1) Chaque streamer ne peut posséder qu'une seule chaîne ; (2) Chaque contenu a un seul type ; (3) Un Pays peut avoir plusieurs streamers ; (4) Une chaîne ne peut avoir qu'un seul type de contenu.",
+          "type": "text",
+          "points": 1.0,
+          "expectedPattern": "^\\s*(F|Faux)[\\s,;/-]+(V|Vrai)[\\s,;/-]+(V|Vrai)[\\s,;/-]+(F|Faux)\\s*$",
+          "explanation": "Réponse officielle : Faux, Vrai, Vrai, Faux."
+        },
+        {
+          "id": "EX3-DDL-1",
+          "prompt": "Augmenter la taille du champ Pseudo de la table Streamer à 50 caractères.",
+          "type": "ddl",
+          "points": 0.5,
+          "expectedDdl": "ALTER TABLE Streamer MODIFY Pseudo VARCHAR(50);",
+          "expectedKeywords": ["ALTER TABLE", "Streamer", "Pseudo", "50"],
+          "explanation": "ALTER TABLE Streamer MODIFY Pseudo VARCHAR(50);"
+        },
+        {
+          "id": "EX3-DDL-2",
+          "prompt": "Ajouter à la table TypeContenu un champ obligatoire Categorie de longueur maximale 20.",
+          "type": "ddl",
+          "points": 0.5,
+          "expectedDdl": "ALTER TABLE TypeContenu ADD Categorie VARCHAR(20) NOT NULL;",
+          "expectedKeywords": ["ALTER TABLE", "TypeContenu", "Categorie", "NOT NULL"],
+          "explanation": "ALTER TABLE TypeContenu ADD Categorie VARCHAR(20) NOT NULL;"
+        },
+        {
+          "id": "EX3-DDL-3",
+          "prompt": "Ajouter une contrainte sur le champ Duree de Contenu pour qu'il soit compris entre 1 et 60.",
+          "type": "ddl",
+          "points": 0.5,
+          "expectedDdl": "ALTER TABLE Contenu ADD CONSTRAINT c1 CHECK (Duree BETWEEN 1 AND 60);",
+          "expectedKeywords": ["ALTER TABLE", "Contenu", "CHECK", "Duree"],
+          "explanation": "ALTER TABLE Contenu ADD CONSTRAINT c1 CHECK (Duree BETWEEN 1 AND 60);"
+        },
+        {
+          "id": "EX3-DDL-4",
+          "prompt": "Créer la table Adresse(CodeMail VARCHAR(10) PK, Email VARCHAR(40) NOT NULL UNIQUE, IdStream INT FK -> Streamer).",
+          "type": "ddl",
+          "points": 0.5,
+          "expectedDdl": "CREATE TABLE Adresse (CodeMail VARCHAR(10) PRIMARY KEY, Email VARCHAR(40) NOT NULL UNIQUE, IdStream INT REFERENCES Streamer(IdStream));",
+          "expectedKeywords": [
+            "CREATE TABLE",
+            "Adresse",
+            "CodeMail",
+            "Email",
+            "UNIQUE",
+            "Streamer"
+          ],
+          "explanation": "CREATE TABLE Adresse (CodeMail VARCHAR(10) PRIMARY KEY, Email VARCHAR(40) NOT NULL UNIQUE, IdStream INT REFERENCES Streamer(IdStream));"
+        },
+        {
+          "id": "EX3-DDL-5",
+          "prompt": "Supprimer le champ Email de la table Streamer.",
+          "type": "ddl",
+          "points": 0.5,
+          "expectedDdl": "ALTER TABLE Streamer DROP COLUMN Email;",
+          "expectedKeywords": ["ALTER TABLE", "Streamer", "DROP", "Email"],
+          "explanation": "ALTER TABLE Streamer DROP COLUMN Email;"
+        }
+      ]
+    },
+    {
+      "id": "ex3-streaming-sql",
+      "title": "Exercice N° 3 (Partie 2-III) : Requêtes SQL Streaming_HD (6 pts)",
+      "type": "sql",
+      "description": "Manipulation et interrogation des données de Streaming_HD.",
+      "points": 6.0,
+      "questions": [
+        {
+          "id": "EX3-SQL-1",
+          "prompt": "Modifier le Mode à 'D' pour tout le contenu de la chaîne 'C005'.",
+          "type": "dml",
+          "points": 1.0,
+          "expectedQuery": "UPDATE Contenu SET Mode = 'D' WHERE IdChaine = 'C005';",
+          "verificationSql": "SELECT Mode FROM Contenu WHERE IdChaine = 'C005';",
+          "explanation": "UPDATE Contenu SET Mode = 'D' WHERE IdChaine = 'C005';"
+        },
+        {
+          "id": "EX3-SQL-2",
+          "prompt": "Supprimer tout le contenu ancien dont la date de création est antérieure à l'année 2017.",
+          "type": "dml",
+          "points": 1.0,
+          "expectedQuery": "DELETE FROM Contenu WHERE DateCreation < '2017-01-01';",
+          "verificationSql": "SELECT COUNT(*) AS nb FROM Contenu WHERE DateCreation < '2017-01-01';",
+          "explanation": "DELETE FROM Contenu WHERE DateCreation < '2017-01-01';"
+        },
+        {
+          "id": "EX3-SQL-3",
+          "prompt": "Afficher les noms de types de contenu (NomType) pour les contenus ayant un nombre de vues dépassant 1000 (NbreVues > 1000).",
+          "type": "query",
+          "points": 1.0,
+          "expectedQuery": "SELECT DISTINCT NomType FROM Contenu C JOIN TypeContenu T ON C.IdType = T.IdType WHERE NbreVues > 1000;",
+          "explanation": "Jointure Contenu-TypeContenu filtrée sur NbreVues > 1000."
+        },
+        {
+          "id": "EX3-SQL-4",
+          "prompt": "Afficher Titre, Duree et NbreVues des contenus diffusés en 2024, triés par ordre décroissant de NbreVues.",
+          "type": "query",
+          "points": 1.0,
+          "expectedQuery": "SELECT Titre, Duree, NbreVues FROM Contenu WHERE DateCreation >= '2024-01-01' AND DateCreation <= '2024-12-31' ORDER BY NbreVues DESC;",
+          "explanation": "Filtre sur l'année 2024 et ORDER BY NbreVues DESC."
+        },
+        {
+          "id": "EX3-SQL-5",
+          "prompt": "Afficher les identifiants des streamers (IdStream) qui ont un contenu de type nommé 'Education'.",
+          "type": "query",
+          "points": 1.0,
+          "expectedQuery": "SELECT DISTINCT IdStream FROM Chaine CH JOIN Contenu CO ON CH.IdChaine = CO.IdChaine JOIN TypeContenu T ON CO.IdType = T.IdType WHERE NomType = 'Education';",
+          "explanation": "Jointure Chaine-Contenu-TypeContenu avec NomType = 'Education'."
+        },
+        {
+          "id": "EX3-SQL-6",
+          "prompt": "Afficher pour chaque chaîne son identifiant (IdChaine) et la durée moyenne de ses contenus.",
+          "type": "query",
+          "points": 1.0,
+          "expectedQuery": "SELECT IdChaine, AVG(Duree) AS DureeMoyenne FROM Contenu GROUP BY IdChaine;",
+          "explanation": "GROUP BY IdChaine avec AVG(Duree)."
+        }
+      ]
+    },
+    {
+      "id": "ex4-maintenance",
+      "title": "Exercice N° 4 : Conception & Normalisation Maintenance (3.5 pts)",
+      "type": "modeling",
+      "description": "Correction d'anomalies de conception sur Client, Materiel, Intervention, Technicien et Qualification.",
+      "points": 3.5,
+      "questions": [
+        {
+          "id": "EX4-Q1",
+          "prompt": "Proposer la représentation textuelle corrigée des tables Client et Materiel respectant R1 et R2.",
+          "type": "representation",
+          "points": 1.0,
+          "expectedKeywords": ["Client", "CodeCl", "Materiel", "RefMat"],
+          "explanation": "Client(#CodeCl, NomCl, AdrCl) et Materiel(#RefMat, DesMat, CodeCl#)."
+        },
+        {
+          "id": "EX4-Q2A",
+          "prompt": "Quelles sont les deux lignes d'enregistrement de Intervention qui violent la clé primaire initiale et quelle contrainte est violée ?",
+          "type": "text",
+          "points": 0.5,
+          "expectedKeywords": ["1", "3", "table"],
+          "explanation": "Ligne 1 et Ligne 3 ont le même couple (M178, 7401) : contrainte d'intégrité de table (clé primaire)."
+        },
+        {
+          "id": "EX4-Q2B",
+          "prompt": "Proposer la représentation textuelle de Intervention respectant R3, R4 et R5 (avec DateInt dans la clé).",
+          "type": "representation",
+          "points": 1.0,
+          "expectedKeywords": ["Intervention", "RefMat", "CodeTech", "DateInt"],
+          "explanation": "Intervention(#RefMat#, #CodeTech#, #DateInt, DescInt, Montant)."
+        },
+        {
+          "id": "EX4-Q3",
+          "prompt": "Proposer la représentation textuelle de Qualification et Technicien pour éliminer la redondance sur Diplome.",
+          "type": "representation",
+          "points": 1.0,
+          "expectedKeywords": ["Qualification", "IdQual", "Diplome", "Technicien", "CodeTech"],
+          "explanation": "Qualification(#IdQual, Diplome) et Technicien(#CodeTech, NomTech, TelTech, IdQual#)."
+        }
+      ]
+    }
+  ]
+}

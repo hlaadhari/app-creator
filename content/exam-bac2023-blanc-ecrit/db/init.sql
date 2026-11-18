@@ -1,0 +1,87 @@
+-- Base de données initiale pour Bac Blanc 2023 (Vente de Véhicules)
+CREATE TABLE IF NOT EXISTS CONSTRUCTEUR (
+  IdConst INT PRIMARY KEY,
+  NomConst VARCHAR(50) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS MODELE (
+  IdMod INT PRIMARY KEY,
+  NomMod VARCHAR(50) NOT NULL,
+  IdConst INT NOT NULL,
+  FOREIGN KEY (IdConst) REFERENCES CONSTRUCTEUR(IdConst)
+);
+
+CREATE TABLE IF NOT EXISTS VEHICULE (
+  ImmatVeh VARCHAR(20) PRIMARY KEY,
+  PuisFisc INT NOT NULL,
+  Energie VARCHAR(1) NOT NULL,
+  Couleur VARCHAR(1) NOT NULL,
+  IdMod INT NOT NULL,
+  FOREIGN KEY (IdMod) REFERENCES MODELE(IdMod)
+);
+
+CREATE TABLE IF NOT EXISTS VENDEUR (
+  IdVend INT PRIMARY KEY,
+  Email VARCHAR(80) NOT NULL,
+  Tel VARCHAR(20) NOT NULL,
+  Region VARCHAR(50) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS ANNONCE (
+  RefAnn VARCHAR(10) PRIMARY KEY,
+  DateAnn DATE NOT NULL,
+  PrixVente DECIMAL(10, 2) NOT NULL,
+  IdVend INT NOT NULL,
+  ImmatVeh VARCHAR(20) NOT NULL,
+  FOREIGN KEY (IdVend) REFERENCES VENDEUR(IdVend),
+  FOREIGN KEY (ImmatVeh) REFERENCES VEHICULE(ImmatVeh)
+);
+
+INSERT INTO CONSTRUCTEUR VALUES
+  (1, 'Peugeot'),
+  (2, 'Renault'),
+  (3, 'Volkswagen');
+
+INSERT INTO MODELE VALUES
+  (10, '208', 1),
+  (11, '3008', 1),
+  (20, 'Clio 5', 2),
+  (30, 'Golf 8', 3);
+
+INSERT INTO VEHICULE VALUES
+  ('190TN1111', 5, 'E', 'B', 10),
+  ('210TN2222', 6, 'D', 'N', 11),
+  ('215TN3333', 5, 'D', 'R', 20),
+  ('220TN4444', 7, 'D', 'B', 30);
+
+INSERT INTO VENDEUR VALUES
+  (100, 'vendeur1@sti.tn', '22111222', 'Tunis'),
+  (101, 'vendeur2@sti.tn', '55333444', 'Sfax');
+
+INSERT INTO ANNONCE VALUES
+  ('A01', '2023-03-10', 48000.00, 100, '210TN2222'),
+  ('A02', '2019-11-05', 32000.00, 100, '190TN1111'),
+  ('A03', '2023-04-12', 42000.00, 101, '215TN3333'),
+  ('A04', '2023-05-01', 75000.00, 101, '220TN4444');
+
+CREATE TABLE IF NOT EXISTS Service (
+  NumService INT PRIMARY KEY,
+  NomService VARCHAR(50)
+);
+
+CREATE TABLE IF NOT EXISTS Employe (
+  Matricule VARCHAR(10) PRIMARY KEY,
+  Nomprenom VARCHAR(50),
+  Taille_Max DECIMAL(15, 3),
+  NumService INT,
+  FOREIGN KEY (NumService) REFERENCES Service(NumService)
+);
+
+CREATE TABLE IF NOT EXISTS Transfert (
+  NumTransfert INT PRIMARY KEY,
+  DateHeureTransfert DATETIME,
+  Duree INT,
+  TailleDonnees DECIMAL(15, 3),
+  Matricule VARCHAR(10),
+  FOREIGN KEY (Matricule) REFERENCES Employe(Matricule)
+);

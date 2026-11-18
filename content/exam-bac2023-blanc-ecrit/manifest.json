@@ -1,0 +1,285 @@
+{
+  "id": "exam-bac2023-blanc-ecrit",
+  "title": "Bac Blanc 2023 - Épreuve Écrite Systèmes & Technologies de l'Informatique",
+  "referentiel_id": "bac-si-tn",
+  "type_sujet": "annale_officielle",
+  "source_reference": "Ministère de l'Éducation — Bac Blanc STI Tunisie",
+  "statut_validation": "valide_pedagogiquement",
+  "session_annee": 2023,
+  "session_libelle": "Bac Blanc",
+  "exam_type": "written",
+  "session_type": "blanc",
+  "year": 2023,
+  "duration": 180,
+  "exam_mode": true,
+  "bareme_total": 20,
+  "category": "Module C - Épreuves Écrites",
+  "level": "Moyen",
+  "tags": ["Bac Blanc 2023", "JavaScript", "PHP", "SQL DDL/DML", "Modélisation", "Épreuve Écrite"],
+  "sections": [
+    {
+      "id": "ex1-qcm",
+      "title": "Exercice N° 1 : Validation de concepts Web & SQL (3 pts)",
+      "type": "qcm",
+      "description": "Choisissez la bonne affirmation pour chaque question.",
+      "points": 3.0,
+      "questions": [
+        {
+          "id": "EX1-Q1",
+          "question": "En JavaScript, que permet l'instruction ch = String.fromCharCode(79, 75) ?",
+          "options": [
+            { "id": "opt-7975-str", "label": "Affecter à ch la chaîne '7975'" },
+            { "id": "opt-ok", "label": "Affecter à ch la chaîne 'OK'" },
+            { "id": "opt-7975-int", "label": "Affecter à ch l'entier 7975" }
+          ],
+          "points": 0.5,
+          "multiple": false,
+          "correctAnswers": ["opt-ok"],
+          "explanation": "79 est le code ASCII de 'O' et 75 celui de 'K'."
+        },
+        {
+          "id": "EX1-Q2",
+          "question": "En JavaScript, quelle affirmation est exacte concernant isNaN(X) ?",
+          "options": [
+            { "id": "opt-false-num", "label": "Retourne false si X est une chaîne numérique" },
+            { "id": "opt-true-num", "label": "Retourne true si X est une chaîne numérique" },
+            {
+              "id": "opt-false-alpha",
+              "label": "Retourne false si X est une chaîne alphanumérique"
+            }
+          ],
+          "points": 0.5,
+          "multiple": false,
+          "correctAnswers": ["opt-false-num"],
+          "explanation": "isNaN(\"123\") vaut false car la chaîne est convertible en nombre."
+        },
+        {
+          "id": "EX1-Q3",
+          "question": "En SQL, dans une requête d'interrogation (SELECT), quel mot-clé ne peut-on PAS utiliser ?",
+          "options": [
+            { "id": "opt-order", "label": "ORDER BY" },
+            { "id": "opt-alter", "label": "ALTER TABLE" },
+            { "id": "opt-distinct", "label": "DISTINCT" }
+          ],
+          "points": 0.5,
+          "multiple": false,
+          "correctAnswers": ["opt-alter"],
+          "explanation": "ALTER TABLE est une instruction LDD de modification de structure, pas une clause de SELECT."
+        },
+        {
+          "id": "EX1-Q4",
+          "question": "En SQL, comment appelle-t-on l'opération qui relie plusieurs tables d'une base de données ?",
+          "options": [
+            { "id": "opt-sel", "label": "Sélection" },
+            { "id": "opt-join", "label": "Jointure" },
+            { "id": "opt-proj", "label": "Projection" }
+          ],
+          "points": 0.5,
+          "multiple": false,
+          "correctAnswers": ["opt-join"],
+          "explanation": "La jointure combine des enregistrements de plusieurs tables selon une condition de lien."
+        },
+        {
+          "id": "EX1-Q5",
+          "question": "En SQL, quel est le rôle de la clause ON UPDATE CASCADE ?",
+          "options": [
+            { "id": "opt-oblig", "label": "Clause obligatoire après toute clé étrangère" },
+            {
+              "id": "opt-cascade",
+              "label": "Met à jour automatiquement les lignes filles dépendantes d'une ligne mère modifiée"
+            },
+            { "id": "opt-delete", "label": "Supprime la table fille lors d'une mise à jour" }
+          ],
+          "points": 0.5,
+          "multiple": false,
+          "correctAnswers": ["opt-cascade"],
+          "explanation": "ON UPDATE CASCADE propage les modifications de clé primaire vers les clés étrangères dépendantes."
+        },
+        {
+          "id": "EX1-Q6",
+          "question": "En PHP, que permet la fonction checkdate($m, $j, $a) ?",
+          "options": [
+            { "id": "opt-fmt", "label": "Formater une date" },
+            { "id": "opt-now", "label": "Donner la date actuelle" },
+            { "id": "opt-valid", "label": "Vérifier si les paramètres forment une date valide" }
+          ],
+          "points": 0.5,
+          "multiple": false,
+          "correctAnswers": ["opt-valid"],
+          "explanation": "checkdate() retourne true si la date grégorienne est valide."
+        }
+      ]
+    },
+    {
+      "id": "ex2-transfert",
+      "title": "Exercice N° 2 : Base Gestion_Transfert & LDD SQL (5 pts)",
+      "type": "modeling",
+      "description": "Représentation textuelle, cardinalités et évolution de structure SQL sur Service, Employe, Transfert et Fonction.",
+      "points": 5.0,
+      "questions": [
+        {
+          "id": "EX2-Q1",
+          "prompt": "Donner la représentation textuelle des tables Service, Employe et Transfert.",
+          "type": "representation",
+          "points": 1.0,
+          "expectedKeywords": [
+            "Service",
+            "NumService",
+            "Employe",
+            "Matricule",
+            "Transfert",
+            "NumTransfert"
+          ],
+          "explanation": "Service(#NumService, NomService) ; Employe(#Matricule, Nomprenom, Taille_Max, NumService#) ; Transfert(#NumTransfert, DateHeureTransfert, Duree, TailleDonnees, Matricule#)."
+        },
+        {
+          "id": "EX2-VF",
+          "prompt": "Indiquer dans l'ordre (F ou V) : (1) Un employé appartient à plusieurs services ; (2) Un service contient un ou plusieurs employés ; (3) Un employé fait plusieurs transferts ; (4) Un transfert est effectué par plusieurs employés.",
+          "type": "text",
+          "points": 1.0,
+          "expectedKeywords": ["F", "V"],
+          "expectedPattern": "^\\s*(F|Faux)[\\s,;/-]+(V|Vrai)[\\s,;/-]+(V|Vrai)[\\s,;/-]+(F|Faux)\\s*$",
+          "explanation": "Réponse officielle : F, V, V, F."
+        },
+        {
+          "id": "EX2-Q3",
+          "prompt": "Écrire la requête SQL ajoutant la contrainte de domaine imposant Duree > 0 sur la table Transfert.",
+          "type": "ddl",
+          "points": 1.0,
+          "expectedDdl": "ALTER TABLE Transfert ADD CONSTRAINT chk_duree CHECK (Duree > 0);",
+          "expectedKeywords": ["ALTER TABLE", "Transfert", "CHECK", "Duree"],
+          "explanation": "ALTER TABLE Transfert ADD CONSTRAINT chk_duree CHECK (Duree > 0);"
+        },
+        {
+          "id": "EX2-Q4",
+          "prompt": "Quelle clause d'intégrité référentielle faut-il ajouter sur la clé étrangère Matricule de Transfert pour permettre la suppression des employés ?",
+          "type": "text",
+          "points": 1.0,
+          "expectedKeywords": ["ON DELETE CASCADE"],
+          "explanation": "Il faut recréer ou modifier la clé étrangère avec ON DELETE CASCADE."
+        },
+        {
+          "id": "EX2-Q5",
+          "prompt": "Écrire la requête SQL de création de la table Fonction(CodeFonct INT PRIMARY KEY, LibFonct VARCHAR(20) NOT NULL).",
+          "type": "ddl",
+          "points": 1.0,
+          "expectedDdl": "CREATE TABLE Fonction (CodeFonct INT PRIMARY KEY, LibFonct VARCHAR(20) NOT NULL);",
+          "expectedKeywords": [
+            "CREATE TABLE",
+            "Fonction",
+            "CodeFonct",
+            "PRIMARY KEY",
+            "LibFonct",
+            "NOT NULL"
+          ],
+          "explanation": "CREATE TABLE Fonction (CodeFonct INT PRIMARY KEY, LibFonct VARCHAR(20) NOT NULL);"
+        }
+      ]
+    },
+    {
+      "id": "ex3-auth",
+      "title": "Exercice N° 3 : Formulaire d'Authentification HTML, JS & PHP (6 pts)",
+      "type": "code_analysis",
+      "description": "Complétion du formulaire F1, de la fonction JavaScript Test() et du script Connexion.php.",
+      "points": 6.0,
+      "questions": [
+        {
+          "id": "EX3-HTML-1",
+          "prompt": "Donner les valeurs des 6 attributs manquants : [1] method, [2] action, [3] onsubmit, [4] type mot de passe, [5] type Valider, [6] type Annuler.",
+          "language": "html",
+          "points": 1.0,
+          "expectedAnswer": "GET, Connexion.php, return Test(), password, submit, reset",
+          "expectedKeywords": ["GET", "Connexion.php", "Test()", "password", "submit", "reset"],
+          "explanation": "method=\"GET\", action=\"Connexion.php\", onsubmit=\"return Test()\", type=\"password\", type=\"submit\", type=\"reset\"."
+        },
+        {
+          "id": "EX3-JS-1",
+          "prompt": "Compléter Test() pour récupérer #user et #pwd, vérifier que user commence par 'USR' (substr(0,3)) et pwd a une longueur de 8, puis retourner resultat.",
+          "language": "javascript",
+          "points": 1.5,
+          "expectedAnswer": "document.getElementById(\"user\").value ; util.substr(0, 3) != 'USR' ; mpass.length != 8 ; return resultat",
+          "expectedKeywords": ["getElementById", "substr", "length", "return"],
+          "explanation": "On utilise document.getElementById, substr(0, 3), .length et return resultat."
+        },
+        {
+          "id": "EX3-PHP-1",
+          "prompt": "Dans Connexion.php, comment récupérer 'user' et 'pwd' envoyés en GET et formuler la requête SELECT sur Identification ?",
+          "language": "php",
+          "points": 2.0,
+          "expectedAnswer": "$_GET['user'], $_GET['pwd'], SELECT * FROM Identification WHERE User = '$utilisateur' AND Mdp = '$mpass'",
+          "expectedKeywords": ["GET", "SELECT", "Identification", "WHERE"],
+          "explanation": "Récupération via $_GET['user'] et $_GET['pwd'], puis requête SELECT sur Identification."
+        },
+        {
+          "id": "EX3-PHP-2",
+          "prompt": "Dans Connexion.php, écrire la requête UPDATE mettant Connecte à 'OUI' lorsque l'utilisateur est trouvé.",
+          "language": "php",
+          "points": 1.5,
+          "expectedAnswer": "UPDATE Identification SET Connecte = 'OUI' WHERE User = '$utilisateur' AND Mdp = '$mpass'",
+          "expectedKeywords": ["UPDATE", "Identification", "SET", "Connecte", "WHERE"],
+          "explanation": "UPDATE Identification SET Connecte = 'OUI' WHERE User = '$utilisateur' AND Mdp = '$mpass'."
+        }
+      ]
+    },
+    {
+      "id": "ex4-sql",
+      "title": "Exercice N° 4 : Requêtes SQL - Annonces Véhicules (6 pts)",
+      "type": "sql",
+      "description": "Manipulation et interrogation de CONSTRUCTEUR, MODELE, VEHICULE, VENDEUR, ANNONCE.",
+      "points": 6.0,
+      "questions": [
+        {
+          "id": "EX4-Q1",
+          "prompt": "Diminuer de 10% les prix de vente des véhicules ayant une puissance fiscale >= 6CV.",
+          "type": "dml",
+          "points": 1.0,
+          "expectedQuery": "UPDATE ANNONCE SET PrixVente = PrixVente * 0.9 WHERE ImmatVeh IN (SELECT ImmatVeh FROM VEHICULE WHERE PuisFisc >= 6);",
+          "verificationSql": "SELECT PrixVente FROM ANNONCE WHERE RefAnn = 'A01';",
+          "explanation": "UPDATE ANNONCE SET PrixVente = PrixVente * 0.9 WHERE ImmatVeh IN (SELECT ImmatVeh FROM VEHICULE WHERE PuisFisc >= 6);"
+        },
+        {
+          "id": "EX4-Q2",
+          "prompt": "Supprimer toutes les annonces effectuées avant l'année 2020.",
+          "type": "dml",
+          "points": 1.0,
+          "expectedQuery": "DELETE FROM ANNONCE WHERE DateAnn < '2020-01-01';",
+          "verificationSql": "SELECT COUNT(*) AS nb FROM ANNONCE WHERE DateAnn < '2020-01-01';",
+          "explanation": "DELETE FROM ANNONCE WHERE DateAnn < '2020-01-01';"
+        },
+        {
+          "id": "EX4-Q3",
+          "prompt": "Supprimer l'annonce qui a le prix de vente minimal.",
+          "type": "dml",
+          "points": 1.0,
+          "expectedQuery": "DELETE FROM ANNONCE WHERE PrixVente = (SELECT MIN(PrixVente) FROM ANNONCE);",
+          "verificationSql": "SELECT COUNT(*) AS nb FROM ANNONCE;",
+          "explanation": "Sous-requête MIN(PrixVente) dans le WHERE du DELETE."
+        },
+        {
+          "id": "EX4-Q4",
+          "prompt": "Afficher tous les noms distincts de modèles (NomMod) de véhicules roulant au Diesel (Energie = 'D') et dont PrixVente <= 50000.",
+          "type": "query",
+          "points": 1.0,
+          "expectedQuery": "SELECT DISTINCT NomMod FROM MODELE M JOIN VEHICULE V ON M.IdMod = V.IdMod JOIN ANNONCE A ON V.ImmatVeh = A.ImmatVeh WHERE Energie = 'D' AND PrixVente <= 50000;",
+          "explanation": "Jointure MODELE-VEHICULE-ANNONCE avec DISTINCT."
+        },
+        {
+          "id": "EX4-Q5",
+          "prompt": "Afficher pour chaque modèle son identifiant (IdMod) et le nombre d'annonces correspondant.",
+          "type": "query",
+          "points": 1.0,
+          "expectedQuery": "SELECT IdMod, COUNT(*) AS NbAnnonces FROM VEHICULE V JOIN ANNONCE A ON V.ImmatVeh = A.ImmatVeh GROUP BY IdMod;",
+          "explanation": "GROUP BY IdMod avec COUNT(*)."
+        },
+        {
+          "id": "EX4-Q6",
+          "prompt": "Afficher pour chaque vendeur son identifiant (IdVend) et la somme des prix de vente de ses annonces.",
+          "type": "query",
+          "points": 1.0,
+          "expectedQuery": "SELECT IdVend, SUM(PrixVente) AS TotalVentes FROM ANNONCE GROUP BY IdVend;",
+          "explanation": "GROUP BY IdVend avec SUM(PrixVente)."
+        }
+      ]
+    }
+  ]
+}

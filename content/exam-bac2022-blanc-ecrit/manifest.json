@@ -1,0 +1,338 @@
+{
+  "id": "exam-bac2022-blanc-ecrit",
+  "title": "Bac Blanc 2022 - Épreuve Écrite Systèmes & Technologies de l'Informatique",
+  "referentiel_id": "bac-si-tn",
+  "type_sujet": "annale_officielle",
+  "source_reference": "Ministère de l'Éducation — Bac Blanc STI Tunisie",
+  "statut_validation": "valide_pedagogiquement",
+  "session_annee": 2022,
+  "session_libelle": "Bac Blanc",
+  "exam_type": "written",
+  "session_type": "blanc",
+  "year": 2022,
+  "duration": 180,
+  "exam_mode": true,
+  "bareme_total": 20,
+  "category": "Module C - Épreuves Écrites",
+  "level": "Moyen",
+  "tags": [
+    "Bac Blanc 2022",
+    "PHP Tableaux",
+    "SQL DDL/DML",
+    "Modélisation",
+    "JavaScript",
+    "Épreuve Écrite"
+  ],
+  "sections": [
+    {
+      "id": "ex1-qcm",
+      "title": "Exercice N° 1 : Concepts Web, PHP & SQL (2.5 pts)",
+      "type": "qcm",
+      "description": "Choisissez la bonne réponse pour chaque question.",
+      "points": 2.5,
+      "questions": [
+        {
+          "id": "EX1-Q1",
+          "question": "En PHP (extension MySQLi), quelle fonction permet de déterminer le nombre de lignes retournées par une requête SELECT exécutée avec mysqli_query() ?",
+          "options": [
+            { "id": "opt-count", "label": "mysqli_count_rows()" },
+            { "id": "opt-num", "label": "mysqli_num_rows()" },
+            { "id": "opt-affected", "label": "mysqli_affected_rows()" },
+            { "id": "opt-fetch", "label": "mysqli_fetch_array()" }
+          ],
+          "points": 0.5,
+          "multiple": false,
+          "correctAnswers": ["opt-num"],
+          "explanation": "mysqli_num_rows($res) retourne le nombre de lignes d'un jeu de résultats SELECT."
+        },
+        {
+          "id": "EX1-Q2",
+          "question": "En JavaScript, quelle valeur retourne l'appel isNaN(\"123\") ?",
+          "options": [
+            { "id": "opt-true", "label": "true" },
+            { "id": "opt-false", "label": "false" },
+            { "id": "opt-null", "label": "null" },
+            { "id": "opt-123", "label": "123" }
+          ],
+          "points": 0.5,
+          "multiple": false,
+          "correctAnswers": ["opt-false"],
+          "explanation": "\"123\" est convertible en nombre, donc isNaN(\"123\") retourne false."
+        },
+        {
+          "id": "EX1-Q3",
+          "question": "En SQL, quelles clauses permettent respectivement de trier les résultats et d'éliminer les doublons dans un SELECT ?",
+          "options": [
+            { "id": "opt-group", "label": "GROUP BY et UNIQUE" },
+            { "id": "opt-order-distinct", "label": "ORDER BY et DISTINCT" },
+            { "id": "opt-sort", "label": "SORT BY et HAVING" },
+            { "id": "opt-where", "label": "WHERE et CHECK" }
+          ],
+          "points": 0.5,
+          "multiple": false,
+          "correctAnswers": ["opt-order-distinct"],
+          "explanation": "ORDER BY trie les lignes et DISTINCT élimine les doublons."
+        },
+        {
+          "id": "EX1-Q4",
+          "question": "En HTML5, quel attribut de la balise <body> permet d'exécuter une fonction JavaScript dès le chargement complet de la page ?",
+          "options": [
+            { "id": "opt-onfocus", "label": "onfocus" },
+            { "id": "opt-onchange", "label": "onchange" },
+            { "id": "opt-onload", "label": "onload" },
+            { "id": "opt-onsubmit", "label": "onsubmit" }
+          ],
+          "points": 0.5,
+          "multiple": false,
+          "correctAnswers": ["opt-onload"],
+          "explanation": "L'événement onload sur <body> se déclenche à la fin du chargement du document."
+        },
+        {
+          "id": "EX1-Q5",
+          "question": "En SQL, quelle clause d'intégrité référentielle supprime automatiquement les lignes filles lors de la suppression d'une ligne mère ?",
+          "options": [
+            { "id": "opt-restrict", "label": "ON DELETE RESTRICT" },
+            { "id": "opt-cascade", "label": "ON DELETE CASCADE" },
+            { "id": "opt-update", "label": "ON UPDATE CASCADE" },
+            { "id": "opt-null", "label": "ON DELETE SET DEFAULT" }
+          ],
+          "points": 0.5,
+          "multiple": false,
+          "correctAnswers": ["opt-cascade"],
+          "explanation": "ON DELETE CASCADE propage la suppression de la table mère vers la table fille."
+        }
+      ]
+    },
+    {
+      "id": "ex2-php",
+      "title": "Exercice N° 2 : Tableaux associatifs PHP & HTML (3 pts)",
+      "type": "code_analysis",
+      "description": "Manipulation d'un tableau associatif $ages en PHP et génération d'un tableau HTML.",
+      "points": 3.0,
+      "questions": [
+        {
+          "id": "EX2-Q1",
+          "prompt": "Compléter l'instruction PHP déclarant le tableau associatif $ages contenant : Ali => 18, Sami => 22, Mouna => 25, Ines => 19.",
+          "codeSnippet": "$ages = array( ... );",
+          "language": "php",
+          "points": 1.0,
+          "expectedAnswer": "$ages = array(\"Ali\" => 18, \"Sami\" => 22, \"Mouna\" => 25, \"Ines\" => 19);",
+          "expectedKeywords": ["array", "Ali", "Sami", "Mouna", "Ines", "=>"],
+          "explanation": "Un tableau associatif PHP s'écrit array(\"Ali\" => 18, \"Sami\" => 22, \"Mouna\" => 25, \"Ines\" => 19)."
+        },
+        {
+          "id": "EX2-Q2",
+          "prompt": "Écrire la boucle foreach et la condition permettant d'afficher uniquement les personnes d'âge >= 20 dans des lignes <tr><td>$nom</td><td>$age</td></tr>.",
+          "language": "php",
+          "points": 1.0,
+          "expectedAnswer": "foreach ($ages as $nom => $age) { if ($age >= 20) { echo \"<tr><td>$nom</td><td>$age</td></tr>\"; } }",
+          "expectedKeywords": ["foreach", "ages", "=>", "if", ">= 20", "echo"],
+          "explanation": "foreach ($ages as $nom => $age) parcourt les paires clé/valeur ; if ($age >= 20) filtre les personnes majeures >= 20 ans."
+        },
+        {
+          "id": "EX2-Q3",
+          "prompt": "Quelles paires (Nom, Âge) seront affichées dans le tableau HTML généré par ce script ?",
+          "language": "html",
+          "points": 1.0,
+          "expectedAnswer": "Sami (22) et Mouna (25)",
+          "expectedKeywords": ["Sami", "22", "Mouna", "25"],
+          "explanation": "Seuls Sami (22) et Mouna (25) ont un âge supérieur ou égal à 20."
+        }
+      ]
+    },
+    {
+      "id": "ex3-contraintes",
+      "title": "Exercice N° 3 : Contraintes d'Intégrité SQL (3 pts)",
+      "type": "modeling",
+      "description": "Validation Vrai/Faux et identification des contraintes sur DEPARTEMENT et EMPLOYE.",
+      "points": 3.0,
+      "questions": [
+        {
+          "id": "EX3-VF-1",
+          "prompt": "Vrai ou Faux : Une table relationnelle peut posséder plusieurs clés primaires distinctes.",
+          "type": "text",
+          "points": 0.5,
+          "expectedPattern": "^\\s*(Faux|F)\\s*$",
+          "explanation": "Faux : une table possède une seule clé primaire (qui peut toutefois être composée de plusieurs colonnes)."
+        },
+        {
+          "id": "EX3-VF-2",
+          "prompt": "Vrai ou Faux : Une clé étrangère peut contenir une valeur NULL si la colonne n'est pas déclarée NOT NULL.",
+          "type": "text",
+          "points": 0.5,
+          "expectedPattern": "^\\s*(Vrai|V)\\s*$",
+          "explanation": "Vrai : sans contrainte NOT NULL, une clé étrangère accepte NULL."
+        },
+        {
+          "id": "EX3-VF-3",
+          "prompt": "Vrai ou Faux : La clause ON DELETE CASCADE entraîne la suppression de la table mère.",
+          "type": "text",
+          "points": 0.5,
+          "expectedPattern": "^\\s*(Faux|F)\\s*$",
+          "explanation": "Faux : elle supprime les lignes dépendantes dans la table fille, jamais la table mère."
+        },
+        {
+          "id": "EX3-CI-1",
+          "prompt": "Quelle catégorie de contrainte d'intégrité impose CHECK (Salaire > 0) sur la table EMPLOYE ?",
+          "type": "text",
+          "points": 0.5,
+          "expectedKeywords": ["domaine"],
+          "explanation": "CHECK (Salaire > 0) est une contrainte d'intégrité de domaine."
+        },
+        {
+          "id": "EX3-CI-2",
+          "prompt": "Quelle catégorie de contrainte garantit que NumDep de EMPLOYE référence un NumDep existant dans DEPARTEMENT ?",
+          "type": "text",
+          "points": 0.5,
+          "expectedKeywords": ["référentielle"],
+          "explanation": "La clé étrangère REFERENCES assure l'intégrité référentielle."
+        },
+        {
+          "id": "EX3-CI-3",
+          "prompt": "Quel mot-clé SQL interdit la saisie de deux adresses Email identiques dans la table EMPLOYE ?",
+          "type": "text",
+          "points": 0.5,
+          "expectedKeywords": ["UNIQUE"],
+          "explanation": "La contrainte UNIQUE empêche les doublons sur une colonne."
+        }
+      ]
+    },
+    {
+      "id": "ex4-sql-vehicules",
+      "title": "Exercice N° 4 (Partie A) : Requêtes SQL - Annonces Véhicules (5.5 pts)",
+      "type": "sql",
+      "description": "Manipulation et interrogation de la base de données CONSTRUCTEUR, MODELE, VEHICULE, VENDEUR, ANNONCE.",
+      "points": 5.5,
+      "questions": [
+        {
+          "id": "EX4-SQL-1",
+          "prompt": "Diminuer de 10% les prix de vente des véhicules ayant une puissance fiscale supérieure ou égale à 6 chevaux (6CV).",
+          "type": "dml",
+          "points": 0.75,
+          "expectedQuery": "UPDATE ANNONCE SET PrixVente = PrixVente * 0.9 WHERE ImmatVeh IN (SELECT ImmatVeh FROM VEHICULE WHERE PuisFisc >= 6);",
+          "verificationSql": "SELECT PrixVente FROM ANNONCE WHERE RefAnn = 'A01';",
+          "explanation": "On applique * 0.9 aux annonces dont ImmatVeh appartient aux véhicules de PuisFisc >= 6."
+        },
+        {
+          "id": "EX4-SQL-2",
+          "prompt": "Supprimer toutes les annonces effectuées avant l'année 2020.",
+          "type": "dml",
+          "points": 0.75,
+          "expectedQuery": "DELETE FROM ANNONCE WHERE DateAnn < '2020-01-01';",
+          "verificationSql": "SELECT COUNT(*) AS nb FROM ANNONCE WHERE DateAnn < '2020-01-01';",
+          "explanation": "DELETE FROM ANNONCE WHERE DateAnn < '2020-01-01' (ou YEAR(DateAnn) < 2020 en MySQL)."
+        },
+        {
+          "id": "EX4-SQL-3",
+          "prompt": "Afficher tous les noms distincts de modèles (NomMod) de véhicules roulant au Diesel (Energie = 'D') et dont le prix de vente est inférieur ou égal à 50000 Dinars.",
+          "type": "query",
+          "points": 1.0,
+          "expectedQuery": "SELECT DISTINCT NomMod FROM MODELE M JOIN VEHICULE V ON M.IdMod = V.IdMod JOIN ANNONCE A ON V.ImmatVeh = A.ImmatVeh WHERE Energie = 'D' AND PrixVente <= 50000;",
+          "explanation": "Jointure MODELE-VEHICULE-ANNONCE avec DISTINCT sur NomMod."
+        },
+        {
+          "id": "EX4-SQL-4",
+          "prompt": "Afficher pour chaque modèle son identifiant (IdMod) et le nombre d'annonces correspondant.",
+          "type": "query",
+          "points": 1.0,
+          "expectedQuery": "SELECT IdMod, COUNT(*) AS NbAnnonces FROM VEHICULE V JOIN ANNONCE A ON V.ImmatVeh = A.ImmatVeh GROUP BY IdMod;",
+          "explanation": "GROUP BY IdMod avec COUNT(*)."
+        },
+        {
+          "id": "EX4-SQL-5",
+          "prompt": "Afficher tous les constructeurs (IdConst, NomConst) qui ont construit des véhicules de puissance fiscale 6CV (PuisFisc = 6).",
+          "type": "query",
+          "points": 1.0,
+          "expectedQuery": "SELECT DISTINCT C.IdConst, NomConst FROM CONSTRUCTEUR C JOIN MODELE M ON C.IdConst = M.IdConst JOIN VEHICULE V ON M.IdMod = V.IdMod WHERE PuisFisc = 6;",
+          "explanation": "Jointure CONSTRUCTEUR-MODELE-VEHICULE filtrée sur PuisFisc = 6."
+        },
+        {
+          "id": "EX4-SQL-6",
+          "prompt": "Afficher pour chaque vendeur son identifiant (IdVend) et la somme des prix de vente de ses annonces.",
+          "type": "query",
+          "points": 1.0,
+          "expectedQuery": "SELECT IdVend, SUM(PrixVente) AS TotalVentes FROM ANNONCE GROUP BY IdVend;",
+          "explanation": "Regroupement sur IdVend avec SUM(PrixVente)."
+        }
+      ]
+    },
+    {
+      "id": "ex4-web",
+      "title": "Exercice N° 4 (Partie B) : Formulaire HTML, JS & PHP (3 pts)",
+      "type": "code_analysis",
+      "description": "Contrôle de saisie côté client et traitement serveur constructeur.php.",
+      "points": 3.0,
+      "questions": [
+        {
+          "id": "EX4-WEB-1",
+          "prompt": "Compléter les attributs de la balise <form> pour appeler Verif() à la soumission vers constructeur.php en méthode POST.",
+          "language": "html",
+          "points": 1.0,
+          "expectedAnswer": "<form action=\"constructeur.php\" method=\"POST\" onsubmit=\"return Verif()\">",
+          "expectedKeywords": ["constructeur.php", "POST", "onsubmit", "Verif"],
+          "explanation": "action=\"constructeur.php\" method=\"POST\" onsubmit=\"return Verif()\"."
+        },
+        {
+          "id": "EX4-WEB-2",
+          "prompt": "En JavaScript, quelle condition dans Verif() permet de vérifier que l'identifiant idc est non vide et numérique ?",
+          "language": "javascript",
+          "points": 1.0,
+          "expectedAnswer": "if (idc == \"\" || isNaN(idc)) { return false; }",
+          "expectedKeywords": ["isNaN", "return false"],
+          "explanation": "On vérifie idc.trim() === \"\" || isNaN(idc) et on retourne false."
+        },
+        {
+          "id": "EX4-WEB-3",
+          "prompt": "En PHP dans constructeur.php, écrire les instructions permettant de récupérer idc en POST et d'exécuter la requête de sélection du constructeur.",
+          "language": "php",
+          "points": 1.0,
+          "expectedAnswer": "$idc = $_POST['idc']; $req = \"SELECT * FROM CONSTRUCTEUR WHERE IdConst = '$idc'\";",
+          "expectedKeywords": ["POST", "SELECT", "CONSTRUCTEUR", "WHERE"],
+          "explanation": "Récupération via $_POST['idc'] puis requête SELECT filtrée sur IdConst."
+        }
+      ]
+    },
+    {
+      "id": "ex5-associations",
+      "title": "Exercice N° 5 : Associations & LDD SQL (3 pts)",
+      "type": "modeling",
+      "description": "Modélisation relationnelle d'une association et requêtes CREATE/ALTER TABLE.",
+      "points": 3.0,
+      "questions": [
+        {
+          "id": "EX5-Q1",
+          "prompt": "Donner la représentation textuelle de la table associative PARTICIPE reliant ADHERENT (NumAdh) et ACTIVITE (CodeActiv) avec l'attribut DateInsc.",
+          "type": "representation",
+          "points": 1.0,
+          "expectedKeywords": ["PARTICIPE", "NumAdh", "CodeActiv", "DateInsc"],
+          "explanation": "PARTICIPE(#NumAdh, #CodeActiv, DateInsc)."
+        },
+        {
+          "id": "EX5-Q2",
+          "prompt": "Écrire la requête SQL permettant de créer la table ASSOCIATION(CodeAssoc, NomAssoc, Ville) avec CodeAssoc clé primaire (VARCHAR(10)) et NomAssoc obligatoire (VARCHAR(50)).",
+          "type": "ddl",
+          "points": 1.0,
+          "expectedDdl": "CREATE TABLE ASSOCIATION (CodeAssoc VARCHAR(10) PRIMARY KEY, NomAssoc VARCHAR(50) NOT NULL, Ville VARCHAR(30));",
+          "expectedKeywords": [
+            "CREATE TABLE",
+            "ASSOCIATION",
+            "CodeAssoc",
+            "PRIMARY KEY",
+            "NomAssoc",
+            "NOT NULL"
+          ],
+          "explanation": "CREATE TABLE ASSOCIATION (CodeAssoc VARCHAR(10) PRIMARY KEY, NomAssoc VARCHAR(50) NOT NULL, Ville VARCHAR(30));"
+        },
+        {
+          "id": "EX5-Q3",
+          "prompt": "Écrire la requête SQL permettant de rendre le champ NomActiv de la table ACTIVITE obligatoire (NOT NULL).",
+          "type": "ddl",
+          "points": 1.0,
+          "expectedDdl": "ALTER TABLE ACTIVITE MODIFY NomActiv VARCHAR(50) NOT NULL;",
+          "expectedKeywords": ["ALTER TABLE", "ACTIVITE", "NomActiv", "NOT NULL"],
+          "explanation": "ALTER TABLE ACTIVITE MODIFY NomActiv VARCHAR(50) NOT NULL;"
+        }
+      ]
+    }
+  ]
+}

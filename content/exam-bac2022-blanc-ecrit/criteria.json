@@ -1,0 +1,74 @@
+[
+  {
+    "id": "BB22-01",
+    "code": "EX1-QCM",
+    "titre": "Exercice N° 1 : QCM Concepts Web, PHP & SQL",
+    "description": "Validation des notions PHP, JS, SQL et HTML5.",
+    "points": 2.5,
+    "ordre": 1,
+    "fichier": "reponses.sql",
+    "sonde": { "type": "sql_query_result", "query": "SELECT 1;", "expectedRowCount": 1 },
+    "fail_message": "Certaines réponses au QCM de l'Exercice 1 sont inexactes.",
+    "indices": ["Revoyez mysqli_num_rows, isNaN, ORDER BY/DISTINCT, onload et ON DELETE CASCADE."]
+  },
+  {
+    "id": "BB22-02",
+    "code": "EX2-PHP",
+    "titre": "Exercice N° 2 : Tableaux associatifs PHP",
+    "description": "Déclaration de $ages, boucle foreach et filtrage >= 20.",
+    "points": 3,
+    "ordre": 2,
+    "fichier": "reponses.sql",
+    "sonde": { "type": "sql_query_result", "query": "SELECT 1;", "expectedRowCount": 1 },
+    "fail_message": "Vérifiez la syntaxe du tableau associatif et de la boucle foreach.",
+    "indices": ["Utilisez foreach ($ages as $nom => $age) et if ($age >= 20)."]
+  },
+  {
+    "id": "BB22-03",
+    "code": "EX3-CI",
+    "titre": "Exercice N° 3 : Contraintes d'Intégrité",
+    "description": "Vrai/Faux et identification des contraintes de domaine, référentielle et UNIQUE.",
+    "points": 3,
+    "ordre": 3,
+    "fichier": "reponses.sql",
+    "sonde": { "type": "sql_query_result", "query": "SELECT 1;", "expectedRowCount": 1 },
+    "fail_message": "Vérifiez la distinction entre contrainte de domaine, référentielle et UNIQUE.",
+    "indices": ["CHECK = domaine, REFERENCES = référentielle, unicité = UNIQUE."]
+  },
+  {
+    "id": "BB22-04",
+    "code": "EX4-SQL",
+    "titre": "Exercice N° 4 (Partie A) : Requêtes SQL Véhicules",
+    "description": "UPDATE, DELETE, SELECT DISTINCT, GROUP BY sur la base Annonces.",
+    "points": 5.5,
+    "ordre": 4,
+    "fichier": "reponses.sql",
+    "sonde": { "type": "sql_query_result", "query": "SELECT 1;", "expectedRowCount": 1 },
+    "fail_message": "Une ou plusieurs requêtes SQL de l'Exercice 4 sont incorrectes.",
+    "indices": ["Vérifiez les jointures entre CONSTRUCTEUR, MODELE, VEHICULE et ANNONCE."]
+  },
+  {
+    "id": "BB22-05",
+    "code": "EX4-WEB",
+    "titre": "Exercice N° 4 (Partie B) : Formulaire HTML, JS & PHP",
+    "description": "Validation Verif() et traitement constructeur.php.",
+    "points": 3,
+    "ordre": 5,
+    "fichier": "reponses.sql",
+    "sonde": { "type": "sql_query_result", "query": "SELECT 1;", "expectedRowCount": 1 },
+    "fail_message": "Vérifiez le formulaire HTML, isNaN() et $_POST.",
+    "indices": ["onsubmit=\"return Verif()\", isNaN(idc), $_POST['idc']."]
+  },
+  {
+    "id": "BB22-06",
+    "code": "EX5-LDD",
+    "titre": "Exercice N° 5 : Associations & LDD SQL",
+    "description": "Table associative PARTICIPE, CREATE TABLE ASSOCIATION et ALTER TABLE ACTIVITE.",
+    "points": 3,
+    "ordre": 6,
+    "fichier": "reponses.sql",
+    "sonde": { "type": "sql_query_result", "query": "SELECT 1;", "expectedRowCount": 1 },
+    "fail_message": "Vérifiez la représentation textuelle de PARTICIPE et les requêtes LDD.",
+    "indices": ["PARTICIPE(#NumAdh, #CodeActiv, DateInsc)."]
+  }
+]
