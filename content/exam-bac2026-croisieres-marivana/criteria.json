@@ -6,9 +6,16 @@
     "description": "La table reservation est créée conformément à la description (clé primaire composée) et les relations entre les tables sont établies, puis la base est exportée.",
     "points": 1.5,
     "ordre": 1,
-    "fichier": "index.html",
-    "correction": "enseignant",
-    "sonde": { "type": "dom_selector", "selector": "body" },
+    "fichier": "db/init.sql",
+    "sonde": {
+      "type": "sql_table_check",
+      "table": "reservation",
+      "primaryKey": ["idCl", "idCro"],
+      "foreignKeys": [
+        { "column": "idCl", "refTable": "client" },
+        { "column": "idCro", "refTable": "croisiere" }
+      ]
+    },
     "fail_message": "La table reservation, sa clé primaire ou les clés étrangères entre les tables sont absentes ou incorrectes."
   },
   {
@@ -169,9 +176,12 @@
     "description": "Le fichier établit la connexion avec mysqli_connect en renseignant le nom de la base.",
     "points": 0.5,
     "ordre": 8,
-    "fichier": "index.html",
-    "correction": "enseignant",
-    "sonde": { "type": "dom_selector", "selector": "body" },
+    "fichier": "connexion.php",
+    "sonde": {
+      "type": "php_mysqli_check",
+      "entrypoint": "connexion.php",
+      "expectedScriptPattern": "bd2026_croisieres[\\s\\S]*mysqli_connect"
+    },
     "fail_message": "connexion.php n'établit pas la connexion à la base de données."
   },
   {
@@ -181,9 +191,13 @@
     "description": "Le script inclut connexion.php, affiche le message d'absence de croisière ou un tableau trié par date de départ croissante, avec les colonnes Durée, Prix et Capacité uniquement si elles sont cochées.",
     "points": 2.5,
     "ordre": 9,
-    "fichier": "index.html",
-    "correction": "enseignant",
-    "sonde": { "type": "dom_selector", "selector": "body" },
+    "fichier": "croisiere.php",
+    "sonde": {
+      "type": "php_mysqli_check",
+      "entrypoint": "croisiere.php",
+      "postData": { "dest": "1", "DD": "2026-05-01", "DF": "2026-06-30", "duree": "1" },
+      "expectedStdoutContains": "Eclat méditerranéen"
+    },
     "fail_message": "croisiere.php ne filtre pas sur la destination et la période, ne trie pas par date ou n'affiche pas les colonnes optionnelles correctement."
   },
   {
@@ -312,9 +326,23 @@
     "description": "Le script nettoie le nom (espaces et majuscules), refuse une réservation déjà faite, crée le client s'il n'existe pas, enregistre la réservation avec la date et l'heure système et affiche le message de confirmation.",
     "points": 4,
     "ordre": 12,
-    "fichier": "index.html",
-    "correction": "enseignant",
-    "sonde": { "type": "dom_selector", "selector": "body" },
+    "fichier": "reservation.php",
+    "sonde": {
+      "type": "php_mysqli_check",
+      "entrypoint": "reservation.php",
+      "postData": {
+        "idCl": "99887766",
+        "nomCl": "  sami ben ali  ",
+        "telCl": "22334455",
+        "idCro": "101",
+        "nbPlace": "2"
+      },
+      "expectedStdoutContains": "Réservation enregistrée dans l'attente de confirmation",
+      "expectedTableRows": {
+        "table": "reservation",
+        "where": { "idCl": "99887766", "idCro": "101" }
+      }
+    },
     "fail_message": "reservation.php ne gère pas correctement le nettoyage du nom, le doublon de réservation, la création du client ou l'insertion avec dateRes."
   }
 ]

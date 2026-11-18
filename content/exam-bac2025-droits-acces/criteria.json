@@ -6,9 +6,16 @@
     "description": "La base bd2025 est créée, tables.sql importé, la table droit créée avec sa clé primaire composée et ses deux clés étrangères, puis la base exportée.",
     "points": 1.25,
     "ordre": 1,
-    "fichier": "index.html",
-    "correction": "enseignant",
-    "sonde": { "type": "dom_selector", "selector": "body" },
+    "fichier": "db/init.sql",
+    "sonde": {
+      "type": "sql_table_check",
+      "table": "droit",
+      "primaryKey": ["idDoc", "idUtil"],
+      "foreignKeys": [
+        { "column": "idDoc", "refTable": "document" },
+        { "column": "idUtil", "refTable": "utilisateur" }
+      ]
+    },
     "fail_message": "La table droit, ses clés ou ses relations avec document et utilisateur sont absentes ou incorrectes."
   },
   {
@@ -178,9 +185,17 @@
     "description": "Le script insère l'utilisateur puis affiche « Utilisateur ajouté avec succès », ou « Erreur d'insertion des données » en cas d'échec.",
     "points": 2,
     "ordre": 8,
-    "fichier": "index.html",
-    "correction": "enseignant",
-    "sonde": { "type": "dom_selector", "selector": "body" },
+    "fichier": "ajout.php",
+    "sonde": {
+      "type": "php_mysqli_check",
+      "entrypoint": "ajout.php",
+      "postData": { "idUtil": "U099", "nomPrenom": "Sami Ben Ali" },
+      "expectedStdoutContains": "Utilisateur ajouté avec succès",
+      "expectedTableRows": {
+        "table": "utilisateur",
+        "where": { "idUtil": "U099", "nomPrenom": "Sami Ben Ali" }
+      }
+    },
     "fail_message": "ajout.php n'insère pas l'utilisateur ou n'affiche pas les messages demandés."
   },
   {
@@ -304,9 +319,23 @@
     "description": "Le script distingue trois cas : utilisateur inexistant, droits déjà attribués (UPDATE) ou nouveaux droits (INSERT), avec le message correspondant.",
     "points": 4.25,
     "ordre": 11,
-    "fichier": "index.html",
-    "correction": "enseignant",
-    "sonde": { "type": "dom_selector", "selector": "body" },
+    "fichier": "droit.php",
+    "sonde": {
+      "type": "php_mysqli_check",
+      "entrypoint": "droit.php",
+      "postData": { "idUtil": "U004", "doc": "D0001", "ecriture": "O", "lecture": "O" },
+      "expectedStdoutContains": "Insertion des droits d'accès réussie",
+      "expectedTableRows": {
+        "table": "droit",
+        "where": {
+          "idDoc": "D0001",
+          "idUtil": "U004",
+          "ecriture": "O",
+          "lecture": "O",
+          "impression": "N"
+        }
+      }
+    },
     "fail_message": "droit.php ne gère pas correctement l'existence de l'utilisateur, la mise à jour ou l'insertion des droits."
   },
   {
@@ -327,9 +356,13 @@
     "description": "Le script affiche le titre avec le nom du document puis, pour chaque utilisateur, son nom et ses droits d'écriture, de lecture et d'impression.",
     "points": 1.75,
     "ordre": 13,
-    "fichier": "index.html",
-    "correction": "enseignant",
-    "sonde": { "type": "dom_selector", "selector": "body" },
+    "fichier": "affichage.php",
+    "sonde": {
+      "type": "php_mysqli_check",
+      "entrypoint": "affichage.php",
+      "postData": { "doc": "D0001" },
+      "expectedStdoutContains": "Ali GAFSI"
+    },
     "fail_message": "affichage.php n'affiche pas la liste des droits selon le format demandé (jointure droit / utilisateur)."
   }
 ]

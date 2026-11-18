@@ -309,6 +309,8 @@ describe("Banc de test de la notation : examens à plusieurs pages", () => {
       const fichiers = lireVariante(ID, "solution");
       for (const nom of Object.keys(fichiers)) {
         if (nom.endsWith(".html")) fichiers[nom] = "<html><body></body></html>";
+        if (nom.endsWith(".php")) fichiers[nom] = "<?php ?>";
+        if (nom.endsWith(".sql")) fichiers[nom] = "";
       }
       const r = await evaluer(ID, fichiers);
       expect(r.got).toBeLessThan(2);
@@ -489,13 +491,15 @@ describe("Banc de test de la notation : JavaScript des examens (js_test_cas)", (
     });
   });
 
-  it("les critères PHP/SQL des 3 examens sont déclarés « corrigés par l'enseignant », jamais gagnés", async () => {
+  it("tous les critères PHP/SQL des 3 examens sont désormais automatisés et gagnés à 20/20 sur le corrigé (#285)", async () => {
     for (const id of [ID25, ID26B, ID26C]) {
       const sujet = contentSubjects.find((c) => c.id === id)!;
       const manuels = sujet.criteria.filter((c) => c.manuel);
-      expect(manuels.length, id).toBe(4);
+      expect(manuels.length, id).toBe(0);
       const sol = await evaluer(id, lireVariante(id, "solution"));
-      for (const c of manuels) expect(sol.reussis, `${id} ${c.id}`).not.toContain(c.id);
+      expect(sol.got, id).toBe(20);
+      expect(sol.verifiable, id).toBe(20);
+      expect(sol.echoues, id).toEqual([]);
       // Tout critère non vérifiable est explicitement déclaré : rien d'implicite.
       expect(
         sujet.criteria.filter((c) => c.automatique === false && !c.manuel),

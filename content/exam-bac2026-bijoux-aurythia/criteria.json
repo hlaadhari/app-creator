@@ -6,9 +6,16 @@
     "description": "Les clés primaires de toutes les tables sont définies, la table evaluation est créée et les relations entre les tables sont établies, puis la base est exportée.",
     "points": 1.75,
     "ordre": 1,
-    "fichier": "index.html",
-    "correction": "enseignant",
-    "sonde": { "type": "dom_selector", "selector": "body" },
+    "fichier": "db/init.sql",
+    "sonde": {
+      "type": "sql_table_check",
+      "table": "evaluation",
+      "primaryKey": ["idExp", "idBij"],
+      "foreignKeys": [
+        { "column": "idExp", "refTable": "expert" },
+        { "column": "idBij", "refTable": "bijou" }
+      ]
+    },
     "fail_message": "Une clé primaire, la table evaluation ou une relation (clé étrangère) est absente ou incorrecte."
   },
   {
@@ -174,9 +181,23 @@
     "description": "Le script insère le bijou puis ses métaux, et affiche « Ajout effectué avec succès » ou « Erreur d'insertion ».",
     "points": 1.75,
     "ordre": 7,
-    "fichier": "index.html",
-    "correction": "enseignant",
-    "sonde": { "type": "dom_selector", "selector": "body" },
+    "fichier": "ajout.php",
+    "sonde": {
+      "type": "php_mysqli_check",
+      "entrypoint": "ajout.php",
+      "postData": {
+        "idBij": "AB999",
+        "desc": "Bague Saphir",
+        "prix": "450",
+        "poids": "12",
+        "c2": "R"
+      },
+      "expectedStdoutContains": "Ajout effectué avec succès",
+      "expectedTableRows": {
+        "table": "bijou",
+        "where": { "idBij": "AB999", "description": "Bague Saphir" }
+      }
+    },
     "fail_message": "ajout.php n'insère pas le bijou et sa composition ou n'affiche pas les messages demandés."
   },
   {
@@ -330,9 +351,23 @@
     "description": "Le script distingue les trois cas (bijou inexistant, bijou déjà évalué par l'expert, nouvelle évaluation avec la date et l'heure système) et affiche le message correspondant.",
     "points": 2.5,
     "ordre": 11,
-    "fichier": "index.html",
-    "correction": "enseignant",
-    "sonde": { "type": "dom_selector", "selector": "body" },
+    "fichier": "evaluation.php",
+    "sonde": {
+      "type": "php_mysqli_check",
+      "entrypoint": "evaluation.php",
+      "postData": {
+        "idBij": "bg123",
+        "expert": "A24",
+        "finition": "5",
+        "originalite": "O",
+        "commentaire": "Tres beau bijou"
+      },
+      "expectedStdoutContains": "Evaluation enregistrée avec succès",
+      "expectedTableRows": {
+        "table": "evaluation",
+        "where": { "idExp": "A24", "idBij": "bg123" }
+      }
+    },
     "fail_message": "evaluation.php ne gère pas correctement l'existence du bijou, le doublon d'évaluation ou l'insertion avec dateEv."
   },
   {
@@ -342,9 +377,12 @@
     "description": "La page affiche, pour les bijoux originaux (originalite = 'O'), l'identifiant, la description et la moyenne de la finition.",
     "points": 1.25,
     "ordre": 12,
-    "fichier": "index.html",
-    "correction": "enseignant",
-    "sonde": { "type": "dom_selector", "selector": "body" },
+    "fichier": "liste.php",
+    "sonde": {
+      "type": "php_mysqli_check",
+      "entrypoint": "liste.php",
+      "expectedStdoutPattern": "<table[\\s\\S]*bg123"
+    },
     "fail_message": "liste.php n'affiche pas les bijoux originaux avec la moyenne de la finition (AVG avec GROUP BY)."
   }
 ]
