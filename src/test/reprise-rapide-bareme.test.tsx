@@ -42,33 +42,27 @@ describe("Issue #134 (UX-04 / PED-06) — Répartition du barème", () => {
     expect(rep.pourcentageAuto).toBe(100);
   });
 
-  it("calcule correctement les sujets avec critères évalués par l'enseignant", () => {
-    // Bac 2025 Droits d'accès : 9.25 pts enseignant (BD + PHP) + 10.75 pts auto
-    const ex2025 = getExercise("exam-bac2025-droits-acces");
-    expect(ex2025).toBeDefined();
-    const rep2025 = calculerBaremeRepartition(ex2025!.criteria);
-    expect(rep2025.totalPoints).toBe(20);
-    expect(rep2025.pointsEnseignant).toBe(9.25);
-    expect(rep2025.pointsAuto).toBe(10.75);
-    expect(rep2025.hasManuel).toBe(true);
+  it("calcule correctement la répartition 100% auto des examens 2025/2026 (#285) et des critères manuels", () => {
+    for (const id of [
+      "exam-bac2025-droits-acces",
+      "exam-bac2026-bijoux-aurythia",
+      "exam-bac2026-croisieres-marivana",
+    ]) {
+      const ex = getExercise(id);
+      expect(ex).toBeDefined();
+      const rep = calculerBaremeRepartition(ex!.criteria);
+      expect(rep.totalPoints).toBe(20);
+      expect(rep.pointsEnseignant).toBe(0);
+      expect(rep.pointsAuto).toBe(20);
+      expect(rep.hasManuel).toBe(false);
+    }
 
-    // Bac 2026 Bijoux Aurythia : 7.25 pts enseignant + 12.75 pts auto
-    const ex2026b = getExercise("exam-bac2026-bijoux-aurythia");
-    expect(ex2026b).toBeDefined();
-    const rep2026b = calculerBaremeRepartition(ex2026b!.criteria);
-    expect(rep2026b.totalPoints).toBe(20);
-    expect(rep2026b.pointsEnseignant).toBe(7.25);
-    expect(rep2026b.pointsAuto).toBe(12.75);
-    expect(rep2026b.hasManuel).toBe(true);
-
-    // Bac 2026 Croisières Marivana : EX26C-01 (1.5) + EX26C-08 (0.5) + EX26C-09 (2.5) + EX26C-12 (4) = 8.5 pts prof
-    const ex2026c = getExercise("exam-bac2026-croisieres-marivana");
-    expect(ex2026c).toBeDefined();
-    const rep2026c = calculerBaremeRepartition(ex2026c!.criteria);
-    expect(rep2026c.totalPoints).toBe(20);
-    expect(rep2026c.pointsEnseignant).toBe(8.5);
-    expect(rep2026c.pointsAuto).toBe(11.5);
-    expect(rep2026c.hasManuel).toBe(true);
+    // Vérifie également le calcul lorsque des critères manuels sont présents
+    const repMixte = calculerBaremeRepartition([{ points: 10.75 }, { points: 9.25, manuel: true }]);
+    expect(repMixte.totalPoints).toBe(20);
+    expect(repMixte.pointsEnseignant).toBe(9.25);
+    expect(repMixte.pointsAuto).toBe(10.75);
+    expect(repMixte.hasManuel).toBe(true);
   });
 
   it("affiche les badges de répartition compacts et détaillés", () => {

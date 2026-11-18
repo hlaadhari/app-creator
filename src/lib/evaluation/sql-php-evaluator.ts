@@ -53,6 +53,7 @@ export interface PhpMySqliCheckProbe {
   postData?: Record<string, unknown>;
   expectedStdoutContains?: string;
   expectedStdoutPattern?: string;
+  expectedScriptPattern?: string;
   expectedTableRows?: {
     table: string;
     minCount?: number;
@@ -348,6 +349,13 @@ export function evaluerPhpMySqliCheck(
       `Erreur lors de l'exécution PHP : ${execRes.error}`,
       isSyntax ? "syntaxe" : "execution",
     );
+  }
+
+  if (probe.expectedScriptPattern) {
+    const scriptRe = new RegExp(probe.expectedScriptPattern, "i");
+    if (!scriptRe.test(scriptContent)) {
+      return echec(critere, `Le script '${entrypoint}' ne contient pas la structure attendue.`);
+    }
   }
 
   if (probe.expectedStdoutContains) {

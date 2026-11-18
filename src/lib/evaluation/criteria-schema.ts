@@ -104,6 +104,7 @@ export const PhpMySqliCheckProbeSchema = z
     postData: z.record(z.string(), z.union([z.string(), z.number(), z.boolean()])).optional(),
     expectedStdoutContains: z.string().optional(),
     expectedStdoutPattern: z.string().optional(),
+    expectedScriptPattern: z.string().optional(),
     expectedTableRows: z
       .object({
         table: z.string().min(1),

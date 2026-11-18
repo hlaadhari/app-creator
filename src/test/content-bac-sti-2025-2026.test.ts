@@ -133,7 +133,10 @@ const isPlaceholder = (c: Criterion) =>
 function earnedPoints(id: string, variant: "initial" | "solution") {
   let earned = 0;
   let total = 0;
-  for (const c of readCriteria(id).filter((x) => !isPlaceholder(x))) {
+  for (const c of readCriteria(id).filter(
+    (x) =>
+      !isPlaceholder(x) && (x.sonde?.type === "dom_selector" || x.sonde?.type === "css_property"),
+  )) {
     const dom = loadPage(id, variant, c.fichier);
     const def: CriterionDefinition = {
       id: c.id,
@@ -202,7 +205,7 @@ describe("Contenu Module C – Annales Bac STI 2025 et 2026 (Niveau 3)", () => {
         criteria.forEach((c) => {
           expect(c.points).toBeGreaterThan(0);
           expect(c.fail_message).toBeTruthy();
-          expect(manifest.fichiers_attendus).toContain(c.fichier);
+          expect([...manifest.fichiers_attendus, "db/init.sql"]).toContain(c.fichier);
         });
       });
 

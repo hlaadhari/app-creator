@@ -256,6 +256,14 @@ export class ProceduralPhpInterpreter {
       }
     }
 
+    // Affectation inline (ex: while ($ligne = mysqli_fetch_assoc($res)))
+    const inlineAssignMatch = expr.match(/^\$([a-zA-Z_][a-zA-Z0-9_]*)\s*=(?!=)\s*([\s\S]+)$/);
+    if (inlineAssignMatch && inlineAssignMatch[1] && inlineAssignMatch[2]) {
+      const val = this.evalExpr(inlineAssignMatch[2].trim());
+      this.vars[inlineAssignMatch[1]] = val;
+      return val;
+    }
+
     // isset(...)
     const issetMatch = expr.match(/^isset\s*\((.+)\)$/i);
     if (issetMatch && issetMatch[1]) {
@@ -597,7 +605,7 @@ export class ProceduralPhpInterpreter {
 
     // mysqli_prepare($con, $sql)
     const prepMatch = clean.match(
-      /^\$([a-zA-Z_][a-zA-Z0-9_]*)\s*=\s*mysqli_prepare\s*\(\s*[^,]+,\s*(.+)\)$/i,
+      /^\$([a-zA-Z_][a-zA-Z0-9_]*)\s*=\s*mysqli_prepare\s*\(\s*[^,]+,\s*([\s\S]+)\)$/i,
     );
     if (prepMatch && prepMatch[1] && prepMatch[2]) {
       const stmtVar = prepMatch[1];
@@ -768,9 +776,30 @@ export class ProceduralPhpInterpreter {
         const parenEnd = this.findMatchingParen(code, parenStart, "(", ")");
         const condExpr = code.slice(parenStart + 1, parenEnd);
 
-        const blockStart = code.indexOf("{", parenEnd);
-        const blockEnd = this.findMatchingParen(code, blockStart, "{", "}");
-        const thenCode = code.slice(blockStart + 1, blockEnd);
+        let afterParen = parenEnd + 1;
+        while (afterParen < n && /\s/.test(code[afterParen] ?? "")) afterParen++;
+
+        let thenCode = "";
+        let blockEnd = afterParen;
+
+        if (code[afterParen] === "{") {
+          blockEnd = this.findMatchingParen(code, afterParen, "{", "}");
+          thenCode = code.slice(afterParen + 1, blockEnd);
+        } else {
+          // Instruction unique sans accolades : if ($cond) echo "...";
+          let sIdx = afterParen;
+          let inS = false;
+          let inD = false;
+          while (sIdx < n) {
+            const ch = code[sIdx];
+            if (ch === "'" && !inD && (sIdx === 0 || code[sIdx - 1] !== "\\")) inS = !inS;
+            else if (ch === '"' && !inS && (sIdx === 0 || code[sIdx - 1] !== "\\")) inD = !inD;
+            else if (ch === ";" && !inS && !inD) break;
+            sIdx++;
+          }
+          blockEnd = sIdx < n ? sIdx : n - 1;
+          thenCode = code.slice(afterParen, blockEnd + 1);
+        }
 
         let elseCode = "";
         let afterBlock = blockEnd + 1;
@@ -778,10 +807,27 @@ export class ProceduralPhpInterpreter {
 
         if (code.slice(afterBlock).startsWith("else")) {
           const afterElse = afterBlock + 4;
-          const elseBlockStart = code.indexOf("{", afterElse);
-          const elseBlockEnd = this.findMatchingParen(code, elseBlockStart, "{", "}");
-          elseCode = code.slice(elseBlockStart + 1, elseBlockEnd);
-          i = elseBlockEnd + 1;
+          let elseStart = afterElse;
+          while (elseStart < n && /\s/.test(code[elseStart] ?? "")) elseStart++;
+          if (code[elseStart] === "{") {
+            const elseBlockEnd = this.findMatchingParen(code, elseStart, "{", "}");
+            elseCode = code.slice(elseStart + 1, elseBlockEnd);
+            i = elseBlockEnd + 1;
+          } else {
+            let sIdx = elseStart;
+            let inS = false;
+            let inD = false;
+            while (sIdx < n) {
+              const ch = code[sIdx];
+              if (ch === "'" && !inD && (sIdx === 0 || code[sIdx - 1] !== "\\")) inS = !inS;
+              else if (ch === '"' && !inS && (sIdx === 0 || code[sIdx - 1] !== "\\")) inD = !inD;
+              else if (ch === ";" && !inS && !inD) break;
+              sIdx++;
+            }
+            const elseEnd = sIdx < n ? sIdx : n - 1;
+            elseCode = code.slice(elseStart, elseEnd + 1);
+            i = elseEnd + 1;
+          }
         } else {
           i = blockEnd + 1;
         }
@@ -1131,10 +1177,25 @@ export function executerScriptPhpProcedural(
   // 1. Résolution des includes
   const resolvedCode = interpreter.resolveIncludes(scriptContent);
 
-  // 2. Nettoyage sécurisé des commentaires (sans altérer les codes hexadécimaux CSS)
-  const cleanCode = stripPhpComments(resolvedCode)
-    .replace(/<\?php/gi, "")
-    .replace(/\?>/gi, "");
+  // 2. Conversion des portions HTML hors balises <?php ... ?> en echo "..." puis nettoyage des commentaires
+  const phpNormalized = /<\?php/i.test(resolvedCode)
+    ? resolvedCode
+        .split(/(<\?php[\s\S]*?(?:\?>|$))/gi)
+        .map((chunk) => {
+          if (/^<\?php/i.test(chunk)) {
+            return chunk.replace(/^<\?php/i, "").replace(/\?>$/, "");
+          }
+          if (chunk.trim().length === 0) return "";
+          const escaped = chunk
+            .replace(/\\/g, "\\\\")
+            .replace(/"/g, '\\"')
+            .replace(/\r?\n/g, "\\n");
+          return `echo "${escaped}";\n`;
+        })
+        .join("\n")
+    : resolvedCode.replace(/<\?php/gi, "").replace(/\?>/gi, "");
+
+  const cleanCode = stripPhpComments(phpNormalized);
 
   // 3. Exécution séquentielle par blocs
   interpreter.executeBlock(cleanCode);
