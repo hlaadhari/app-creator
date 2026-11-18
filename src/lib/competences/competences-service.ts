@@ -104,9 +104,12 @@ export async function getStudentMasteryRecords(
   eleveId?: string | null | undefined,
 ): Promise<MaitriseRecord[]> {
   const localList = getLocalRecords();
+  const isUuid =
+    typeof eleveId === "string" &&
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(eleveId);
 
-  if (!eleveId) {
-    return localList;
+  if (!eleveId || !isUuid) {
+    return eleveId ? localList.filter((r) => !r.eleveId || r.eleveId === eleveId) : localList;
   }
 
   try {
@@ -142,9 +145,12 @@ export async function getStudentMasteryRecords(
  */
 export async function getStudentBadges(eleveId?: string | null | undefined): Promise<BadgeEleve[]> {
   const localBadges = getLocalBadges();
+  const isUuid =
+    typeof eleveId === "string" &&
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(eleveId);
 
-  if (!eleveId) {
-    return localBadges;
+  if (!eleveId || !isUuid) {
+    return eleveId ? localBadges.filter((b) => !b.eleveId || b.eleveId === eleveId) : localBadges;
   }
 
   try {
