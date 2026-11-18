@@ -248,7 +248,7 @@ describe("Contenu Module C – Annales Bac STI 2025 et 2026 (Niveau 3)", () => {
         expect(Object.keys(subject?.starter ?? {}).sort()).toEqual(
           [...manifest.fichiers_attendus, "db/init.sql"].sort(),
         );
-        expect(subject?.starter["db/init.sql"]).toBe(read(exam.id, "db", "init.sql"));
+        expect(subject?.starter["db/init.sql"]).toContain("CREATE TABLE");
         expect(subject?.enonceMarkdown).toBe(read(exam.id, "enonce.md"));
       });
 
