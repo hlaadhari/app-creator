@@ -433,4 +433,44 @@ video:hover  { transform: scale(1.2); }            /* agrandit de 20 % au survol
       </li>
     </ul>
   </section>
+
+  <section id="css-flexbox-keyframes" class="course-section">
+    <h2>8. Mise en page Flexbox &amp; Animations <code>@keyframes</code></h2>
+    <p>
+      <strong>Flexbox</strong> permet d'aligner facilement des blocs sur une ligne ou en colonne
+      sans recourir aux tableaux de mise en page ni au positionnement fixe.
+    </p>
+    <div class="code-card">
+      <div class="code-card-header">
+        <span>Alignement horizontal et vertical avec Flexbox</span>
+        <span class="lang-tag">CSS</span>
+      </div>
+      <pre><code class="language-css">.conteneur {
+  display: flex;
+  justify-content: space-between; /* axe principal (horizontal) */
+  align-items: center;            /* axe secondaire (vertical) */
+  gap: 16px;
+  flex-wrap: wrap;
+}</code></pre>
+    </div>
+    <div class="code-card">
+      <div class="code-card-header">
+        <span>Animation continue avec @keyframes</span>
+        <span class="lang-tag">CSS</span>
+      </div>
+      <pre><code class="language-css">@keyframes apparition {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.carte {
+  animation: apparition 0.6s ease forwards;
+}</code></pre>
+    </div>
+    <ul>
+      <li>
+        Piège : <code>justify-content</code> et <code>align-items</code> ne fonctionnent que si le
+        conteneur parent possède <code>display: flex</code> (ou <code>inline-flex</code>).
+      </li>
+    </ul>
+  </section>
 </article>
