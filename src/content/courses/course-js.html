@@ -454,4 +454,42 @@ document.getElementById("comment").value = "Merci";                      // cont
       </li>
     </ul>
   </article>
+
+  <article id="js-evenements" class="course-section">
+    <h2>
+      9. Écouteurs d'Événements (<code>addEventListener</code> &amp; <code>preventDefault</code>)
+    </h2>
+    <p>
+      En complément des attributs HTML (<code>onsubmit="return verif();"</code>,
+      <code>onclick="..."</code>), JavaScript permet d'attacher un ou plusieurs écouteurs
+      directement depuis le script via <code>addEventListener</code>.
+    </p>
+    <div class="code-card">
+      <div class="code-card-header">
+        <span>Intercepter la soumission d'un formulaire ou un clic</span>
+        <span class="lang-tag">JAVASCRIPT</span>
+      </div>
+      <pre><code class="language-javascript">const form = document.querySelector("form");
+form.addEventListener("submit", function (event) {
+  if (!verif()) {
+    event.preventDefault(); // empêche l'envoi au serveur PHP si la saisie est invalide
+  }
+});
+
+document.getElementById("plus").addEventListener("click", () => {
+  // Action exécutée à chaque clic sur le bouton #plus
+});</code></pre>
+    </div>
+    <ul>
+      <li>
+        Ne jamais écrire les parenthèses lors du passage de la fonction :
+        <code>btn.addEventListener("click", maFonction)</code> (et non <code>maFonction()</code>).
+      </li>
+      <li>
+        <code>event.preventDefault()</code> dans <code>addEventListener("submit", ...)</code> joue
+        le même rôle bloquant que <code>return false;</code> dans
+        <code>onsubmit="return verif();"</code>.
+      </li>
+    </ul>
+  </article>
 </section>

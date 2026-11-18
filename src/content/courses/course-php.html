@@ -371,4 +371,64 @@ if (mysqli_affected_rows($cnx) != 0) { // INSERT, UPDATE, DELETE : lignes touch�
       </li>
     </ul>
   </article>
+
+  <article id="php-prepare-sessions" class="course-section">
+    <h2>7. Requêtes Préparées, Transactions &amp; Sessions</h2>
+    <p>
+      Dans les sujets récents du Bac STI (2025–2026), les requêtes SQL paramétrées utilisent les
+      <strong>requêtes préparées MySQLi procédurales</strong> pour éviter les injections SQL et
+      gérer proprement les chaînes contenant des apostrophes.
+    </p>
+    <div class="code-card">
+      <div class="code-card-header">
+        <span>Requête préparée MySQLi procédurale (SELECT et INSERT)</span>
+        <span class="lang-tag">PHP</span>
+      </div>
+      <pre><code class="language-php">&lt;?php
+$stmt = mysqli_prepare($cnx, "SELECT idUtil FROM utilisateur WHERE idUtil = ?");
+mysqli_stmt_bind_param($stmt, "s", $idUtil); // "s" = string, "i" = integer, "d" = double
+mysqli_stmt_execute($stmt);
+mysqli_stmt_store_result($stmt);
+if (mysqli_stmt_num_rows($stmt) == 0) {
+  $ins = mysqli_prepare($cnx, "INSERT INTO utilisateur (idUtil, nomPrenom) VALUES (?, ?)");
+  mysqli_stmt_bind_param($ins, "ss", $idUtil, $nomPrenom);
+  mysqli_stmt_execute($ins);
+}
+// Pour lire les lignes d'un SELECT préparé :
+$res = mysqli_stmt_get_result($stmt);
+while ($ligne = mysqli_fetch_assoc($res)) {
+  echo htmlspecialchars($ligne["nomPrenom"]);
+}
+?&gt;</code></pre>
+    </div>
+    <div class="code-card">
+      <div class="code-card-header">
+        <span>Transactions (tout-ou-rien), Sessions &amp; Formatage ucwords</span>
+        <span class="lang-tag">PHP</span>
+      </div>
+      <pre><code class="language-php">&lt;?php
+session_start();
+$_SESSION["client"] = ucwords(trim($_POST["nomCl"])); // "  sami ben ali " -&gt; "Sami Ben Ali"
+
+mysqli_begin_transaction($cnx);
+try {
+  // Plusieurs INSERT/UPDATE liés (ex: bijou + composition)
+  mysqli_commit($cnx);
+} catch (mysqli_sql_exception $e) {
+  mysqli_rollback($cnx);
+}
+?&gt;</code></pre>
+    </div>
+    <ul>
+      <li>
+        <code>session_start()</code> doit impérativement être appelée
+        <strong>avant tout affichage HTML</strong> (<code>echo</code>) pour lire ou écrire dans
+        <code>$_SESSION</code>.
+      </li>
+      <li>
+        <code>ucwords(trim($ch))</code> supprime les espaces superflus aux extrémités puis met en
+        majuscule la première lettre de chaque mot.
+      </li>
+    </ul>
+  </article>
 </section>

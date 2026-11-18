@@ -304,6 +304,25 @@ describe("Support de Cours Interactif & Mémento Bac STI (feat/course-support-ht
       expect(rBonjour.id).toBe("kb-fallback");
       expect(rBonjour.answer).toContain("Je n'ai pas de fiche sur ce sujet");
     });
+
+    it("couvre les compléments PHP (mysqli_prepare, transactions, sessions), CSS3 (Flexbox, @keyframes) et JS (addEventListener)", () => {
+      const php = COURSE_MODULES.find((m) => m.id === "php")!;
+      expect(php.sections.some((s) => s.id === "php-prepare-sessions")).toBe(true);
+      expect(php.rawHtml).toContain('id="php-prepare-sessions"');
+      expect(php.rawHtml).toContain("mysqli_prepare");
+      expect(php.rawHtml).toContain("session_start");
+
+      const css = COURSE_MODULES.find((m) => m.id === "css3")!;
+      expect(css.sections.some((s) => s.id === "css-flexbox-keyframes")).toBe(true);
+      expect(css.rawHtml).toContain('id="css-flexbox-keyframes"');
+      expect(css.rawHtml).toContain("display: flex");
+      expect(css.rawHtml).toContain("@keyframes");
+
+      const js = COURSE_MODULES.find((m) => m.id === "js")!;
+      expect(js.sections.some((s) => s.id === "js-evenements")).toBe(true);
+      expect(js.rawHtml).toContain('id="js-evenements"');
+      expect(js.rawHtml).toContain("addEventListener");
+    });
   });
   describe("Modélisation et requêtes SQL avancées des annales (#205)", () => {
     const NOTIONS = [

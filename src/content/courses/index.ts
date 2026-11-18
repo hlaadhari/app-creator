@@ -58,6 +58,7 @@ export const COURSE_MODULES: CourseModule[] = [
       { id: "arriere-plans", title: "5. Arrière-plans & Gradients" },
       { id: "transitions-transformations", title: "6. Transformations & Transitions" },
       { id: "css-annales", title: "7. Notions fréquentes des annales" },
+      { id: "css-flexbox-keyframes", title: "8. Flexbox & Animations @keyframes" },
     ],
   },
   {
@@ -78,12 +79,13 @@ export const COURSE_MODULES: CourseModule[] = [
       { id: "js-objets", title: "6. Objets Prédéfinis : Math & Date" },
       { id: "js-verif", title: "7. Patron Canonique de la Fonction verif()" },
       { id: "js-annales", title: "8. Notions fréquentes des annales" },
+      { id: "js-evenements", title: "9. Écouteurs addEventListener & preventDefault" },
     ],
   },
   {
     id: "php",
     badge: "Module 4",
-    title: "PHP 8.2 & Traitement Serveur",
+    title: "PHP & Traitement Serveur",
     shortTitle: "PHP / MySQLi",
     description:
       "Récupération HTTP, superglobales, traitement des chaînes et interfaçage procédural MySQLi.",
@@ -96,6 +98,7 @@ export const COURSE_MODULES: CourseModule[] = [
       { id: "php-mysqli", title: "4. Interfaçage MySQLi Procédural" },
       { id: "php-patron", title: "5. Patron Canonique d'Insertion & Consultation" },
       { id: "php-annales", title: "6. Notions fréquentes des annales" },
+      { id: "php-prepare-sessions", title: "7. Requêtes Préparées, Transactions & Sessions" },
     ],
   },
   {
