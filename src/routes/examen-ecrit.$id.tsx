@@ -10,7 +10,7 @@ export const Route = createFileRoute("/examen-ecrit/$id")({
   head: ({ params }) => ({
     meta: [
       {
-        title: `${getWrittenExamPublic(params.id)?.title ?? "Épreuve écrite"} – Labo STI`,
+        title: `${getWrittenExamPublic(params.id)?.title ?? "Épreuve écrite"} – Code Behi`,
       },
       {
         name: "description",

@@ -37,7 +37,7 @@ import {
 export const Route = createFileRoute("/calendrier")({
   head: () => ({
     meta: [
-      { title: "Planning des Séances TP & Réservation de Postes – Labo STI" },
+      { title: "Planning des Séances TP & Réservation de Postes – Code Behi" },
       {
         name: "description",
         content:

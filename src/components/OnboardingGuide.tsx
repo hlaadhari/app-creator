@@ -55,14 +55,14 @@ export function OnboardingGuide({ forceOpen = false, onClose }: OnboardingGuideP
 
   const steps = [
     {
-      title: "Bienvenue sur Labo STI",
+      title: "Bienvenue sur Code Behi",
       subtitle:
         "Plateforme d'entraînement et d'examen pour le Baccalauréat STI (Sciences de l'Informatique)",
       icon: <Code2 className="h-8 w-8 text-primary" />,
       content: (
         <div className="space-y-3 text-xs leading-relaxed text-muted-foreground">
           <p>
-            Labo STI met à votre disposition un environnement de développement web complet
+            Code Behi met à votre disposition un environnement de développement web complet
             directement dans votre navigateur, conçu pour vous préparer aux épreuves pratiques en
             conditions réelles.
           </p>

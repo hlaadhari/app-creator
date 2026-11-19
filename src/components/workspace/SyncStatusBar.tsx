@@ -130,7 +130,7 @@ export function SyncStatusBar({
           Ln {cursorPos.line}, Col {cursorPos.col}
         </span>
         <span>UTF-8</span>
-        <span className="font-semibold text-foreground/80">Labo STI v3.1</span>
+        <span className="font-semibold text-foreground/80">Code Behi v3.1</span>
       </div>
     </footer>
   );

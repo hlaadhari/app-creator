@@ -27,7 +27,7 @@ export function PedagogicalTutorPane({ context, onSelectCriterion }: Pedagogical
       id: "initial-welcome",
       role: "assistant",
       content:
-        "Bonjour ! Je suis votre tuteur pédagogique Labo STI. Je suis là pour vous poser les bonnes questions et vous aider à structurer votre raisonnement sans faire le travail à votre place.\n\nSur quel aspect ou critère du sujet souhaitez-vous échanger ?",
+        "Bonjour ! Je suis votre tuteur pédagogique Code Behi. Je suis là pour vous poser les bonnes questions et vous aider à structurer votre raisonnement sans faire le travail à votre place.\n\nSur quel aspect ou critère du sujet souhaitez-vous échanger ?",
       timestamp: new Date().toISOString(),
       suggestedFollowUps: [
         "Pourquoi mon dernier test échoue ?",

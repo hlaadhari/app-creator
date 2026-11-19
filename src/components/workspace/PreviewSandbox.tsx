@@ -104,11 +104,11 @@ export function PreviewSandbox({ files, className = "" }: PreviewSandboxProps) {
 
     // Blocage absolu des requêtes réseau sortantes (T-11)
     window.fetch = function() {
-      console.warn("[Sandbox Labo STI] Appel fetch bloqué par sécurité.");
+      console.warn("[Sandbox Code Behi] Appel fetch bloqué par sécurité.");
       return Promise.reject(new Error("Accès réseau sortant interdit dans le bac à sable"));
     };
     window.XMLHttpRequest = function() {
-      console.warn("[Sandbox Labo STI] XMLHttpRequest bloqué par sécurité.");
+      console.warn("[Sandbox Code Behi] XMLHttpRequest bloqué par sécurité.");
       throw new Error("Accès réseau sortant interdit dans le bac à sable");
     };
     if (window.WebSocket) {

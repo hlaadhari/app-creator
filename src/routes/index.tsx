@@ -50,7 +50,7 @@ export const Route = createFileRoute("/")({
   },
   head: () => ({
     meta: [
-      { title: "Labo STI – Entraînement gratuit au Bac Informatique (Tunisie)" },
+      { title: "Code Behi – Entraînement gratuit au Bac Informatique (Tunisie)" },
       {
         name: "description",
         content:
@@ -58,7 +58,7 @@ export const Route = createFileRoute("/")({
       },
       {
         property: "og:title",
-        content: "Labo STI – Entraînement gratuit au Bac Informatique (Tunisie)",
+        content: "Code Behi – Entraînement gratuit au Bac Informatique (Tunisie)",
       },
       {
         property: "og:description",
@@ -259,10 +259,10 @@ function Index() {
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
           <div>
             <p className="font-mono text-xs uppercase tracking-wider text-primary">
-              // Entraînement officiel Bac STI
+              // Entraînement gratuit Bac Info
             </p>
             <h1 className="mt-2 text-3xl md:text-4xl font-bold tracking-tight">
-              Codez, vérifiez, progressez.
+              Code, vérifie… c'est behi !
             </h1>
             <p className="mt-2 text-sm text-muted-foreground max-w-xl">
               Éditeur VS Code intégré, arborescence normalisée, bac à sable étanche et correction

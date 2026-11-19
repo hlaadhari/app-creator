@@ -1,5 +1,5 @@
 /**
- * Labo STI - Moteur SQL Relationnel Local (PRD §8.2, F-25 à F-31, TEC-02)
+ * Code Behi - Moteur SQL Relationnel Local (PRD §8.2, F-25 à F-31, TEC-02)
  *
  * Moteur de base de données relationnelle locale exécutant le SQL dans le navigateur
  * avec contrôle de dialecte MySQL/MariaDB, visualiseur de tables et réinitialisation instantanée.
@@ -168,7 +168,7 @@ export class SqliteEngine {
    */
   public async exportDump(): Promise<string> {
     const lines: string[] = [
-      `-- Export Base de données Labo STI`,
+      `-- Export Base de données Code Behi`,
       `-- Généré le : ${new Date().toISOString()}`,
       `-- --------------------------------------------------------`,
       "",

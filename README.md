@@ -1,20 +1,22 @@
-# Labo STI — S'entraîner au Bac Informatique (Tunisie), gratuitement, dans le navigateur
+# Code Behi — S'entraîner au Bac Informatique (Tunisie), gratuitement, dans le navigateur
+
+**Code, vérifie… c'est behi !** _(« behi » = « c'est bien » en tunisien)_
 
 > Plateforme **gratuite** d'entraînement à l'épreuve pratique et à l'épreuve écrite du **Bac Sciences de l'Informatique (STI)** : HTML, CSS, JavaScript, PHP et SQL, avec **correction automatique** critère par critère. Rien à installer.
 
-### 👉 [Ouvrir Labo STI : app-creator-phi.vercel.app](https://app-creator-phi.vercel.app/)
+### 👉 [Ouvrir Code Behi : app-creator-phi.vercel.app](https://app-creator-phi.vercel.app/)
 
 [![Essayer en ligne](https://img.shields.io/badge/essayer-en%20ligne-22c55e?style=for-the-badge)](https://app-creator-phi.vercel.app/)
 [![Gratuit](https://img.shields.io/badge/prix-gratuit-0ea5e9?style=for-the-badge)](https://app-creator-phi.vercel.app/)
 [![Licence](https://img.shields.io/badge/licence-MIT%20%2F%20CC%20BY--SA%204.0-orange?style=for-the-badge)](LICENSE)
 
-![Catalogue des sujets de Labo STI](docs/images/accueil-catalogue.jpg)
+![Catalogue des sujets de Code Behi](docs/images/accueil-catalogue.jpg)
 
 ---
 
 ## 🎓 Pour qui ?
 
-| Vous êtes…                                   | Labo STI vous permet de…                                                                                                                                                                                        |
+| Vous êtes…                                   | Code Behi vous permet de…                                                                                                                                                                                       |
 | -------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Élève de 4ème Sciences de l'Informatique** | Coder les sujets du Bac directement dans le navigateur, savoir immédiatement ce qui est juste et ce qui manque, débloquer des indices sans recevoir la solution, et refaire les annales en conditions d'examen. |
 | **Enseignant d'informatique**                | Créer une classe, inviter vos élèves avec un code, suivre leur progression en direct, consulter leurs travaux et organiser des examens blancs chronométrés.                                                     |
@@ -43,7 +45,7 @@ Votre travail est sauvegardé automatiquement, même si la connexion internet co
 
 ---
 
-## ⚡ Ce que contient Labo STI
+## ⚡ Ce que contient Code Behi
 
 ![Atelier : énoncé, éditeur et aperçu en direct](docs/images/atelier-editeur.jpg)
 
@@ -62,7 +64,7 @@ Votre travail est sauvegardé automatiquement, même si la connexion internet co
 
 ## 🤝 Faire connaître et contribuer
 
-Labo STI est un projet **gratuit et ouvert**, offert aux élèves et enseignants du Bac Informatique.
+Code Behi est un projet **gratuit et ouvert**, offert aux élèves et enseignants du Bac Informatique.
 
 - ⭐ **Mettez une étoile au dépôt** : cela aide d'autres enseignants à le trouver.
 - 📣 **Partagez le lien** [app-creator-phi.vercel.app](https://app-creator-phi.vercel.app/) avec vos élèves, collègues et groupes de révision.
@@ -72,6 +74,8 @@ Labo STI est un projet **gratuit et ouvert**, offert aux élèves et enseignants
 ---
 
 ## 🛠 Pour les développeurs
+
+> Le projet s'appelait auparavant **Labo STI** : ce nom apparaît encore dans la documentation technique (`CONTEXT.md`, `docs/`).
 
 ### Stack technique
 

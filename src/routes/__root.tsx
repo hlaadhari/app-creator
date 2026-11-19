@@ -84,11 +84,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Labo STI – Plateforme d'entraînement au Bac STI" },
+      { title: "Code Behi – Plateforme d'entraînement au Bac STI" },
       {
         name: "description",
         content:
-          "Plateforme d'entraînement et d'examen pratique au Baccalauréat STI (Sciences de l'Informatique) – Labo STI",
+          "Plateforme d'entraînement et d'examen pratique au Baccalauréat STI (Sciences de l'Informatique) – Code Behi",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

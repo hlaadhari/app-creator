@@ -7,10 +7,10 @@ import { APP_INFO, formatBuildDate } from "@/lib/app-info";
 export const Route = createFileRoute("/a-propos")({
   head: () => ({
     meta: [
-      { title: "À propos — Labo STI" },
+      { title: "À propos — Code Behi" },
       {
         name: "description",
-        content: "Droits, version et auteurs de Labo STI, atelier d'entraînement au Bac STI.",
+        content: "Droits, version et auteurs de Code Behi, atelier d'entraînement au Bac STI.",
       },
     ],
   }),

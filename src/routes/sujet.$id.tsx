@@ -14,9 +14,9 @@ export const Route = createFileRoute("/sujet/$id")({
   },
   head: ({ loaderData }) => ({
     meta: [
-      { title: `${loaderData?.title ?? "Sujet"} – Labo STI` },
+      { title: `${loaderData?.title ?? "Sujet"} – Code Behi` },
       { name: "description", content: `Sujet d'entraînement : ${loaderData?.competence ?? ""}` },
-      { property: "og:title", content: `${loaderData?.title ?? "Sujet"} – Labo STI` },
+      { property: "og:title", content: `${loaderData?.title ?? "Sujet"} – Code Behi` },
       {
         property: "og:description",
         content: `Sujet d'entraînement Bac STI : ${loaderData?.competence ?? ""}`,
