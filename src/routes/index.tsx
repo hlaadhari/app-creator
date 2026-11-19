@@ -50,19 +50,27 @@ export const Route = createFileRoute("/")({
   },
   head: () => ({
     meta: [
-      { title: "Labo STI – Plateforme d'entraînement au Bac STI" },
+      { title: "Labo STI – Entraînement gratuit au Bac Informatique (Tunisie)" },
       {
         name: "description",
         content:
-          "Entraînez-vous au Bac STI avec Labo STI : HTML, CSS et JavaScript avec correction automatique et indices.",
+          "Entraînez-vous gratuitement au Bac Sciences de l'Informatique : sujets pratiques et annales HTML, CSS, JavaScript, PHP et SQL, corrigés automatiquement dans le navigateur. Rien à installer.",
       },
-      { property: "og:title", content: "Labo STI – Plateforme d'entraînement au Bac STI" },
+      {
+        property: "og:title",
+        content: "Labo STI – Entraînement gratuit au Bac Informatique (Tunisie)",
+      },
       {
         property: "og:description",
-        content: "Éditeur dans le navigateur, aperçu en direct et correction automatique.",
+        content:
+          "Sujets pratiques et annales du Bac Info (HTML, CSS, JS, PHP, SQL) corrigés automatiquement, directement dans le navigateur.",
       },
       { property: "og:type", content: "website" },
+      { property: "og:url", content: "https://app-creator-phi.vercel.app/" },
+      { property: "og:image", content: "https://app-creator-phi.vercel.app/og-image.jpg" },
+      { property: "og:locale", content: "fr_TN" },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:image", content: "https://app-creator-phi.vercel.app/og-image.jpg" },
     ],
   }),
   component: Index,

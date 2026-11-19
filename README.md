@@ -1,129 +1,137 @@
-# Labo STI — Plateforme d'Entraînement Web (Bac STI)
+# Labo STI — S'entraîner au Bac Informatique (Tunisie), gratuitement, dans le navigateur
 
-> Plateforme web d'entraînement et d'examen blanc au **Bac STI** (HTML/CSS, JavaScript, PHP, SQL) associant un environnement de développement type VS Code dans le navigateur et un moteur de correction pédagogique en direct.
+> Plateforme **gratuite** d'entraînement à l'épreuve pratique et à l'épreuve écrite du **Bac Sciences de l'Informatique (STI)** : HTML, CSS, JavaScript, PHP et SQL, avec **correction automatique** critère par critère. Rien à installer.
 
-[![Version](https://img.shields.io/badge/version-3.1--draft-blue.svg)](docs/PRD.md)
-[![Stack](https://img.shields.io/badge/stack-TanStack%20Start%20%7C%20Supabase%20%7C%20Tailwind%20v4-emerald.svg)](CONTEXT.md)
-[![License](https://img.shields.io/badge/license-MIT%20%2F%20CC%20BY--SA%204.0-orange.svg)](docs/PRD.md)
+### 👉 [Ouvrir Labo STI : app-creator-phi.vercel.app](https://app-creator-phi.vercel.app/)
 
----
+[![Essayer en ligne](https://img.shields.io/badge/essayer-en%20ligne-22c55e?style=for-the-badge)](https://app-creator-phi.vercel.app/)
+[![Gratuit](https://img.shields.io/badge/prix-gratuit-0ea5e9?style=for-the-badge)](https://app-creator-phi.vercel.app/)
+[![Licence](https://img.shields.io/badge/licence-MIT%20%2F%20CC%20BY--SA%204.0-orange?style=for-the-badge)](LICENSE)
 
-## 📖 Sommaire
-
-- [Présentation](#-présentation)
-- [Fonctionnalités Clés](#-fonctionnalités-clés)
-- [Architecture & Stack Technique](#-architecture--stack-technique)
-- [Documentation de Référence](#-documentation-de-référence)
-- [Démarrage Rapide](#-démarrage-rapide)
-- [Synchronisation Lovable](#-synchronisation-lovable)
-- [Feuille de Route](#-feuille-de-route)
+![Catalogue des sujets de Labo STI](docs/images/accueil-catalogue.jpg)
 
 ---
 
-## 🎯 Présentation
+## 🎓 Pour qui ?
 
-Labo STI répond aux défis majeurs de l'apprentissage du développement web au lycée :
+| Vous êtes…                                   | Labo STI vous permet de…                                                                                                                                                                                        |
+| -------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Élève de 4ème Sciences de l'Informatique** | Coder les sujets du Bac directement dans le navigateur, savoir immédiatement ce qui est juste et ce qui manque, débloquer des indices sans recevoir la solution, et refaire les annales en conditions d'examen. |
+| **Enseignant d'informatique**                | Créer une classe, inviter vos élèves avec un code, suivre leur progression en direct, consulter leurs travaux et organiser des examens blancs chronométrés.                                                     |
 
-1. **Zéro Installation** : l'élève code directement dans son navigateur (aucune configuration de serveur Apache, PHP ou MySQL requise sur les postes du lycée).
-2. **Correction Immédiate** : évaluation en direct critère par critère (DOM, styles calculés, scripts, logique serveur et bases de données).
-3. **Pédagogie Bienveillante** : indices progressifs sur 3 niveaux pour débloquer l'élève sans lui donner la solution brute.
-4. **Conditions Réelles d'Examen** : mode examen chronométré avec horloge serveur étanche, format officiel `SW_xxxxx` et snapshots scellés.
-5. **Gain de Temps Enseignant** : pré-correction automatique, grille de notation assistée et détection des difficultés d'apprentissage.
-
----
-
-## ⚡ Fonctionnalités Clés
-
-- **Éditeur type VS Code** : Monaco Editor avec coloration multi-langages, arborescence normalisée et raccourcis usuels.
-- **Bac à Sable Sécurisé** : aperçu web live dans une iframe sandbox isolée sans accès réseau ni fuite de cookies.
-- **Exécution Locale PHP & SQL (Phase 2)** : exécution in-browser via simulateur PHP procédural en Web Worker (watchdog 3s) et moteur relationnel SQLite/MySQLi en mémoire avec contrôleur de dialecte MySQL.
-- **Résilience Maximale (Offline-First)** : tampon local IndexedDB prioritaire, synchronisation asynchrone avec détection des conflits de révision (`rev`).
-- **Immuabilité des Sujets** : chaque publication crée une version figée non modifiable (`sujet_versions`), garantissant la pérennité des notes et des rendus d'examen.
+**Aucune installation** : pas besoin de serveur Apache, de PHP ni de MySQL sur les postes du lycée ou à la maison. Un navigateur récent (Chrome, Firefox, Edge) suffit.
 
 ---
 
-## 🛠 Architecture & Stack Technique
+## 🚀 Commencer en 1 minute
+
+### Élève
+
+1. Ouvrez **[app-creator-phi.vercel.app](https://app-creator-phi.vercel.app/)**.
+2. Choisissez un sujet dans le catalogue (Initiation, Module A, B ou C). **Pas besoin de compte pour essayer.**
+3. Codez, puis cliquez sur **« Vérifier mon code »** (ou `Ctrl + Entrée`) : chaque critère s'affiche en vert ou en rouge avec une explication.
+4. Bloqué ? Débloquez un **indice** (3 niveaux, du rappel de notion à l'exemple de syntaxe).
+5. Créez un compte (**Connexion / Inscription**) pour garder votre progression sur tous vos appareils et **rejoindre la classe** de votre enseignant avec son code.
+
+Votre travail est sauvegardé automatiquement, même si la connexion internet coupe.
+
+### Enseignant
+
+1. Créez un compte, puis demandez l'accès enseignant depuis votre profil (validé par l'administrateur).
+2. Dans l'**Espace Enseignant**, créez une classe et partagez le **code d'invitation** à vos élèves.
+3. Affectez des sujets, suivez la progression de la classe, consultez les copies et lancez des **examens blancs** synchronisés.
+
+---
+
+## ⚡ Ce que contient Labo STI
+
+![Atelier : énoncé, éditeur et aperçu en direct](docs/images/atelier-editeur.jpg)
+
+- **15 sujets pratiques corrigés automatiquement** : initiation HTML/CSS/JS, modules A (client), B et C (PHP/MySQL), et annales du Bac pratique (2018, 2022, 2023, 2025, 2026).
+- **10 épreuves écrites** : Bac 2022 à 2025 (sessions principale et de contrôle) et Bac Blanc 2022 à 2024, avec barème et correction.
+- **Éditeur type VS Code** (Monaco) avec coloration HTML, CSS, JS, PHP et SQL, et **aperçu en direct**.
+- **PHP et SQL dans le navigateur** : `mysqli_*` procédural et base de données relationnelle, avec un avertissement si une syntaxe n'est pas compatible MySQL.
+- **Correction formative** critère par critère et **indices progressifs**.
+- **Mode examen** : chronomètre serveur, tiers-temps, remise au format officiel `SW_<numéro>`.
+- **Mémento STI** (`/cours`) : fiches de cours, capsules vidéo, quiz et un **tuteur** qui répond aux questions sur le programme.
+- **Bilan de compétences** : progression sur les compétences du programme officiel et badges.
+
+![Mémento STI et tuteur](docs/images/cours-tuteur.jpg)
+
+---
+
+## 🤝 Faire connaître et contribuer
+
+Labo STI est un projet **gratuit et ouvert**, offert aux élèves et enseignants du Bac Informatique.
+
+- ⭐ **Mettez une étoile au dépôt** : cela aide d'autres enseignants à le trouver.
+- 📣 **Partagez le lien** [app-creator-phi.vercel.app](https://app-creator-phi.vercel.app/) avec vos élèves, collègues et groupes de révision.
+- 🐛 **Signalez un problème ou proposez un sujet** : [ouvrir une issue](https://github.com/hlaadhari/app-creator/issues/new).
+- 🧑‍💻 **Contribuez au code ou aux sujets** : voir [`CONTRIBUTING.md`](CONTRIBUTING.md) et le [guide de rédaction des critères](docs/CRITERIA_GUIDE.md).
+
+---
+
+## 🛠 Pour les développeurs
+
+### Stack technique
 
 - **Frontend** : [TanStack Start](https://tanstack.com/start) (React 19, Vite, Nitro), [Tailwind CSS v4](https://tailwindcss.com), [Radix UI](https://www.radix-ui.com/), [Monaco Editor](https://microsoft.github.io/monaco-editor/).
-- **Backend & Données** : [Supabase](https://supabase.com) (PostgreSQL avec Row Level Security sur 30 tables, Supabase Auth, Storage S3, Realtime).
-- **Migrations SQL** : `supabase/migrations/` (source unique de vérité SQL, migrations `0000` à `0016+`).
-- **Tests** : [Vitest](https://vitest.dev/), Testing Library, suite de tests négatifs de sécurité (T-01 à T-14+).
+- **Backend & données** : [Supabase](https://supabase.com) (PostgreSQL avec Row Level Security, Auth, Storage, Realtime).
+- **Migrations SQL** : `supabase/migrations/` (source unique de vérité SQL).
+- **Tests** : [Vitest](https://vitest.dev/), Testing Library, Playwright, suite de tests négatifs de sécurité (T-01 à T-14).
+- **Hébergement** : Vercel.
 
----
+### Lancer le projet en local
 
-## 📚 Documentation de Référence
-
-L'ensemble du cadrage et des spécifications est organisé dans le dossier `docs/` et à la racine :
-
-- [`CONTEXT.md`](CONTEXT.md) : **Document maître de contexte** (vision, principes directeurs, analyse d'écart et stack).
-- [`docs/PRD.md`](docs/PRD.md) : **Product Requirement Document (v3.1)** exhaustif.
-- [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) : Détail de l'architecture logicielle, sandboxing, isolation et Plan B.
-- [`docs/DATA_MODEL.md`](docs/DATA_MODEL.md) : Modèle relationnel complet des 30 tables, triggers d'immuabilité et RLS.
-- [`docs/SECURITY.md`](docs/SECURITY.md) : Modèle de menace, politique CSP et spécifications des tests négatifs de sécurité.
-- [`docs/CRITERIA_GUIDE.md`](docs/CRITERIA_GUIDE.md) : **Guide de rédaction des critères pédagogiques** (modèles de tests, règles de tolérance, 3 niveaux d'indices).
-- [`roadmap.md`](roadmap.md) : Feuille de route détaillée jalonnée de M0 à M8.
-- [`CONTRIBUTING.md`](CONTRIBUTING.md) : Guide de contribution, conventions de commit et workflow.
-- [`SECURITY.md`](SECURITY.md) : Politique de signalement de vulnérabilités.
-- [`AGENTS.md`](AGENTS.md) : Consignes de pair programming et règles d'or pour agents IA.
-
----
-
-## 🚀 Démarrage Rapide
-
-### Prérequis
-
-- [Node.js](https://nodejs.org/) v20+ ou v22+
-- Gestionnaire de paquets `npm` ou `bun`
-
-### Installation Locale
+Prérequis : [Bun](https://bun.sh/) (ou Node.js 20+ avec npm).
 
 ```bash
 # 1. Cloner le dépôt
-git clone <url-du-depot>
+git clone https://github.com/hlaadhari/app-creator.git
 cd app-creator
 
 # 2. Installer les dépendances
-npm install
+bun install
 
 # 3. Configurer les variables d'environnement
-# Copier .env.example vers .env.local et renseigner les clés publiques Supabase.
-# Sur Vercel, définir aussi les variables serveur (mêmes valeurs) :
-# VITE_SUPABASE_URL / SUPABASE_URL
-# VITE_SUPABASE_PUBLISHABLE_KEY / SUPABASE_PUBLISHABLE_KEY
-# Secrets GitHub Actions requis pour le déploiement : VITE_SUPABASE_URL, VITE_SUPABASE_PUBLISHABLE_KEY.
+# Copier .env.example vers .env.local et renseigner les clés publiques Supabase
+# (VITE_SUPABASE_URL, VITE_SUPABASE_PUBLISHABLE_KEY). Voir docs/SUPABASE_SETUP.md.
 
 # 4. Lancer le serveur de développement
-npm run dev
+bun run dev
 
-# 5. Exécuter la suite de tests
-npm test
+# 5. Vérifier avant une PR
+bun run test
+bun run typecheck
+bun run build
 ```
 
----
+Déploiement et variables serveur : voir [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md).
 
-## 🔄 Synchronisation Lovable
+### Documentation de référence
 
-Ce projet est connecté à la plateforme [Lovable](https://lovable.dev).
+- [`CONTEXT.md`](CONTEXT.md) : document maître (vision, principes, stack, état d'avancement).
+- [`docs/PRD.md`](docs/PRD.md) : spécification fonctionnelle et technique (v3.1).
+- [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) : architecture, bac à sable, isolation.
+- [`docs/DATA_MODEL.md`](docs/DATA_MODEL.md) : modèle de données, triggers et RLS.
+- [`docs/SECURITY.md`](docs/SECURITY.md) : modèle de menace et tests négatifs.
+- [`docs/CRITERIA_GUIDE.md`](docs/CRITERIA_GUIDE.md) : rédaction des critères pédagogiques.
+- [`docs/REFERENTIEL.md`](docs/REFERENTIEL.md) : programme officiel couvert.
+- [`roadmap.md`](roadmap.md) : feuille de route (jalons M0 à M8).
+- [`AGENTS.md`](AGENTS.md) : règles pour les agents IA et les contributeurs.
 
-- Les commits poussés sur la branche `main` sont synchronisés automatiquement avec l'éditeur Lovable.
-- **Important** : Ne réécrivez jamais l'historique Git (`git push --force`, rebase de commits publiés) pour préserver l'intégrité de la synchronisation Lovable.
+### Synchronisation Lovable
 
----
-
-## 🗺 Feuille de Route
-
-Le projet se déploie selon 6 phases strictes :
-
-- **Phase 0** : Jalon de validation technique (PHP WASM + SQLite sur poste 4 Go RAM).
-- **Phase 1 (MVP)** : Parcours complet élève HTML/CSS/JS (Authentification, Monaco, Tampon local, Critères DOM).
-- **Phase 2** : PHP & SQL local (Panneau DB, lint MySQL, réinitialisation).
-- **Phase 3** : Correction étendue, indices progressifs et gestion des contestations.
-- **Phase 4** : Mode examen blanc, minuteur serveur et snapshots scellés.
-- **Phase 5** : Référentiel de compétences, pilotage enseignant et tuteur IA optionnel.
+Ce projet est connecté à [Lovable](https://lovable.dev) : les commits poussés sur `main` sont synchronisés avec l'éditeur Lovable. **Ne réécrivez jamais l'historique Git** (`git push --force`, rebase de commits publiés).
 
 ---
 
 ## 📄 Licences
 
-- Code source : sous licence [MIT](https://opensource.org/licenses/MIT).
-- Sujets et contenus pédagogiques : sous licence [Creative Commons CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/).
+- Code source : licence [MIT](LICENSE).
+- Sujets et contenus pédagogiques originaux : [Creative Commons CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/).
+- Les énoncés d'annales proviennent du Ministère de l'Éducation (Tunisie) : leurs droits restent ceux de leurs titulaires. Ils sont proposés à des fins d'entraînement pédagogique.
+
+---
+
+<sub>Mots-clés : bac informatique Tunisie, bac sciences de l'informatique, bac STI, épreuve pratique informatique, annales bac info, exercices PHP MySQL, exercices SQL, HTML CSS JavaScript, باكالوريا إعلامية، تمارين باكالوريا علوم الإعلامية، امتحان تطبيقي إعلامية.</sub>
