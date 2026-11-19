@@ -24,6 +24,7 @@
     "Normalisation",
     "Épreuve Écrite"
   ],
+  "initialSql": "CREATE TABLE IF NOT EXISTS Pays ( IdPays INT PRIMARY KEY, NomPays VARCHAR(50) NOT NULL ); CREATE TABLE IF NOT EXISTS Streamer ( IdStream INT PRIMARY KEY, Pseudo VARCHAR(30) NOT NULL, Email VARCHAR(60) NOT NULL, IdPays INT NOT NULL, FOREIGN KEY (IdPays) REFERENCES Pays(IdPays) ); CREATE TABLE IF NOT EXISTS Chaine ( IdChaine VARCHAR(10) PRIMARY KEY, NomChaine VARCHAR(50) NOT NULL, DesChaine VARCHAR(120), URL VARCHAR(100), IdStream INT NOT NULL, FOREIGN KEY (IdStream) REFERENCES Streamer(IdStream) ); CREATE TABLE IF NOT EXISTS TypeContenu ( IdType INT PRIMARY KEY, NomType VARCHAR(40) NOT NULL ); CREATE TABLE IF NOT EXISTS Contenu ( IdType INT NOT NULL, IdChaine VARCHAR(10) NOT NULL, Titre VARCHAR(80) NOT NULL, DateCreation DATE NOT NULL, Duree INT NOT NULL, NbreVues INT NOT NULL, Mode VARCHAR(1) NOT NULL, PRIMARY KEY (IdType, IdChaine, Titre), FOREIGN KEY (IdType) REFERENCES TypeContenu(IdType), FOREIGN KEY (IdChaine) REFERENCES Chaine(IdChaine) ); INSERT INTO Pays VALUES (1, 'Tunisie'), (2, 'France'); INSERT INTO Streamer VALUES (10, 'TechTunisia', 'tech@sti.tn', 1), (11, 'CodeMaster', 'code@sti.tn', 2); INSERT INTO Chaine VALUES ('C005', 'Labo STI', 'Cours informatique', 'https://stream.tn/c005', 10), ('C006', 'Dev Live', 'Live coding', 'https://stream.tn/c006', 11); INSERT INTO TypeContenu VALUES (1, 'Education'), (2, 'Gaming'); INSERT INTO Contenu VALUES (1, 'C005', 'SQL Avance', '2024-03-15', 45, 2500, 'I'), (2, 'C005', 'Retro 2016', '2016-06-10', 30, 800, 'I'), (1, 'C006', 'PHP PDO', '2024-04-20', 50, 1800, 'D');",
   "sections": [
     {
       "id": "ex1-qcm",
@@ -36,9 +37,18 @@
           "id": "EX1-Q1",
           "question": "En HTML5, quel événement se déclenche lorsqu'un élément perd le focus ?",
           "options": [
-            { "id": "opt-onfocus", "label": "onfocus" },
-            { "id": "opt-onblur", "label": "onblur" },
-            { "id": "opt-onload", "label": "onload" }
+            {
+              "id": "opt-onfocus",
+              "label": "onfocus"
+            },
+            {
+              "id": "opt-onblur",
+              "label": "onblur"
+            },
+            {
+              "id": "opt-onload",
+              "label": "onload"
+            }
           ],
           "points": 0.5,
           "multiple": false,
@@ -49,9 +59,18 @@
           "id": "EX1-Q2",
           "question": "En CSS, quelle règle permet d'effectuer une translation horizontale d'un élément de 100px ?",
           "options": [
-            { "id": "opt-transform", "label": "transform: translate(100px);" },
-            { "id": "opt-trans-rev", "label": "translate: transform(100px);" },
-            { "id": "opt-translate", "label": "translate: 100px;" }
+            {
+              "id": "opt-transform",
+              "label": "transform: translate(100px);"
+            },
+            {
+              "id": "opt-trans-rev",
+              "label": "translate: transform(100px);"
+            },
+            {
+              "id": "opt-translate",
+              "label": "translate: 100px;"
+            }
           ],
           "points": 0.5,
           "multiple": false,
@@ -62,9 +81,18 @@
           "id": "EX1-Q3",
           "question": "En JavaScript, quelle méthode permet de modifier le numéro du mois d'une variable de type Date ?",
           "options": [
-            { "id": "opt-getmonth", "label": "getMonth()" },
-            { "id": "opt-getdate", "label": "getDate()" },
-            { "id": "opt-setmonth", "label": "setMonth()" }
+            {
+              "id": "opt-getmonth",
+              "label": "getMonth()"
+            },
+            {
+              "id": "opt-getdate",
+              "label": "getDate()"
+            },
+            {
+              "id": "opt-setmonth",
+              "label": "setMonth()"
+            }
           ],
           "points": 0.5,
           "multiple": false,
@@ -75,9 +103,18 @@
           "id": "EX1-Q4",
           "question": "En PHP, dans quel cas la fonction isset($a) retourne-t-elle false ?",
           "options": [
-            { "id": "opt-null", "label": "Si la variable $a est nulle (NULL)" },
-            { "id": "opt-zero", "label": "Si la variable $a est égale à 0" },
-            { "id": "opt-nonnull", "label": "Si la variable $a est non nulle" }
+            {
+              "id": "opt-null",
+              "label": "Si la variable $a est nulle (NULL)"
+            },
+            {
+              "id": "opt-zero",
+              "label": "Si la variable $a est égale à 0"
+            },
+            {
+              "id": "opt-nonnull",
+              "label": "Si la variable $a est non nulle"
+            }
           ],
           "points": 0.5,
           "multiple": false,
@@ -88,9 +125,18 @@
           "id": "EX1-Q5",
           "question": "En SQL, l'ajout d'une contrainte UNIQUE(NomClient) suivie de deux insertions avec 'AHMED' provoque une violation de :",
           "options": [
-            { "id": "opt-table", "label": "Contrainte d'intégrité de table (unicité)" },
-            { "id": "opt-ref", "label": "Contrainte d'intégrité référentielle" },
-            { "id": "opt-dom", "label": "Contrainte d'intégrité de domaine" }
+            {
+              "id": "opt-table",
+              "label": "Contrainte d'intégrité de table (unicité)"
+            },
+            {
+              "id": "opt-ref",
+              "label": "Contrainte d'intégrité référentielle"
+            },
+            {
+              "id": "opt-dom",
+              "label": "Contrainte d'intégrité de domaine"
+            }
           ],
           "points": 0.5,
           "multiple": false,
@@ -146,7 +192,7 @@
           "id": "EX2-JS",
           "prompt": "Donner les 4 expressions JS de verif() : longueur de mat, 2 premiers caractères de mat, suppression des espaces de nmpr, position de l'espace dans nmpr2.",
           "language": "javascript",
-          "points": 1.0,
+          "points": 1,
           "expectedAnswer": "mat.length ; mat.substr(0, 2) ; nmpr.trim() ; nmpr2.indexOf(\" \")",
           "expectedKeywords": ["mat.length", "substr", "trim", "indexOf"],
           "explanation": "mat.length, mat.substr(0, 2), nmpr.trim(), nmpr2.indexOf(\" \")."
@@ -155,7 +201,7 @@
           "id": "EX2-PHP",
           "prompt": "Donner les 4 expressions PHP de ajoutClient.php : position de l'espace dans $nompre, extraction du nom, mise en majuscule, remplacement dans $nompre.",
           "language": "php",
-          "points": 1.0,
+          "points": 1,
           "expectedAnswer": "strpos($nompre, \" \") ; substr($nompre, 0, $p) ; strtoupper($nom) ; str_replace($nom, $nommajus, $nompre)",
           "expectedKeywords": ["strpos", "substr", "strtoupper", "str_replace"],
           "explanation": "strpos($nompre, \" \"), substr($nompre, 0, $p), strtoupper($nom), str_replace($nom, $nommajus, $nompre)."
@@ -173,7 +219,7 @@
           "id": "EX3-VF",
           "prompt": "Indiquer Vrai ou Faux dans l'ordre : (1) Chaque streamer ne peut posséder qu'une seule chaîne ; (2) Chaque contenu a un seul type ; (3) Un Pays peut avoir plusieurs streamers ; (4) Une chaîne ne peut avoir qu'un seul type de contenu.",
           "type": "text",
-          "points": 1.0,
+          "points": 1,
           "expectedPattern": "^\\s*(F|Faux)[\\s,;/-]+(V|Vrai)[\\s,;/-]+(V|Vrai)[\\s,;/-]+(F|Faux)\\s*$",
           "explanation": "Réponse officielle : Faux, Vrai, Vrai, Faux."
         },
@@ -236,13 +282,13 @@
       "title": "Exercice N° 3 (Partie 2-III) : Requêtes SQL Streaming_HD (6 pts)",
       "type": "sql",
       "description": "Manipulation et interrogation des données de Streaming_HD.",
-      "points": 6.0,
+      "points": 6,
       "questions": [
         {
           "id": "EX3-SQL-1",
           "prompt": "Modifier le Mode à 'D' pour tout le contenu de la chaîne 'C005'.",
           "type": "dml",
-          "points": 1.0,
+          "points": 1,
           "expectedQuery": "UPDATE Contenu SET Mode = 'D' WHERE IdChaine = 'C005';",
           "verificationSql": "SELECT Mode FROM Contenu WHERE IdChaine = 'C005';",
           "explanation": "UPDATE Contenu SET Mode = 'D' WHERE IdChaine = 'C005';"
@@ -251,7 +297,7 @@
           "id": "EX3-SQL-2",
           "prompt": "Supprimer tout le contenu ancien dont la date de création est antérieure à l'année 2017.",
           "type": "dml",
-          "points": 1.0,
+          "points": 1,
           "expectedQuery": "DELETE FROM Contenu WHERE DateCreation < '2017-01-01';",
           "verificationSql": "SELECT COUNT(*) AS nb FROM Contenu WHERE DateCreation < '2017-01-01';",
           "explanation": "DELETE FROM Contenu WHERE DateCreation < '2017-01-01';"
@@ -260,7 +306,7 @@
           "id": "EX3-SQL-3",
           "prompt": "Afficher les noms de types de contenu (NomType) pour les contenus ayant un nombre de vues dépassant 1000 (NbreVues > 1000).",
           "type": "query",
-          "points": 1.0,
+          "points": 1,
           "expectedQuery": "SELECT DISTINCT NomType FROM Contenu C JOIN TypeContenu T ON C.IdType = T.IdType WHERE NbreVues > 1000;",
           "explanation": "Jointure Contenu-TypeContenu filtrée sur NbreVues > 1000."
         },
@@ -268,7 +314,7 @@
           "id": "EX3-SQL-4",
           "prompt": "Afficher Titre, Duree et NbreVues des contenus diffusés en 2024, triés par ordre décroissant de NbreVues.",
           "type": "query",
-          "points": 1.0,
+          "points": 1,
           "expectedQuery": "SELECT Titre, Duree, NbreVues FROM Contenu WHERE DateCreation >= '2024-01-01' AND DateCreation <= '2024-12-31' ORDER BY NbreVues DESC;",
           "explanation": "Filtre sur l'année 2024 et ORDER BY NbreVues DESC."
         },
@@ -276,7 +322,7 @@
           "id": "EX3-SQL-5",
           "prompt": "Afficher les identifiants des streamers (IdStream) qui ont un contenu de type nommé 'Education'.",
           "type": "query",
-          "points": 1.0,
+          "points": 1,
           "expectedQuery": "SELECT DISTINCT IdStream FROM Chaine CH JOIN Contenu CO ON CH.IdChaine = CO.IdChaine JOIN TypeContenu T ON CO.IdType = T.IdType WHERE NomType = 'Education';",
           "explanation": "Jointure Chaine-Contenu-TypeContenu avec NomType = 'Education'."
         },
@@ -284,7 +330,7 @@
           "id": "EX3-SQL-6",
           "prompt": "Afficher pour chaque chaîne son identifiant (IdChaine) et la durée moyenne de ses contenus.",
           "type": "query",
-          "points": 1.0,
+          "points": 1,
           "expectedQuery": "SELECT IdChaine, AVG(Duree) AS DureeMoyenne FROM Contenu GROUP BY IdChaine;",
           "explanation": "GROUP BY IdChaine avec AVG(Duree)."
         }
@@ -301,7 +347,7 @@
           "id": "EX4-Q1",
           "prompt": "Proposer la représentation textuelle corrigée des tables Client et Materiel respectant R1 et R2.",
           "type": "representation",
-          "points": 1.0,
+          "points": 1,
           "expectedKeywords": ["Client", "CodeCl", "Materiel", "RefMat"],
           "explanation": "Client(#CodeCl, NomCl, AdrCl) et Materiel(#RefMat, DesMat, CodeCl#)."
         },
@@ -317,7 +363,7 @@
           "id": "EX4-Q2B",
           "prompt": "Proposer la représentation textuelle de Intervention respectant R3, R4 et R5 (avec DateInt dans la clé).",
           "type": "representation",
-          "points": 1.0,
+          "points": 1,
           "expectedKeywords": ["Intervention", "RefMat", "CodeTech", "DateInt"],
           "explanation": "Intervention(#RefMat#, #CodeTech#, #DateInt, DescInt, Montant)."
         },
@@ -325,7 +371,7 @@
           "id": "EX4-Q3",
           "prompt": "Proposer la représentation textuelle de Qualification et Technicien pour éliminer la redondance sur Diplome.",
           "type": "representation",
-          "points": 1.0,
+          "points": 1,
           "expectedKeywords": ["Qualification", "IdQual", "Diplome", "Technicien", "CodeTech"],
           "explanation": "Qualification(#IdQual, Diplome) et Technicien(#CodeTech, NomTech, TelTech, IdQual#)."
         }
