@@ -4,10 +4,10 @@
 
 > Plateforme **gratuite** d'entraînement à l'épreuve pratique et à l'épreuve écrite du **Bac Sciences de l'Informatique (STI)** : HTML, CSS, JavaScript, PHP et SQL, avec **correction automatique** critère par critère. Rien à installer.
 
-### 👉 [Ouvrir Code Behi : app-creator-phi.vercel.app](https://app-creator-phi.vercel.app/)
+### 👉 [Ouvrir Code Behi : codebehi.vercel.app](https://codebehi.vercel.app/)
 
-[![Essayer en ligne](https://img.shields.io/badge/essayer-en%20ligne-22c55e?style=for-the-badge)](https://app-creator-phi.vercel.app/)
-[![Gratuit](https://img.shields.io/badge/prix-gratuit-0ea5e9?style=for-the-badge)](https://app-creator-phi.vercel.app/)
+[![Essayer en ligne](https://img.shields.io/badge/essayer-en%20ligne-22c55e?style=for-the-badge)](https://codebehi.vercel.app/)
+[![Gratuit](https://img.shields.io/badge/prix-gratuit-0ea5e9?style=for-the-badge)](https://codebehi.vercel.app/)
 [![Licence](https://img.shields.io/badge/licence-MIT%20%2F%20CC%20BY--SA%204.0-orange?style=for-the-badge)](LICENSE)
 
 ![Catalogue des sujets de Code Behi](docs/images/accueil-catalogue.jpg)
@@ -29,7 +29,7 @@
 
 ### Élève
 
-1. Ouvrez **[app-creator-phi.vercel.app](https://app-creator-phi.vercel.app/)**.
+1. Ouvrez **[codebehi.vercel.app](https://codebehi.vercel.app/)**.
 2. Choisissez un sujet dans le catalogue (Initiation, Module A, B ou C). **Pas besoin de compte pour essayer.**
 3. Codez, puis cliquez sur **« Vérifier mon code »** (ou `Ctrl + Entrée`) : chaque critère s'affiche en vert ou en rouge avec une explication.
 4. Bloqué ? Débloquez un **indice** (3 niveaux, du rappel de notion à l'exemple de syntaxe).
@@ -67,7 +67,7 @@ Votre travail est sauvegardé automatiquement, même si la connexion internet co
 Code Behi est un projet **gratuit et ouvert**, offert aux élèves et enseignants du Bac Informatique.
 
 - ⭐ **Mettez une étoile au dépôt** : cela aide d'autres enseignants à le trouver.
-- 📣 **Partagez le lien** [app-creator-phi.vercel.app](https://app-creator-phi.vercel.app/) avec vos élèves, collègues et groupes de révision.
+- 📣 **Partagez le lien** [codebehi.vercel.app](https://codebehi.vercel.app/) avec vos élèves, collègues et groupes de révision.
 - 🐛 **Signalez un problème ou proposez un sujet** : [ouvrir une issue](https://github.com/hlaadhari/app-creator/issues/new).
 - 🧑‍💻 **Contribuez au code ou aux sujets** : voir [`CONTRIBUTING.md`](CONTRIBUTING.md) et le [guide de rédaction des critères](docs/CRITERIA_GUIDE.md).
 
