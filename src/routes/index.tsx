@@ -50,7 +50,7 @@ export const Route = createFileRoute("/")({
   },
   head: () => ({
     meta: [
-      { title: "Labo STI – Entraînement gratuit au Bac Informatique (Tunisie)" },
+      { title: "Code Behi – Entraînement gratuit au Bac Informatique (Tunisie)" },
       {
         name: "description",
         content:
@@ -58,7 +58,7 @@ export const Route = createFileRoute("/")({
       },
       {
         property: "og:title",
-        content: "Labo STI – Entraînement gratuit au Bac Informatique (Tunisie)",
+        content: "Code Behi – Entraînement gratuit au Bac Informatique (Tunisie)",
       },
       {
         property: "og:description",
@@ -66,11 +66,11 @@ export const Route = createFileRoute("/")({
           "Sujets pratiques et annales du Bac Info (HTML, CSS, JS, PHP, SQL) corrigés automatiquement, directement dans le navigateur.",
       },
       { property: "og:type", content: "website" },
-      { property: "og:url", content: "https://app-creator-phi.vercel.app/" },
-      { property: "og:image", content: "https://app-creator-phi.vercel.app/og-image.jpg" },
+      { property: "og:url", content: "https://codebehi.vercel.app/" },
+      { property: "og:image", content: "https://codebehi.vercel.app/og-image.jpg" },
       { property: "og:locale", content: "fr_TN" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:image", content: "https://app-creator-phi.vercel.app/og-image.jpg" },
+      { name: "twitter:image", content: "https://codebehi.vercel.app/og-image.jpg" },
     ],
   }),
   component: Index,
@@ -259,10 +259,10 @@ function Index() {
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
           <div>
             <p className="font-mono text-xs uppercase tracking-wider text-primary">
-              // Entraînement officiel Bac STI
+              // Entraînement gratuit Bac Info
             </p>
             <h1 className="mt-2 text-3xl md:text-4xl font-bold tracking-tight">
-              Codez, vérifiez, progressez.
+              Code, vérifie… c'est behi !
             </h1>
             <p className="mt-2 text-sm text-muted-foreground max-w-xl">
               Éditeur VS Code intégré, arborescence normalisée, bac à sable étanche et correction

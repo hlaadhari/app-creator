@@ -11,7 +11,7 @@ interface SproutLogoProps {
 export function SproutLogo({
   size = "md",
   showText = true,
-  title = "Labo STI",
+  title = "Code Behi",
   subtitle,
   className = "",
 }: SproutLogoProps) {

@@ -42,13 +42,13 @@ import {
 export const Route = createFileRoute("/cours")({
   head: () => ({
     meta: [
-      { title: "Mémento, Capsules Vidéo & Support de Cours – Labo STI" },
+      { title: "Mémento, Capsules Vidéo & Support de Cours – Code Behi" },
       {
         name: "description",
         content:
           "Support de cours officiel, 10 capsules vidéo du carnet STI-BAC INFO, guide de révision synthétique, flashcards, quiz et annales corrigées Bac STI (2025/2026).",
       },
-      { property: "og:title", content: "Mémento & Carnet STI-BAC INFO – Labo STI" },
+      { property: "og:title", content: "Mémento & Carnet STI-BAC INFO – Code Behi" },
       {
         property: "og:description",
         content:

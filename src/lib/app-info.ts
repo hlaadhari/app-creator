@@ -39,13 +39,13 @@ const revision = lireConstante(() => __APP_COMMIT__) ?? "locale";
 const dateBuild = lireConstante(() => __APP_BUILD_DATE__);
 
 export const APP_INFO: AppInfo = {
-  nom: "Labo STI",
-  sousTitre: "Atelier d'entraînement Bac STI — Sprout Workshop",
+  nom: "Code Behi",
+  sousTitre: "Entraînement gratuit au Bac Info — Code, vérifie… c'est behi !",
   version,
   revision,
   dateBuild,
   licence: { nom: "Licence MIT", url: `${DEPOT}/blob/main/LICENSE` },
-  copyright: "© 2026 Hatem Laadhari / Labo STI Contributors",
+  copyright: "© 2026 Hatem Laadhari / Code Behi Contributors",
   depot: DEPOT,
   auteurs: [
     {
@@ -54,7 +54,7 @@ export const APP_INFO: AppInfo = {
       href: "https://github.com/hlaadhari",
     },
     {
-      nom: "Labo STI Contributors",
+      nom: "Code Behi Contributors",
       role: "Contributeurs du dépôt",
       href: `${DEPOT}/graphs/contributors`,
     },

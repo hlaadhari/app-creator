@@ -55,7 +55,7 @@ export function verifierRequeteEleve(prompt: string, context: TutorContext): Gua
       autorise: false,
       motif: "DEMANDE_SOLUTION_BRUTE",
       messageRefus:
-        "En tant que tuteur pédagogique Labo STI, je ne peux pas écrire le code à votre place ni vous donner la solution brute. Mon rôle est de vous guider pas à pas par des questions pour que vous trouviez la solution par vous-même. Que cherchez-vous à réaliser précisément à cette étape ?",
+        "En tant que tuteur pédagogique Code Behi, je ne peux pas écrire le code à votre place ni vous donner la solution brute. Mon rôle est de vous guider pas à pas par des questions pour que vous trouviez la solution par vous-même. Que cherchez-vous à réaliser précisément à cette étape ?",
     };
   }
 

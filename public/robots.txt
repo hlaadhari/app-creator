@@ -13,4 +13,4 @@ Allow: /
 User-agent: *
 Allow: /
 
-Sitemap: https://app-creator-phi.vercel.app/sitemap.xml
+Sitemap: https://codebehi.vercel.app/sitemap.xml

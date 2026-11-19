@@ -630,7 +630,7 @@ if (mysqli_num_rows($resU) == 0) {
     duration: "09:40",
     durationSeconds: 580,
     badge: "Capsule #8 • Annale Blanche 2026",
-    notebookRef: "Carnet STI-BAC INFO • Annale Blanche 2026 (Sujet d'entraînement Labo STI)",
+    notebookRef: "Carnet STI-BAC INFO • Annale Blanche 2026 (Sujet d'entraînement Code Behi)",
     relatedSubjectId: "exam-bac2026-bijoux-aurythia",
     summary:
       "Correction intégrale du sujet d'entraînement type Bac STI 2026 (Bijoux Aurythia) : validation du code bijou et de sa composition dans mesControles.js, insertion dans ajout.php, enregistrement de l'évaluation d'expert dans evaluation.php et consultation filtrée dans liste.php.",

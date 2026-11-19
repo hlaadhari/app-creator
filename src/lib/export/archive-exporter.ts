@@ -1,5 +1,5 @@
 /**
- * Labo STI - Exportateur d'archive de projet élève SW_xxxxx.zip (PRD §8.2, F-28)
+ * Code Behi - Exportateur d'archive de projet élève SW_xxxxx.zip (PRD §8.2, F-28)
  *
  * Génère une archive ZIP standardisée sans dépendance externe lourde, contenant
  * l'arborescence officielle Travail_Eleve/SW_<numéro>/ avec fichiers sources, dump SQL et manifest.
@@ -184,7 +184,7 @@ export function exporterProjetEleveZip(options: ProjectArchiveOptions): {
   const manifestData = options.manifest || {
     cin: ncin,
     exportedAt: new Date().toISOString(),
-    generator: "Labo STI v3.1",
+    generator: "Code Behi v3.1",
     fileCount: Object.keys(options.files).length,
   };
   entries.push({

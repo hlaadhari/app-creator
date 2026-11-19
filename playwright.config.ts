@@ -5,7 +5,7 @@ import { defineConfig } from "@playwright/test";
  * et la base Supabase correspondante. Les tests sont en lecture seule et
  * utilisent des comptes dédiés fournis par variables d'environnement.
  */
-const baseURL = process.env["E2E_BASE_URL"] || "https://app-creator-phi.vercel.app";
+const baseURL = process.env["E2E_BASE_URL"] || "https://codebehi.vercel.app";
 const useLocalServer = /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?/i.test(baseURL);
 
 export default defineConfig({
