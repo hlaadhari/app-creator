@@ -56,6 +56,7 @@ describe("Bac Blanc STI 2022, 2023 & 2024 - Épreuves Écrites", () => {
         expect(exam?.exam_mode).toBe(true);
         expect(exam?.bareme_total).toBe(20);
         expect(exam?.duration).toBe(180);
+        expect(exam?.initialSql).toBeTruthy();
 
         const all = getAllWrittenExams();
         expect(all.some((e) => e.id === examCase.id)).toBe(true);
@@ -102,9 +103,9 @@ describe("Bac Blanc STI 2022, 2023 & 2024 - Épreuves Écrites", () => {
         expect(report.totalScore).toBe(0);
       });
 
-      it("obtient 20/20 sur solution/reponses.json", async () => {
+      it("obtient 20/20 sur solution/reponses.json (en utilisant manifest.initialSql comme le navigateur)", async () => {
         const exam = getWrittenExam(examCase.id)!;
-        const report = await evaluerCopieEcrite(exam, solutionReponses, initSql);
+        const report = await evaluerCopieEcrite(exam, solutionReponses);
         expect(report.totalScore).toBeCloseTo(20, 2);
       });
 

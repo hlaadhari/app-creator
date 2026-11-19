@@ -16,21 +16,31 @@
   "category": "Module C - Épreuves Écrites",
   "level": "Moyen",
   "tags": ["Bac Blanc 2023", "JavaScript", "PHP", "SQL DDL/DML", "Modélisation", "Épreuve Écrite"],
+  "initialSql": "CREATE TABLE IF NOT EXISTS CONSTRUCTEUR ( IdConst INT PRIMARY KEY, NomConst VARCHAR(50) NOT NULL ); CREATE TABLE IF NOT EXISTS MODELE ( IdMod INT PRIMARY KEY, NomMod VARCHAR(50) NOT NULL, IdConst INT NOT NULL, FOREIGN KEY (IdConst) REFERENCES CONSTRUCTEUR(IdConst) ); CREATE TABLE IF NOT EXISTS VEHICULE ( ImmatVeh VARCHAR(20) PRIMARY KEY, PuisFisc INT NOT NULL, Energie VARCHAR(1) NOT NULL, Couleur VARCHAR(1) NOT NULL, IdMod INT NOT NULL, FOREIGN KEY (IdMod) REFERENCES MODELE(IdMod) ); CREATE TABLE IF NOT EXISTS VENDEUR ( IdVend INT PRIMARY KEY, Email VARCHAR(80) NOT NULL, Tel VARCHAR(20) NOT NULL, Region VARCHAR(50) NOT NULL ); CREATE TABLE IF NOT EXISTS ANNONCE ( RefAnn VARCHAR(10) PRIMARY KEY, DateAnn DATE NOT NULL, PrixVente DECIMAL(10, 2) NOT NULL, IdVend INT NOT NULL, ImmatVeh VARCHAR(20) NOT NULL, FOREIGN KEY (IdVend) REFERENCES VENDEUR(IdVend), FOREIGN KEY (ImmatVeh) REFERENCES VEHICULE(ImmatVeh) ); INSERT INTO CONSTRUCTEUR VALUES (1, 'Peugeot'), (2, 'Renault'), (3, 'Volkswagen'); INSERT INTO MODELE VALUES (10, '208', 1), (11, '3008', 1), (20, 'Clio 5', 2), (30, 'Golf 8', 3); INSERT INTO VEHICULE VALUES ('190TN1111', 5, 'E', 'B', 10), ('210TN2222', 6, 'D', 'N', 11), ('215TN3333', 5, 'D', 'R', 20), ('220TN4444', 7, 'D', 'B', 30); INSERT INTO VENDEUR VALUES (100, 'vendeur1@sti.tn', '22111222', 'Tunis'), (101, 'vendeur2@sti.tn', '55333444', 'Sfax'); INSERT INTO ANNONCE VALUES ('A01', '2023-03-10', 48000.00, 100, '210TN2222'), ('A02', '2019-11-05', 32000.00, 100, '190TN1111'), ('A03', '2023-04-12', 42000.00, 101, '215TN3333'), ('A04', '2023-05-01', 75000.00, 101, '220TN4444'); CREATE TABLE IF NOT EXISTS Service ( NumService INT PRIMARY KEY, NomService VARCHAR(50) ); CREATE TABLE IF NOT EXISTS Employe ( Matricule VARCHAR(10) PRIMARY KEY, Nomprenom VARCHAR(50), Taille_Max DECIMAL(15, 3), NumService INT, FOREIGN KEY (NumService) REFERENCES Service(NumService) ); CREATE TABLE IF NOT EXISTS Transfert ( NumTransfert INT PRIMARY KEY, DateHeureTransfert DATETIME, Duree INT, TailleDonnees DECIMAL(15, 3), Matricule VARCHAR(10), FOREIGN KEY (Matricule) REFERENCES Employe(Matricule) );",
   "sections": [
     {
       "id": "ex1-qcm",
       "title": "Exercice N° 1 : Validation de concepts Web & SQL (3 pts)",
       "type": "qcm",
       "description": "Choisissez la bonne affirmation pour chaque question.",
-      "points": 3.0,
+      "points": 3,
       "questions": [
         {
           "id": "EX1-Q1",
           "question": "En JavaScript, que permet l'instruction ch = String.fromCharCode(79, 75) ?",
           "options": [
-            { "id": "opt-7975-str", "label": "Affecter à ch la chaîne '7975'" },
-            { "id": "opt-ok", "label": "Affecter à ch la chaîne 'OK'" },
-            { "id": "opt-7975-int", "label": "Affecter à ch l'entier 7975" }
+            {
+              "id": "opt-7975-str",
+              "label": "Affecter à ch la chaîne '7975'"
+            },
+            {
+              "id": "opt-ok",
+              "label": "Affecter à ch la chaîne 'OK'"
+            },
+            {
+              "id": "opt-7975-int",
+              "label": "Affecter à ch l'entier 7975"
+            }
           ],
           "points": 0.5,
           "multiple": false,
@@ -41,8 +51,14 @@
           "id": "EX1-Q2",
           "question": "En JavaScript, quelle affirmation est exacte concernant isNaN(X) ?",
           "options": [
-            { "id": "opt-false-num", "label": "Retourne false si X est une chaîne numérique" },
-            { "id": "opt-true-num", "label": "Retourne true si X est une chaîne numérique" },
+            {
+              "id": "opt-false-num",
+              "label": "Retourne false si X est une chaîne numérique"
+            },
+            {
+              "id": "opt-true-num",
+              "label": "Retourne true si X est une chaîne numérique"
+            },
             {
               "id": "opt-false-alpha",
               "label": "Retourne false si X est une chaîne alphanumérique"
@@ -57,9 +73,18 @@
           "id": "EX1-Q3",
           "question": "En SQL, dans une requête d'interrogation (SELECT), quel mot-clé ne peut-on PAS utiliser ?",
           "options": [
-            { "id": "opt-order", "label": "ORDER BY" },
-            { "id": "opt-alter", "label": "ALTER TABLE" },
-            { "id": "opt-distinct", "label": "DISTINCT" }
+            {
+              "id": "opt-order",
+              "label": "ORDER BY"
+            },
+            {
+              "id": "opt-alter",
+              "label": "ALTER TABLE"
+            },
+            {
+              "id": "opt-distinct",
+              "label": "DISTINCT"
+            }
           ],
           "points": 0.5,
           "multiple": false,
@@ -70,9 +95,18 @@
           "id": "EX1-Q4",
           "question": "En SQL, comment appelle-t-on l'opération qui relie plusieurs tables d'une base de données ?",
           "options": [
-            { "id": "opt-sel", "label": "Sélection" },
-            { "id": "opt-join", "label": "Jointure" },
-            { "id": "opt-proj", "label": "Projection" }
+            {
+              "id": "opt-sel",
+              "label": "Sélection"
+            },
+            {
+              "id": "opt-join",
+              "label": "Jointure"
+            },
+            {
+              "id": "opt-proj",
+              "label": "Projection"
+            }
           ],
           "points": 0.5,
           "multiple": false,
@@ -83,12 +117,18 @@
           "id": "EX1-Q5",
           "question": "En SQL, quel est le rôle de la clause ON UPDATE CASCADE ?",
           "options": [
-            { "id": "opt-oblig", "label": "Clause obligatoire après toute clé étrangère" },
+            {
+              "id": "opt-oblig",
+              "label": "Clause obligatoire après toute clé étrangère"
+            },
             {
               "id": "opt-cascade",
               "label": "Met à jour automatiquement les lignes filles dépendantes d'une ligne mère modifiée"
             },
-            { "id": "opt-delete", "label": "Supprime la table fille lors d'une mise à jour" }
+            {
+              "id": "opt-delete",
+              "label": "Supprime la table fille lors d'une mise à jour"
+            }
           ],
           "points": 0.5,
           "multiple": false,
@@ -99,9 +139,18 @@
           "id": "EX1-Q6",
           "question": "En PHP, que permet la fonction checkdate($m, $j, $a) ?",
           "options": [
-            { "id": "opt-fmt", "label": "Formater une date" },
-            { "id": "opt-now", "label": "Donner la date actuelle" },
-            { "id": "opt-valid", "label": "Vérifier si les paramètres forment une date valide" }
+            {
+              "id": "opt-fmt",
+              "label": "Formater une date"
+            },
+            {
+              "id": "opt-now",
+              "label": "Donner la date actuelle"
+            },
+            {
+              "id": "opt-valid",
+              "label": "Vérifier si les paramètres forment une date valide"
+            }
           ],
           "points": 0.5,
           "multiple": false,
@@ -115,13 +164,13 @@
       "title": "Exercice N° 2 : Base Gestion_Transfert & LDD SQL (5 pts)",
       "type": "modeling",
       "description": "Représentation textuelle, cardinalités et évolution de structure SQL sur Service, Employe, Transfert et Fonction.",
-      "points": 5.0,
+      "points": 5,
       "questions": [
         {
           "id": "EX2-Q1",
           "prompt": "Donner la représentation textuelle des tables Service, Employe et Transfert.",
           "type": "representation",
-          "points": 1.0,
+          "points": 1,
           "expectedKeywords": [
             "Service",
             "NumService",
@@ -136,7 +185,7 @@
           "id": "EX2-VF",
           "prompt": "Indiquer dans l'ordre (F ou V) : (1) Un employé appartient à plusieurs services ; (2) Un service contient un ou plusieurs employés ; (3) Un employé fait plusieurs transferts ; (4) Un transfert est effectué par plusieurs employés.",
           "type": "text",
-          "points": 1.0,
+          "points": 1,
           "expectedKeywords": ["F", "V"],
           "expectedPattern": "^\\s*(F|Faux)[\\s,;/-]+(V|Vrai)[\\s,;/-]+(V|Vrai)[\\s,;/-]+(F|Faux)\\s*$",
           "explanation": "Réponse officielle : F, V, V, F."
@@ -145,7 +194,7 @@
           "id": "EX2-Q3",
           "prompt": "Écrire la requête SQL ajoutant la contrainte de domaine imposant Duree > 0 sur la table Transfert.",
           "type": "ddl",
-          "points": 1.0,
+          "points": 1,
           "expectedDdl": "ALTER TABLE Transfert ADD CONSTRAINT chk_duree CHECK (Duree > 0);",
           "expectedKeywords": ["ALTER TABLE", "Transfert", "CHECK", "Duree"],
           "explanation": "ALTER TABLE Transfert ADD CONSTRAINT chk_duree CHECK (Duree > 0);"
@@ -154,7 +203,7 @@
           "id": "EX2-Q4",
           "prompt": "Quelle clause d'intégrité référentielle faut-il ajouter sur la clé étrangère Matricule de Transfert pour permettre la suppression des employés ?",
           "type": "text",
-          "points": 1.0,
+          "points": 1,
           "expectedKeywords": ["ON DELETE CASCADE"],
           "explanation": "Il faut recréer ou modifier la clé étrangère avec ON DELETE CASCADE."
         },
@@ -162,7 +211,7 @@
           "id": "EX2-Q5",
           "prompt": "Écrire la requête SQL de création de la table Fonction(CodeFonct INT PRIMARY KEY, LibFonct VARCHAR(20) NOT NULL).",
           "type": "ddl",
-          "points": 1.0,
+          "points": 1,
           "expectedDdl": "CREATE TABLE Fonction (CodeFonct INT PRIMARY KEY, LibFonct VARCHAR(20) NOT NULL);",
           "expectedKeywords": [
             "CREATE TABLE",
@@ -181,13 +230,13 @@
       "title": "Exercice N° 3 : Formulaire d'Authentification HTML, JS & PHP (6 pts)",
       "type": "code_analysis",
       "description": "Complétion du formulaire F1, de la fonction JavaScript Test() et du script Connexion.php.",
-      "points": 6.0,
+      "points": 6,
       "questions": [
         {
           "id": "EX3-HTML-1",
           "prompt": "Donner les valeurs des 6 attributs manquants : [1] method, [2] action, [3] onsubmit, [4] type mot de passe, [5] type Valider, [6] type Annuler.",
           "language": "html",
-          "points": 1.0,
+          "points": 1,
           "expectedAnswer": "GET, Connexion.php, return Test(), password, submit, reset",
           "expectedKeywords": ["GET", "Connexion.php", "Test()", "password", "submit", "reset"],
           "explanation": "method=\"GET\", action=\"Connexion.php\", onsubmit=\"return Test()\", type=\"password\", type=\"submit\", type=\"reset\"."
@@ -205,7 +254,7 @@
           "id": "EX3-PHP-1",
           "prompt": "Dans Connexion.php, comment récupérer 'user' et 'pwd' envoyés en GET et formuler la requête SELECT sur Identification ?",
           "language": "php",
-          "points": 2.0,
+          "points": 2,
           "expectedAnswer": "$_GET['user'], $_GET['pwd'], SELECT * FROM Identification WHERE User = '$utilisateur' AND Mdp = '$mpass'",
           "expectedKeywords": ["GET", "SELECT", "Identification", "WHERE"],
           "explanation": "Récupération via $_GET['user'] et $_GET['pwd'], puis requête SELECT sur Identification."
@@ -226,13 +275,13 @@
       "title": "Exercice N° 4 : Requêtes SQL - Annonces Véhicules (6 pts)",
       "type": "sql",
       "description": "Manipulation et interrogation de CONSTRUCTEUR, MODELE, VEHICULE, VENDEUR, ANNONCE.",
-      "points": 6.0,
+      "points": 6,
       "questions": [
         {
           "id": "EX4-Q1",
           "prompt": "Diminuer de 10% les prix de vente des véhicules ayant une puissance fiscale >= 6CV.",
           "type": "dml",
-          "points": 1.0,
+          "points": 1,
           "expectedQuery": "UPDATE ANNONCE SET PrixVente = PrixVente * 0.9 WHERE ImmatVeh IN (SELECT ImmatVeh FROM VEHICULE WHERE PuisFisc >= 6);",
           "verificationSql": "SELECT PrixVente FROM ANNONCE WHERE RefAnn = 'A01';",
           "explanation": "UPDATE ANNONCE SET PrixVente = PrixVente * 0.9 WHERE ImmatVeh IN (SELECT ImmatVeh FROM VEHICULE WHERE PuisFisc >= 6);"
@@ -241,7 +290,7 @@
           "id": "EX4-Q2",
           "prompt": "Supprimer toutes les annonces effectuées avant l'année 2020.",
           "type": "dml",
-          "points": 1.0,
+          "points": 1,
           "expectedQuery": "DELETE FROM ANNONCE WHERE DateAnn < '2020-01-01';",
           "verificationSql": "SELECT COUNT(*) AS nb FROM ANNONCE WHERE DateAnn < '2020-01-01';",
           "explanation": "DELETE FROM ANNONCE WHERE DateAnn < '2020-01-01';"
@@ -250,7 +299,7 @@
           "id": "EX4-Q3",
           "prompt": "Supprimer l'annonce qui a le prix de vente minimal.",
           "type": "dml",
-          "points": 1.0,
+          "points": 1,
           "expectedQuery": "DELETE FROM ANNONCE WHERE PrixVente = (SELECT MIN(PrixVente) FROM ANNONCE);",
           "verificationSql": "SELECT COUNT(*) AS nb FROM ANNONCE;",
           "explanation": "Sous-requête MIN(PrixVente) dans le WHERE du DELETE."
@@ -259,7 +308,7 @@
           "id": "EX4-Q4",
           "prompt": "Afficher tous les noms distincts de modèles (NomMod) de véhicules roulant au Diesel (Energie = 'D') et dont PrixVente <= 50000.",
           "type": "query",
-          "points": 1.0,
+          "points": 1,
           "expectedQuery": "SELECT DISTINCT NomMod FROM MODELE M JOIN VEHICULE V ON M.IdMod = V.IdMod JOIN ANNONCE A ON V.ImmatVeh = A.ImmatVeh WHERE Energie = 'D' AND PrixVente <= 50000;",
           "explanation": "Jointure MODELE-VEHICULE-ANNONCE avec DISTINCT."
         },
@@ -267,7 +316,7 @@
           "id": "EX4-Q5",
           "prompt": "Afficher pour chaque modèle son identifiant (IdMod) et le nombre d'annonces correspondant.",
           "type": "query",
-          "points": 1.0,
+          "points": 1,
           "expectedQuery": "SELECT IdMod, COUNT(*) AS NbAnnonces FROM VEHICULE V JOIN ANNONCE A ON V.ImmatVeh = A.ImmatVeh GROUP BY IdMod;",
           "explanation": "GROUP BY IdMod avec COUNT(*)."
         },
@@ -275,7 +324,7 @@
           "id": "EX4-Q6",
           "prompt": "Afficher pour chaque vendeur son identifiant (IdVend) et la somme des prix de vente de ses annonces.",
           "type": "query",
-          "points": 1.0,
+          "points": 1,
           "expectedQuery": "SELECT IdVend, SUM(PrixVente) AS TotalVentes FROM ANNONCE GROUP BY IdVend;",
           "explanation": "GROUP BY IdVend avec SUM(PrixVente)."
         }
