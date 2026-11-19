@@ -92,6 +92,12 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
+      // Validation de la propriété Google Search Console (https://codebehi.vercel.app/).
+      // Ne pas supprimer : Google revérifie régulièrement cette balise.
+      {
+        name: "google-site-verification",
+        content: "hDJgZpPmxfmOt7FxkWMFOb5dWESehfe3Q6Fq3dIPfjs",
+      },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
