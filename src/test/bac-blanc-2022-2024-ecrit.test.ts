@@ -123,4 +123,37 @@ describe("Bac Blanc STI 2022, 2023 & 2024 - Épreuves Écrites", () => {
       });
     });
   }
+
+  it("la migration serveur 0039 contient le barème détaillé (questions + correctAnswers QCM) pour les 3 Bac Blanc", () => {
+    const migPath = path.resolve(
+      process.cwd(),
+      "supabase/migrations/20261119183000_0039_bareme_serveur_bac_blanc_questions.sql",
+    );
+    expect(fs.existsSync(migPath)).toBe(true);
+    const sql = fs.readFileSync(migPath, "utf-8");
+    const jsonBlocks = [...sql.matchAll(/\$json\$([\s\S]*?)\$json\$/g)].map((m) =>
+      JSON.parse(m[1]!),
+    ) as Array<
+      Array<{
+        id: string;
+        type: string;
+        pointsMax: number;
+        questions: Array<{ id: string; points: number; correctAnswers?: string[] }>;
+      }>
+    >;
+    expect(jsonBlocks).toHaveLength(3);
+    for (const sections of jsonBlocks) {
+      const total = sections.reduce((sum, s) => sum + s.pointsMax, 0);
+      expect(total).toBeCloseTo(20, 5);
+      const qcmSections = sections.filter((s) => s.type === "qcm");
+      expect(qcmSections.length).toBeGreaterThanOrEqual(1);
+      for (const qcm of qcmSections) {
+        expect(qcm.questions.length).toBeGreaterThanOrEqual(5);
+        for (const q of qcm.questions) {
+          expect(Array.isArray(q.correctAnswers)).toBe(true);
+          expect(q.correctAnswers!.length).toBeGreaterThanOrEqual(1);
+        }
+      }
+    }
+  });
 });
