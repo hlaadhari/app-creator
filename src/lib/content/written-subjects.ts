@@ -10,17 +10,23 @@ import type {
   WrittenSqlQuestion,
   WrittenCodeAnalysisQuestion,
 } from "@/lib/evaluator/written/written-exam-evaluator";
+import bac2022BlancManifest from "../../../content/exam-bac2022-blanc-ecrit/manifest.json";
 import bac2022ControleManifest from "../../../content/exam-bac2022-controle-ecrit/manifest.json";
+import bac2023BlancManifest from "../../../content/exam-bac2023-blanc-ecrit/manifest.json";
 import bac2023ControleManifest from "../../../content/exam-bac2023-controle-ecrit/manifest.json";
 import bac2023PrincipaleManifest from "../../../content/exam-bac2023-principale-ecrit/manifest.json";
+import bac2024BlancManifest from "../../../content/exam-bac2024-blanc-ecrit/manifest.json";
 import bac2024ControleManifest from "../../../content/exam-bac2024-controle-ecrit/manifest.json";
 import bac2025ControleManifest from "../../../content/exam-bac2025-controle-ecrit/manifest.json";
 import bac2025PrincipaleManifest from "../../../content/exam-bac2025-principale-ecrit/manifest.json";
 import bac2024PrincipaleManifest from "../../../content/exam-bac2024-principale-ecrit/manifest.json";
 
+export const examBac2022Blanc = bac2022BlancManifest as unknown as WrittenExamManifest;
 export const examBac2022Controle = bac2022ControleManifest as unknown as WrittenExamManifest;
+export const examBac2023Blanc = bac2023BlancManifest as unknown as WrittenExamManifest;
 export const examBac2023Controle = bac2023ControleManifest as unknown as WrittenExamManifest;
 export const examBac2023Principale = bac2023PrincipaleManifest as unknown as WrittenExamManifest;
+export const examBac2024Blanc = bac2024BlancManifest as unknown as WrittenExamManifest;
 export const examBac2024Controle = bac2024ControleManifest as unknown as WrittenExamManifest;
 export const examBac2025Controle = bac2025ControleManifest as unknown as WrittenExamManifest;
 export const examBac2025Principale = bac2025PrincipaleManifest as unknown as WrittenExamManifest;
@@ -209,9 +215,12 @@ INSERT INTO Employe VALUES
 
 const writtenExamsRegistry: Map<string, WrittenExamManifest> = new Map([
   [sampleWrittenExam.id, sampleWrittenExam],
+  [examBac2022Blanc.id, examBac2022Blanc],
   [examBac2022Controle.id, examBac2022Controle],
+  [examBac2023Blanc.id, examBac2023Blanc],
   [examBac2023Controle.id, examBac2023Controle],
   [examBac2023Principale.id, examBac2023Principale],
+  [examBac2024Blanc.id, examBac2024Blanc],
   [examBac2024Controle.id, examBac2024Controle],
   [examBac2024Principale.id, examBac2024Principale],
   [examBac2025Controle.id, examBac2025Controle],

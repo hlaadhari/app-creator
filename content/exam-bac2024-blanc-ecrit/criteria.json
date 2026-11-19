@@ -1,0 +1,62 @@
+[
+  {
+    "id": "BB24-01",
+    "code": "EX1-QCM",
+    "titre": "Exercice N° 1 : QCM, Fonctions & CSS",
+    "description": "onblur, transform, setMonth, isset, UNIQUE, correspondance fonctions et CSS.",
+    "points": 3.75,
+    "ordre": 1,
+    "fichier": "reponses.sql",
+    "sonde": { "type": "sql_query_result", "query": "SELECT 1;", "expectedRowCount": 1 },
+    "fail_message": "Certaines réponses de l'Exercice 1 sont inexactes.",
+    "indices": ["onblur, transform: translate(100px), setMonth(), isset($a) false si NULL."]
+  },
+  {
+    "id": "BB24-02",
+    "code": "EX2-CLIENT",
+    "titre": "Exercice N° 2 : Formulaire BD_Gestion (HTML, JS & PHP)",
+    "description": "Complétion du formulaire, verif() JS et ajoutClient.php.",
+    "points": 3.25,
+    "ordre": 2,
+    "fichier": "reponses.sql",
+    "sonde": { "type": "sql_query_result", "query": "SELECT 1;", "expectedRowCount": 1 },
+    "fail_message": "Vérifiez les expressions JS/PHP de l'Exercice 2.",
+    "indices": ["mat.length, mat.substr(0,2), strpos($nompre,' '), strtoupper($nom)."]
+  },
+  {
+    "id": "BB24-03",
+    "code": "EX3-DDL",
+    "titre": "Exercice N° 3 : Streaming_HD — Cardinalités & LDD",
+    "description": "Vrai/Faux et requêtes ALTER / CREATE TABLE.",
+    "points": 3.5,
+    "ordre": 3,
+    "fichier": "reponses.sql",
+    "sonde": { "type": "sql_query_result", "query": "SELECT 1;", "expectedRowCount": 1 },
+    "fail_message": "Vérifiez les cardinalités et les requêtes LDD de l'Exercice 3.",
+    "indices": ["Faux, Vrai, Vrai, Faux ; CHECK (Duree BETWEEN 1 AND 60)."]
+  },
+  {
+    "id": "BB24-04",
+    "code": "EX3-SQL",
+    "titre": "Exercice N° 3 : Streaming_HD — Requêtes LMD & LID",
+    "description": "UPDATE, DELETE, SELECT avec jointures, tri et AVG(Duree).",
+    "points": 6,
+    "ordre": 4,
+    "fichier": "reponses.sql",
+    "sonde": { "type": "sql_query_result", "query": "SELECT 1;", "expectedRowCount": 1 },
+    "fail_message": "Une ou plusieurs requêtes SQL de l'Exercice 3 sont inexactes.",
+    "indices": ["Vérifiez les jointures entre Chaine, Contenu et TypeContenu."]
+  },
+  {
+    "id": "BB24-05",
+    "code": "EX4-NORM",
+    "titre": "Exercice N° 4 : Conception & Normalisation Maintenance",
+    "description": "Correction de Client/Materiel, clé primaire de Intervention et table Qualification.",
+    "points": 3.5,
+    "ordre": 5,
+    "fichier": "reponses.sql",
+    "sonde": { "type": "sql_query_result", "query": "SELECT 1;", "expectedRowCount": 1 },
+    "fail_message": "Vérifiez la correction des clés primaires et étrangères de l'Exercice 4.",
+    "indices": ["Intervention(#RefMat#, #CodeTech#, #DateInt, DescInt, Montant)."]
+  }
+]

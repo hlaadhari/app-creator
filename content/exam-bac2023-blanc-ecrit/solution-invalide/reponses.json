@@ -1,0 +1,23 @@
+{
+  "EX1-Q1": "opt-7975-str",
+  "EX1-Q2": "opt-true-num",
+  "EX1-Q3": "opt-order",
+  "EX1-Q4": "opt-sel",
+  "EX1-Q5": "opt-oblig",
+  "EX1-Q6": "opt-fmt",
+  "EX2-Q1": "Service()",
+  "EX2-VF": "V, F, F, V",
+  "EX2-Q3": "SELECT 1;",
+  "EX2-Q4": "RESTRICT",
+  "EX2-Q5": "SELECT 1;",
+  "EX3-HTML-1": "POST",
+  "EX3-JS-1": "return true;",
+  "EX3-PHP-1": "echo 'test';",
+  "EX3-PHP-2": "SELECT 1;",
+  "EX4-Q1": "SELECT * FROM ANNONCE;",
+  "EX4-Q2": "SELECT * FROM ANNONCE;",
+  "EX4-Q3": "SELECT * FROM ANNONCE;",
+  "EX4-Q4": "SELECT NomMod FROM MODELE;",
+  "EX4-Q5": "SELECT IdMod FROM VEHICULE;",
+  "EX4-Q6": "SELECT IdVend FROM VENDEUR;"
+}

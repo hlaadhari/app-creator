@@ -1,0 +1,50 @@
+[
+  {
+    "id": "BB23-01",
+    "code": "EX1-QCM",
+    "titre": "Exercice N° 1 : Concepts JS, SQL & PHP",
+    "description": "String.fromCharCode, isNaN, SELECT, Jointure, ON UPDATE CASCADE, checkdate.",
+    "points": 3,
+    "ordre": 1,
+    "fichier": "reponses.sql",
+    "sonde": { "type": "sql_query_result", "query": "SELECT 1;", "expectedRowCount": 1 },
+    "fail_message": "Certaines réponses au QCM de l'Exercice 1 sont inexactes.",
+    "indices": ["String.fromCharCode(79,75) vaut 'OK'."]
+  },
+  {
+    "id": "BB23-02",
+    "code": "EX2-TRANSFERT",
+    "titre": "Exercice N° 2 : Base Gestion_Transfert & LDD",
+    "description": "Représentation textuelle, cardinalités et contraintes CHECK / CASCADE / CREATE TABLE.",
+    "points": 5,
+    "ordre": 2,
+    "fichier": "reponses.sql",
+    "sonde": { "type": "sql_query_result", "query": "SELECT 1;", "expectedRowCount": 1 },
+    "fail_message": "Vérifiez la modélisation et les requêtes LDD de l'Exercice 2.",
+    "indices": ["Cardinalités : F, V, V, F ; contrainte CHECK (Duree > 0)."]
+  },
+  {
+    "id": "BB23-03",
+    "code": "EX3-AUTH",
+    "titre": "Exercice N° 3 : Formulaire HTML, JS Test() & Connexion.php",
+    "description": "Complétion du formulaire d'authentification et du script serveur.",
+    "points": 6,
+    "ordre": 3,
+    "fichier": "reponses.sql",
+    "sonde": { "type": "sql_query_result", "query": "SELECT 1;", "expectedRowCount": 1 },
+    "fail_message": "Vérifiez les attributs HTML, la fonction Test() et Connexion.php.",
+    "indices": ["method=\"GET\", $_GET['user'], substr(0,3)."]
+  },
+  {
+    "id": "BB23-04",
+    "code": "EX4-SQL",
+    "titre": "Exercice N° 4 : Requêtes SQL Véhicules",
+    "description": "UPDATE 10%, DELETE < 2020, DELETE MIN(PrixVente), SELECT DISTINCT, GROUP BY.",
+    "points": 6,
+    "ordre": 4,
+    "fichier": "reponses.sql",
+    "sonde": { "type": "sql_query_result", "query": "SELECT 1;", "expectedRowCount": 1 },
+    "fail_message": "Une ou plusieurs requêtes SQL de l'Exercice 4 sont inexactes.",
+    "indices": ["Utilisez une sous-requête pour MIN(PrixVente) et JOIN pour les jointures."]
+  }
+]

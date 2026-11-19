@@ -1,0 +1,23 @@
+{
+  "EX1-Q1": "opt-ok",
+  "EX1-Q2": "opt-false-num",
+  "EX1-Q3": "opt-alter",
+  "EX1-Q4": "opt-join",
+  "EX1-Q5": "opt-cascade",
+  "EX1-Q6": "opt-valid",
+  "EX2-Q1": "Service(#NumService, NomService) ; Employe(#Matricule, Nomprenom, Taille_Max, NumService#) ; Transfert(#NumTransfert, DateHeureTransfert, Duree, TailleDonnees, Matricule#)",
+  "EX2-VF": "F, V, V, F",
+  "EX2-Q3": "ALTER TABLE Transfert ADD CONSTRAINT chk_duree CHECK (Duree > 0);",
+  "EX2-Q4": "ON DELETE CASCADE",
+  "EX2-Q5": "CREATE TABLE Fonction (CodeFonct INT PRIMARY KEY, LibFonct VARCHAR(20) NOT NULL);",
+  "EX3-HTML-1": "GET, Connexion.php, return Test(), password, submit, reset",
+  "EX3-JS-1": "document.getElementById(\"user\").value ; util.substr(0, 3) != 'USR' ; mpass.length != 8 ; return resultat",
+  "EX3-PHP-1": "$_GET['user'], $_GET['pwd'], SELECT * FROM Identification WHERE User = '$utilisateur' AND Mdp = '$mpass'",
+  "EX3-PHP-2": "UPDATE Identification SET Connecte = 'OUI' WHERE User = '$utilisateur' AND Mdp = '$mpass'",
+  "EX4-Q1": "UPDATE ANNONCE SET PrixVente = PrixVente * 0.9 WHERE ImmatVeh IN (SELECT ImmatVeh FROM VEHICULE WHERE PuisFisc >= 6);",
+  "EX4-Q2": "DELETE FROM ANNONCE WHERE DateAnn < '2020-01-01';",
+  "EX4-Q3": "DELETE FROM ANNONCE WHERE PrixVente = (SELECT MIN(PrixVente) FROM ANNONCE);",
+  "EX4-Q4": "SELECT DISTINCT NomMod FROM MODELE M JOIN VEHICULE V ON M.IdMod = V.IdMod JOIN ANNONCE A ON V.ImmatVeh = A.ImmatVeh WHERE Energie = 'D' AND PrixVente <= 50000;",
+  "EX4-Q5": "SELECT IdMod, COUNT(*) AS NbAnnonces FROM VEHICULE V JOIN ANNONCE A ON V.ImmatVeh = A.ImmatVeh GROUP BY IdMod;",
+  "EX4-Q6": "SELECT IdVend, SUM(PrixVente) AS TotalVentes FROM ANNONCE GROUP BY IdVend;"
+}
