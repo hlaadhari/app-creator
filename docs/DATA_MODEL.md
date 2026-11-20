@@ -399,3 +399,11 @@ Table `notifications` : `id`, `user_id` (→ `profiles`, suppression en cascade)
 - **Temps réel** : la table est ajoutée à la publication `supabase_realtime` ; les diffusions respectent la RLS.
 
 La cloche de l'interface n'est affichée que si `VITE_NOTIFICATIONS_ENABLED=true` au build : à n'activer qu'une fois la migration appliquée sur le projet Supabase visé (sinon la table absente renvoie des 404). Aucun producteur n'est encore branché : la cloche affiche ce que `creer_notification` écrit. Brancher les événements (résultats de correction, tuteur, échéance, invitation de classe, conflit de synchronisation) fera l'objet d'issues dédiées.
+
+## Réglages d'application `parametres_application` (migration 0040, issue #294)
+
+Table clé/valeur `public.parametres_application` : `cle` (clé primaire texte), `valeur` (`jsonb`), `modifie_par` (`uuid` → `profiles`, index explicite `idx_parametres_application_modifie_par`), `updated_at` (`timestamptz`).
+
+- **Lecture** : autorisée pour `authenticated` ; aucune écriture directe (`INSERT`/`UPDATE`/`DELETE`) pour `anon` ni `authenticated`.
+- **Écriture** : exclusivement via la RPC `SECURITY DEFINER` `public.admin_definir_parametre(p_cle text, p_valeur jsonb)` réservée aux administrateurs (`has_role(auth.uid(), 'admin')`), avec liste blanche des clés autorisées (`tuteur_gemini_notebook`), validation stricte des URLs (`https://notebook.google.com` ou `https://notebooklm.google.com`) et journalisation dans `journal_securite` (`admin_parametre_modifie`).
+- **Valeur initiale** : `tuteur_gemini_notebook` est désactivé par défaut (`{"actif": false, "url": "https://notebook.google.com/notebook/a42c871a-969a-42a2-8bb3-af3be46fcd65"}`).

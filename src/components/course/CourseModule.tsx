@@ -32,8 +32,8 @@ import {
   type NotebookCategoryId,
   type NotebookVideoCapsule,
 } from "@/content/notebook-sti";
-import { NOTEBOOK_LM_PUBLIC_URL } from "@/lib/tutor/course-gemini";
 import { askCourseNotebookTutor } from "@/lib/tutor/course-tutor-fn";
+import { AskNotebookButton } from "@/components/tutor/AskNotebookButton";
 
 interface RevisionGuideModalProps {
   isOpen: boolean;
@@ -491,16 +491,20 @@ export function CourseNotebookTutor({ activeCategoryId }: NotebookTutorChatProps
         </div>
 
         <div className="flex items-center gap-1 shrink-0">
-          <a
-            href={NOTEBOOK_LM_PUBLIC_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-1 px-2 py-1 rounded text-[10px] font-medium bg-primary/10 hover:bg-primary/20 text-primary border border-primary/25 transition-colors"
-            title="Ouvrir le NotebookLM public STI dans un nouvel onglet (compte Google requis)"
-          >
-            <ExternalLink className="w-3 h-3" />
-            <span className="hidden xl:inline">NotebookLM</span>
-          </a>
+          <AskNotebookButton
+            compact
+            buildContext={() => {
+              const lastUserMsg = [...messages].reverse().find((m) => m.role === "user")?.text;
+              return {
+                source: "cours",
+                moduleActif: activeCategoryId,
+                question:
+                  input.trim() ||
+                  lastUserMsg ||
+                  `Explique-moi les notions clés du module ${activeCategoryId}.`,
+              };
+            }}
+          />
           <button
             type="button"
             onClick={() => setMessages((prev) => (prev.length > 0 ? [prev[0] as ChatEntry] : []))}
