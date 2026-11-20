@@ -131,7 +131,7 @@ function normaliserEtatCopieServeur(
       ? (rawNotesEns as Record<string, number>)
       : {};
 
-  const rawEvalDetail = raw["evaluation_detail"];
+  const rawEvalDetail = raw["detail_evaluation"] ?? raw["evaluation_detail"];
   const evaluationDetail =
     rawEvalDetail && typeof rawEvalDetail === "object" && !Array.isArray(rawEvalDetail)
       ? (rawEvalDetail as WrittenExamServerEvaluation)
@@ -369,7 +369,7 @@ export async function listerCopiesExamenEcritEnseignant(
       const rawMaxOuvert = r["max_ouvert"];
       const rawNoteFinale = r["note_finale"];
       const rawBaremeTotal = r["bareme_total"];
-      const rawEvalDetail = r["evaluation_detail"];
+      const rawEvalDetail = r["detail_evaluation"] ?? r["evaluation_detail"];
       const rawNotesEns = r["notes_enseignant"];
       const rawCommentaire = r["commentaire_enseignant"];
       const rawHash = r["hash_sha256"];
