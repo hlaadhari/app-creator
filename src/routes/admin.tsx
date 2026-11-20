@@ -30,6 +30,7 @@ import {
   type DemandeEnseignant,
 } from "@/lib/supabase/teacher-requests";
 import { TeacherRequestsQueue } from "@/components/teacher/TeacherRequestsQueue";
+import { NotebookTutorSettingCard } from "@/components/admin/NotebookTutorSettingCard";
 import { AuthModal } from "@/components/AuthModal";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -713,6 +714,7 @@ function AdminDashboardPage() {
 
           {/* Onglet 3 : Supervision Système & Services */}
           <TabsContent value="supervision" className="space-y-4">
+            <NotebookTutorSettingCard isDemo={isDemo} />
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
               <Card>
                 <CardHeader className="pb-2">

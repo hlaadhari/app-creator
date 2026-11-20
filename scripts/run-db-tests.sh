@@ -22,5 +22,6 @@ psql "$DB_URL" -v ON_ERROR_STOP=1 -f supabase/tests/06_epreuve_ecrite_serveur.sq
 psql "$DB_URL" -v ON_ERROR_STOP=1 -f supabase/tests/07_sauvegarde_fichiers_lot.sql
 psql "$DB_URL" -v ON_ERROR_STOP=1 -f supabase/tests/08_notifications.sql
 psql "$DB_URL" -v ON_ERROR_STOP=1 -f supabase/tests/09_performance_et_droits.sql
+psql "$DB_URL" -v ON_ERROR_STOP=1 -f supabase/tests/10_parametres_application.sql
 
 echo "==> Tous les tests SQL PostgreSQL se sont terminés avec succès."

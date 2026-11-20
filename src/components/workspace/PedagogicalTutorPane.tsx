@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import type { TutorMessage, TutorContext } from "@/lib/tutor/types";
 import { interagirAvecTuteur } from "@/lib/tutor/engine";
+import { AskNotebookButton } from "@/components/tutor/AskNotebookButton";
 
 interface PedagogicalTutorPaneProps {
   context: TutorContext;
@@ -133,6 +134,40 @@ export function PedagogicalTutorPane({ context, onSelectCriterion }: Pedagogical
             >
               Mode Guidé
             </Badge>
+          )}
+
+          {!isExam && (
+            <AskNotebookButton
+              compact
+              tutorContext={context}
+              isExamMode={isExam}
+              buildContext={() => {
+                const failedCrit =
+                  context.activeCriteria?.find(
+                    (c) =>
+                      (context.selectedCriterionCode && c.code === context.selectedCriterionCode) ||
+                      c.ok === false,
+                  ) ?? null;
+                const lastUserMsg = [...messages].reverse().find((m) => m.role === "user")?.content;
+                return {
+                  source: "atelier",
+                  titreSujet: context.sujetTitre ?? context.sujetId,
+                  critereEchoue: failedCrit
+                    ? {
+                        code: failedCrit.code,
+                        titre: failedCrit.label,
+                        message: failedCrit.message,
+                      }
+                    : null,
+                  fichierActif: context.activeFile,
+                  contenuFichier: context.fileContent,
+                  question:
+                    inputPrompt.trim() ||
+                    lastUserMsg ||
+                    "Peux-tu m'aider à comprendre ce critère ?",
+                };
+              }}
+            />
           )}
 
           {!isExam && (
